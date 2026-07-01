@@ -1,4 +1,4 @@
-import { BrandText } from "./Logo.jsx";
+import Logo from "./Logo.jsx";
 
 const FOOTER_LINKS = [
   { href: "#services", label: "Services" },
@@ -14,7 +14,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="container footer-inner">
         <div className="footer-brand">
-          <BrandText />
+          <Logo variant="footer" />
           <p>Protecting what matters most, around the clock.</p>
         </div>
         <div className="footer-links">

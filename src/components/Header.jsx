@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrandMark, BrandText } from "./Logo.jsx";
+import Logo from "./Logo.jsx";
 
 const NAV_LINKS = [
   { href: "#services", label: "Services" },
@@ -15,8 +15,7 @@ export default function Header() {
     <header className={`site-header${open ? " open" : ""}`} id="top">
       <div className="container header-inner">
         <a href="#top" className="brand" aria-label="Jama Go Security home">
-          <BrandMark />
-          <BrandText />
+          <Logo variant="header" />
         </a>
 
         <nav className="main-nav" aria-label="Main navigation">
