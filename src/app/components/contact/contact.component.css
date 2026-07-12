@@ -64,10 +64,21 @@
 .contact-hero-bg {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(125deg, rgba(12, 31, 61, 0.94) 0%, rgba(26, 123, 181, 0.82) 52%, rgba(246, 153, 61, 0.38) 100%),
-    url('https://images.unsplash.com/photo-1557597774-9d273605dfa8?auto=format&fit=crop&w=1600&q=80')
-      center / cover no-repeat;
+  z-index: 1;
+  background: linear-gradient(
+    125deg,
+    rgba(12, 31, 61, 0.92) 0%,
+    rgba(26, 123, 181, 0.78) 52%,
+    rgba(246, 153, 61, 0.35) 100%
+  );
+}
+
+.contact-hero-photo {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   transform: scale(1.04);
   animation: contactHeroZoom 18s ease-in-out infinite alternate;
 }
@@ -80,6 +91,7 @@
 .contact-hero-grid {
   position: absolute;
   inset: 0;
+  z-index: 2;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
@@ -93,6 +105,7 @@
   filter: blur(80px);
   opacity: 0.55;
   animation: contactGlowDrift 12s ease-in-out infinite alternate;
+  z-index: 2;
 }
 
 .contact-hero-glow--1 {
@@ -120,6 +133,7 @@
 .contact-hero-overlay {
   position: absolute;
   inset: 0;
+  z-index: 3;
   background:
     radial-gradient(circle at 20% 20%, rgba(37, 148, 210, 0.28), transparent 45%),
     radial-gradient(circle at 80% 80%, rgba(246, 153, 61, 0.2), transparent 40%);
@@ -323,10 +337,14 @@
   transform: scale(1.1);
 }
 
-.contact-stat--blue .contact-stat-icon { background: rgba(37, 148, 210, 0.16); box-shadow: 0 8px 20px -10px rgba(37, 148, 210, 0.4); }
-.contact-stat--gold .contact-stat-icon { background: rgba(246, 153, 61, 0.18); box-shadow: 0 8px 20px -10px rgba(246, 153, 61, 0.4); }
-.contact-stat--teal .contact-stat-icon { background: rgba(13, 148, 136, 0.16); box-shadow: 0 8px 20px -10px rgba(13, 148, 136, 0.35); }
-.contact-stat--coral .contact-stat-icon { background: rgba(249, 115, 22, 0.16); box-shadow: 0 8px 20px -10px rgba(249, 115, 22, 0.35); }
+.contact-stat-icon svg {
+  display: block;
+}
+
+.contact-stat--blue .contact-stat-icon { background: rgba(37, 148, 210, 0.16); color: var(--contact-sky); box-shadow: 0 8px 20px -10px rgba(37, 148, 210, 0.4); }
+.contact-stat--gold .contact-stat-icon { background: rgba(246, 153, 61, 0.18); color: var(--contact-gold-deep); box-shadow: 0 8px 20px -10px rgba(246, 153, 61, 0.4); }
+.contact-stat--teal .contact-stat-icon { background: rgba(13, 148, 136, 0.16); color: var(--contact-teal); box-shadow: 0 8px 20px -10px rgba(13, 148, 136, 0.35); }
+.contact-stat--coral .contact-stat-icon { background: rgba(249, 115, 22, 0.16); color: var(--contact-coral); box-shadow: 0 8px 20px -10px rgba(249, 115, 22, 0.35); }
 
 .contact-stat strong,
 .contact-stat-value {
@@ -1246,9 +1264,80 @@
   left: -20px;
 }
 
-.contact-why-icon {
-  font-size: 36px;
+.contact-submit--whatsapp {
+  background: linear-gradient(135deg, #25d366, #1ebe57) !important;
+  box-shadow: 0 12px 32px -10px rgba(37, 211, 102, 0.55) !important;
+}
+
+.contact-submit--whatsapp:hover {
+  box-shadow: 0 16px 40px -10px rgba(37, 211, 102, 0.7) !important;
+}
+
+.contact-form-email-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--contact-sky);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.contact-form-email-link:hover {
+  color: var(--contact-blue);
+}
+
+.contact-visit-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.contact-visit-photo {
+  position: relative;
+  margin: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  box-shadow: var(--contact-shadow);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.contact-visit-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
+  transition: transform 0.35s ease;
+}
+
+.contact-visit-photo:hover img {
+  transform: scale(1.06);
+}
+
+.contact-visit-photo figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(0deg, rgba(12, 31, 61, 0.85), transparent);
+}
+
+.contact-why-icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
   margin-bottom: 16px;
 }
 
@@ -1502,6 +1591,10 @@
   .contact-faq-body,
   .contact-faq-body.open {
     padding-left: 22px;
+  }
+
+  .contact-visit-gallery {
+    grid-template-columns: 1fr;
   }
 
   .contact-hours-hero {
