@@ -16,6 +16,7 @@
     "dev": "node scripts/run-with-node.mjs ng serve",
     "start": "node scripts/run-with-node.mjs ng serve",
     "build": "node scripts/run-with-node.mjs ng build",
+    "deploy": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1",
     "watch": "node scripts/run-with-node.mjs ng build --watch --configuration development",
     "preview": "node scripts/run-with-node.mjs ng serve --configuration production"
   },
