@@ -8,22 +8,19 @@
       @for (item of navItems; track item.label) {
         @if (isDropdown(item)) {
           <div
-            #dropdownEl
-            [attr.data-label]="item.label"
             class="nav-dropdown"
             [class]="'nav-dropdown nav-dropdown--' + item.menu"
-            [class.open]="openDropdown === item.label"
+            [class.open]="isDropdownOpen(item.label)"
             [class.active]="childIsActive(item)"
             (mouseenter)="onDropdownEnter(item.label)"
             (mouseleave)="onDropdownLeave()"
-            (focusin)="onDropdownEnter(item.label)"
-            (focusout)="onDropdownBlur($event, item.label)"
           >
             <button
               type="button"
               class="nav-link nav-link--dropdown"
-              [attr.aria-expanded]="openDropdown === item.label"
+              [attr.aria-expanded]="isDropdownOpen(item.label)"
               aria-haspopup="true"
+              (mousedown)="onDropdownMouseDown($event)"
               (click)="!isDesktopNav && toggleMobileDropdown(item.label)"
             >
               {{ item.label }}

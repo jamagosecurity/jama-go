@@ -2,10 +2,6 @@ import {
   Component,
   OnInit,
   OnDestroy,
-  ElementRef,
-  ViewChildren,
-  QueryList,
-  AfterViewInit,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
@@ -18,11 +14,7 @@ import {
   NavItem,
   NavLink,
 } from '../../models/nav.model';
-import {
-  CLOSE_DELAY_MS,
-  DESKTOP_MQ,
-  isPointerInSafeZone,
-} from '../../utils/mega-menu.utils';
+import { DESKTOP_MQ } from '../../utils/mega-menu.utils';
 
 @Component({
   selector: 'app-header',
@@ -31,7 +23,7 @@ import {
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './header.component.html',
 })
-export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
+export class HeaderComponent implements OnInit, OnDestroy {
   readonly navItems = NAV_ITEMS;
 
   mobileOpen = false;
@@ -40,17 +32,12 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   openDropdown: string | null = null;
   isDesktopNav = true;
 
-  @ViewChildren('dropdownEl') dropdownEls!: QueryList<ElementRef<HTMLElement>>;
-
-  private closeTimer: ReturnType<typeof setTimeout> | null = null;
-  private dropdownMap = new Map<string, HTMLElement>();
   private mediaQuery = window.matchMedia(DESKTOP_MQ);
   private onHashChange = () => this.syncNavState();
   private onMediaChange = (e: MediaQueryListEvent) => {
     this.isDesktopNav = e.matches;
+    if (e.matches) this.openDropdown = null;
   };
-  private onMouseMove = (e: MouseEvent) => this.handleMouseMove(e);
-  private onPointerDown = (e: PointerEvent) => this.handlePointerDown(e);
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') this.closeDropdown();
   };
@@ -70,21 +57,11 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     document.addEventListener('keydown', this.onKeyDown);
   }
 
-  ngAfterViewInit(): void {
-    this.rebuildDropdownMap();
-    this.dropdownEls.changes.subscribe(() => this.rebuildDropdownMap());
-    document.addEventListener('mousemove', this.onMouseMove, { passive: true });
-    document.addEventListener('pointerdown', this.onPointerDown);
-  }
-
   ngOnDestroy(): void {
-    this.cancelClose();
     this.navSub.unsubscribe();
     window.removeEventListener('hashchange', this.onHashChange);
     this.mediaQuery.removeEventListener('change', this.onMediaChange);
     document.removeEventListener('keydown', this.onKeyDown);
-    document.removeEventListener('mousemove', this.onMouseMove);
-    document.removeEventListener('pointerdown', this.onPointerDown);
   }
 
   isDropdown(item: NavItem): item is NavDropdownItem {
@@ -124,23 +101,18 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     return duplicates.length === 1;
   }
 
+  onDropdownMouseDown(event: MouseEvent): void {
+    if (this.isDesktopNav) event.preventDefault();
+  }
+
   onDropdownEnter(label: string): void {
-    if (!this.isDesktopNav) return;
-    this.cancelClose();
+    if (this.isDesktopNav) return;
     this.openDropdown = label;
   }
 
   onDropdownLeave(): void {
-    if (!this.isDesktopNav) return;
-    this.scheduleClose();
-  }
-
-  onDropdownBlur(event: FocusEvent, label: string): void {
-    if (!this.isDesktopNav) return;
-    const current = event.currentTarget as HTMLElement;
-    if (!current.contains(event.relatedTarget as Node)) {
-      this.scheduleClose();
-    }
+    if (this.isDesktopNav) return;
+    this.openDropdown = null;
   }
 
   toggleMobileDropdown(label: string): void {
@@ -156,54 +128,17 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mobileOpen = !this.mobileOpen;
   }
 
+  isDropdownOpen(label: string): boolean {
+    return !this.isDesktopNav && this.openDropdown === label;
+  }
+
   private syncNavState(): void {
     const [path, hash = ''] = this.router.url.split('#');
     this.activePath = path || '/';
     this.activeHash = hash ? `#${hash}` : window.location.hash;
   }
 
-  private rebuildDropdownMap(): void {
-    this.dropdownMap.clear();
-    this.dropdownEls.forEach((ref) => {
-      const label = ref.nativeElement.dataset['label'];
-      if (label) this.dropdownMap.set(label, ref.nativeElement);
-    });
-  }
-
-  private cancelClose(): void {
-    if (this.closeTimer) {
-      clearTimeout(this.closeTimer);
-      this.closeTimer = null;
-    }
-  }
-
   private closeDropdown(): void {
-    this.cancelClose();
     this.openDropdown = null;
-  }
-
-  private scheduleClose(): void {
-    this.cancelClose();
-    this.closeTimer = setTimeout(() => {
-      this.openDropdown = null;
-      this.closeTimer = null;
-    }, CLOSE_DELAY_MS);
-  }
-
-  private handleMouseMove(e: MouseEvent): void {
-    if (!this.openDropdown || !this.isDesktopNav) return;
-    const activeEl = this.dropdownMap.get(this.openDropdown);
-    if (!activeEl) return;
-    if (isPointerInSafeZone(e.clientX, e.clientY, activeEl)) {
-      this.cancelClose();
-    }
-  }
-
-  private handlePointerDown(e: PointerEvent): void {
-    if (!this.openDropdown || !this.isDesktopNav) return;
-    const activeEl = this.dropdownMap.get(this.openDropdown);
-    if (activeEl && !activeEl.contains(e.target as Node)) {
-      this.closeDropdown();
-    }
   }
 }
