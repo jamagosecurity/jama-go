@@ -6,8 +6,10 @@ import {
   ViewChildren,
   QueryList,
   AfterViewInit,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
 } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
 import { LogoComponent } from '../logo/logo.component';
 import { NAV_ITEMS } from '../../data/nav.data';
 import {
@@ -33,7 +35,8 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly navItems = NAV_ITEMS;
 
   mobileOpen = false;
-  activeHash = '#top';
+  activePath = '/';
+  activeHash = '';
   openDropdown: string | null = null;
   isDesktopNav = true;
 
@@ -42,7 +45,7 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   private closeTimer: ReturnType<typeof setTimeout> | null = null;
   private dropdownMap = new Map<string, HTMLElement>();
   private mediaQuery = window.matchMedia(DESKTOP_MQ);
-  private onHashChange = () => this.syncHash();
+  private onHashChange = () => this.syncNavState();
   private onMediaChange = (e: MediaQueryListEvent) => {
     this.isDesktopNav = e.matches;
   };
@@ -51,9 +54,16 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') this.closeDropdown();
   };
+  private readonly navSub;
+
+  constructor(private readonly router: Router) {
+    this.navSub = this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => this.syncNavState());
+  }
 
   ngOnInit(): void {
-    this.syncHash();
+    this.syncNavState();
     this.isDesktopNav = this.mediaQuery.matches;
     window.addEventListener('hashchange', this.onHashChange);
     this.mediaQuery.addEventListener('change', this.onMediaChange);
@@ -69,6 +79,7 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.cancelClose();
+    this.navSub.unsubscribe();
     window.removeEventListener('hashchange', this.onHashChange);
     this.mediaQuery.removeEventListener('change', this.onMediaChange);
     document.removeEventListener('keydown', this.onKeyDown);
@@ -95,9 +106,11 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     return children as NavLink[];
   }
 
-  isActive(href: string, hash = this.activeHash): boolean {
-    if (href === '#top') return hash === '#top' || hash === '';
-    return hash === href;
+  isActive(href: string): boolean {
+    if (href === '/contact') return this.activePath === '/contact';
+    if (href === '/') return this.activePath === '/' && !this.activeHash;
+    if (href.startsWith('/#')) return this.activePath === '/' && this.activeHash === href.slice(1);
+    return false;
   }
 
   childIsActive(item: NavDropdownItem): boolean {
@@ -143,8 +156,10 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mobileOpen = !this.mobileOpen;
   }
 
-  private syncHash(): void {
-    this.activeHash = window.location.hash || '#top';
+  private syncNavState(): void {
+    const [path, hash = ''] = this.router.url.split('#');
+    this.activePath = path || '/';
+    this.activeHash = hash ? `#${hash}` : window.location.hash;
   }
 
   private rebuildDropdownMap(): void {

@@ -1,0 +1,52 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Wenneker Resume/CV (XeLaTeX + Arabic)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+\setmainfont{XCharter}
+\newfontfamily\arabicfont{Amiri}[Script=Arabic,Scale=0.95]
+
+\usepackage[utf8]{inputenc}
+\usepackage[top=1cm,left=1cm,right=1cm,bottom=1cm]{geometry}
+
+\usepackage{graphicx}
+\usepackage{flowfram}
+\usepackage{url}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{enumitem}
+\setlist{noitemsep,nolistsep}
+
+\setlength{\columnsep}{\baselineskip}
+
+\newflowframe{0.2\textwidth}{\textheight}{0pt}{0pt}[left]
+\newlength{\LeftMainSep}
+\setlength{\LeftMainSep}{0.2\textwidth}
+\addtolength{\LeftMainSep}{1\columnsep}
+
+\newstaticframe{1.5pt}{\textheight}{\LeftMainSep}{0pt}
+
+\begin{staticcontents}{1}
+\hfill
+\tikz{\draw[loosely dotted,color=RoyalBlue,line width=1.5pt,yshift=0](0,0) -- (0,\textheight);}
+\hfill\mbox{}
+\end{staticcontents}
+
+\addtolength{\LeftMainSep}{1.5pt}
+\addtolength{\LeftMainSep}{1\columnsep}
+\newflowframe{0.7\textwidth}{\textheight}{\LeftMainSep}{0pt}[main01]
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\newcommand{\userinformation}[1]{\renewcommand{\userinformation}{#1}}
+\newcommand{\cvheading}[1]{{\Huge\bfseries\color{RoyalBlue} #1} \par\vspace{.6\baselineskip}}
+\newcommand{\cvsubheading}[1]{{\Large\bfseries #1} \bigbreak}
+\newcommand{\Sep}{\vspace{1em}}
+\newcommand{\SmallSep}{\vspace{0.5em}}
+\newcommand{\aboutme}[2]{\textbf{\color{RoyalBlue} #1}~~#2\par\Sep}
+\newcommand{\CVSection}[1]{{\Large\textbf{#1}}\par\SmallSep}
+\newcommand{\CVItem}[2]{\textbf{\color{RoyalBlue} #1}\par#2\SmallSep}
+\newcommand{\bluebullet}{\textcolor{RoyalBlue}{$\circ$}~~}

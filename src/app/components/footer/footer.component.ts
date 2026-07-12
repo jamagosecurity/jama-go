@@ -12,11 +12,11 @@ export class FooterComponent {
   readonly year = new Date().getFullYear();
 
   readonly footerLinks = [
-    { href: '#services', label: 'Services' },
-    { href: '#why', label: 'Why Us' },
-    { href: '#stats', label: 'Results' },
-    { href: '#support', label: 'Support' },
-    { href: '#team', label: 'Our Team' },
-    { href: '#contact', label: 'Contact' },
+    { href: '/#services', label: 'Services' },
+    { href: '/#why', label: 'Why Us' },
+    { href: '/#stats', label: 'Results' },
+    { href: '/#support', label: 'Support' },
+    { href: '/#team', label: 'Our Team' },
+    { href: '/contact', label: 'Contact' },
   ];
 }

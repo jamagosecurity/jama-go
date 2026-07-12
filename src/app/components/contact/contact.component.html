@@ -1,47 +1,331 @@
-<section class="section cta-section" id="contact">
-  <div class="container cta-inner">
-    <div appReveal class="cta-copy">
-      <span class="kicker">Get Protected</span>
-      <h2>Ready for security that never sleeps?</h2>
-      <p>
-        Tell us about your site and we'll build a tailored security plan — free of charge.
+<section class="contact-page" id="contact">
+  <!-- Hero -->
+  <header class="contact-hero">
+    <div class="contact-hero-bg" aria-hidden="true"></div>
+    <div class="contact-hero-grid" aria-hidden="true"></div>
+    <div class="contact-hero-glow contact-hero-glow--1" aria-hidden="true"></div>
+    <div class="contact-hero-glow contact-hero-glow--2" aria-hidden="true"></div>
+    <div class="contact-hero-overlay" aria-hidden="true"></div>
+
+    <div class="container contact-hero-inner">
+      <span class="contact-kicker contact-kicker--hero" appReveal>
+        <span class="contact-kicker-dot"></span>
+        We're Here For You
+      </span>
+      <h1 appReveal>
+        Contact <span class="contact-hero-brand">{{ companyEn }}</span>
+      </h1>
+      <p class="contact-hero-lead" appReveal>
+        {{ companySub }}
       </p>
-      <ul class="contact-list">
-        <li>📞 <a href="tel:+10000000000">+1 (000) 000-0000</a></li>
-        <li>✉️ <a href="mailto:hello&#64;jamago.security">hello&#64;jamago.security</a></li>
-        <li>📍 Available nationwide, 24 hours a day</li>
-      </ul>
+      <p class="contact-hero-ar" dir="rtl" lang="ar" appReveal>{{ companyAr }}</p>
+      <p class="contact-hero-text" appReveal>
+        Questions about CCTV, access control, alarms, or a tailored security plan? Our engineers
+        are ready to protect your site with professional installation and 24/7 support.
+      </p>
+
+      <div class="contact-hero-actions" appReveal>
+        <a [href]="'tel:' + primaryPhone.tel" class="contact-hero-btn contact-hero-btn--primary">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="2"/></svg>
+          Call Now
+        </a>
+        <a [href]="whatsappUrl" class="contact-hero-btn contact-hero-btn--whatsapp" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <a [href]="mapLinkUrl" class="contact-hero-btn contact-hero-btn--ghost" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 21s7-4.5 7-11a7 7 0 10-14 0c0 6.5 7 11 7 11z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="2"/></svg>
+          Get Directions
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Floating stats -->
+  <div class="container contact-stats-wrap">
+    <div class="contact-stats" appReveal>
+      @for (stat of heroStats; track stat.label) {
+        <article class="contact-stat" [class]="'contact-stat--' + stat.tone">
+          <span class="contact-stat-icon">{{ stat.icon }}</span>
+          <strong
+            class="contact-stat-value"
+            [appCountUp]="stat.count"
+            [countPrefix]="stat.prefix ?? ''"
+            [countSuffix]="stat.suffix ?? ''"
+            [countDecimals]="stat.decimals ?? 0"
+          ></strong>
+          <span>{{ stat.label }}</span>
+        </article>
+      }
+    </div>
+  </div>
+
+  <!-- Trust strip -->
+  <div class="container" appReveal>
+    <div class="contact-trust">
+      @for (badge of trustBadges; track badge) {
+        <span>{{ badge }}</span>
+      }
+    </div>
+  </div>
+
+  <!-- Contact channels -->
+  <section class="contact-section contact-section--channels">
+    <div class="contact-channels-bg" aria-hidden="true">
+      <div class="contact-channels-mesh"></div>
+      <div class="contact-channels-grid"></div>
+      <div class="contact-channels-ring"></div>
+      <div class="contact-channels-orb contact-channels-orb--1"></div>
+      <div class="contact-channels-orb contact-channels-orb--2"></div>
+      <div class="contact-channels-orb contact-channels-orb--3"></div>
+      <div class="contact-channels-orb contact-channels-orb--4"></div>
     </div>
 
-    <form appReveal class="quote-form" (submit)="handleSubmit($event)">
-      <div class="field">
-        <label for="name">Full name</label>
-        <input id="name" name="name" type="text" placeholder="Jane Doe" required />
+    <div class="container contact-channels-inner">
+      <div class="contact-section-head" appReveal>
+        <span class="contact-kicker">Reach Out</span>
+        <h2>Get in Touch</h2>
+        <p>Choose the most convenient way to reach our security team in Qatar.</p>
       </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" placeholder="jane@company.com" required />
-      </div>
-      <div class="field">
-        <label for="service">Service needed</label>
-        <select id="service" name="service">
-          @for (option of serviceOptions; track option) {
-            <option [value]="option">{{ option }}</option>
-          }
-        </select>
-      </div>
-      <div class="field">
-        <label for="msg">Message</label>
-        <textarea id="msg" name="msg" rows="3" placeholder="Tell us about your site…"></textarea>
-      </div>
-      <button class="btn btn-primary btn-block" type="submit" [disabled]="sent">
-        @if (sent) {
-          ✓ Request Sent — We'll be in touch
-        } @else {
-          Request Free Assessment
+
+      <div class="contact-channels">
+        @for (channel of channels; track channel.id) {
+          <a
+            appReveal
+            class="contact-channel"
+            [class]="'contact-channel--' + channel.tone"
+            [href]="channel.href"
+            [attr.target]="channel.id === 'visit' || channel.id === 'whatsapp' ? '_blank' : null"
+            [attr.rel]="channel.id === 'visit' || channel.id === 'whatsapp' ? 'noopener noreferrer' : null"
+          >
+            <span class="contact-channel-shine" aria-hidden="true"></span>
+            <span class="contact-channel-icon">
+              @switch (channel.id) {
+                @case ('call') {
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="2"/></svg>
+                }
+                @case ('whatsapp') {
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                }
+                @case ('email') {
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2"/><path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="2"/></svg>
+                }
+                @default {
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M12 21s7-4.5 7-11a7 7 0 10-14 0c0 6.5 7 11 7 11z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="2"/></svg>
+                }
+              }
+            </span>
+            <span class="contact-channel-badge">{{ channel.badge }}</span>
+            <span class="contact-channel-label">{{ channel.label }}</span>
+            <strong>{{ channel.value }}</strong>
+            <span class="contact-channel-note">{{ channel.note }}</span>
+            <span class="contact-channel-arrow" aria-hidden="true">→</span>
+          </a>
         }
-      </button>
-      <p class="form-note">We'll respond within one business hour.</p>
-    </form>
-  </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Form + map + hours -->
+  <section class="contact-section contact-section--mesh">
+    <div class="container contact-form-grid">
+      <form appReveal class="contact-form-card" (submit)="handleSubmit($event)">
+        <div class="contact-form-glow" aria-hidden="true"></div>
+        <div class="contact-form-head">
+          <span class="contact-form-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Send us a Message</h3>
+            <p>Our team responds within 2 hours</p>
+          </div>
+        </div>
+
+        <div class="contact-form-row">
+          <div class="field contact-field">
+            <label for="name">Full Name *</label>
+            <input id="name" name="name" type="text" placeholder="Your name" required />
+          </div>
+          <div class="field contact-field">
+            <label for="email">Email Address *</label>
+            <input id="email" name="email" type="email" placeholder="you@company.com" required />
+          </div>
+        </div>
+
+        <div class="contact-form-row">
+          <div class="field contact-field">
+            <label for="phone">Phone Number</label>
+            <input id="phone" name="phone" type="tel" placeholder="+974 3064 4006" />
+          </div>
+          <div class="field contact-field">
+            <label for="service">Service Needed *</label>
+            <select id="service" name="service" required>
+              @for (option of serviceOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="field contact-field">
+          <label for="msg">Your Message *</label>
+          <textarea id="msg" name="msg" rows="4" placeholder="Tell us about your site or project…" required></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-block contact-submit" type="submit" [disabled]="sent()">
+          @if (sent()) {
+            ✓ Message Sent — We'll be in touch
+          } @else {
+            Send Message
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
+        <p class="contact-form-note">Secure enquiry · No spam · Free consultation</p>
+      </form>
+
+      <div class="contact-side">
+        <div class="contact-map-card" appReveal>
+          <div class="contact-map-frame">
+            <iframe
+              title="Jama Go Security Equipment location"
+              [src]="mapEmbedUrl"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+            <a class="contact-map-pin" [href]="mapLinkUrl" target="_blank" rel="noopener noreferrer">
+              <span>📍</span> Open in Maps
+            </a>
+          </div>
+          <div class="contact-map-caption">
+            <strong>Showroom — Doha, Qatar</strong>
+            <span>{{ address }}</span>
+          </div>
+        </div>
+
+        <div class="contact-hours-card" appReveal>
+          <div class="contact-hours-head">
+            <span class="contact-hours-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <h3>Office Hours</h3>
+          </div>
+          @for (slot of officeHours; track slot.day) {
+            <div class="contact-hours-row" [class]="'contact-hours-row--' + slot.tone">
+              <span>{{ slot.day }}</span>
+              <span class="contact-hours-pill">{{ slot.hours }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visit office -->
+  <section class="contact-section">
+    <div class="container contact-visit-grid">
+      <div class="contact-visit-copy" appReveal>
+        <span class="contact-kicker">Our Office</span>
+        <h2>Visit Our Showroom</h2>
+        <p>
+          Located on Salwa Road in Doha — easy to reach for consultations, equipment demos, and
+          project planning with our security engineers.
+        </p>
+
+        <div class="contact-visit-cards">
+          <div class="contact-visit-item">
+            <span class="contact-visit-icon contact-visit-icon--violet">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 21s7-4.5 7-11a7 7 0 10-14 0c0 6.5 7 11 7 11z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="2"/></svg>
+            </span>
+            <div>
+              <strong>Full Address</strong>
+              <p>{{ address }}</p>
+            </div>
+          </div>
+
+          <div class="contact-visit-item">
+            <span class="contact-visit-icon contact-visit-icon--blue">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="2"/></svg>
+            </span>
+            <div>
+              <strong>Phone Numbers</strong>
+              <div class="contact-chip-row">
+                @for (phone of phones; track phone.tel) {
+                  <a class="contact-chip" [href]="'tel:' + phone.tel">{{ phone.display }}</a>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-visit-item">
+            <span class="contact-visit-icon contact-visit-icon--gold">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2"/><path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="2"/></svg>
+            </span>
+            <div>
+              <strong>Email</strong>
+              <div class="contact-chip-row">
+                @for (email of emails; track email) {
+                  <a class="contact-chip" [href]="'mailto:' + email">{{ email }}</a>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="contact-why-card" appReveal>
+        <div class="contact-why-glow" aria-hidden="true"></div>
+        <span class="contact-why-icon">🌐</span>
+        <h3>Why Choose Us?</h3>
+        <ul>
+          @for (item of whyChoose; track item) {
+            <li><span aria-hidden="true">✦</span> {{ item }}</li>
+          }
+        </ul>
+        <a class="contact-why-cta" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
+          Chat on WhatsApp →
+        </a>
+      </aside>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="contact-section contact-section--mesh contact-faq-section">
+    <div class="container">
+      <div class="contact-section-head" appReveal>
+        <span class="contact-kicker">Common Questions</span>
+        <h2>Frequently Asked Questions</h2>
+      </div>
+
+      <div class="contact-faq-list">
+        @for (faq of faqs; track faq.question; let i = $index) {
+          <article appReveal class="contact-faq" [class.open]="openFaq() === i">
+            <button type="button" class="contact-faq-trigger" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaq() === i">
+              <span class="contact-faq-num">{{ i + 1 }}</span>
+              <span class="contact-faq-q">{{ faq.question }}</span>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="contact-faq-body" [class.open]="openFaq() === i">
+              <p>{{ faq.answer }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <a class="contact-whatsapp-fab" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+    <span class="contact-whatsapp-pulse" aria-hidden="true"></span>
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
 </section>
