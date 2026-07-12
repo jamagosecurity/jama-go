@@ -69,6 +69,7 @@ export class ContactComponent {
   readonly mapLng = 51.46524245838021;
   readonly mapCoords = `${this.mapLat},${this.mapLng}`;
   readonly mapLinkUrl = `https://www.google.com/maps?q=${this.mapCoords}`;
+  readonly mapDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${this.mapCoords}`;
   readonly mapEmbedUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
     `https://www.google.com/maps?q=${this.mapCoords}&z=16&output=embed`,
   );
@@ -81,7 +82,9 @@ export class ContactComponent {
 
   readonly emails = ['info@jamago.qa', 'newton@jamago.qa'];
   readonly primaryPhone = this.phones[0];
+  readonly callUrl = `tel:${this.primaryPhone.tel}`;
   readonly whatsappUrl = `https://wa.me/${this.primaryPhone.tel.replace('+', '')}`;
+  readonly whatsappHeroUrl = `${this.whatsappUrl}?text=${encodeURIComponent('Hello Jama Go Security, I would like to enquire about your security services.')}`;
 
   readonly heroImageUrl =
     'https://images.unsplash.com/photo-1563986768609-322da97575a0?auto=format&fit=crop&w=1600&q=80';

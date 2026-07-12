@@ -139,9 +139,17 @@
     radial-gradient(circle at 80% 80%, rgba(246, 153, 61, 0.2), transparent 40%);
 }
 
+.contact-hero-bg,
+.contact-hero-photo,
+.contact-hero-grid,
+.contact-hero-glow,
+.contact-hero-overlay {
+  pointer-events: none;
+}
+
 .contact-hero-inner {
   position: relative;
-  z-index: 1;
+  z-index: 5;
   padding: clamp(64px, 9vw, 104px) 24px clamp(96px, 11vw, 128px);
   text-align: center;
   color: #fff;
@@ -230,6 +238,7 @@
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
