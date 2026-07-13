@@ -17,3 +17,10 @@ pnpm-debug.log*
 !.vscode/extensions.json
 .idea
 .DS_Store
+
+# .NET / ASP.NET API
+jamago-api/**/bin/
+jamago-api/**/obj/
+jamago-api/appsettings.Development.json
+jamago-api/appsettings.Production.json
+jamago-api/.vs/
