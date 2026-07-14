@@ -61,11 +61,9 @@ export class ContactComponent {
   private readonly contactService = inject(ContactService);
 
   readonly companyEn = 'Jama Go Security Equipment';
-  readonly companySub = 'Jama Q Security Solutions';
-  readonly companyAr = 'جاما جو للمعدات الامنية';
 
   readonly address =
-    'Showroom, Unit 41, Building No. 349, Street 340, Zone 56, Al Ain Complex, Salwa Road, Doha, Qatar';
+    'Unit 41, Zone 56, Street 340, Building No. 349 Al Ain Complex, Salwa Road, Doha - Qatar';
 
   readonly mapLat = 25.244419707160755;
   readonly mapLng = 51.46524245838021;
