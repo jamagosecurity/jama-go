@@ -3,7 +3,7 @@
     <div>
       <span class="admin-kicker">Inspection form</span>
       <h1>Quarterly site inspection</h1>
-      <p>Capture camera, network, VMS, UPS and ANPR details.</p>
+      <p>Capture camera, network, VMS, UPS, ANPR and K'Poi details.</p>
     </div>
     <a mat-stroked-button routerLink="/technician">Back to dashboard</a>
   </header>
@@ -79,6 +79,14 @@
           <mat-form-field appearance="outline" class="span-2"><mat-label>Configuration</mat-label><input matInput formControlName="configuration" /></mat-form-field>
           <mat-form-field appearance="outline" class="span-2"><mat-label>Remarks</mat-label><textarea matInput rows="2" formControlName="remarks"></textarea></mat-form-field>
         </div>
+      </section>
+
+      <section class="tech-section" formGroupName="kpoi">
+        <h2>K'Poi</h2>
+        <mat-form-field appearance="outline" class="tech-full-width">
+          <mat-label>K'Poi details</mat-label>
+          <textarea matInput rows="4" formControlName="details"></textarea>
+        </mat-form-field>
       </section>
 
       <div class="tech-form-actions">

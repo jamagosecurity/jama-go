@@ -34,5 +34,15 @@
         }
       </div>
     </div>
+
+    @if (item.currentInspection; as inspection) {
+      <div class="admin-panel">
+        <div class="tech-header-actions">
+          <h2>Key inspection info · Quarter {{ inspection.quarter }}</h2>
+          <span class="tech-status">{{ inspection.status }}</span>
+        </div>
+        <app-technician-inspection-sections [inspection]="inspection" />
+      </div>
+    }
   }
 </section>

@@ -74,6 +74,9 @@ export class TechnicianInspectionFormComponent implements OnInit {
       softwareVersion: [''],
       remarks: [''],
     }),
+    kpoi: this.fb.group({
+      details: [''],
+    }),
   });
 
   protected get cameras(): FormArray {
@@ -148,6 +151,7 @@ export class TechnicianInspectionFormComponent implements OnInit {
           ...raw.anpr,
           anprInstalled: raw.anpr.anprInstalled ?? false,
         },
+        kpoi: raw.kpoi.details?.trim() ? { details: raw.kpoi.details.trim() } : null,
       })
       .pipe(finalize(() => this.saving.set(false)))
       .subscribe({
@@ -192,6 +196,7 @@ export class TechnicianInspectionFormComponent implements OnInit {
       vms: inspection.vms ?? {},
       upsGeneral: inspection.upsGeneral ?? { generatorAvailable: false },
       anpr: inspection.anpr ?? { anprInstalled: false },
+      kpoi: inspection.kpoi ?? { details: '' },
     });
   }
 }

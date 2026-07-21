@@ -13,12 +13,15 @@
       <a mat-stroked-button routerLink="/technician">Back to dashboard</a>
     </header>
 
-    <section class="admin-panel tech-section">
-      <h2>Quarterly inspections ({{ item.inspections.length }})</h2>
-      @for (inspection of item.inspections; track inspection.id) {
-        <p>Quarter {{ inspection.quarter }} — {{ inspection.status }} · {{ inspection.cameras.length }} cameras</p>
-      }
-    </section>
+    @for (inspection of item.inspections; track inspection.id) {
+      <div class="admin-panel">
+        <div class="tech-header-actions">
+          <h2>Quarter {{ inspection.quarter }} inspection</h2>
+          <span class="tech-status">{{ inspection.status }}</span>
+        </div>
+        <app-technician-inspection-sections [inspection]="inspection" />
+      </div>
+    }
 
     <section class="admin-panel tech-section">
       <h2>Invoices ({{ item.invoices.length }})</h2>

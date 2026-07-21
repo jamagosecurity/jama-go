@@ -7,10 +7,12 @@ import { TechnicianInspection } from '../../../models/technician.model';
 import { TechnicianService } from '../../../services/technician.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 
+import { TechnicianInspectionSectionsComponent } from '../shared/technician-inspection-sections.component';
+
 @Component({
   selector: 'app-technician-inspection-review',
   standalone: true,
-  imports: [RouterLink, MatButtonModule, MatSnackBarModule],
+  imports: [RouterLink, MatButtonModule, MatSnackBarModule, TechnicianInspectionSectionsComponent],
   templateUrl: './technician-inspection-review.component.html',
   styleUrl: '../technician.styles.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

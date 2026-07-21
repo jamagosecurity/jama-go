@@ -7,10 +7,12 @@ import { TechnicianFinalSummary } from '../../../models/technician.model';
 import { TechnicianService } from '../../../services/technician.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 
+import { TechnicianInspectionSectionsComponent } from '../shared/technician-inspection-sections.component';
+
 @Component({
   selector: 'app-technician-final-summary',
   standalone: true,
-  imports: [DatePipe, RouterLink, MatButtonModule],
+  imports: [DatePipe, RouterLink, MatButtonModule, TechnicianInspectionSectionsComponent],
   templateUrl: './technician-final-summary.component.html',
   styleUrl: '../technician.styles.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

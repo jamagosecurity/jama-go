@@ -13,33 +13,9 @@
       <a mat-stroked-button routerLink="/technician">Back to dashboard</a>
     </header>
 
-    <section class="admin-panel tech-section">
-      <h2>Cameras ({{ item.cameras.length }})</h2>
-      @for (camera of item.cameras; track $index) {
-        <p><strong>{{ camera.brand }} {{ camera.model }}</strong> × {{ camera.quantity }} — {{ camera.location || 'No location' }}</p>
-      }
-    </section>
-
-    <section class="admin-panel tech-section">
-      <h2>Network</h2>
-      <p>{{ item.network?.switchBrand }} {{ item.network?.switchModel }} · Router {{ item.network?.routerBrand }} {{ item.network?.routerModel }}</p>
-      <p>{{ item.network?.networkRemarks || 'No network remarks' }}</p>
-    </section>
-
-    <section class="admin-panel tech-section">
-      <h2>VMS</h2>
-      <p>{{ item.vms?.vmsName }} {{ item.vms?.version }} — {{ item.vms?.healthStatus || 'No health status' }}</p>
-    </section>
-
-    <section class="admin-panel tech-section">
-      <h2>UPS / General</h2>
-      <p>{{ item.upsGeneral?.upsBrand }} {{ item.upsGeneral?.upsCapacity }} · Generator {{ item.upsGeneral?.generatorAvailable ? 'Yes' : 'No' }}</p>
-    </section>
-
-    <section class="admin-panel tech-section">
-      <h2>ANPR</h2>
-      <p>Installed: {{ item.anpr?.anprInstalled ? 'Yes' : 'No' }} · {{ item.anpr?.softwareVersion || 'No version' }}</p>
-    </section>
+    <div class="admin-panel">
+      <app-technician-inspection-sections [inspection]="item" />
+    </div>
 
     <div class="tech-form-actions">
       @if (!item.isReadOnly) {

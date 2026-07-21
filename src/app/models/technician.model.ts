@@ -88,6 +88,10 @@ export interface AnprConfiguration {
   remarks?: string | null;
 }
 
+export interface KpoiDetail {
+  details?: string | null;
+}
+
 export interface TechnicianInspection {
   id: string;
   diaInspectionId: string;
@@ -100,6 +104,7 @@ export interface TechnicianInspection {
   vms: VmsDetail | null;
   upsGeneral: UpsGeneralDetail | null;
   anpr: AnprConfiguration | null;
+  kpoi: KpoiDetail | null;
 }
 
 export interface TechnicianDiaDetail {
@@ -160,6 +165,7 @@ export interface SaveTechnicianDraftRequest {
   vms: VmsDetail | null;
   upsGeneral: UpsGeneralDetail | null;
   anpr: AnprConfiguration | null;
+  kpoi: KpoiDetail | null;
 }
 
 export interface PaginatedData<T> {

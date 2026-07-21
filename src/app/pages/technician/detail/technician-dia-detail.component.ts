@@ -8,10 +8,12 @@ import { TechnicianDiaDetail } from '../../../models/technician.model';
 import { TechnicianService } from '../../../services/technician.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 
+import { TechnicianInspectionSectionsComponent } from '../shared/technician-inspection-sections.component';
+
 @Component({
   selector: 'app-technician-dia-detail',
   standalone: true,
-  imports: [DatePipe, RouterLink, MatButtonModule, MatProgressBarModule],
+  imports: [DatePipe, RouterLink, MatButtonModule, MatProgressBarModule, TechnicianInspectionSectionsComponent],
   templateUrl: './technician-dia-detail.component.html',
   styleUrl: '../technician.styles.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
