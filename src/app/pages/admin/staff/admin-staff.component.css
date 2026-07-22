@@ -1,5 +1,5 @@
 .form-eyebrow {
-  color: #1478b3;
+  color: var(--admin-blue-deep);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -69,7 +69,7 @@
   height: 54px;
   border-radius: 17px;
   color: #fff;
-  background: linear-gradient(135deg, #f6993d, #2594d2);
+  background: var(--admin-avatar-grad);
   box-shadow: 0 16px 30px -16px rgba(37, 148, 210, 0.85);
 }
 
@@ -84,14 +84,14 @@
 }
 
 .staff-modal-title h2 {
-  color: #0b1f33;
+  color: var(--admin-ink);
   font-size: clamp(1.35rem, 2vw, 1.7rem);
   letter-spacing: -0.03em;
 }
 
 .staff-modal-subtitle {
   margin-top: 4px;
-  color: #5d7288;
+  color: var(--admin-muted);
   font-size: 0.88rem;
 }
 
@@ -155,7 +155,7 @@
   padding: 13px 15px;
   font: inherit;
   background: #fff;
-  color: #0b1f33;
+  color: var(--admin-ink);
 }
 
 .staff-form input:focus,
@@ -166,7 +166,7 @@
 }
 
 .field-help {
-  color: #5d7288;
+  color: var(--admin-muted);
   font-size: 0.76rem;
   font-weight: 500;
 }
@@ -194,7 +194,7 @@
 .staff-switch small {
   display: block;
   margin-top: 2px;
-  color: #5d7288;
+  color: var(--admin-muted);
   font-weight: 500;
 }
 
@@ -249,7 +249,7 @@
   border-radius: 16px;
   color: #fff;
   font-weight: 800;
-  background: linear-gradient(135deg, #f6993d, #2594d2);
+  background: var(--admin-avatar-grad);
   box-shadow: 0 12px 24px -14px rgba(37, 148, 210, 0.8);
 }
 
@@ -257,11 +257,11 @@
   font-family: "Sora", "Inter", sans-serif;
   font-size: 1.05rem;
   letter-spacing: -0.02em;
-  color: #0b1f33;
+  color: var(--admin-ink);
 }
 
 .staff-card-meta p {
-  color: #1478b3;
+  color: var(--admin-blue-deep);
   font-size: 0.88rem;
   font-weight: 700;
 }
@@ -269,13 +269,13 @@
 .staff-card-meta small {
   display: block;
   margin-top: 2px;
-  color: #5d7288;
+  color: var(--admin-muted);
   font-size: 0.76rem;
   overflow-wrap: anywhere;
 }
 
 .staff-copy {
-  color: #5d7288;
+  color: var(--admin-muted);
   font-size: 0.92rem;
   line-height: 1.5;
   min-height: 2.8em;
@@ -292,7 +292,7 @@
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(37, 148, 210, 0.1);
-  color: #1478b3;
+  color: var(--admin-blue-deep);
   font-size: 0.78rem;
   font-weight: 800;
 }

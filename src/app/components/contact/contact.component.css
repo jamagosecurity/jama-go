@@ -1,10 +1,10 @@
 /* ===== Contact Page — Premium ===== */
 .contact-page {
   --contact-navy: #0c1f3d;
-  --contact-blue: #1a7bb5;
-  --contact-sky: #2594d2;
-  --contact-gold: #f6993d;
-  --contact-gold-deep: #ef7f16;
+  --contact-blue: var(--brand-strong);
+  --contact-sky: var(--brand);
+  --contact-gold: var(--brand-2);
+  --contact-gold-deep: var(--brand-2-strong);
   --contact-green: #16a34a;
   --contact-violet: #7c3aed;
   --contact-teal: #0d9488;

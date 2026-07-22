@@ -36,14 +36,14 @@
   border-radius: 16px;
   color: #fff;
   font-weight: 800;
-  background: linear-gradient(135deg, #2594d2, #14b8a6);
+  background: linear-gradient(135deg, var(--admin-blue), var(--admin-teal));
 }
 
 .contact-identity h3 {
   font-family: "Sora", "Inter", sans-serif;
   font-size: 1.05rem;
   letter-spacing: -0.02em;
-  color: #0b1f33;
+  color: var(--admin-ink);
 }
 
 .contact-identity p {
@@ -51,12 +51,12 @@
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 4px;
-  color: #5d7288;
+  color: var(--admin-muted);
   font-size: 0.9rem;
 }
 
 .contact-identity a {
-  color: #1478b3;
+  color: var(--admin-blue-deep);
   font-weight: 700;
 }
 

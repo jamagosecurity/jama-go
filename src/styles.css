@@ -718,6 +718,10 @@ a { color: inherit; text-decoration: none; }
   --admin-rose: #e11d48;
   --admin-shadow: 0 22px 50px -28px rgba(11, 31, 51, 0.45);
   --admin-radius: 22px;
+  /* Shared brand avatar/icon gradient — reused across admin staff cards,
+     staff editor, staff profile and admin layout (was duplicated as a
+     literal linear-gradient in each component file). */
+  --admin-avatar-grad: linear-gradient(135deg, var(--admin-orange), var(--admin-blue));
 }
 
 .admin-page {

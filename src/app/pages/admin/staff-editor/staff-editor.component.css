@@ -11,7 +11,7 @@
   margin-bottom: 22px;
   padding: 0;
   border: 0;
-  color: #1478b3;
+  color: var(--admin-blue-deep);
   background: transparent;
   font: inherit;
   font-size: 0.9rem;
@@ -49,7 +49,7 @@
   height: 68px;
   border-radius: 21px;
   color: #fff;
-  background: linear-gradient(135deg, #f6993d, #2594d2);
+  background: var(--admin-avatar-grad);
   box-shadow: 0 18px 34px -18px rgba(37, 148, 210, 0.9);
 }
 
@@ -65,7 +65,7 @@
 
 .editor-eyebrow {
   margin-bottom: 4px;
-  color: #1478b3;
+  color: var(--admin-blue-deep);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.13em;
@@ -73,14 +73,14 @@
 }
 
 .editor-header h1 {
-  color: #0b1f33;
+  color: var(--admin-ink);
   font-size: clamp(1.8rem, 3vw, 2.5rem);
   letter-spacing: -0.04em;
 }
 
 .editor-header > div:last-child > p:last-child {
   margin-top: 5px;
-  color: #5d7288;
+  color: var(--admin-muted);
 }
 
 .editor-card {
@@ -94,7 +94,7 @@
 }
 
 .editor-loading {
-  color: #5d7288;
+  color: var(--admin-muted);
   text-align: center;
 }
 
@@ -109,7 +109,7 @@
 }
 
 .form-section-heading span {
-  color: #0b1f33;
+  color: var(--admin-ink);
   font-size: 1.08rem;
   font-weight: 800;
 }
@@ -145,7 +145,7 @@
   padding: 14px 16px;
   border: 1px solid rgba(15, 40, 70, 0.12);
   border-radius: 15px;
-  color: #0b1f33;
+  color: var(--admin-ink);
   background: #fff;
   font: inherit;
   font-weight: 500;
@@ -224,7 +224,7 @@
 
 .visibility-control small {
   margin-top: 2px;
-  color: #5d7288;
+  color: var(--admin-muted);
 }
 
 .editor-actions {

@@ -290,7 +290,7 @@
   border-radius: 14px;
   font-weight: 800;
   color: #10233a;
-  background: linear-gradient(135deg, #f6993d, #2594d2);
+  background: var(--admin-avatar-grad);
 }
 
 .admin-user-meta p {
@@ -335,7 +335,7 @@
 }
 
 .admin-topbar-kicker {
-  color: #1478b3;
+  color: var(--admin-blue-deep);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -347,7 +347,7 @@
   font-family: "Sora", "Inter", sans-serif;
   font-size: clamp(1.35rem, 2vw, 1.7rem);
   letter-spacing: -0.03em;
-  color: #0b1f33;
+  color: var(--admin-ink);
 }
 
 .admin-topbar-pills {
@@ -382,7 +382,7 @@
 .pill-brand {
   color: #fff;
   border: none;
-  background: linear-gradient(120deg, #f6993d, #2594d2);
+  background: linear-gradient(120deg, var(--admin-orange), var(--admin-blue));
 }
 
 @keyframes pulse-live {

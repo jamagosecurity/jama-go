@@ -3,12 +3,12 @@
 }
 
 .admin-login {
-  --blue: #2594d2;
-  --blue-2: #1a7bb5;
+  --blue: var(--brand);
+  --blue-2: var(--brand-strong);
   --sky: #27a9e0;
   --sky-bright: #4fc3f7;
-  --orange: #f6993d;
-  --orange-2: #ef7f16;
+  --orange: var(--brand-2);
+  --orange-2: var(--brand-2-strong);
   --violet: #7c6cf2;
   --teal: #16bfa4;
   --ink: #e8f1f9;
