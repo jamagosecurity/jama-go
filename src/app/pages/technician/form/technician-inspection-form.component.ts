@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { finalize } from 'rxjs';
-import { TechnicianInspection } from '../../../models/technician.model';
+import { CameraDetail, TechnicianInspection } from '../../../models/technician.model';
 import { TechnicianService } from '../../../services/technician.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 
@@ -90,14 +90,15 @@ export class TechnicianInspectionFormComponent implements OnInit {
     this.load();
   }
 
-  protected addCamera(): void {
+  protected addCamera(existing?: CameraDetail): void {
     this.cameras.push(
       this.fb.nonNullable.group({
-        brand: ['', Validators.required],
-        model: ['', Validators.required],
-        quantity: [1, [Validators.required, Validators.min(1)]],
-        location: [''],
-        remarks: [''],
+        id: [existing?.id ?? null],
+        brand: [existing?.brand ?? '', Validators.required],
+        model: [existing?.model ?? '', Validators.required],
+        quantity: [existing?.quantity ?? 1, [Validators.required, Validators.min(1)]],
+        location: [existing?.location ?? ''],
+        remarks: [existing?.remarks ?? ''],
       }),
     );
   }
@@ -128,6 +129,7 @@ export class TechnicianInspectionFormComponent implements OnInit {
     this.saving.set(true);
     const raw = this.form.getRawValue();
     type CameraFormValue = {
+      id: string | null;
       brand: string;
       model: string;
       quantity: number;
@@ -138,6 +140,7 @@ export class TechnicianInspectionFormComponent implements OnInit {
       .saveDraft({
         inspectionId: inspection.id,
         cameras: (raw.cameras as CameraFormValue[]).map((camera) => ({
+          id: camera.id,
           brand: camera.brand.trim(),
           model: camera.model.trim(),
           quantity: Number(camera.quantity),
@@ -190,16 +193,9 @@ export class TechnicianInspectionFormComponent implements OnInit {
   }
 
   private patchForm(inspection: TechnicianInspection): void {
-    inspection.cameras.forEach(() => this.addCamera());
+    inspection.cameras.forEach((camera) => this.addCamera(camera));
     if (!inspection.cameras.length) this.addCamera();
     this.form.patchValue({
-      cameras: inspection.cameras.map((camera) => ({
-        brand: camera.brand,
-        model: camera.model,
-        quantity: camera.quantity,
-        location: camera.location ?? '',
-        remarks: camera.remarks ?? '',
-      })),
       network: inspection.network ?? {},
       vms: inspection.vms ?? {},
       upsGeneral: inspection.upsGeneral ?? { generatorAvailable: false },
