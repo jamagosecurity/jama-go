@@ -8,7 +8,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, filter, finalize, switchMap } from 'rxjs';
 import { Dia, DiaStatus } from '../../../../models/dia.model';
+import { Invoice } from '../../../../models/invoice.model';
 import { DiaService } from '../../../../services/dia.service';
+import { InvoiceService } from '../../../../services/invoice.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
 import {
   ConfirmationDialogData,
@@ -37,6 +39,7 @@ import {
 })
 export class DiaDetailComponent implements OnInit {
   private readonly service = inject(DiaService);
+  private readonly invoiceService = inject(InvoiceService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
@@ -48,9 +51,13 @@ export class DiaDetailComponent implements OnInit {
   protected readonly loading = signal(true);
   protected readonly acting = signal(false);
   protected readonly error = signal('');
+  protected readonly invoices = signal<Invoice[]>([]);
+  protected readonly invoicesLoading = signal(true);
+  protected readonly sharingInvoiceId = signal<string | null>(null);
 
   ngOnInit(): void {
     this.load();
+    this.loadInvoices();
   }
 
   protected statusLabel(status: DiaStatus): string {
@@ -125,6 +132,70 @@ export class DiaDetailComponent implements OnInit {
         next: (dia) => this.dia.set(dia),
         error: (error: unknown) =>
           this.error.set(getApiErrorMessage(error, 'Unable to load this DIA inspection.')),
+      });
+  }
+
+  protected loadInvoices(): void {
+    this.invoicesLoading.set(true);
+    this.invoiceService
+      .getList(this.id)
+      .pipe(
+        finalize(() => this.invoicesLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (invoices) => this.invoices.set(invoices),
+        error: (error: unknown) =>
+          this.snackBar.open(getApiErrorMessage(error, 'Unable to load invoices.'), 'Dismiss', {
+            duration: 5000,
+          }),
+      });
+  }
+
+  protected downloadInvoice(invoice: Invoice): void {
+    this.invoiceService
+      .download(invoice.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (blob) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${invoice.invoiceNumber}.pdf`;
+          link.click();
+          URL.revokeObjectURL(url);
+        },
+        error: (error: unknown) =>
+          this.snackBar.open(getApiErrorMessage(error, 'Unable to download invoice.'), 'Dismiss', {
+            duration: 5000,
+          }),
+      });
+  }
+
+  protected shareInvoice(invoice: Invoice): void {
+    this.sharingInvoiceId.set(invoice.id);
+    this.invoiceService
+      .createShareLink(invoice.id)
+      .pipe(
+        finalize(() => this.sharingInvoiceId.set(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: async (link) => {
+          const url = this.invoiceService.buildShareUrl(link.token);
+          try {
+            await navigator.clipboard.writeText(url);
+            this.snackBar.open('Share link copied to clipboard (valid 7 days).', 'Dismiss', {
+              duration: 5000,
+            });
+          } catch {
+            this.snackBar.open(url, 'Copy', { duration: 15000 });
+          }
+        },
+        error: (error: unknown) =>
+          this.snackBar.open(getApiErrorMessage(error, 'Unable to create share link.'), 'Dismiss', {
+            duration: 5000,
+          }),
       });
   }
 }

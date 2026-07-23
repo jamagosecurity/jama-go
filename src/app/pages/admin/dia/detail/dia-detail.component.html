@@ -84,6 +84,46 @@
       </section>
     </div>
 
+    <section class="admin-panel">
+      <div class="admin-panel-title"><h2>Invoices</h2></div>
+      @if (invoicesLoading()) {
+        <p>Loading invoices…</p>
+      } @else if (invoices().length === 0) {
+        <p>No invoices generated yet — an invoice is created each time a quarter is submitted.</p>
+      } @else {
+        <table class="dia-invoice-table">
+          <thead>
+            <tr>
+              <th>Invoice Number</th>
+              <th>Quarter</th>
+              <th>Generated</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (invoice of invoices(); track invoice.id) {
+              <tr>
+                <td>{{ invoice.invoiceNumber }}</td>
+                <td>Q{{ invoice.quarter }}</td>
+                <td>{{ invoice.generatedAt | date: 'mediumDate' }}</td>
+                <td class="dia-invoice-actions">
+                  <button mat-stroked-button type="button" (click)="downloadInvoice(invoice)">Download</button>
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    [disabled]="sharingInvoiceId() === invoice.id"
+                    (click)="shareInvoice(invoice)"
+                  >
+                    Share
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
     <div class="dia-detail-actions admin-panel">
       <div><h2>Record actions</h2><p>Manage this DIA inspection lifecycle.</p></div>
       <div class="dia-header-actions">
