@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { finalize } from 'rxjs';
-import { TechnicianCycleStatus, TechnicianDiaAction, TechnicianDiaListItem } from '../../../models/technician.model';
+import { TechnicianCycleStatus, TechnicianDiaListItem } from '../../../models/technician.model';
 import { TechnicianService } from '../../../services/technician.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 
@@ -41,11 +41,15 @@ export class TechnicianDashboardComponent implements OnInit {
     return status.startsWith('Quarter') ? `Quarter ${status.slice(-1)}` : status.replace(/([A-Z])/g, ' $1').trim();
   }
 
-  protected actionLabel(action: TechnicianDiaAction): string {
-    return action === 'StartInspection' ? 'Start Inspection' : action;
+  protected actionLabel(item: TechnicianDiaListItem): string {
+    if (item.inspectionStatus === 'Completed') return 'View Summary';
+    return item.action === 'StartInspection' ? 'Start Inspection' : item.action;
   }
 
   protected actionLink(item: TechnicianDiaListItem): string[] {
+    if (item.inspectionStatus === 'Completed') {
+      return ['/technician/dia', item.id, 'summary'];
+    }
     if (item.action === 'Continue' && item.currentInspectionId) {
       return ['/technician/inspection', item.currentInspectionId];
     }
