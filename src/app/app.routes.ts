@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { ContactComponent } from './components/contact/contact.component';
+import { SifeddineLandingComponent } from './pages/sifeddine/sifeddine-landing.component';
 import { AdminLoginComponent } from './pages/admin/login/admin-login.component';
 import { AdminLayoutComponent } from './pages/admin/layout/admin-layout.component';
 import { AdminStaffComponent } from './pages/admin/staff/admin-staff.component';
@@ -12,6 +13,11 @@ import { adminGuard, guestGuard, staffGuard, technicianGuard } from './guards/ad
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Jama Go Security — Protecting What Matters Most' },
   { path: 'contact', component: ContactComponent, title: 'Contact Us — Jama Go Security' },
+  {
+    path: 'sifeddine',
+    component: SifeddineLandingComponent,
+    title: 'Sifeddine Taghelabet — Business Development Specialist | Jama Go',
+  },
   {
     path: 'admin',
     children: [
