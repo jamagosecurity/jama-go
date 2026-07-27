@@ -16,6 +16,7 @@ import { finalize } from 'rxjs';
 import { DiaWriteRequest } from '../../../../models/dia.model';
 import { DiaService } from '../../../../services/dia.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
+import { DIA_BASE_PATH } from '../dia-base-path';
 import { DiaEmptyStateComponent, DiaSkeletonComponent } from '../shared/dia-shared.components';
 
 function requiredTrimmed(control: AbstractControl<string>): ValidationErrors | null {
@@ -45,6 +46,8 @@ export class DiaFormComponent implements OnInit {
   private readonly service = inject(DiaService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  /** Portal this screen is mounted under — see DIA_BASE_PATH. */
+  protected readonly base = inject(DIA_BASE_PATH);
   private readonly snackBar = inject(MatSnackBar);
 
   protected readonly id = this.route.snapshot.paramMap.get('id');
@@ -90,7 +93,7 @@ export class DiaFormComponent implements OnInit {
         this.snackBar.open(`DIA ${this.isEdit ? 'updated' : 'created'} successfully.`, 'Dismiss', {
           duration: 3500,
         });
-        void this.router.navigate(['/admin/dia/list']);
+        void this.router.navigate([this.base, 'list']);
       },
       error: (error: unknown) =>
         this.saveError.set(getApiErrorMessage(error, `Unable to ${this.isEdit ? 'update' : 'create'} DIA.`)),

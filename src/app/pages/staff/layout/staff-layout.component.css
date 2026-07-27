@@ -1,0 +1,290 @@
+/* Staff portal shell. Mirrors the admin command-centre layout so the two
+   portals feel like one product, with a fixed sidebar on desktop. */
+
+.staff-shell {
+  --sidebar: 300px;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: var(--sidebar) 1fr;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(37, 148, 210, 0.16), transparent 28%),
+    radial-gradient(circle at 90% 0%, rgba(246, 153, 61, 0.18), transparent 26%),
+    linear-gradient(180deg, #eef6fc 0%, #f7fafc 42%, #f3f7fb 100%);
+}
+
+.staff-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 16px 14px 14px;
+  color: #e8f3fb;
+  background:
+    linear-gradient(165deg, rgba(20, 120, 180, 0.22), transparent 42%),
+    linear-gradient(180deg, #0b1f33 0%, #102a42 55%, #0d2236 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.staff-brand {
+  display: grid;
+  gap: 10px;
+}
+
+.staff-logo-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow:
+    0 18px 34px -18px rgba(2, 12, 24, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.staff-logo {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.staff-eyebrow {
+  display: inline-flex;
+  color: #7dd3fc;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.staff-brand h2 {
+  margin-top: 4px;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.staff-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.staff-nav a {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 18px;
+  color: #d7e7f4;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.staff-nav a strong {
+  display: block;
+  font-size: 0.96rem;
+}
+
+.staff-nav a small {
+  display: block;
+  margin-top: 2px;
+  color: #8eadc4;
+  font-size: 0.76rem;
+}
+
+.nav-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.staff-nav a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(2px);
+}
+
+.staff-nav a.active {
+  background: linear-gradient(120deg, rgba(246, 153, 61, 0.22), rgba(37, 148, 210, 0.28));
+  border-color: rgba(125, 211, 252, 0.22);
+}
+
+.staff-nav a.active .nav-icon {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.staff-nav-muted {
+  margin-top: 4px;
+  opacity: 0.92;
+}
+
+.staff-sidebar-foot {
+  margin-top: auto;
+}
+
+.staff-user {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 8px 12px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.staff-avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  font-weight: 800;
+  color: #10233a;
+  background: var(--admin-avatar-grad);
+}
+
+.staff-user-meta p {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.staff-user-meta small {
+  color: #94b4cb;
+  font-size: 0.76rem;
+  word-break: break-all;
+}
+
+.signout {
+  grid-column: 1 / -1;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #e8f3fb;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.18s ease;
+}
+
+.signout:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.staff-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.staff-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 28px 8px;
+  flex-wrap: wrap;
+}
+
+.staff-topbar-kicker {
+  color: var(--admin-blue-deep);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.staff-topbar h1 {
+  margin-top: 4px;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+  letter-spacing: -0.03em;
+  color: var(--admin-ink);
+}
+
+.staff-topbar-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 40, 70, 0.08);
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.pill-live i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #14b8a6;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.16);
+}
+
+.pill-brand {
+  color: #fff;
+  border: none;
+  background: linear-gradient(120deg, var(--admin-orange), var(--admin-blue));
+}
+
+.staff-content {
+  padding: 12px 28px 36px;
+  min-width: 0;
+}
+
+@media (max-width: 980px) {
+  .staff-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .staff-sidebar {
+    position: relative;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .staff-logo-badge {
+    max-width: 260px;
+  }
+
+  .staff-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .staff-topbar,
+  .staff-content {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}

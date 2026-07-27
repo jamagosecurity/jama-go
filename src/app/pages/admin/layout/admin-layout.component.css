@@ -1,18 +1,13 @@
 .admin-shell {
-  --sidebar: 340px;
-  --sidebar-collapsed: 108px;
+  --sidebar: 300px;
   min-height: 100dvh;
   display: grid;
   grid-template-columns: var(--sidebar) 1fr;
-  transition: grid-template-columns 0.28s ease;
+  /* Two blooms only — brand blue top-left, brand orange bottom-right. */
   background:
-    radial-gradient(circle at 12% 10%, rgba(37, 148, 210, 0.16), transparent 28%),
-    radial-gradient(circle at 90% 0%, rgba(246, 153, 61, 0.18), transparent 26%),
-    linear-gradient(180deg, #eef6fc 0%, #f7fafc 42%, #f3f7fb 100%);
-}
-
-.admin-shell--collapsed {
-  grid-template-columns: var(--sidebar-collapsed) 1fr;
+    radial-gradient(circle at 8% 4%, rgba(37, 148, 210, 0.18), transparent 32%),
+    radial-gradient(circle at 88% 96%, rgba(246, 153, 61, 0.16), transparent 34%),
+    linear-gradient(180deg, #eef6ff 0%, #fbfdff 44%, #f2f7fd 100%);
 }
 
 .admin-sidebar {
@@ -23,107 +18,45 @@
   flex-direction: column;
   gap: 14px;
   padding: 14px 14px 12px;
-  color: #e8f3fb;
-  background:
-    linear-gradient(165deg, rgba(20, 120, 180, 0.22), transparent 42%),
-    linear-gradient(180deg, #0b1f33 0%, #102a42 55%, #0d2236 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
+  color: #f2f9ff;
+  background: var(--admin-sidebar-grad);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, 0.06),
+    18px 0 60px -40px rgba(37, 22, 96, 0.9);
   overflow: hidden;
   transition: padding 0.28s ease;
 }
 
-.admin-shell--collapsed .admin-sidebar {
-  padding: 16px 10px;
-  align-items: center;
-  gap: 14px;
+/* Slow aurora wash over the rail so the colour reads as lit, not painted on. */
+.admin-sidebar::before {
+  content: "";
+  position: absolute;
+  inset: -30% -40%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(37, 148, 210, 0.4), transparent 45%),
+    radial-gradient(circle at 70% 80%, rgba(246, 153, 61, 0.26), transparent 48%);
+  filter: blur(30px);
+  opacity: 0.55;
+  animation: sidebar-aurora 16s ease-in-out infinite alternate;
 }
 
-.admin-sidebar-head {
-  display: grid;
-  gap: 8px;
+@keyframes sidebar-aurora {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(6%, -5%, 0) scale(1.12); }
 }
 
-.admin-shell--collapsed .admin-sidebar-head {
-  width: 100%;
-  justify-items: center;
+.admin-sidebar > * {
+  position: relative;
+  z-index: 1;
 }
 
-/* Cascading hamburger:
-        -----
-    -----
------
-*/
-.hamburger {
-  display: inline-grid;
-  align-content: center;
-  justify-items: start;
-  gap: 6px;
-  width: 48px;
-  height: 48px;
-  padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
-}
-
-.hamburger:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(125, 211, 252, 0.35);
-  transform: translateY(-1px);
-}
-
-.ham-line {
-  display: block;
-  width: 18px;
-  height: 2.5px;
-  border-radius: 999px;
-  background: #e8f3fb;
-  transition: margin 0.2s ease, transform 0.2s ease, opacity 0.2s ease, width 0.2s ease;
-}
-
-.ham-line-1 {
-  margin-left: 10px;
-}
-
-.ham-line-2 {
-  margin-left: 5px;
-}
-
-.ham-line-3 {
-  margin-left: 0;
-}
-
-.admin-shell--collapsed .ham-line-1,
-.admin-shell--collapsed .ham-line-2,
-.admin-shell--collapsed .ham-line-3 {
-  width: 18px;
-  margin-left: 0;
-}
-
-.admin-shell--collapsed .ham-line-1 {
-  transform: translateY(8.5px) rotate(45deg);
-}
-
-.admin-shell--collapsed .ham-line-2 {
-  opacity: 0;
-}
-
-.admin-shell--collapsed .ham-line-3 {
-  transform: translateY(-8.5px) rotate(-45deg);
-}
-
+/* The logo lockup is the whole of the brand block now — no toggle beside it,
+   no title beneath it. */
 .admin-brand {
-  display: grid;
-  gap: 10px;
-  justify-items: start;
-}
-
-.admin-shell--collapsed .admin-brand {
-  justify-items: center;
-  width: 100%;
+  padding: 6px 0 2px;
 }
 
 /* White lockup card — the mark reads cleanly against the dark sidebar and
@@ -133,54 +66,20 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 12px 18px;
-  border-radius: 16px;
+  padding: 16px 20px;
+  border-radius: 18px;
   background: #ffffff;
   box-shadow:
     0 18px 34px -18px rgba(2, 12, 24, 0.7),
     0 0 0 1px rgba(255, 255, 255, 0.08);
-  transition: padding 0.28s ease, border-radius 0.28s ease, width 0.28s ease;
-}
-
-.admin-shell--collapsed .admin-logo-badge {
-  width: auto;
-  padding: 10px;
-  border-radius: 13px;
 }
 
 .admin-logo {
   width: 100%;
-  max-width: 200px;
+  max-width: 210px;
   height: auto;
   display: block;
   object-fit: contain;
-  transition: width 0.28s ease;
-}
-
-.admin-shell--collapsed .admin-logo {
-  width: 42px;
-}
-
-.admin-brand-copy {
-  padding-left: 2px;
-}
-
-.admin-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: #7dd3fc;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.admin-brand h2 {
-  margin-top: 4px;
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: 1.35rem;
-  letter-spacing: -0.03em;
 }
 
 .admin-nav {
@@ -189,37 +88,86 @@
   gap: 8px;
 }
 
+/* Every nav row owns a hue (--accent / --accent-2). Idle rows show it only in
+   the icon tile; the active row floods the whole pill with it. */
 .admin-nav a {
+  --accent: #4bb0e8;
+  --accent-2: #2594d2;
+  position: relative;
   display: grid;
   grid-template-columns: 42px 1fr;
   gap: 12px;
   align-items: center;
   padding: 12px;
   border-radius: 18px;
-  color: #d7e7f4;
+  color: #eaf4ff;
   border: 1px solid transparent;
-  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+/* One step along the brand ramp per row: blue → indigo → deep blue → orange.
+   Named for the destination, not the hue, so re-paletting later does not leave
+   class names lying about what colour they are.
+
+   Scoped to `.admin-nav a` — a bare `.nav-staff` (0,1,0) loses to the defaults
+   set on `.admin-nav a` (0,1,1) above, which silently paints every row alike. */
+.admin-nav a.nav-staff { --accent: #4bb0e8; --accent-2: #2594d2; }
+.admin-nav a.nav-contacts { --accent: #7d92f0; --accent-2: #4f46e5; }
+.admin-nav a.nav-dia { --accent: #4aa9dd; --accent-2: #0d6fae; }
+.admin-nav a.nav-site { --accent: #f9b877; --accent-2: #f6993d; }
+
+/* left colour tab, revealed on hover / active */
+.admin-nav a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 0;
+  border-radius: 0 4px 4px 0;
+  background: var(--accent);
+  transform: translateY(-50%);
+  transition: height 0.24s ease;
+}
+
+.admin-nav a:hover::before {
+  height: 46%;
+}
+
+.admin-nav a.active::before {
+  height: 62%;
+  background: #08192b;
 }
 
 .admin-nav a strong {
   display: block;
   font-size: 0.98rem;
+  font-weight: 700;
 }
 
 .admin-nav a small {
   display: block;
   margin-top: 2px;
-  color: #8eadc4;
+  color: rgba(226, 240, 255, 0.72);
   font-size: 0.78rem;
 }
 
+/* Bright tile, dark glyph. White on the light end of the ramp — and on brand
+   orange especially — sits near 2:1, so the icon inverts rather than the tile
+   being dimmed to accommodate it. */
 .nav-icon {
   display: grid;
   place-items: center;
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
+  color: #08192b;
+  background: linear-gradient(140deg, var(--accent), var(--accent-2));
+  box-shadow:
+    0 10px 22px -12px color-mix(in srgb, var(--accent) 85%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
 .nav-icon svg {
@@ -227,66 +175,60 @@
   height: 18px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .admin-nav a:hover {
-  background: rgba(255, 255, 255, 0.05);
-  transform: translateX(2px);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(3px);
 }
 
+.admin-nav a:hover .nav-icon {
+  transform: scale(1.06);
+  box-shadow:
+    0 14px 28px -10px color-mix(in srgb, var(--accent) 95%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+/* Active row floods with the accent and flips to ink-dark text — a bright pill
+   with near-black copy reads far harder than white on the same fill. */
 .admin-nav a.active {
-  background: linear-gradient(120deg, rgba(246, 153, 61, 0.22), rgba(37, 148, 210, 0.28));
-  border-color: rgba(125, 211, 252, 0.22);
-  box-shadow: 0 14px 30px -20px rgba(0, 0, 0, 0.8);
+  color: #08192b;
+  background: linear-gradient(115deg, var(--accent), var(--accent-2));
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 18px 34px -18px color-mix(in srgb, var(--accent) 90%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.admin-nav a.active strong {
+  font-weight: 800;
+}
+
+.admin-nav a.active small {
+  color: rgba(8, 25, 43, 0.78);
 }
 
 .admin-nav a.active .nav-icon {
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(8, 25, 43, 0.1);
+  color: #08192b;
   transform: translateX(3px);
 }
 
 .admin-nav-muted {
   margin-top: 4px;
-  opacity: 0.92;
 }
 
+/* margin-top:auto pins the user block to the floor of the flex column, so it
+   sits at the bottom of the rail regardless of how many nav items there are. */
 .admin-sidebar-foot {
   display: grid;
   gap: 10px;
-  margin-top: 8px;
-}
-
-.admin-sidebar-card {
-  padding: 14px;
-  border-radius: 16px;
-  background:
-    radial-gradient(circle at top right, rgba(246, 153, 61, 0.28), transparent 45%),
-    linear-gradient(160deg, rgba(37, 148, 210, 0.22), rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.admin-sidebar-card p {
-  color: #7dd3fc;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.admin-sidebar-card strong {
-  display: block;
-  margin: 8px 0 6px;
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: 1.05rem;
-}
-
-.admin-sidebar-card small {
-  color: #a9c4d8;
-  line-height: 1.45;
+  margin-top: auto;
+  padding-top: 12px;
 }
 
 .admin-user {
@@ -296,8 +238,8 @@
   align-items: center;
   padding: 10px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .admin-avatar {
@@ -307,27 +249,47 @@
   height: 44px;
   border-radius: 14px;
   font-weight: 800;
-  color: #10233a;
-  background: var(--admin-avatar-grad);
+  /* Ink initials on the bright gradient — white would drop under 2:1 here. */
+  color: #08192b;
+  background: linear-gradient(135deg, #f6993d, #2594d2);
+  box-shadow:
+    0 10px 22px -12px rgba(251, 113, 133, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .admin-user-meta p {
   font-weight: 700;
   font-size: 0.92rem;
+  color: #fff;
 }
 
 .admin-user-meta small {
-  color: #94b4cb;
+  color: rgba(214, 234, 250, 0.8);
   font-size: 0.78rem;
   word-break: break-all;
 }
 
+/* Quiet by default, rose on hover. Signing out is routine, not destructive —
+   a solid crimson block competes with the nav for attention every time the
+   sidebar is on screen. The warning colour belongs at the moment of intent. */
 .signout {
   grid-column: 1 / -1;
   width: 100%;
-  color: #e8f3fb !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #eaf4ff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.signout:hover {
+  color: #fff !important;
+  background: rgba(225, 29, 72, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.signout:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 .admin-main {
@@ -353,7 +315,14 @@
 }
 
 .admin-topbar-kicker {
-  color: var(--admin-blue-deep);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 148, 210, 0.3);
+  background: linear-gradient(120deg, rgba(37, 148, 210, 0.16), rgba(246, 153, 61, 0.16));
+  color: var(--admin-blue-ink);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -361,51 +330,15 @@
 }
 
 .admin-topbar h1 {
-  margin-top: 4px;
+  margin-top: 6px;
   font-family: "Sora", "Inter", sans-serif;
   font-size: clamp(1.35rem, 2vw, 1.7rem);
   letter-spacing: -0.03em;
-  color: var(--admin-ink);
-}
-
-.admin-topbar-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(15, 40, 70, 0.08);
-  color: #334155;
-  font-size: 0.8rem;
-  font-weight: 700;
-  box-shadow: 0 10px 24px -20px rgba(11, 31, 51, 0.5);
-}
-
-.pill-live i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #14b8a6;
-  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.16);
-  animation: pulse-live 1.8s ease infinite;
-}
-
-.pill-brand {
-  color: #fff;
-  border: none;
-  background: linear-gradient(120deg, var(--admin-orange), var(--admin-blue));
-}
-
-@keyframes pulse-live {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.15); opacity: 0.7; }
+  /* Deep stops only — this is body-weight display text on a near-white bar. */
+  background: linear-gradient(100deg, var(--admin-blue-ink) 0%, var(--admin-indigo-ink) 55%, var(--admin-orange-ink) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .admin-content {
@@ -414,8 +347,7 @@
 }
 
 @media (max-width: 980px) {
-  .admin-shell,
-  .admin-shell--collapsed {
+  .admin-shell {
     grid-template-columns: 1fr;
   }
 
@@ -426,10 +358,6 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  .admin-shell--collapsed .admin-sidebar {
-    padding: 14px 12px;
-  }
-
   .admin-logo-badge {
     max-width: 260px;
   }
@@ -438,13 +366,9 @@
     max-width: 170px;
   }
 
-  .admin-shell--collapsed .admin-logo {
-    width: 40px;
-  }
-
-  .admin-brand {
-    justify-items: center;
-    justify-content: center;
+  /* Stacked layout has no leftover height, so the foot follows the nav. */
+  .admin-sidebar-foot {
+    margin-top: 12px;
   }
 
   .admin-nav {
@@ -459,10 +383,6 @@
 
   .nav-icon {
     margin: 0 auto;
-  }
-
-  .admin-sidebar-card {
-    display: none;
   }
 
   .admin-topbar,
@@ -484,10 +404,6 @@
 
   .nav-icon {
     margin: 0;
-  }
-
-  .admin-topbar-pills {
-    width: 100%;
   }
 
   .admin-nav a:hover {

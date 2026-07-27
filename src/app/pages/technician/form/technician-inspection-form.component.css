@@ -1,0 +1,312 @@
+/* Multi-step inspection wizard. Each rail entry owns a hue via --step (assigned
+   by position below), so the numbered dot, the current-step highlight and the
+   "filled" label all carry that section's colour. */
+
+/* ===== Step rail ===== */
+.wiz-rail {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--admin-line);
+  box-shadow: var(--admin-shadow);
+}
+
+.wiz-step {
+  --step: var(--admin-blue);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 15px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+/* Same four-step rotation the cards use, repeating for steps 5 and 6. A
+   continuous blue→orange ramp would have to pass through muddy mauves, and
+   position is already carried by the number and the current-step highlight. */
+.wiz-step:nth-child(4n + 1) { --step: var(--admin-blue); }
+.wiz-step:nth-child(4n + 2) { --step: var(--admin-indigo); }
+.wiz-step:nth-child(4n + 3) { --step: var(--admin-blue-deep); }
+.wiz-step:nth-child(4n + 4) { --step: var(--admin-orange); }
+
+.wiz-step:hover {
+  background: color-mix(in srgb, var(--step) 10%, transparent);
+  transform: translateY(-1px);
+}
+
+.wiz-step:focus-visible {
+  outline: 2px solid var(--step);
+  outline-offset: 2px;
+}
+
+.wiz-dot {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  background: rgba(15, 40, 70, 0.08);
+  color: var(--admin-ink-soft);
+  font-size: 0.86rem;
+  font-weight: 800;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.wiz-dot svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wiz-step-copy {
+  min-width: 0;
+}
+
+.wiz-step-copy strong {
+  display: block;
+  color: var(--admin-ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wiz-step-copy small {
+  display: block;
+  margin-top: 2px;
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* filled */
+.wiz-step.is-done .wiz-dot {
+  background: color-mix(in srgb, var(--step) 20%, #fff);
+  color: color-mix(in srgb, var(--step) 72%, #000);
+}
+
+.wiz-step.is-done .wiz-step-copy small {
+  color: color-mix(in srgb, var(--step) 72%, #000);
+}
+
+/* skipped */
+.wiz-step.is-skipped .wiz-dot {
+  background: rgba(100, 116, 139, 0.16);
+  color: #3f4c5f;
+}
+
+.wiz-step.is-skipped .wiz-step-copy strong {
+  color: var(--admin-muted);
+}
+
+/* current wins over both */
+.wiz-step.is-current {
+  background: color-mix(in srgb, var(--step) 14%, #fff);
+  border-color: color-mix(in srgb, var(--step) 40%, transparent);
+  box-shadow: 0 12px 26px -20px color-mix(in srgb, var(--step) 90%, transparent);
+}
+
+.wiz-step.is-current .wiz-dot {
+  color: #fff;
+  background: linear-gradient(140deg,
+    color-mix(in srgb, var(--step) 85%, #000),
+    color-mix(in srgb, var(--step) 65%, #000));
+  box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--step) 90%, transparent);
+}
+
+.wiz-step.is-current .wiz-step-copy strong,
+.wiz-step.is-current .wiz-step-copy small {
+  color: color-mix(in srgb, var(--step) 74%, #000);
+}
+
+/* ===== Progress ===== */
+.wiz-progress {
+  height: 6px;
+  margin-bottom: 16px;
+  border-radius: 999px;
+  background: rgba(15, 40, 70, 0.08);
+  overflow: hidden;
+}
+
+.wiz-progress i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--admin-brand-grad-deep);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ===== Step panel ===== */
+.wiz-panel {
+  animation: wiz-in 0.28s ease both;
+}
+
+@keyframes wiz-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.wiz-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--admin-line);
+  flex-wrap: wrap;
+}
+
+.wiz-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(79, 70, 229, 0.28);
+  background: linear-gradient(120deg, rgba(37, 148, 210, 0.16), rgba(246, 153, 61, 0.14));
+  color: #3730a3;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.wiz-head h2 {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  letter-spacing: -0.03em;
+  color: var(--admin-ink);
+}
+
+.wiz-hint {
+  margin-top: 4px;
+  max-width: 62ch;
+  color: var(--admin-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.wiz-flag {
+  align-self: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.14);
+  border: 1px solid rgba(100, 116, 139, 0.26);
+  color: #3f4c5f;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.wiz-body-actions {
+  margin-bottom: 8px;
+}
+
+.wiz-empty {
+  padding: 22px;
+  border: 1px dashed rgba(15, 40, 70, 0.22);
+  border-radius: 16px;
+  background: rgba(15, 40, 70, 0.02);
+  color: var(--admin-muted);
+  text-align: center;
+}
+
+/* Material checkboxes sit in the 2-col grid without a form-field wrapper, so
+   they need their own vertical rhythm to line up with the inputs. */
+.wiz-check {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  padding-bottom: 22px;
+}
+
+/* ===== Footer ===== */
+.wiz-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--admin-line);
+  flex-wrap: wrap;
+}
+
+.wiz-actions-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.wiz-skip {
+  --mdc-outlined-button-label-text-color: var(--admin-muted);
+}
+
+.wiz-next {
+  --mdc-filled-button-container-color: transparent;
+  --mdc-filled-button-label-text-color: #fff;
+  background: var(--admin-brand-grad-deep) !important;
+  background-size: 180% 100% !important;
+  box-shadow: 0 14px 30px -14px rgba(37, 148, 210, 0.75);
+  transition: transform 0.18s ease, box-shadow 0.22s ease, background-position 0.4s ease;
+}
+
+.wiz-next:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background-position: 100% 0 !important;
+  box-shadow: 0 20px 38px -12px rgba(246, 153, 61, 0.6);
+}
+
+@media (max-width: 1080px) {
+  .wiz-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  /* Rail becomes a horizontal filmstrip rather than wrapping to 6 rows. */
+  .wiz-rail {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .wiz-step {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .wiz-step-copy small {
+    display: none;
+  }
+
+  .wiz-actions,
+  .wiz-actions-main {
+    width: 100%;
+  }
+
+  .wiz-actions-main > * {
+    flex: 1 1 auto;
+  }
+}

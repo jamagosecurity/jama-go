@@ -10,6 +10,7 @@ import { Observable, filter, finalize, switchMap } from 'rxjs';
 import { Dia, DiaStatus } from '../../../../models/dia.model';
 import { Invoice } from '../../../../models/invoice.model';
 import { DiaService } from '../../../../services/dia.service';
+import { DIA_BASE_PATH } from '../dia-base-path';
 import { InvoiceService } from '../../../../services/invoice.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
 import {
@@ -42,6 +43,8 @@ export class DiaDetailComponent implements OnInit {
   private readonly invoiceService = inject(InvoiceService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  /** Portal this screen is mounted under — see DIA_BASE_PATH. */
+  protected readonly base = inject(DIA_BASE_PATH);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
@@ -110,7 +113,7 @@ export class DiaDetailComponent implements OnInit {
         next: () => {
           this.snackBar.open(`DIA ${action}d successfully.`, 'Dismiss', { duration: 3500 });
           if (action === 'archive') {
-            void this.router.navigate(['/admin/dia/list']);
+            void this.router.navigate([this.base, 'list']);
           } else {
             this.load();
           }

@@ -99,13 +99,61 @@
       </div>
 
       <label class="visibility-control">
+        <input type="checkbox" [(ngModel)]="form.canSignIn" name="canSignIn" />
+        <span class="switch-track"><i></i></span>
+        <span>
+          <strong>Allow sign-in</strong>
+          <small>
+            Let this person log in to the portal. Turn off to suspend the account without
+            deleting it.
+          </small>
+        </span>
+      </label>
+
+      <label class="visibility-control">
         <input type="checkbox" [(ngModel)]="form.isActive" name="isActive" />
         <span class="switch-track"><i></i></span>
         <span>
-          <strong>Active on public site</strong>
-          <small>Show this team member in the public Our Team section and allow login.</small>
+          <strong>Show on public site</strong>
+          <small>
+            List this team member in the Our Team section on jamago.qa. Internal staff can stay
+            hidden here and still sign in.
+          </small>
         </span>
       </label>
+
+      @if (!form.canSignIn) {
+        <p class="access-warning">
+          Sign-in is off — this person cannot log in, and the permissions below will not apply
+          until you turn it back on.
+        </p>
+      }
+
+      <section class="permission-section">
+        <div class="permission-heading">
+          <strong>Access permissions</strong>
+          <small>
+            Choose what this person can do once they sign in. Leave everything unticked on a new
+            account to apply the department's defaults.
+          </small>
+        </div>
+
+        <div class="permission-list">
+          @for (permission of permissionCatalogue(); track permission.key) {
+            <label class="permission-item">
+              <input
+                type="checkbox"
+                [checked]="isGranted(permission.key)"
+                (change)="togglePermission(permission.key, $any($event.target).checked)"
+              />
+              <span>
+                <strong>{{ permission.name }}</strong>
+                <small>{{ permission.description }}</small>
+              </span>
+            </label>
+          }
+        </div>
+      </section>
 
       <footer class="editor-actions">
         <button type="button" class="btn-admin btn-admin-ghost" (click)="cancel()">Cancel</button>

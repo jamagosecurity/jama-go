@@ -705,23 +705,54 @@ a { color: inherit; text-decoration: none; }
 
 /* ===== Admin command panel ===== */
 :root {
-  --admin-ink: #0b1f33;
-  --admin-ink-soft: #1a334d;
-  --admin-panel: rgba(255, 255, 255, 0.92);
-  --admin-line: rgba(15, 40, 70, 0.1);
-  --admin-muted: #5d7288;
+  --admin-ink: #08192b;
+  --admin-ink-soft: #16324e;
+  --admin-panel: rgba(255, 255, 255, 0.96);
+  --admin-line: rgba(15, 40, 70, 0.12);
+  /* Darkened from the old #5d7288 — secondary copy now clears AA on white. */
+  --admin-muted: #4b6280;
+  /* ===== Palette =====
+     Decorative colour is limited to the Jama Go brand pair plus one cool depth
+     stop (indigo). Rotating accents — nav rows, stat cards, wizard steps —
+     cycle only through these four, so a screen reads as one system.
+
+     Teal, rose and amber are SEMANTIC. They mean on-track, overdue/danger and
+     due-soon. Never reach for them as decoration; if a colour is not carrying
+     meaning it must come from the decorative set above. */
   --admin-blue: #2594d2;
-  --admin-blue-deep: #1478b3;
+  --admin-blue-deep: #0d6fae;
+  --admin-indigo: #4f46e5;
   --admin-orange: #f6993d;
-  --admin-orange-deep: #ef7f16;
-  --admin-teal: #14b8a6;
+  --admin-orange-deep: #e87708;
+
+  --admin-teal: #0fb9a5;
   --admin-rose: #e11d48;
+  --admin-amber: #f59e0b;
+
+  /* Readable text weights of the accents, for figures and labels on white. */
+  --admin-blue-ink: #0b5c92;
+  --admin-indigo-ink: #3730a3;
+  --admin-orange-ink: #b45309;
+  --admin-teal-ink: #0d6d63;
+  --admin-rose-ink: #9f1239;
   --admin-shadow: 0 22px 50px -28px rgba(11, 31, 51, 0.45);
   --admin-radius: 22px;
   /* Shared brand avatar/icon gradient — reused across admin staff cards,
      staff editor, staff profile and admin layout (was duplicated as a
      literal linear-gradient in each component file). */
   --admin-avatar-grad: linear-gradient(135deg, var(--admin-orange), var(--admin-blue));
+  /* Brand sweep: orange into blue through indigo. Decorative use only — the
+     orange end cannot hold white text. */
+  --admin-brand-grad: linear-gradient(115deg, var(--admin-orange) 0%, var(--admin-blue) 55%, var(--admin-indigo) 100%);
+  /* Same family, deep stops only, so white labels clear 4.5:1 wherever the
+     gradient lands. Use this on anything with text on top. */
+  --admin-brand-grad-deep: linear-gradient(115deg, #0b5c92 0%, #1d4ed8 55%, #3730a3 100%);
+  /* Sidebar body — one cool ramp from indigo into brand blue, warmed by a
+     single orange bloom so the rail has depth without turning into a rainbow. */
+  --admin-sidebar-grad:
+    radial-gradient(circle at 100% 96%, rgba(246, 153, 61, 0.24), transparent 46%),
+    radial-gradient(circle at 6% 22%, rgba(37, 148, 210, 0.28), transparent 44%),
+    linear-gradient(178deg, #221c66 0%, #1b357c 38%, #12548f 72%, #0d6fae 100%);
 }
 
 .admin-page {
@@ -776,6 +807,16 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
 }
 
+/* Page headings pick up the brand sweep so every admin screen opens on colour.
+   Deeper stops than --admin-brand-grad: gradient text still has to clear
+   contrast against the near-white admin canvas. */
+.admin-page-header h1 {
+  background: linear-gradient(105deg, var(--admin-orange-ink) 0%, var(--admin-blue-ink) 52%, var(--admin-indigo-ink) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -783,48 +824,77 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 22px;
 }
 
+/* Each stat card carries its own hue via --accent: a colour-washed surface, a
+   full-width top stripe and a matching number. The white base stays so the
+   figures keep their contrast. */
 .admin-stat {
+  --accent: var(--admin-blue);
+  --accent-ink: var(--admin-blue-deep);
   position: relative;
   overflow: hidden;
   border-radius: 20px;
-  padding: 18px 18px 16px;
-  background: var(--admin-panel);
-  border: 1px solid var(--admin-line);
-  box-shadow: var(--admin-shadow);
-  backdrop-filter: blur(10px);
+  padding: 22px 18px 16px;
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--accent) 14%, #fff) 0%, #fff 62%);
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+  box-shadow:
+    0 18px 38px -26px color-mix(in srgb, var(--accent) 70%, transparent),
+    0 2px 0 rgba(255, 255, 255, 0.6) inset;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.admin-stat:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 26px 48px -24px color-mix(in srgb, var(--accent) 80%, transparent),
+    0 2px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+/* top stripe */
+.admin-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 45%, #fff));
 }
 
 .admin-stat::after {
   content: "";
   position: absolute;
   inset: auto -20% -40% auto;
-  width: 120px;
-  height: 120px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
-  opacity: 0.18;
+  background: var(--accent);
+  opacity: 0.16;
   pointer-events: none;
 }
 
-.admin-stat--blue::after { background: var(--admin-blue); }
-.admin-stat--orange::after { background: var(--admin-orange); }
-.admin-stat--teal::after { background: var(--admin-teal); }
-.admin-stat--ink::after { background: var(--admin-ink); }
+/* Decorative accents — use these to differentiate cards. */
+.admin-stat--blue { --accent: var(--admin-blue); --accent-ink: var(--admin-blue-ink); }
+.admin-stat--indigo { --accent: var(--admin-indigo); --accent-ink: var(--admin-indigo-ink); }
+.admin-stat--orange { --accent: var(--admin-orange); --accent-ink: var(--admin-orange-ink); }
+.admin-stat--ink { --accent: var(--admin-blue-deep); --accent-ink: var(--admin-blue-ink); }
+/* Semantic — only when the figure genuinely means healthy or at-risk. */
+.admin-stat--teal { --accent: var(--admin-teal); --accent-ink: var(--admin-teal-ink); }
+.admin-stat--rose { --accent: var(--admin-rose); --accent-ink: var(--admin-rose-ink); }
 
 .admin-stat strong {
   display: block;
   font-family: "Sora", "Inter", sans-serif;
-  font-size: 1.85rem;
+  font-size: 1.95rem;
   letter-spacing: -0.04em;
-  color: var(--admin-ink);
+  color: var(--accent-ink);
   line-height: 1;
 }
 
 .admin-stat span {
   display: block;
   margin-top: 8px;
-  color: var(--admin-muted);
+  color: var(--admin-ink-soft);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .admin-toolbar {
@@ -867,17 +937,33 @@ a { color: inherit; text-decoration: none; }
 
 .admin-search input:focus {
   outline: none;
-  border-color: rgba(37, 148, 210, 0.45);
-  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+  border-color: var(--admin-blue);
+  box-shadow:
+    0 0 0 4px rgba(37, 148, 210, 0.22),
+    0 10px 26px -16px rgba(37, 148, 210, 0.7);
 }
 
 .admin-panel {
+  position: relative;
   background: var(--admin-panel);
   border: 1px solid var(--admin-line);
   border-radius: var(--admin-radius);
   box-shadow: var(--admin-shadow);
   padding: 22px;
   backdrop-filter: blur(12px);
+}
+
+/* Brand ribbon across the top of every panel — the cheapest way to get colour
+   onto the big white content cards without hurting the text contrast inside.
+   Corners are rounded on the pseudo-element rather than clipping the panel, so
+   menus and shadows inside the panel can still overflow it. */
+.admin-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  border-radius: var(--admin-radius) var(--admin-radius) 0 0;
+  background: var(--admin-brand-grad);
 }
 
 .admin-panel-title {
@@ -935,26 +1021,30 @@ a { color: inherit; text-decoration: none; }
   gap: 6px;
   padding: 5px 11px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.06);
-  color: var(--admin-ink-soft);
+  background: rgba(79, 70, 229, 0.1);
+  border: 1px solid rgba(79, 70, 229, 0.22);
+  color: #3730a3;
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
 
 .admin-badge--active {
-  background: rgba(20, 184, 166, 0.14);
-  color: #0f766e;
+  background: rgba(15, 185, 165, 0.16);
+  border-color: rgba(15, 185, 165, 0.32);
+  color: #0d6d63;
 }
 
 .admin-badge--hidden {
   background: rgba(100, 116, 139, 0.14);
-  color: #475569;
+  border-color: rgba(100, 116, 139, 0.26);
+  color: #3f4c5f;
 }
 
 .admin-badge--new {
   background: rgba(246, 153, 61, 0.16);
-  color: #c2410c;
+  border-color: rgba(246, 153, 61, 0.36);
+  color: var(--admin-orange-ink);
 }
 
 .admin-badge--dot::before {
@@ -989,13 +1079,21 @@ a { color: inherit; text-decoration: none; }
 
 .btn-admin-primary {
   color: #fff;
-  background: linear-gradient(120deg, var(--admin-orange), var(--admin-blue));
-  box-shadow: 0 14px 30px -14px rgba(37, 148, 210, 0.7);
+  background: var(--admin-brand-grad-deep);
+  background-size: 180% 100%;
+  box-shadow:
+    0 14px 30px -14px rgba(37, 148, 210, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.28);
+  transition: transform 0.18s ease, box-shadow 0.22s ease, background-position 0.4s ease;
 }
 
 .btn-admin-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 34px -12px rgba(246, 153, 61, 0.55);
+  background-position: 100% 0;
+  box-shadow:
+    0 20px 38px -12px rgba(246, 153, 61, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .btn-admin-primary:disabled {

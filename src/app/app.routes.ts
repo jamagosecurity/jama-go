@@ -7,7 +7,6 @@ import { AdminLayoutComponent } from './pages/admin/layout/admin-layout.componen
 import { AdminStaffComponent } from './pages/admin/staff/admin-staff.component';
 import { StaffEditorComponent } from './pages/admin/staff-editor/staff-editor.component';
 import { AdminContactsComponent } from './pages/admin/contacts/admin-contacts.component';
-import { StaffProfileComponent } from './pages/staff/profile/staff-profile.component';
 import { adminGuard, guestGuard, staffGuard, technicianGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
@@ -65,10 +64,9 @@ export const routes: Routes = [
       import('./pages/technician/technician.routes').then((module) => module.TECHNICIAN_ROUTES),
   },
   {
-    path: 'staff/profile',
-    component: StaffProfileComponent,
+    path: 'staff',
     canActivate: [staffGuard],
-    title: 'My Profile — Jama Go Staff',
+    loadChildren: () => import('./pages/staff/staff.routes').then((module) => module.STAFF_ROUTES),
   },
   { path: '**', redirectTo: '' },
 ];

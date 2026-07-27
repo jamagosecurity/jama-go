@@ -5,7 +5,7 @@
       <h1>Inspection records</h1>
       <p>Search, filter and manage client inspection schedules.</p>
     </div>
-    <a mat-flat-button routerLink="/admin/dia/new">Create DIA</a>
+    <a mat-flat-button [routerLink]="[base, 'new']">Create DIA</a>
   </header>
 
   <div class="dia-filters" aria-label="DIA filters">
@@ -51,7 +51,7 @@
           >
             <ng-container matColumnDef="diaNumber">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>DIA number</th>
-              <td mat-cell *matCellDef="let item"><strong>{{ item.diaNumber }}</strong></td>
+              <td mat-cell *matCellDef="let item"><span class="dia-num">{{ item.diaNumber }}</span></td>
             </ng-container>
             <ng-container matColumnDef="clientNumber">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Client number</th>
@@ -63,7 +63,9 @@
             </ng-container>
             <ng-container matColumnDef="clientLocation">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Location</th>
-              <td mat-cell *matCellDef="let item">{{ item.clientLocation }}</td>
+              <td mat-cell *matCellDef="let item">
+                <span class="dia-loc" [title]="item.clientLocation">{{ item.clientLocation }}</span>
+              </td>
             </ng-container>
             <ng-container matColumnDef="currentQuarter">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Quarter</th>
@@ -86,15 +88,54 @@
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>Actions</th>
               <td mat-cell *matCellDef="let item">
-                <div class="dia-actions">
-                  <a mat-button [routerLink]="['/admin/dia', item.id]">View</a>
-                  <a mat-button [routerLink]="['/admin/dia', item.id, 'edit']">Edit</a>
-                  @if (item.isActive) {
-                    <button mat-button type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, 'deactivate')">Deactivate</button>
-                  } @else {
-                    <button mat-button type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, 'activate')">Activate</button>
-                  }
-                  <button mat-button class="dia-danger" type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, 'archive')">Archive</button>
+                <!-- Icon buttons: four text buttons needed ~330px and wrapped to
+                     two lines, which doubled every row's height. -->
+                <div class="dia-row-actions">
+                  <a
+                    class="dia-act dia-act--view"
+                    [routerLink]="[base, item.id]"
+                    matTooltip="View details"
+                    aria-label="View details"
+                  >
+                    <svg viewBox="0 0 24 24"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="2.8" /></svg>
+                  </a>
+
+                  <a
+                    class="dia-act dia-act--edit"
+                    [routerLink]="[base, item.id, 'edit']"
+                    matTooltip="Edit record"
+                    aria-label="Edit record"
+                  >
+                    <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+                  </a>
+
+                  <button
+                    class="dia-act"
+                    [class.dia-act--deactivate]="item.isActive"
+                    [class.dia-act--activate]="!item.isActive"
+                    type="button"
+                    [disabled]="actionId() === item.id"
+                    [matTooltip]="item.isActive ? 'Deactivate' : 'Activate'"
+                    [attr.aria-label]="item.isActive ? 'Deactivate' : 'Activate'"
+                    (click)="confirmAction(item, item.isActive ? 'deactivate' : 'activate')"
+                  >
+                    @if (item.isActive) {
+                      <svg viewBox="0 0 24 24"><path d="M18.4 6.6a9 9 0 1 1-12.8 0" /><path d="M12 2v10" /></svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7" /></svg>
+                    }
+                  </button>
+
+                  <button
+                    class="dia-act dia-act--danger"
+                    type="button"
+                    [disabled]="actionId() === item.id"
+                    matTooltip="Archive"
+                    aria-label="Archive"
+                    (click)="confirmAction(item, 'archive')"
+                  >
+                    <svg viewBox="0 0 24 24"><path d="M3 7h18v4H3z" /><path d="M5 11v9h14v-9M10 15h4" /></svg>
+                  </button>
                 </div>
               </td>
             </ng-container>
@@ -118,8 +159,8 @@
                 <div><dt>Next inspection</dt><dd>{{ (item.nextInspectionDate | date: 'mediumDate') || '—' }}</dd></div>
               </dl>
               <div class="dia-actions">
-                <a mat-button [routerLink]="['/admin/dia', item.id]">View</a>
-                <a mat-button [routerLink]="['/admin/dia', item.id, 'edit']">Edit</a>
+                <a mat-button [routerLink]="[base, item.id]">View</a>
+                <a mat-button [routerLink]="[base, item.id, 'edit']">Edit</a>
                 <button mat-button type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, item.isActive ? 'deactivate' : 'activate')">{{ item.isActive ? 'Deactivate' : 'Activate' }}</button>
                 <button mat-button class="dia-danger" type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, 'archive')">Archive</button>
               </div>

@@ -5,74 +5,130 @@
       <h1>Activated DIA inspections</h1>
       <p>Start or continue quarterly inspections for activated client sites.</p>
     </div>
+    <button mat-stroked-button type="button" (click)="load()">Refresh</button>
   </header>
 
   @if (loading()) {
-    <p>Loading activated DIA records…</p>
+    <div class="admin-panel"><p>Loading activated DIA records…</p></div>
   } @else if (error()) {
     <div class="admin-panel">
-      <p>{{ error() }}</p>
+      <p class="admin-error">{{ error() }}</p>
       <button mat-stroked-button type="button" (click)="load()">Try again</button>
     </div>
   } @else if (items().length) {
-    <div class="admin-panel">
-      <div class="tech-table-wrap">
-        <table mat-table [dataSource]="items()">
-          <ng-container matColumnDef="diaNumber">
-            <th mat-header-cell *matHeaderCellDef>DIA number</th>
-            <td mat-cell *matCellDef="let item"><strong>{{ item.diaNumber }}</strong></td>
-          </ng-container>
-          <ng-container matColumnDef="clientNumber">
-            <th mat-header-cell *matHeaderCellDef>Client number</th>
-            <td mat-cell *matCellDef="let item">{{ item.clientNumber }}</td>
-          </ng-container>
-          <ng-container matColumnDef="clientName">
-            <th mat-header-cell *matHeaderCellDef>Client name</th>
-            <td mat-cell *matCellDef="let item">{{ item.clientName }}</td>
-          </ng-container>
-          <ng-container matColumnDef="clientLocation">
-            <th mat-header-cell *matHeaderCellDef>Location</th>
-            <td mat-cell *matCellDef="let item">{{ item.clientLocation }}</td>
-          </ng-container>
-          <ng-container matColumnDef="activatedDate">
-            <th mat-header-cell *matHeaderCellDef>Activated</th>
-            <td mat-cell *matCellDef="let item">{{ (item.activatedDate | date: 'mediumDate') || '—' }}</td>
-          </ng-container>
-          <ng-container matColumnDef="inspectionStatus">
-            <th mat-header-cell *matHeaderCellDef>Inspection status</th>
-            <td mat-cell *matCellDef="let item">
-              <span class="tech-status tech-status--{{ item.inspectionStatus.toLowerCase() }}">
-                {{ statusLabel(item.inspectionStatus) }}
-              </span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="currentQuarter">
-            <th mat-header-cell *matHeaderCellDef>Quarter</th>
-            <td mat-cell *matCellDef="let item">{{ item.currentQuarter ? 'Q' + item.currentQuarter : '—' }}</td>
-          </ng-container>
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Action</th>
-            <td mat-cell *matCellDef="let item">
-              <a mat-flat-button [routerLink]="actionLink(item)">{{ actionLabel(item) }}</a>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-      </div>
+    <div class="admin-stats">
+      <article class="admin-stat admin-stat--blue">
+        <strong>{{ summary().sites }}</strong>
+        <span>Active sites</span>
+      </article>
+      <article class="admin-stat admin-stat--teal">
+        <strong>{{ summary().done }} / {{ summary().capacity }}</strong>
+        <span>Quarters submitted</span>
+      </article>
+      <article class="admin-stat admin-stat--violet">
+        <strong>{{ summary().remaining }}</strong>
+        <span>Quarters remaining</span>
+      </article>
+      <article class="admin-stat" [class.admin-stat--pink]="summary().overdue" [class.admin-stat--orange]="!summary().overdue">
+        <strong>{{ summary().overdue }}</strong>
+        <span>{{ summary().overdue ? 'Overdue' : 'Due within 14 days: ' + summary().dueSoon }}</span>
+      </article>
+    </div>
 
-      <div class="tech-mobile-cards">
-        @for (item of items(); track item.id) {
-          <article class="tech-record-card">
-            <strong>{{ item.diaNumber }}</strong>
-            <p>{{ item.clientName }} · {{ item.clientLocation }}</p>
-            <p>Quarter: {{ item.currentQuarter ? 'Q' + item.currentQuarter : '—' }}</p>
-            <a mat-flat-button [routerLink]="actionLink(item)">{{ actionLabel(item) }}</a>
-          </article>
-        }
-      </div>
+    <div class="tech-site-grid">
+      @for (item of items(); track item.id) {
+        <article class="tech-site" [class.is-complete]="item.inspectionStatus === 'Completed'">
+          <header class="tech-site-head">
+            <div>
+              <p class="tech-site-dia">{{ item.diaNumber }}</p>
+              <h2>{{ item.clientName }}</h2>
+              <p class="tech-site-sub">Client no. {{ item.clientNumber }}</p>
+            </div>
+            <span class="tech-status tech-status--{{ item.inspectionStatus.toLowerCase() }}">
+              {{ statusLabel(item.inspectionStatus) }}
+            </span>
+          </header>
+
+          <p class="tech-site-loc" [title]="item.clientLocation">{{ item.clientLocation }}</p>
+
+          <!-- Cycle progress: one pip per quarter, plus the done/left tally. -->
+          <div class="tech-cycle">
+            <div class="tech-pips" aria-hidden="true">
+              @for (q of quarterSlots; track q) {
+                <span class="tech-pip tech-pip--{{ quarterState(item, q) }}">
+                  @if (quarterState(item, q) === 'done') {
+                    <svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7" /></svg>
+                  } @else {
+                    Q{{ q }}
+                  }
+                </span>
+              }
+            </div>
+            <p class="tech-cycle-count">
+              <strong>{{ item.submittedQuarters }} of 4</strong> quarters complete
+              @if (quartersLeft(item)) {
+                <span>· {{ quartersLeft(item) }} left</span>
+              }
+            </p>
+          </div>
+
+          <div class="tech-bar" role="presentation">
+            <i [style.width.%]="item.submittedQuarters * 25"></i>
+          </div>
+
+          <!-- Next inspection: the date first, since that is what a technician
+               is actually planning around, with the countdown as support. -->
+          <div class="tech-next tech-next--{{ dueInfo(item).tone }}">
+            <div class="tech-next-row">
+              <span class="tech-next-label">
+                @if (item.inspectionStatus === 'Completed') {
+                  Cycle finished
+                } @else {
+                  Next inspection
+                }
+              </span>
+              <span class="tech-next-chip">
+                <span class="tech-due-dot" aria-hidden="true"></span>
+                {{ dueInfo(item).label }}
+              </span>
+            </div>
+
+            <p class="tech-next-date">
+              @if (item.quarterEndDate) {
+                {{ item.quarterEndDate | date: 'EEE, d MMM y' }}
+              } @else {
+                Scheduled once the first inspection starts
+              }
+            </p>
+
+            <p class="tech-next-meta">
+              {{ nextQuarterLabel(item) }}
+              @if (item.quarterStartDate && item.quarterEndDate && item.inspectionStatus !== 'Completed') {
+                <span>
+                  · window {{ item.quarterStartDate | date: 'd MMM' }} –
+                  {{ item.quarterEndDate | date: 'd MMM y' }}
+                </span>
+              }
+            </p>
+          </div>
+
+          <footer class="tech-site-foot">
+            <span class="tech-site-meta">
+              Activated {{ (item.activatedDate | date: 'mediumDate') || '—' }}
+            </span>
+            <a mat-flat-button class="tech-site-cta" [routerLink]="actionLink(item)">
+              {{ actionLabel(item) }}
+            </a>
+          </footer>
+        </article>
+      }
     </div>
   } @else {
-    <div class="admin-panel"><p>No activated DIA records are available right now.</p></div>
+    <div class="admin-panel">
+      <div class="admin-empty">
+        <strong>Nothing activated yet</strong>
+        <p>No activated DIA records are available right now.</p>
+      </div>
+    </div>
   }
 </section>

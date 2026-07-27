@@ -7,7 +7,82 @@
 .dia-metric span,.dia-metric small{display:block;color:var(--admin-muted)}.dia-metric span{font-weight:700}.dia-metric strong{display:block;margin:14px 0 8px;font:800 2.2rem/1 Sora,Inter,sans-serif;color:var(--dia-ink)}.dia-metric small{font-size:.8rem}
 .dia-metric--blue,.dia-metric--q1{color:#2563eb}.dia-metric--green,.dia-metric--completed{color:#16a34a}.dia-metric--gray{color:#64748b}.dia-metric--q2{color:#0891b2}.dia-metric--q3{color:#ea580c}.dia-metric--q4{color:#9333ea}
 .dia-filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}.dia-filters mat-form-field:first-child{flex:1 1 280px;max-width:520px}.dia-filters mat-form-field:nth-child(2){width:210px}
-.dia-list-panel{padding:0;overflow:hidden}.dia-list-panel app-dia-skeleton{display:block;padding:22px}.dia-table-wrap{overflow:auto}table{width:100%;min-width:1180px}th.mat-mdc-header-cell{font-weight:800;color:#334155;white-space:nowrap}td.mat-mdc-cell{color:#334155}.dia-actions{white-space:nowrap}.dia-danger{color:#be123c!important}
+.dia-list-panel{padding:0;overflow:hidden}.dia-list-panel app-dia-skeleton{display:block;padding:22px}
+.dia-table-wrap{overflow:auto}
+/* Icon actions cut the column from ~330px to ~150px, so the table no longer
+   needs to be wider than most screens to avoid wrapping. */
+table{width:100%;min-width:980px;border-collapse:separate;border-spacing:0}
+
+/* Header: sticky while the body scrolls, tinted so it separates from row 1. */
+th.mat-mdc-header-cell{
+  position:sticky;top:0;z-index:2;
+  padding:14px 12px;
+  background:linear-gradient(180deg,#f4f9fe,#eef4fb);
+  border-bottom:1px solid rgba(15,40,70,.14);
+  font-size:.74rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--admin-blue-ink);white-space:nowrap;
+}
+
+td.mat-mdc-cell{
+  padding:12px;
+  border-bottom:1px solid rgba(15,40,70,.07);
+  color:var(--admin-ink-soft);font-size:.9rem;vertical-align:middle;
+}
+
+tr.mat-mdc-row{transition:background .16s ease}
+tr.mat-mdc-row:hover{background:rgba(37,148,210,.06)}
+tr.mat-mdc-row:last-child td.mat-mdc-cell{border-bottom:0}
+
+/* Tabular figures keep DIA numbers aligned down the column. */
+.dia-num{
+  font-weight:800;font-size:.95rem;color:var(--admin-ink);
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+
+/* Addresses run long — clamp to two lines, full text on hover. */
+.dia-loc{
+  display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;max-width:34ch;line-height:1.4;
+}
+
+.dia-row-actions{display:flex;align-items:center;gap:4px;white-space:nowrap}
+
+/* Each action carries its own tint via --act, so the row is scannable by colour
+   rather than by reading four identical blue glyphs. The hues are meaningful,
+   not decorative: blue reads, indigo edits, teal/amber switch state on and off,
+   rose destroys. Tinted chip by default, saturating on hover. */
+.dia-act{
+  --act: var(--admin-blue);
+  --act-ink: var(--admin-blue-ink);
+  display:grid;place-items:center;flex:0 0 auto;
+  width:34px;height:34px;padding:0;
+  border:1px solid color-mix(in srgb, var(--act) 24%, transparent);
+  border-radius:10px;
+  background:color-mix(in srgb, var(--act) 12%, #fff);
+  color:var(--act-ink);cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.dia-act svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.dia-act:hover{
+  background:color-mix(in srgb, var(--act) 22%, #fff);
+  border-color:color-mix(in srgb, var(--act) 45%, transparent);
+  transform:translateY(-1px);
+}
+.dia-act:focus-visible{outline:2px solid var(--act);outline-offset:1px}
+.dia-act:disabled{opacity:.4;cursor:not-allowed}
+.dia-act:disabled:hover{transform:none;background:color-mix(in srgb, var(--act) 12%, #fff)}
+
+.dia-act--view{--act:var(--admin-blue);--act-ink:var(--admin-blue-ink)}
+.dia-act--edit{--act:var(--admin-indigo);--act-ink:var(--admin-indigo-ink)}
+/* Turning a DIA on is a healthy state change; turning it off is a caution. */
+.dia-act--activate{--act:var(--admin-teal);--act-ink:var(--admin-teal-ink)}
+.dia-act--deactivate{--act:var(--admin-amber);--act-ink:var(--admin-orange-ink)}
+/* Archive is the only irreversible action in the row. */
+.dia-act--danger{--act:var(--admin-rose);--act-ink:var(--admin-rose-ink)}
+
+/* Still used by the mobile record cards and the detail screen, which keep
+   full-width text buttons rather than icons. */
+.dia-danger{color:var(--admin-rose-ink)!important}
 .dia-mobile-cards{display:none;padding:14px;gap:12px}.dia-record-card{padding:16px;border:1px solid rgba(15,40,70,.1);border-radius:18px;background:#fff}.dia-record-card header{display:flex;justify-content:space-between;gap:12px}.dia-record-card header strong,.dia-record-card header span{display:block}.dia-record-card header span,.dia-record-card p{color:var(--admin-muted);font-size:.85rem}.dia-record-card h2{margin-top:14px;font-size:1.05rem}.dia-record-card dl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}.dia-record-card dl div{padding:8px;border-radius:10px;background:#f4f8fb}.dia-record-card dt{font-size:.68rem;text-transform:uppercase;color:#64748b}.dia-record-card dd{font-weight:700;color:#0b1f33}
 .dia-form-page{max-width:880px}.dia-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px}.dia-form mat-form-field:nth-of-type(4){grid-column:1/-1}.dia-form .admin-error,.dia-form-actions{grid-column:1/-1}.dia-form-actions{justify-content:flex-end;margin-top:8px}.dia-form-actions mat-spinner{display:inline-block;margin-right:6px}
 .dia-progress-panel{margin-bottom:18px}.dia-progress-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.dia-progress-heading>div{display:flex;align-items:baseline;gap:12px}.dia-progress-heading span{color:var(--admin-muted)}.dia-progress-heading strong{font:800 1.7rem Sora,Inter,sans-serif}.dia-progress-panel p{margin-top:12px;color:var(--admin-muted)}.dia-progress-complete{--mdc-linear-progress-active-indicator-color:#16a34a}

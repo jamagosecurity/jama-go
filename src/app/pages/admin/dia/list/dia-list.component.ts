@@ -11,11 +11,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, debounceTime, distinctUntilChanged, filter, finalize, switchMap } from 'rxjs';
 import { DIA_STATUSES, Dia, DiaListQuery, DiaStatus, PaginatedData } from '../../../../models/dia.model';
 import { DiaService } from '../../../../services/dia.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
+import { DIA_BASE_PATH } from '../dia-base-path';
 import {
   ConfirmationDialogData,
   DiaConfirmationDialogComponent,
@@ -40,6 +42,7 @@ import {
     MatSnackBarModule,
     MatSortModule,
     MatTableModule,
+    MatTooltipModule,
     DiaEmptyStateComponent,
     DiaSkeletonComponent,
     DiaStatusChipComponent,
@@ -53,6 +56,8 @@ export class DiaListComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  /** Portal this screen is mounted under — see DIA_BASE_PATH. */
+  protected readonly base = inject(DIA_BASE_PATH);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
 

@@ -27,11 +27,8 @@ export class AppComponent {
 
   private isPortalRoute(url: string): boolean {
     const path = url.split('?')[0] ?? url;
-    return (
-      path === '/admin' ||
-      path.startsWith('/admin/') ||
-      path === '/staff' ||
-      path.startsWith('/staff/')
+    return ['/admin', '/staff', '/technician'].some(
+      (portal) => path === portal || path.startsWith(`${portal}/`),
     );
   }
 }

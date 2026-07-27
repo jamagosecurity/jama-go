@@ -1,4 +1,4 @@
-<section class="dia-page">
+<section class="dia-page tech-wizard">
   <header class="admin-page-header">
     <div>
       <span class="admin-kicker">Inspection form</span>
@@ -9,92 +9,189 @@
   </header>
 
   @if (loading()) {
-    <p>Loading inspection form…</p>
+    <div class="admin-panel"><p>Loading inspection form…</p></div>
   } @else if (error()) {
-    <div class="admin-panel"><p>{{ error() }}</p></div>
+    <div class="admin-panel"><p class="admin-error">{{ error() }}</p></div>
   } @else {
-    <form [formGroup]="form" class="admin-panel">
-      <section class="tech-section">
-        <div class="tech-header-actions">
-          <h2>Camera details</h2>
-          <button mat-stroked-button type="button" (click)="addCamera()">Add camera</button>
+    <!-- Step rail — any step is reachable, so a technician can jump straight
+         to the section that matters on site. -->
+    <nav class="wiz-rail" aria-label="Inspection sections">
+      @for (step of steps; track step.key; let i = $index) {
+        <button
+          type="button"
+          class="wiz-step"
+          [class.is-current]="i === stepIndex()"
+          [class.is-done]="isCompleted(step.key)"
+          [class.is-skipped]="isSkipped(step.key)"
+          [attr.aria-current]="i === stepIndex() ? 'step' : null"
+          (click)="goTo(i)"
+        >
+          <span class="wiz-dot" aria-hidden="true">
+            @if (isCompleted(step.key) && i !== stepIndex()) {
+              <svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7" /></svg>
+            } @else if (isSkipped(step.key) && i !== stepIndex()) {
+              <svg viewBox="0 0 24 24"><path d="M5 12h14" /></svg>
+            } @else {
+              {{ i + 1 }}
+            }
+          </span>
+          <span class="wiz-step-copy">
+            <strong>{{ step.label }}</strong>
+            @if (isSkipped(step.key)) {
+              <small>Skipped</small>
+            } @else if (isCompleted(step.key)) {
+              <small>Filled</small>
+            } @else {
+              <small>Pending</small>
+            }
+          </span>
+        </button>
+      }
+    </nav>
+
+    <div
+      class="wiz-progress"
+      role="progressbar"
+      [attr.aria-valuenow]="progress()"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      <i [style.width.%]="progress()"></i>
+    </div>
+
+    <form [formGroup]="form" class="admin-panel wiz-panel">
+      <header class="wiz-head">
+        <div class="wiz-head-copy">
+          <p class="wiz-eyebrow">Step {{ stepIndex() + 1 }} of {{ steps.length }}</p>
+          <h2>{{ currentStep().label }}</h2>
+          <p class="wiz-hint">{{ currentStep().hint }}</p>
         </div>
-        <div formArrayName="cameras">
-          @for (camera of cameras.controls; track $index; let i = $index) {
-            <div class="tech-camera-row" [formGroupName]="i">
-              <mat-form-field appearance="outline"><mat-label>Brand</mat-label><input matInput formControlName="brand" /></mat-form-field>
-              <mat-form-field appearance="outline"><mat-label>Model</mat-label><input matInput formControlName="model" /></mat-form-field>
-              <mat-form-field appearance="outline"><mat-label>Qty</mat-label><input matInput type="number" formControlName="quantity" /></mat-form-field>
-              <mat-form-field appearance="outline"><mat-label>Location</mat-label><input matInput formControlName="location" /></mat-form-field>
-              <mat-form-field appearance="outline"><mat-label>Remarks</mat-label><input matInput formControlName="remarks" /></mat-form-field>
-              <button mat-button type="button" (click)="removeCamera(i)" [disabled]="cameras.length === 1">Remove</button>
+        @if (isSkipped(currentStep().key)) {
+          <span class="wiz-flag">Skipped — fill anything in to undo</span>
+        }
+      </header>
+
+      <div class="wiz-body">
+        @switch (currentStep().key) {
+          @case ('cameras') {
+            <div formArrayName="cameras">
+              <div class="tech-header-actions wiz-body-actions">
+                <button mat-stroked-button type="button" (click)="addCamera()">Add camera</button>
+              </div>
+
+              @if (!cameras.length) {
+                <p class="wiz-empty">
+                  No cameras recorded for this site. Add one, or move on — this section is optional.
+                </p>
+              }
+
+              @for (camera of cameras.controls; track $index; let i = $index) {
+                <div class="tech-camera-row" [formGroupName]="i">
+                  <mat-form-field appearance="outline"><mat-label>Brand</mat-label><input matInput formControlName="brand" /></mat-form-field>
+                  <mat-form-field appearance="outline"><mat-label>Model</mat-label><input matInput formControlName="model" /></mat-form-field>
+                  <mat-form-field appearance="outline"><mat-label>Qty</mat-label><input matInput type="number" formControlName="quantity" /></mat-form-field>
+                  <mat-form-field appearance="outline"><mat-label>Location</mat-label><input matInput formControlName="location" /></mat-form-field>
+                  <mat-form-field appearance="outline"><mat-label>Remarks</mat-label><input matInput formControlName="remarks" /></mat-form-field>
+                  <button mat-button type="button" (click)="removeCamera(i)">Remove</button>
+                </div>
+              }
             </div>
           }
-        </div>
-      </section>
 
-      <section class="tech-section" formGroupName="network">
-        <h2>Network</h2>
-        <div class="tech-grid">
-          <mat-form-field appearance="outline"><mat-label>Switch brand</mat-label><input matInput formControlName="switchBrand" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Switch model</mat-label><input matInput formControlName="switchModel" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Router brand</mat-label><input matInput formControlName="routerBrand" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Router model</mat-label><input matInput formControlName="routerModel" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>Firewall</mat-label><input matInput formControlName="firewall" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>Rack details</mat-label><input matInput formControlName="rackDetails" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>Network remarks</mat-label><textarea matInput rows="2" formControlName="networkRemarks"></textarea></mat-form-field>
-        </div>
-      </section>
+          @case ('network') {
+            <div class="tech-grid" formGroupName="network">
+              <mat-form-field appearance="outline"><mat-label>Switch brand</mat-label><input matInput formControlName="switchBrand" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Switch model</mat-label><input matInput formControlName="switchModel" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Router brand</mat-label><input matInput formControlName="routerBrand" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Router model</mat-label><input matInput formControlName="routerModel" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>Firewall</mat-label><input matInput formControlName="firewall" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>Rack details</mat-label><input matInput formControlName="rackDetails" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>Network remarks</mat-label><textarea matInput rows="2" formControlName="networkRemarks"></textarea></mat-form-field>
+            </div>
+          }
 
-      <section class="tech-section" formGroupName="vms">
-        <h2>VMS</h2>
-        <div class="tech-grid">
-          <mat-form-field appearance="outline"><mat-label>VMS name</mat-label><input matInput formControlName="vmsName" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Version</mat-label><input matInput formControlName="version" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>License details</mat-label><input matInput formControlName="licenseDetails" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>Server details</mat-label><input matInput formControlName="serverDetails" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Health status</mat-label><input matInput formControlName="healthStatus" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Remarks</mat-label><input matInput formControlName="remarks" /></mat-form-field>
-        </div>
-      </section>
+          @case ('vms') {
+            <div class="tech-grid" formGroupName="vms">
+              <mat-form-field appearance="outline"><mat-label>VMS name</mat-label><input matInput formControlName="vmsName" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Version</mat-label><input matInput formControlName="version" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>License details</mat-label><input matInput formControlName="licenseDetails" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>Server details</mat-label><input matInput formControlName="serverDetails" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Health status</mat-label><input matInput formControlName="healthStatus" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Remarks</mat-label><input matInput formControlName="remarks" /></mat-form-field>
+            </div>
+          }
 
-      <section class="tech-section" formGroupName="upsGeneral">
-        <h2>UPS / General</h2>
-        <div class="tech-grid">
-          <mat-form-field appearance="outline"><mat-label>UPS brand</mat-label><input matInput formControlName="upsBrand" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>UPS capacity</mat-label><input matInput formControlName="upsCapacity" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Battery status</mat-label><input matInput formControlName="batteryStatus" /></mat-form-field>
-          <mat-checkbox formControlName="generatorAvailable">Generator available</mat-checkbox>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>Generator details</mat-label><input matInput formControlName="generatorDetails" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>General remarks</mat-label><textarea matInput rows="2" formControlName="generalRemarks"></textarea></mat-form-field>
-        </div>
-      </section>
+          @case ('upsGeneral') {
+            <div class="tech-grid" formGroupName="upsGeneral">
+              <mat-form-field appearance="outline"><mat-label>UPS brand</mat-label><input matInput formControlName="upsBrand" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>UPS capacity</mat-label><input matInput formControlName="upsCapacity" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Battery status</mat-label><input matInput formControlName="batteryStatus" /></mat-form-field>
+              <div class="wiz-check"><mat-checkbox formControlName="generatorAvailable">Generator available</mat-checkbox></div>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>Generator details</mat-label><input matInput formControlName="generatorDetails" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>General remarks</mat-label><textarea matInput rows="2" formControlName="generalRemarks"></textarea></mat-form-field>
+            </div>
+          }
 
-      <section class="tech-section" formGroupName="anpr">
-        <h2>ANPR system</h2>
-        <div class="tech-grid">
-          <mat-checkbox formControlName="anprInstalled">ANPR installed</mat-checkbox>
-          <mat-form-field appearance="outline"><mat-label>Software version</mat-label><input matInput formControlName="softwareVersion" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>Camera details</mat-label><input matInput formControlName="cameraDetails" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>Configuration</mat-label><input matInput formControlName="configuration" /></mat-form-field>
-          <mat-form-field appearance="outline" class="span-2"><mat-label>Remarks</mat-label><textarea matInput rows="2" formControlName="remarks"></textarea></mat-form-field>
-        </div>
-      </section>
+          @case ('anpr') {
+            <div class="tech-grid" formGroupName="anpr">
+              <div class="wiz-check"><mat-checkbox formControlName="anprInstalled">ANPR installed</mat-checkbox></div>
+              <mat-form-field appearance="outline"><mat-label>Software version</mat-label><input matInput formControlName="softwareVersion" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>Camera details</mat-label><input matInput formControlName="cameraDetails" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>Configuration</mat-label><input matInput formControlName="configuration" /></mat-form-field>
+              <mat-form-field appearance="outline" class="span-2"><mat-label>Remarks</mat-label><textarea matInput rows="2" formControlName="remarks"></textarea></mat-form-field>
+            </div>
+          }
 
-      <section class="tech-section" formGroupName="kpoi">
-        <h2>K'Poi</h2>
-        <div class="tech-grid">
-          <mat-form-field appearance="outline"><mat-label>IVD / IVSS</mat-label><input matInput formControlName="ivdIvss" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>KPOI camera</mat-label><input matInput formControlName="kpoiCamera" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Lens</mat-label><input matInput formControlName="lens" /></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Hard disc</mat-label><input matInput formControlName="hardDisc" /></mat-form-field>
-        </div>
-      </section>
-
-      <div class="tech-form-actions">
-        <button mat-stroked-button type="button" [disabled]="saving()" (click)="saveDraft()">Save draft</button>
-        <button mat-flat-button type="button" [disabled]="saving()" (click)="review()">Review & submit</button>
+          @case ('kpoi') {
+            <div class="tech-grid" formGroupName="kpoi">
+              <mat-form-field appearance="outline"><mat-label>IVD / IVSS</mat-label><input matInput formControlName="ivdIvss" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>KPOI camera</mat-label><input matInput formControlName="kpoiCamera" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Lens</mat-label><input matInput formControlName="lens" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Hard disc</mat-label><input matInput formControlName="hardDisc" /></mat-form-field>
+            </div>
+          }
+        }
       </div>
+
+      <footer class="wiz-actions">
+        <button
+          mat-stroked-button
+          type="button"
+          class="wiz-back"
+          [disabled]="isFirstStep()"
+          (click)="back()"
+        >
+          Back
+        </button>
+
+        <div class="wiz-actions-main">
+          <button mat-stroked-button type="button" [disabled]="saving()" (click)="saveDraft()">
+            Save draft
+          </button>
+
+          @if (!isLastStep()) {
+            <button mat-stroked-button type="button" class="wiz-skip" (click)="skip()">
+              Skip this section
+            </button>
+            <button mat-flat-button type="button" class="wiz-next" (click)="next()">
+              Next
+            </button>
+          } @else {
+            <button mat-stroked-button type="button" class="wiz-skip" (click)="skip()">
+              Skip this section
+            </button>
+            <button
+              mat-flat-button
+              type="button"
+              class="wiz-next"
+              [disabled]="saving()"
+              (click)="review()"
+            >
+              Review &amp; submit
+            </button>
+          }
+        </div>
+      </footer>
     </form>
   }
 </section>

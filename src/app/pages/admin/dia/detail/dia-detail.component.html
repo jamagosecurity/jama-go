@@ -18,8 +18,8 @@
         <p>{{ item.clientName }} · {{ item.clientLocation }}</p>
       </div>
       <div class="dia-header-actions">
-        <a mat-stroked-button routerLink="/admin/dia/list">Back to list</a>
-        <a mat-flat-button [routerLink]="['/admin/dia', item.id, 'edit']">Edit</a>
+        <a mat-stroked-button [routerLink]="[base, 'list']">Back to list</a>
+        <a mat-flat-button [routerLink]="[base, item.id, 'edit']">Edit</a>
       </div>
     </header>
 

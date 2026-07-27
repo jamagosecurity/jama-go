@@ -41,6 +41,16 @@ export interface TechnicianDiaListItem {
   currentQuarter: number | null;
   action: TechnicianDiaAction;
   currentInspectionId: string | null;
+  /** Quarters submitted so far, 0–4. */
+  submittedQuarters: number;
+  /** Opening date of the quarter currently due. */
+  quarterStartDate: string | null;
+  /** Deadline for the quarter currently open; null once the cycle is done. */
+  quarterEndDate: string | null;
+  /** Server-computed days left on the open quarter. Floored at 0 — an overdue
+   *  quarter reports 0, so use quarterEndDate to detect that case. */
+  remainingDays: number;
+  progressPercent: number;
 }
 
 export interface CameraDetail {

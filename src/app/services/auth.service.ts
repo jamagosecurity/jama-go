@@ -4,7 +4,12 @@ import { Router } from '@angular/router';
 import { Observable, map, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResult, unwrapApiResult } from '../models/api-result.model';
-import { LoginRequest, LoginResponse, UserSummary } from '../models/auth.model';
+import {
+  ChangePasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  UserSummary,
+} from '../models/auth.model';
 
 const TOKEN_KEY = 'jamago_admin_token';
 const USER_KEY = 'jamago_admin_user';
@@ -46,9 +51,18 @@ export class AuthService {
     return this.currentUser()?.role === 'Technician';
   }
 
+  /**
+   * Whether the signed-in user holds a permission. Drives navigation and
+   * button visibility only — the API enforces the same requirement on every
+   * endpoint, so this is convenience, not a security boundary.
+   */
+  can(permission: string): boolean {
+    return this.currentUser()?.permissions?.includes(permission) ?? false;
+  }
+
   landingRoute(user = this.currentUser()): string {
     if (user?.role === 'Technician') return '/technician';
-    return user?.role === 'Staff' ? '/staff/profile' : '/admin/staff';
+    return user?.role === 'Staff' ? '/staff' : '/admin/staff';
   }
 
   login(request: LoginRequest): Observable<LoginResponse> {
@@ -58,6 +72,13 @@ export class AuthService {
         map((result) => unwrapApiResult(result)),
         tap((response) => this.persistSession(response)),
       );
+  }
+
+  /** Self-service password change for the signed-in user, any role. */
+  changePassword(request: ChangePasswordRequest): Observable<string> {
+    return this.http
+      .post<ApiResult<string>>(`${environment.apiUrl}/auth/change-password`, request)
+      .pipe(map((result) => unwrapApiResult(result)));
   }
 
   validateSession(): Observable<UserSummary> {

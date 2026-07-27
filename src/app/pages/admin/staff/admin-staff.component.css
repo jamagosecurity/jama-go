@@ -213,21 +213,42 @@
   gap: 14px;
 }
 
+/* Cards rotate through the accent set so a roster reads as a colour sequence
+   rather than a wall of white-on-white. --accent drives the wash, the border,
+   the left rail and the avatar on each card. */
 .staff-card {
+  --accent: var(--admin-blue);
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 14px;
-  padding: 18px;
+  padding: 18px 18px 18px 22px;
   border-radius: 20px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 253, 0.96));
-  border: 1px solid rgba(15, 40, 70, 0.08);
-  box-shadow: 0 18px 36px -28px rgba(11, 31, 51, 0.45);
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 11%, #fff) 0%, #fff 58%);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--accent) 75%, transparent);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* left colour rail */
+.staff-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #fff));
+}
+
+/* Decorative rotation — the brand ramp only. */
+.staff-card:nth-child(4n + 1) { --accent: var(--admin-blue); }
+.staff-card:nth-child(4n + 2) { --accent: var(--admin-indigo); }
+.staff-card:nth-child(4n + 3) { --accent: var(--admin-blue-deep); }
+.staff-card:nth-child(4n + 4) { --accent: var(--admin-orange); }
+
 .staff-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 24px 40px -24px rgba(11, 31, 51, 0.5);
+  box-shadow: 0 26px 44px -24px color-mix(in srgb, var(--accent) 85%, transparent);
 }
 
 .staff-card--hidden {
@@ -241,6 +262,8 @@
   align-items: center;
 }
 
+/* White initials on the old orange→blue gradient sat near 2:1 at the warm end.
+   Solid accent + white now, which also ties the avatar to the card's hue. */
 .staff-avatar {
   display: grid;
   place-items: center;
@@ -249,8 +272,10 @@
   border-radius: 16px;
   color: #fff;
   font-weight: 800;
-  background: var(--admin-avatar-grad);
-  box-shadow: 0 12px 24px -14px rgba(37, 148, 210, 0.8);
+  background: linear-gradient(140deg,
+    color-mix(in srgb, var(--accent) 88%, #000),
+    color-mix(in srgb, var(--accent) 70%, #000));
+  box-shadow: 0 12px 24px -14px color-mix(in srgb, var(--accent) 90%, transparent);
 }
 
 .staff-card-meta h3 {
@@ -261,9 +286,9 @@
 }
 
 .staff-card-meta p {
-  color: var(--admin-blue-deep);
+  color: color-mix(in srgb, var(--accent) 72%, #000);
   font-size: 0.88rem;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .staff-card-meta small {
@@ -289,17 +314,19 @@
 
 .tag {
   display: inline-flex;
-  padding: 6px 10px;
+  padding: 6px 11px;
   border-radius: 999px;
-  background: rgba(37, 148, 210, 0.1);
-  color: var(--admin-blue-deep);
+  background: color-mix(in srgb, var(--accent) 16%, #fff);
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+  color: color-mix(in srgb, var(--accent) 72%, #000);
   font-size: 0.78rem;
   font-weight: 800;
 }
 
 .tag-soft {
   background: rgba(15, 40, 70, 0.06);
-  color: #475569;
+  border-color: rgba(15, 40, 70, 0.14);
+  color: #3f4c5f;
 }
 
 .staff-card-actions {

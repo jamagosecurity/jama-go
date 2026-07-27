@@ -1,51 +1,103 @@
-<main class="staff-portal">
-  <header class="portal-header">
-    <img src="/JamaGoLogo.png" alt="Jama Go" width="220" height="86" />
-    <button type="button" class="portal-button portal-button--ghost" (click)="logout()">Sign out</button>
+<section class="admin-page">
+  <header class="admin-page-header">
+    <div>
+      <h1>My Profile</h1>
+      <p>Update how you appear across the Jama Go portals.</p>
+    </div>
   </header>
 
-  <section class="profile-shell">
-    <div class="profile-intro">
-      <p class="eyebrow">Staff portal</p>
-      <h1>My profile</h1>
-      <p>Your secure Jama Go account and public team information.</p>
+  @if (error()) {
+    <div class="staff-alert staff-alert-error" role="alert">{{ error() }}</div>
+  }
+
+  @if (saved()) {
+    <div class="staff-alert staff-alert-success" role="status">Your profile has been saved.</div>
+  }
+
+  <div class="admin-panel">
+    <div class="admin-panel-title">
+      <h2>Account details</h2>
     </div>
 
-    @if (error()) {
-      <div class="message message--error">
-        <p>{{ error() }}</p>
-        <button type="button" class="portal-button" (click)="loadProfile()">Try again</button>
+    @if (loading()) {
+      <div class="admin-empty">
+        <strong>Loading your profile…</strong>
       </div>
-    } @else if (loading()) {
-      <div class="profile-card profile-loading">Loading your profile…</div>
-    } @else if (profile(); as member) {
-      <article class="profile-card">
-        <div class="profile-avatar" aria-hidden="true">
-          {{ member.fullName.slice(0, 2).toUpperCase() }}
-        </div>
-        <div class="profile-heading">
-          <span class="status" [class.status--hidden]="!member.isActive">
-            {{ member.isActive ? 'Active' : 'Hidden' }}
-          </span>
-          <h2>{{ member.fullName }}</h2>
-          <p>{{ member.role }}</p>
+    } @else {
+      <div class="staff-grid">
+        <div class="staff-tile">
+          <p>Email</p>
+          <strong>{{ profile()?.email || auth.currentUser()?.email }}</strong>
+          <small>Contact your administrator to change this.</small>
         </div>
 
-        <dl class="profile-details">
-          <div>
-            <dt>Email</dt>
-            <dd>{{ member.email }}</dd>
-          </div>
-          <div>
-            <dt>Department</dt>
-            <dd>{{ member.department || 'Not assigned' }}</dd>
-          </div>
-          <div>
-            <dt>Responsibility</dt>
-            <dd>{{ member.responsibility || 'No public description yet' }}</dd>
-          </div>
-        </dl>
-      </article>
+        <div class="staff-tile staff-tile--orange">
+          <p>Role &amp; department</p>
+          <strong>{{ profile()?.role }}</strong>
+          <small>{{ profile()?.department || 'No department assigned' }}</small>
+        </div>
+
+        <!-- isActive is public-site visibility, not account state. Anyone
+             reading this page is signed in, so labelling it "Account status"
+             showed "Disabled" to people who were demonstrably logged in. -->
+        <div class="staff-tile staff-tile--teal">
+          <p>Public profile</p>
+          <strong>{{ profile()?.isActive ? 'Listed' : 'Hidden' }}</strong>
+          <small>
+            {{
+              profile()?.isActive
+                ? 'You appear in the Our Team section on jamago.qa.'
+                : 'You are not shown on the public website.'
+            }}
+          </small>
+        </div>
+      </div>
     }
-  </section>
-</main>
+  </div>
+
+  <div class="admin-panel">
+    <div class="admin-panel-title">
+      <h2>Editable details</h2>
+    </div>
+
+    <form class="staff-form" (submit)="save($event)" novalidate>
+      <div class="staff-field">
+        <label for="staff-full-name">Full name</label>
+        <input
+          id="staff-full-name"
+          name="fullName"
+          type="text"
+          [(ngModel)]="fullName"
+          maxlength="150"
+          required
+          [disabled]="loading()"
+        />
+      </div>
+
+      <div class="staff-field">
+        <label for="staff-responsibility">Responsibility</label>
+        <textarea
+          id="staff-responsibility"
+          name="responsibility"
+          [(ngModel)]="responsibility"
+          maxlength="1000"
+          [disabled]="loading()"
+          placeholder="Describe what you are responsible for."
+        ></textarea>
+        <p class="staff-hint">
+          Your role, department, email and account status are managed by an administrator.
+        </p>
+      </div>
+
+      <div class="staff-actions">
+        <button
+          type="submit"
+          class="btn-admin btn-admin-primary"
+          [disabled]="saving() || loading() || !fullName.trim()"
+        >
+          {{ saving() ? 'Saving…' : 'Save changes' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

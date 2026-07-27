@@ -1,0 +1,106 @@
+<div class="staff-shell">
+  <aside class="staff-sidebar" aria-label="Staff sidebar">
+    <div class="staff-sidebar-head">
+      <div class="staff-brand">
+        <div class="staff-logo-badge">
+          <img
+            class="staff-logo"
+            src="/JamaGoLogo-trim.png"
+            alt="Jama Go"
+            width="360"
+            height="108"
+          />
+        </div>
+        <div class="staff-brand-copy">
+          <p class="staff-eyebrow">Staff Portal</p>
+          <h2>Jama Go Staff</h2>
+        </div>
+      </div>
+    </div>
+
+    <nav class="staff-nav" aria-label="Staff">
+      <a routerLink="/staff" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 22V12h6v10" /></svg>
+        </span>
+        <span>
+          <strong>Dashboard</strong>
+          <small>Your workspace</small>
+        </span>
+      </a>
+
+      @if (canUploadDia()) {
+        <a routerLink="/staff/dia" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 3h6l1 2h3v16H5V5h3z" />
+              <path d="M9 12l2 2 4-4M9 18h6" />
+            </svg>
+          </span>
+          <span>
+            <strong>DIA Inspection</strong>
+            <small>Create &amp; edit records</small>
+          </span>
+        </a>
+      }
+
+      <a routerLink="/staff/profile" routerLinkActive="active">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4.5 21a7.5 7.5 0 0 1 15 0" /></svg>
+        </span>
+        <span>
+          <strong>My Profile</strong>
+          <small>Your details</small>
+        </span>
+      </a>
+
+      <a routerLink="/staff/password" routerLinkActive="active">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></svg>
+        </span>
+        <span>
+          <strong>Password</strong>
+          <small>Update credentials</small>
+        </span>
+      </a>
+
+      <a routerLink="/" class="staff-nav-muted">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="m10 17 5-5-5-5M15 12H3" /></svg>
+        </span>
+        <span>
+          <strong>Public site</strong>
+          <small>Open jamago.qa</small>
+        </span>
+      </a>
+    </nav>
+
+    <div class="staff-sidebar-foot">
+      <div class="staff-user">
+        <div class="staff-avatar" aria-hidden="true">{{ initials() }}</div>
+        <div class="staff-user-meta">
+          <p>{{ auth.currentUser()?.fullName || 'Staff member' }}</p>
+          <small>{{ auth.currentUser()?.email }}</small>
+        </div>
+        <button type="button" class="signout" (click)="logout()">Sign out</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="staff-main">
+    <header class="staff-topbar">
+      <div>
+        <p class="staff-topbar-kicker">{{ greeting() }}</p>
+        <h1>{{ auth.currentUser()?.fullName || 'Staff member' }}</h1>
+      </div>
+      <div class="staff-topbar-pills">
+        <span class="pill pill-live"><i></i> Signed in</span>
+        <span class="pill pill-brand">Staff Portal</span>
+      </div>
+    </header>
+
+    <div class="staff-content">
+      <router-outlet />
+    </div>
+  </div>
+</div>

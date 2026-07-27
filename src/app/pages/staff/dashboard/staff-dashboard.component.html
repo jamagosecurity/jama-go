@@ -1,0 +1,62 @@
+<section class="admin-page">
+  <header class="admin-page-header">
+    <div>
+      <h1>Your workspace</h1>
+      <p>Everything assigned to your Jama Go staff account.</p>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="staff-alert staff-alert-error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="staff-grid">
+    <div class="staff-tile">
+      <p>Role</p>
+      <strong>{{ loading() ? '—' : (profile()?.role || 'Staff Member') }}</strong>
+      <small>Assigned by your administrator.</small>
+    </div>
+
+    <div class="staff-tile staff-tile--orange">
+      <p>Department</p>
+      <strong>{{ loading() ? '—' : (profile()?.department || 'Not assigned') }}</strong>
+      <small>Determines which areas you can access.</small>
+    </div>
+
+    <div class="staff-tile staff-tile--teal">
+      <p>Account status</p>
+      <strong>{{ loading() ? '—' : (profile()?.isActive ? 'Active' : 'Disabled') }}</strong>
+      <small>{{ auth.currentUser()?.email }}</small>
+    </div>
+  </div>
+
+  <div class="admin-panel">
+    <div class="admin-panel-title">
+      <h2>Quick actions</h2>
+    </div>
+
+    <div class="staff-quick">
+      <a routerLink="/staff/profile">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
+        </svg>
+        <span>
+          My Profile
+          <small>Review and update your details</small>
+        </span>
+      </a>
+
+      <a routerLink="/staff/password">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="10" width="14" height="11" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+        </svg>
+        <span>
+          Change Password
+          <small>Replace the password you were given</small>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>

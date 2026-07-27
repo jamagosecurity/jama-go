@@ -6,7 +6,9 @@ import { ApiResult, unwrapApiResult } from '../models/api-result.model';
 import {
   AdminStaffMember,
   CreateStaffRequest,
+  PermissionDefinition,
   StaffMember,
+  UpdateMyStaffProfileRequest,
   UpdateStaffRequest,
 } from '../models/staff.model';
 
@@ -38,6 +40,30 @@ export class StaffService {
   getMine(): Observable<AdminStaffMember> {
     return this.http
       .get<ApiResult<AdminStaffMember>>(`${this.baseUrl}/me`)
+      .pipe(map((result) => unwrapApiResult(result)));
+  }
+
+  /**
+   * Staff self-service. Only name and responsibility are editable — role,
+   * department and account status stay under admin control on the server.
+   */
+  updateMine(request: UpdateMyStaffProfileRequest): Observable<string> {
+    return this.http
+      .put<ApiResult<string>>(`${this.baseUrl}/me`, request)
+      .pipe(map((result) => unwrapApiResult(result)));
+  }
+
+  /** Admin: every permission that can be granted, for rendering the picker. */
+  getPermissionCatalogue(): Observable<PermissionDefinition[]> {
+    return this.http
+      .get<ApiResult<PermissionDefinition[]>>(`${this.baseUrl}/permissions`)
+      .pipe(map((result) => unwrapApiResult(result)));
+  }
+
+  /** Admin: replaces a staff member's grants with exactly this set. */
+  setPermissions(id: string, permissions: string[]): Observable<string> {
+    return this.http
+      .put<ApiResult<string>>(`${this.baseUrl}/${id}/permissions`, { permissions })
       .pipe(map((result) => unwrapApiResult(result)));
   }
 

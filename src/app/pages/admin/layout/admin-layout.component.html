@@ -1,40 +1,19 @@
-<div class="admin-shell" [class.admin-shell--collapsed]="sidebarCollapsed()">
-  <aside class="admin-sidebar" [attr.aria-label]="sidebarCollapsed() ? 'Collapsed sidebar' : 'Admin sidebar'">
-    <div class="admin-sidebar-head">
-      <button
-        type="button"
-        class="hamburger"
-        (click)="toggleSidebar()"
-        [attr.aria-expanded]="!sidebarCollapsed()"
-        aria-label="Toggle sidebar"
-      >
-        <span class="ham-line ham-line-1"></span>
-        <span class="ham-line ham-line-2"></span>
-        <span class="ham-line ham-line-3"></span>
-      </button>
-
-      <div class="admin-brand">
-        <div class="admin-logo-badge">
-          <img
-            class="admin-logo"
-            src="/JamaGoLogo-trim.png"
-            alt="Jama Go"
-            width="360"
-            height="108"
-          />
-        </div>
-        @if (!sidebarCollapsed()) {
-          <div class="admin-brand-copy">
-            <p class="admin-eyebrow">Command Center</p>
-            <h2>Jama Go Admin</h2>
-          </div>
-        }
+<div class="admin-shell">
+  <aside class="admin-sidebar" aria-label="Admin sidebar">
+    <div class="admin-brand">
+      <div class="admin-logo-badge">
+        <img
+          class="admin-logo"
+          src="/JamaGoLogo-trim.png"
+          alt="Jama Go"
+          width="360"
+          height="108"
+        />
       </div>
     </div>
 
-    @if (!sidebarCollapsed()) {
-      <nav class="admin-nav" aria-label="Admin">
-        <a routerLink="/admin/staff" routerLinkActive="active">
+    <nav class="admin-nav" aria-label="Admin">
+        <a routerLink="/admin/staff" routerLinkActive="active" class="nav-staff">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>
           </span>
@@ -44,7 +23,7 @@
           </span>
         </a>
 
-        <a routerLink="/admin/contacts" routerLinkActive="active">
+        <a routerLink="/admin/contacts" routerLinkActive="active" class="nav-contacts">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z" /><path d="m22 6-10 7L2 6" /></svg>
           </span>
@@ -54,7 +33,7 @@
           </span>
         </a>
 
-        <a routerLink="/admin/dia" routerLinkActive="active">
+        <a routerLink="/admin/dia" routerLinkActive="active" class="nav-dia">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M9 3h6l1 2h3v16H5V5h3z" />
@@ -67,7 +46,7 @@
           </span>
         </a>
 
-        <a routerLink="/" class="admin-nav-muted">
+        <a routerLink="/" class="admin-nav-muted nav-site">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 22V12h6v10" /></svg>
           </span>
@@ -78,25 +57,18 @@
         </a>
       </nav>
 
-      <div class="admin-sidebar-foot">
-        <div class="admin-sidebar-card">
-          <p>Live operations</p>
-          <strong>Secure control room</strong>
-          <small>Staff profiles sync to the public team section instantly.</small>
+    <div class="admin-sidebar-foot">
+      <div class="admin-user">
+        <div class="admin-avatar" aria-hidden="true">{{ initials() }}</div>
+        <div class="admin-user-meta">
+          <p>{{ auth.currentUser()?.fullName || 'Administrator' }}</p>
+          <small>{{ auth.currentUser()?.email }}</small>
         </div>
-
-        <div class="admin-user">
-          <div class="admin-avatar" aria-hidden="true">{{ initials() }}</div>
-          <div class="admin-user-meta">
-            <p>{{ auth.currentUser()?.fullName || 'Administrator' }}</p>
-            <small>{{ auth.currentUser()?.email }}</small>
-          </div>
-          <button type="button" class="btn-admin btn-admin-ghost signout" (click)="logout()">
-            Sign out
-          </button>
-        </div>
+        <button type="button" class="btn-admin btn-admin-ghost signout" (click)="logout()">
+          Sign out
+        </button>
       </div>
-    }
+    </div>
   </aside>
 
   <div class="admin-main">
@@ -106,11 +78,6 @@
           <p class="admin-topbar-kicker">{{ greeting() }}</p>
           <h1>{{ auth.currentUser()?.fullName || 'Administrator' }}</h1>
         </div>
-      </div>
-      <div class="admin-topbar-pills">
-        <span class="pill pill-live"><i></i> Systems online</span>
-        <span class="pill">JWT protected</span>
-        <span class="pill pill-brand">Jama Go Security</span>
       </div>
     </header>
 
