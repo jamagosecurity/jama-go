@@ -1,0 +1,171 @@
+/* Per-DIA overview and the confirm-and-start step for a quarterly inspection.
+   Previously leaned on .dia-details from dia.styles.css, which this component
+   never loads — the definition list rendered as unstyled stacked text. */
+
+.tech-dia-hero {
+  display: grid;
+  gap: 18px;
+}
+
+/* ===== Quarter + countdown ===== */
+.tech-dia-cycle {
+  --tone: var(--admin-teal);
+  --tone-ink: var(--admin-teal-ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.tech-dia-cycle--soon { --tone: var(--admin-amber); --tone-ink: var(--admin-orange-ink); }
+.tech-dia-cycle--overdue { --tone: var(--admin-rose); --tone-ink: var(--admin-rose-ink); }
+.tech-dia-cycle--idle { --tone: #64748b; --tone-ink: #3f4c5f; }
+
+.tech-dia-quarter {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--admin-ink);
+}
+
+.tech-dia-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tone) 14%, #fff);
+  border: 1px solid color-mix(in srgb, var(--tone) 34%, transparent);
+  color: var(--tone-ink);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.tech-dia-countdown i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ===== Progress ===== */
+.tech-dia-progress {
+  display: grid;
+  gap: 7px;
+}
+
+.tech-dia-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(15, 40, 70, 0.09);
+  overflow: hidden;
+}
+
+.tech-dia-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--admin-brand-grad-deep);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tech-dia-progress small {
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* ===== Fact tiles ===== */
+.tech-dia-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.tech-dia-fact {
+  --accent: var(--admin-blue);
+  position: relative;
+  overflow: hidden;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 10%, #fff) 0%, #fff 62%);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.tech-dia-fact::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--accent);
+}
+
+.tech-dia-fact:nth-child(2) { --accent: var(--admin-indigo); }
+.tech-dia-fact:nth-child(3) { --accent: var(--admin-orange); }
+
+.tech-dia-fact dt {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tech-dia-fact dd {
+  margin: 5px 0 0;
+  color: var(--admin-ink);
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+/* ===== Actions ===== */
+.tech-dia-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.tech-dia-cta {
+  --mdc-filled-button-container-color: transparent;
+  --mdc-filled-button-label-text-color: #fff;
+  background: var(--admin-brand-grad-deep) !important;
+  background-size: 180% 100% !important;
+  box-shadow: 0 14px 30px -14px rgba(37, 148, 210, 0.75);
+  transition: transform 0.18s ease, box-shadow 0.22s ease, background-position 0.4s ease;
+}
+
+.tech-dia-cta:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background-position: 100% 0 !important;
+  box-shadow: 0 20px 38px -12px rgba(246, 153, 61, 0.6);
+}
+
+.tech-dia-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tech-dia-section-head h2 {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: var(--admin-ink);
+}
+
+@media (max-width: 620px) {
+  .tech-dia-actions > * {
+    width: 100%;
+  }
+}
