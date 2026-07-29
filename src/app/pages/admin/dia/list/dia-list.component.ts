@@ -63,7 +63,11 @@ export class DiaListComponent implements OnInit {
 
   protected readonly statuses = DIA_STATUSES;
   protected readonly searchControl = new FormControl('', { nonNullable: true });
-  protected readonly statusControl = new FormControl<DiaStatus | ''>('', { nonNullable: true });
+  /** 'Archived' is a filter mode, not a cycle status — it swaps the list over
+   *  to soft-deleted records rather than filtering the live ones. */
+  protected readonly statusControl = new FormControl<DiaStatus | 'Archived' | ''>('', {
+    nonNullable: true,
+  });
   protected readonly result = signal<PaginatedData<Dia> | null>(null);
   protected readonly loading = signal(true);
   protected readonly actionId = signal<string | null>(null);
@@ -89,9 +93,11 @@ export class DiaListComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const statusValue = params.get('status');
-      const status = this.statuses.includes(statusValue as DiaStatus)
-        ? (statusValue as DiaStatus)
-        : undefined;
+      const archived = statusValue === 'Archived';
+      const status =
+        !archived && this.statuses.includes(statusValue as DiaStatus)
+          ? (statusValue as DiaStatus)
+          : undefined;
       const query: DiaListQuery = {
         pageNumber: Math.max(1, Number(params.get('page')) || 1),
         pageSize: [10, 25, 50].includes(Number(params.get('pageSize')))
@@ -99,12 +105,15 @@ export class DiaListComponent implements OnInit {
           : 10,
         search: params.get('search')?.trim() || undefined,
         status,
+        archived,
         sortBy: params.get('sortBy') || 'createdDate',
         sortDirection: params.get('sortDirection') === 'asc' ? 'asc' : 'desc',
       };
       this.query.set(query);
       this.searchControl.setValue(query.search ?? '', { emitEvent: false });
-      this.statusControl.setValue(query.status ?? '', { emitEvent: false });
+      this.statusControl.setValue(archived ? 'Archived' : (query.status ?? ''), {
+        emitEvent: false,
+      });
       this.load();
     });
 
@@ -145,7 +154,10 @@ export class DiaListComponent implements OnInit {
     return (item.currentQuarter ?? 0) > 0 ? `Q${item.currentQuarter}` : '—';
   }
 
-  protected confirmAction(item: Dia, action: 'activate' | 'deactivate' | 'archive'): void {
+  protected confirmAction(
+    item: Dia,
+    action: 'activate' | 'deactivate' | 'archive' | 'restore',
+  ): void {
     const definitions: Record<typeof action, ConfirmationDialogData> = {
       activate: {
         title: 'Activate DIA inspection?',
@@ -159,9 +171,17 @@ export class DiaListComponent implements OnInit {
       },
       archive: {
         title: 'Archive DIA inspection?',
-        message: `${item.diaNumber} will be removed from the active register. This action cannot be undone.`,
+        // Was "cannot be undone" — no longer true now that Restore exists, and
+        // telling an admin an action is permanent when it isn't makes them
+        // avoid a safe action.
+        message: `${item.diaNumber} will be removed from the active register. You can bring it back from the Archived filter.`,
         confirmLabel: 'Archive',
         danger: true,
+      },
+      restore: {
+        title: 'Restore DIA inspection?',
+        message: `${item.diaNumber} will return to the register as inactive. Activate it separately to restart its quarterly schedule.`,
+        confirmLabel: 'Restore',
       },
     };
     this.dialog
@@ -176,7 +196,9 @@ export class DiaListComponent implements OnInit {
               ? this.service.activate(item.id)
               : action === 'deactivate'
                 ? this.service.deactivate(item.id)
-                : this.service.archive(item.id);
+                : action === 'restore'
+                  ? this.service.restore(item.id)
+                  : this.service.archive(item.id);
           return request.pipe(finalize(() => this.actionId.set(null)));
         }),
         takeUntilDestroyed(this.destroyRef),

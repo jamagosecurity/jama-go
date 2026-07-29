@@ -95,6 +95,14 @@
               <option [ngValue]="department.value">{{ department.label }}</option>
             }
           </select>
+          <!-- Department silently decides the role, and therefore which portal
+               this person lands in. Leaving that implicit meant accounts meant
+               for the technician portal ended up in the staff portal. -->
+          <small class="field-hint">
+            Decides which portal they land in:
+            <strong>Technician</strong> opens the technician portal,
+            every other department opens the staff portal.
+          </small>
         </label>
       </div>
 

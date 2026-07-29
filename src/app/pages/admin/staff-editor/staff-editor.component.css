@@ -306,6 +306,19 @@
   line-height: 1.5;
 }
 
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.field-hint strong {
+  color: var(--admin-blue-ink);
+  font-weight: 800;
+}
+
 .permission-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

@@ -15,6 +15,8 @@ export interface Dia {
   createdDate: string;
   activatedDate: string | null;
   isActive: boolean;
+  /** Soft-deleted. Only true when the list is filtered to archived records. */
+  isArchived: boolean;
   status: DiaStatus;
   currentQuarter: number | null;
   quarterStartDate: string | null;
@@ -39,6 +41,8 @@ export interface DiaListQuery {
   pageSize: number;
   search?: string;
   status?: DiaStatus;
+  /** List archived records instead of live ones. Mutually exclusive with status. */
+  archived?: boolean;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
 }

@@ -23,6 +23,7 @@ export class DiaService {
       .set('pageSize', query.pageSize);
     if (query.search) params = params.set('search', query.search);
     if (query.status) params = params.set('status', query.status);
+    if (query.archived) params = params.set('archived', true);
     if (query.sortBy) params = params.set('sortBy', query.sortBy);
     if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
     return this.http
@@ -76,5 +77,12 @@ export class DiaService {
 
   archive(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  /** Brings an archived DIA back into the register, inactive. */
+  restore(id: string): Observable<Dia> {
+    return this.http
+      .post<ApiResult<Dia>>(`${this.baseUrl}/${id}/restore`, {})
+      .pipe(map(unwrapApiResult));
   }
 }

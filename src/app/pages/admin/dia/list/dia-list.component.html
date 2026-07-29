@@ -20,6 +20,7 @@
         @for (status of statuses; track status) {
           <mat-option [value]="status">{{ statusLabel(status) }}</mat-option>
         }
+        <mat-option value="Archived">Archived</mat-option>
       </mat-select>
     </mat-form-field>
     @if (searchControl.value || statusControl.value) {
@@ -91,6 +92,20 @@
                 <!-- Icon buttons: four text buttons needed ~330px and wrapped to
                      two lines, which doubled every row's height. -->
                 <div class="dia-row-actions">
+                  @if (item.isArchived) {
+                    <!-- Archived records are read-only until restored: the API
+                         rejects edit, activate and deactivate on them. -->
+                    <button
+                      class="dia-act dia-act--restore"
+                      type="button"
+                      [disabled]="actionId() === item.id"
+                      matTooltip="Restore to register"
+                      aria-label="Restore to register"
+                      (click)="confirmAction(item, 'restore')"
+                    >
+                      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></svg>
+                    </button>
+                  } @else {
                   <a
                     class="dia-act dia-act--view"
                     [routerLink]="[base, item.id]"
@@ -136,6 +151,7 @@
                   >
                     <svg viewBox="0 0 24 24"><path d="M3 7h18v4H3z" /><path d="M5 11v9h14v-9M10 15h4" /></svg>
                   </button>
+                  }
                 </div>
               </td>
             </ng-container>
@@ -159,10 +175,14 @@
                 <div><dt>Next inspection</dt><dd>{{ (item.nextInspectionDate | date: 'mediumDate') || '—' }}</dd></div>
               </dl>
               <div class="dia-actions">
-                <a mat-button [routerLink]="[base, item.id]">View</a>
-                <a mat-button [routerLink]="[base, item.id, 'edit']">Edit</a>
-                <button mat-button type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, item.isActive ? 'deactivate' : 'activate')">{{ item.isActive ? 'Deactivate' : 'Activate' }}</button>
-                <button mat-button class="dia-danger" type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, 'archive')">Archive</button>
+                @if (item.isArchived) {
+                  <button mat-button type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, 'restore')">Restore</button>
+                } @else {
+                  <a mat-button [routerLink]="[base, item.id]">View</a>
+                  <a mat-button [routerLink]="[base, item.id, 'edit']">Edit</a>
+                  <button mat-button type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, item.isActive ? 'deactivate' : 'activate')">{{ item.isActive ? 'Deactivate' : 'Activate' }}</button>
+                  <button mat-button class="dia-danger" type="button" [disabled]="actionId() === item.id" (click)="confirmAction(item, 'archive')">Archive</button>
+                }
               </div>
             </article>
           }

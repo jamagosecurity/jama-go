@@ -77,8 +77,9 @@ tr.mat-mdc-row:last-child td.mat-mdc-cell{border-bottom:0}
 /* Turning a DIA on is a healthy state change; turning it off is a caution. */
 .dia-act--activate{--act:var(--admin-teal);--act-ink:var(--admin-teal-ink)}
 .dia-act--deactivate{--act:var(--admin-amber);--act-ink:var(--admin-orange-ink)}
-/* Archive is the only irreversible action in the row. */
+/* Archive removes from the register; Restore is the way back. */
 .dia-act--danger{--act:var(--admin-rose);--act-ink:var(--admin-rose-ink)}
+.dia-act--restore{--act:var(--admin-teal);--act-ink:var(--admin-teal-ink)}
 
 /* Still used by the mobile record cards and the detail screen, which keep
    full-width text buttons rather than icons. */
