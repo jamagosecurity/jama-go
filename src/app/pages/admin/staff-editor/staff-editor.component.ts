@@ -48,14 +48,38 @@ export class StaffEditorComponent {
   readonly departments = STAFF_DEPARTMENTS;
 
   readonly permissionCatalogue = signal<PermissionDefinition[]>([]);
+  /** Department -> the permissions that department starts with, from the API. */
+  private readonly departmentDefaults = signal<Record<string, string[]>>({});
   /** Permission keys currently ticked. */
   readonly selectedPermissions = signal<ReadonlySet<string>>(new Set());
+  /** Set once the admin ticks anything, so their choices are never overwritten. */
+  private permissionsTouched = false;
 
   isGranted(key: string): boolean {
     return this.selectedPermissions().has(key);
   }
 
+  /**
+   * Department drives both the portal and the starting permissions, but the
+   * defaults were previously only seeded server-side at creation. An admin who
+   * picked the department afterwards — or changed it — kept whatever the account
+   * happened to have, which is how a "New technician" ended up in the staff
+   * portal holding only dia.view.
+   *
+   * Applying them here makes the consequence visible in the form, and still
+   * editable, rather than being decided invisibly on save.
+   */
+  departmentChanged(): void {
+    if (this.permissionsTouched) return;
+
+    const defaults = this.form.department
+      ? (this.departmentDefaults()[this.form.department] ?? [])
+      : [];
+    this.selectedPermissions.set(new Set(defaults));
+  }
+
   togglePermission(key: string, checked: boolean): void {
+    this.permissionsTouched = true;
     const next = new Set(this.selectedPermissions());
     if (checked) {
       next.add(key);
@@ -79,7 +103,12 @@ export class StaffEditorComponent {
       .getPermissionCatalogue()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (catalogue) => this.permissionCatalogue.set(catalogue),
+        next: (catalogue) => {
+          this.permissionCatalogue.set(catalogue.permissions);
+          this.departmentDefaults.set(catalogue.departmentDefaults ?? {});
+          // A brand new account starts on whatever department is preselected.
+          if (!this.isEditing) this.departmentChanged();
+        },
         error: () => undefined,
       });
 

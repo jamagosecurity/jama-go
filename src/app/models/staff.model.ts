@@ -34,6 +34,13 @@ export interface PermissionDefinition {
   description: string;
 }
 
+/** Grantable permissions plus what each department starts with. */
+export interface PermissionCatalogue {
+  permissions: PermissionDefinition[];
+  /** Keyed by StaffDepartment, e.g. departmentDefaults['Technician']. */
+  departmentDefaults: Record<string, string[]>;
+}
+
 export interface CreateStaffRequest {
   fullName: string;
   email: string;

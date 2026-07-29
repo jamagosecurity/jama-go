@@ -6,7 +6,7 @@ import { ApiResult, unwrapApiResult } from '../models/api-result.model';
 import {
   AdminStaffMember,
   CreateStaffRequest,
-  PermissionDefinition,
+  PermissionCatalogue,
   StaffMember,
   UpdateMyStaffProfileRequest,
   UpdateStaffRequest,
@@ -54,9 +54,9 @@ export class StaffService {
   }
 
   /** Admin: every permission that can be granted, for rendering the picker. */
-  getPermissionCatalogue(): Observable<PermissionDefinition[]> {
+  getPermissionCatalogue(): Observable<PermissionCatalogue> {
     return this.http
-      .get<ApiResult<PermissionDefinition[]>>(`${this.baseUrl}/permissions`)
+      .get<ApiResult<PermissionCatalogue>>(`${this.baseUrl}/permissions`)
       .pipe(map((result) => unwrapApiResult(result)));
   }
 
