@@ -69,12 +69,14 @@ export class StaffEditorComponent {
    * Applying them here makes the consequence visible in the form, and still
    * editable, rather than being decided invisibly on save.
    */
-  departmentChanged(): void {
+  departmentChanged(department: StaffDepartment | null): void {
+    // Assigns the model itself — the template binds [ngModel] one-way so this
+    // is the only writer, rather than racing a two-way binding.
+    this.form.department = department;
+
     if (this.permissionsTouched) return;
 
-    const defaults = this.form.department
-      ? (this.departmentDefaults()[this.form.department] ?? [])
-      : [];
+    const defaults = department ? (this.departmentDefaults()[department] ?? []) : [];
     this.selectedPermissions.set(new Set(defaults));
   }
 
@@ -107,7 +109,7 @@ export class StaffEditorComponent {
           this.permissionCatalogue.set(catalogue.permissions);
           this.departmentDefaults.set(catalogue.departmentDefaults ?? {});
           // A brand new account starts on whatever department is preselected.
-          if (!this.isEditing) this.departmentChanged();
+          if (!this.isEditing) this.departmentChanged(this.form.department);
         },
         error: () => undefined,
       });

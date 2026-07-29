@@ -86,10 +86,14 @@
 
         <label>
           <span>Department</span>
+          <!-- One-way [ngModel] with an explicit handler. Pairing [(ngModel)]
+               with a second (ngModelChange) leaves two output bindings on the
+               element and the two-way assignment stops being reliable, which
+               silently saved a null department. -->
           <select
-            [(ngModel)]="form.department"
+            [ngModel]="form.department"
             name="department"
-            (ngModelChange)="departmentChanged()"
+            (ngModelChange)="departmentChanged($event)"
           >
             <option [ngValue]="null">Select department</option>
             @for (department of departments; track department.value) {
