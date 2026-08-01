@@ -11,6 +11,7 @@ import {
   DiaWriteRequest,
   PaginatedData,
 } from '../models/dia.model';
+import { TechnicianFinalSummary } from '../models/technician.model';
 
 @Injectable({ providedIn: 'root' })
 export class DiaService {
@@ -33,6 +34,13 @@ export class DiaService {
 
   getById(id: string): Observable<Dia> {
     return this.http.get<ApiResult<Dia>>(`${this.baseUrl}/${id}`).pipe(map(unwrapApiResult));
+  }
+
+  /** What each quarter's inspection captured, for the admin detail page. */
+  getSubmittedInspections(id: string): Observable<TechnicianFinalSummary> {
+    return this.http
+      .get<ApiResult<TechnicianFinalSummary>>(`${this.baseUrl}/${id}/inspections`)
+      .pipe(map(unwrapApiResult));
   }
 
   getDashboard(): Observable<DiaDashboard> {

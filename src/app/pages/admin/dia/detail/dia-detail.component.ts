@@ -9,6 +9,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, filter, finalize, switchMap } from 'rxjs';
 import { Dia, DiaStatus } from '../../../../models/dia.model';
 import { Invoice } from '../../../../models/invoice.model';
+import { TechnicianInspection } from '../../../../models/technician.model';
+import { TechnicianInspectionSectionsComponent } from '../../../technician/shared/technician-inspection-sections.component';
 import { DiaService } from '../../../../services/dia.service';
 import { DIA_BASE_PATH } from '../dia-base-path';
 import { InvoiceService } from '../../../../services/invoice.service';
@@ -33,9 +35,10 @@ import {
     DiaEmptyStateComponent,
     DiaSkeletonComponent,
     DiaStatusChipComponent,
+    TechnicianInspectionSectionsComponent,
   ],
   templateUrl: './dia-detail.component.html',
-  styleUrl: '../dia.styles.css',
+  styleUrls: ['../dia.styles.css', '../../../technician/technician.styles.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiaDetailComponent implements OnInit {
@@ -57,10 +60,33 @@ export class DiaDetailComponent implements OnInit {
   protected readonly invoices = signal<Invoice[]>([]);
   protected readonly invoicesLoading = signal(true);
   protected readonly sharingInvoiceId = signal<string | null>(null);
+  /** Submitted quarters only — a draft is a technician's work in progress. */
+  protected readonly submitted = signal<TechnicianInspection[]>([]);
+  protected readonly submittedLoading = signal(true);
 
   ngOnInit(): void {
     this.load();
     this.loadInvoices();
+    this.loadSubmittedInspections();
+  }
+
+  private loadSubmittedInspections(): void {
+    this.service
+      .getSubmittedInspections(this.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.submittedLoading.set(false)),
+      )
+      .subscribe({
+        next: (summary) =>
+          this.submitted.set(
+            summary.inspections
+              .filter((inspection) => inspection.status === 'Submitted')
+              .sort((a, b) => a.quarter - b.quarter),
+          ),
+        // Non-fatal: the rest of the record is still worth showing.
+        error: () => this.submitted.set([]),
+      });
   }
 
   protected statusLabel(status: DiaStatus): string {

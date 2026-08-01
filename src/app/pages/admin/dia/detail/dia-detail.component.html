@@ -124,6 +124,38 @@
       }
     </section>
 
+    <!-- What each quarter actually recorded. Collapsed by default so a
+         four-quarter record does not bury the actions below it. -->
+    <section class="admin-panel">
+      <div class="admin-panel-title">
+        <h2>Quarterly inspection details</h2>
+        @if (!submittedLoading()) {
+          <span class="tech-status">{{ submitted().length }} of 4 submitted</span>
+        }
+      </div>
+
+      @if (submittedLoading()) {
+        <p class="tech-muted">Loading inspection details…</p>
+      } @else if (!submitted().length) {
+        <p class="tech-muted">
+          No quarters have been submitted yet. Details appear here once a technician submits an
+          inspection.
+        </p>
+      } @else {
+        @for (inspection of submitted(); track inspection.id) {
+          <details class="dia-quarter">
+            <summary>
+              <strong>Quarter {{ inspection.quarter }}</strong>
+              @if (inspection.submittedAt) {
+                <span>Submitted {{ inspection.submittedAt | date: 'mediumDate' }}</span>
+              }
+            </summary>
+            <app-technician-inspection-sections [inspection]="inspection" />
+          </details>
+        }
+      }
+    </section>
+
     <div class="dia-detail-actions admin-panel">
       <div><h2>Record actions</h2><p>Manage this DIA inspection lifecycle.</p></div>
       <div class="dia-header-actions">

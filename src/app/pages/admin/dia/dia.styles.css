@@ -91,3 +91,16 @@ tr.mat-mdc-row:last-child td.mat-mdc-cell{border-bottom:0}
 .dia-invoice-table{width:100%;border-collapse:collapse}.dia-invoice-table th{text-align:left;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#64748b;padding:10px 8px;border-bottom:1px solid rgba(15,40,70,.1)}.dia-invoice-table td{padding:12px 8px;border-bottom:1px solid rgba(15,40,70,.08);color:var(--dia-ink)}.dia-invoice-actions{display:flex;gap:8px;justify-content:flex-end}
 @media(max-width:1200px){.dia-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dia-table-wrap{display:none}.dia-mobile-cards{display:grid}}
 @media(max-width:720px){.dia-dashboard-grid,.dia-detail-grid,.dia-form{grid-template-columns:1fr}.dia-detail-grid>section:last-child,.dia-form mat-form-field:nth-of-type(4){grid-column:auto}.dia-details{grid-template-columns:1fr}.dia-filters mat-form-field{width:100%!important;max-width:none!important}.dia-record-card dl{grid-template-columns:1fr}.dia-detail-actions{align-items:flex-start;flex-direction:column}.dia-header-actions{width:100%}}
+
+/* Collapsible per-quarter inspection detail on the admin DIA page. */
+.dia-quarter{margin-top:10px;border:1px solid rgba(15,40,70,.1);border-radius:14px;background:#fff;overflow:hidden}
+.dia-quarter>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;cursor:pointer;list-style:none;transition:background .16s ease}
+.dia-quarter>summary::-webkit-details-marker{display:none}
+.dia-quarter>summary::after{content:"";width:8px;height:8px;flex:0 0 auto;margin-left:auto;border-right:2px solid var(--admin-muted);border-bottom:2px solid var(--admin-muted);transform:rotate(45deg) translateY(-2px);transition:transform .18s ease}
+.dia-quarter[open]>summary::after{transform:rotate(225deg) translateY(-2px)}
+.dia-quarter>summary:hover{background:rgba(37,148,210,.06)}
+.dia-quarter>summary strong{font-size:.95rem;color:var(--admin-ink)}
+.dia-quarter>summary span{color:var(--admin-muted);font-size:.82rem;font-weight:600}
+.dia-quarter[open]>summary{border-bottom:1px solid rgba(15,40,70,.08);background:rgba(37,148,210,.04)}
+.dia-quarter .tech-section{margin:0;border:0;border-radius:0;border-bottom:1px solid rgba(15,40,70,.06)}
+.dia-quarter .tech-section:last-child{border-bottom:0}
