@@ -1,6 +1,7 @@
+/* Full width, like the list pages. This was capped at 980px and centred, which
+   left most of a wide screen empty while the permission cards wrapped below. */
 .staff-editor-page {
-  width: min(980px, 100%);
-  margin: 0 auto;
+  width: 100%;
   animation: admin-rise 0.4s ease both;
 }
 
@@ -118,9 +119,11 @@
   color: #718398;
 }
 
+/* Fills the row rather than stretching two fields across the whole screen:
+   four columns on a wide monitor, collapsing to two and then one. */
 .editor-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 24px 22px;
 }
 
@@ -336,9 +339,12 @@
   text-transform: uppercase;
 }
 
+/* auto-fill, not auto-fit: an area holding a single permission (Invoices,
+   Enquiries) keeps a card-sized card instead of one stretching the full width
+   of the screen. */
 .permission-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 10px;
 }
 
