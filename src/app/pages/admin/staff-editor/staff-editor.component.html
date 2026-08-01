@@ -143,29 +143,71 @@
       }
 
       <section class="permission-section">
-        <div class="permission-heading">
-          <strong>Access permissions</strong>
-          <small>
-            Choose what this person can do once they sign in. Picking a department ticks its usual
-            permissions — adjust them here if this person needs something different.
-          </small>
-        </div>
+        <header class="permission-heading">
+          <div>
+            <strong>Access permissions</strong>
+            <small>
+              Choose what this person can do once they sign in. Picking a department ticks its usual
+              permissions — adjust them here if this person needs something different.
+            </small>
+          </div>
 
-        <div class="permission-list">
-          @for (permission of permissionCatalogue(); track permission.key) {
-            <label class="permission-item">
-              <input
-                type="checkbox"
-                [checked]="isGranted(permission.key)"
-                (change)="togglePermission(permission.key, $any($event.target).checked)"
-              />
-              <span>
-                <strong>{{ permission.name }}</strong>
-                <small>{{ permission.description }}</small>
-              </span>
-            </label>
-          }
-        </div>
+          <div class="permission-toolbar">
+            <span class="permission-count">
+              {{ selectedCount() }} of {{ permissionCatalogue().length }} selected
+            </span>
+            @if (form.department && !matchesDepartmentDefaults()) {
+              <button type="button" class="permission-link" (click)="resetToDepartmentDefaults()">
+                Reset to department defaults
+              </button>
+            }
+            <button type="button" class="permission-link" (click)="selectAllPermissions()">
+              Select all
+            </button>
+            <button
+              type="button"
+              class="permission-link"
+              [disabled]="!selectedCount()"
+              (click)="clearPermissions()"
+            >
+              Clear
+            </button>
+          </div>
+        </header>
+
+        @for (area of permissionAreas(); track area.label) {
+          <div class="permission-area">
+            <p class="permission-area-label">{{ area.label }}</p>
+            <div class="permission-list">
+              @for (permission of area.permissions; track permission.key) {
+                <label class="permission-item" [class.is-granted]="isGranted(permission.key)">
+                  <input
+                    type="checkbox"
+                    [checked]="isGranted(permission.key)"
+                    (change)="togglePermission(permission.key, $any($event.target).checked)"
+                  />
+
+                  <span class="permission-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      @for (d of iconPaths(permission.key); track d) {
+                        <path [attr.d]="d" />
+                      }
+                    </svg>
+                  </span>
+
+                  <span class="permission-copy">
+                    <strong>{{ permission.name }}</strong>
+                    <small>{{ permission.description }}</small>
+                  </span>
+
+                  <span class="permission-check" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7" /></svg>
+                  </span>
+                </label>
+              }
+            </div>
+          </div>
+        }
       </section>
 
       <footer class="editor-actions">

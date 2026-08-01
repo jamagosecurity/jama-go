@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -47,7 +54,71 @@ export class StaffEditorComponent {
   readonly error = signal<string | null>(null);
   readonly departments = STAFF_DEPARTMENTS;
 
+  /** Area headings, matched by permission key prefix so adding a permission to
+   *  an existing area needs no change here. */
+  private static readonly AREAS: ReadonlyArray<{ prefix: string; label: string }> = [
+    { prefix: 'dia.', label: 'DIA inspections' },
+    { prefix: 'invoice.', label: 'Invoices' },
+    { prefix: 'contact.', label: 'Enquiries' },
+    { prefix: 'panels.', label: 'Control panels' },
+  ];
+
+  /** Icon path data per permission, so each card is scannable at a glance. */
+  private static readonly ICONS: Record<string, string[]> = {
+    'dia.view': ['M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z', 'M12 9.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z'],
+    'dia.upload': ['M9 3h6l1 2h3v16H5V5h3z', 'M12 10v6M9 13h6'],
+    'dia.inspect': ['M9 3h6l1 2h3v16H5V5h3z', 'M9 12l2 2 4-4M9 17h6'],
+    'invoice.view': ['M6 2h9l3 3v17H6z', 'M9 9h6M9 13h6M9 17h4'],
+    'contact.view': ['M4 5h16v14H4z', 'm20 6-8 6-8-6'],
+    'panels.manage': ['M4 4h16v16H4z', 'M9 9h6v6H9z', 'M4 10h5M15 10h5M4 14h5M15 14h5'],
+  };
+
   readonly permissionCatalogue = signal<PermissionDefinition[]>([]);
+
+  /** Catalogue split into areas, preserving catalogue order within each. */
+  readonly permissionAreas = computed(() =>
+    StaffEditorComponent.AREAS.map((area) => ({
+      label: area.label,
+      permissions: this.permissionCatalogue().filter((p) => p.key.startsWith(area.prefix)),
+    })).filter((area) => area.permissions.length > 0),
+  );
+
+  readonly selectedCount = computed(() => this.selectedPermissions().size);
+
+  iconPaths(key: string): string[] {
+    return StaffEditorComponent.ICONS[key] ?? ['M12 4v16M4 12h16'];
+  }
+
+  /**
+   * Whether the selection still matches the department's defaults. A method
+   * rather than a computed: form.department is a plain property, so a computed
+   * would not recompute when the department changes.
+   */
+  matchesDepartmentDefaults(): boolean {
+    const defaults = this.form.department
+      ? (this.departmentDefaults()[this.form.department] ?? [])
+      : [];
+    const selected = this.selectedPermissions();
+    return defaults.length === selected.size && defaults.every((key) => selected.has(key));
+  }
+
+  selectAllPermissions(): void {
+    this.permissionsTouched = true;
+    this.selectedPermissions.set(new Set(this.permissionCatalogue().map((p) => p.key)));
+  }
+
+  clearPermissions(): void {
+    this.permissionsTouched = true;
+    this.selectedPermissions.set(new Set());
+  }
+
+  /** Puts the department's usual permissions back after manual edits. */
+  resetToDepartmentDefaults(): void {
+    const defaults = this.form.department
+      ? (this.departmentDefaults()[this.form.department] ?? [])
+      : [];
+    this.selectedPermissions.set(new Set(defaults));
+  }
   /** Department -> the permissions that department starts with, from the API. */
   private readonly departmentDefaults = signal<Record<string, string[]>>({});
   /** Permission keys currently ticked. */
