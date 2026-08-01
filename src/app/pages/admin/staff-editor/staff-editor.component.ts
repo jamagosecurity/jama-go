@@ -57,9 +57,9 @@ export class StaffEditorComponent {
   /** Area headings, matched by permission key prefix so adding a permission to
    *  an existing area needs no change here. */
   private static readonly AREAS: ReadonlyArray<{ prefix: string; label: string }> = [
-    { prefix: 'dia.', label: 'DIA inspections' },
+    { prefix: 'dia.', label: 'DIA records & inspections' },
     { prefix: 'invoice.', label: 'Invoices' },
-    { prefix: 'contact.', label: 'Enquiries' },
+    { prefix: 'contact.', label: 'Website enquiries' },
     { prefix: 'panels.', label: 'Control panels' },
   ];
 
