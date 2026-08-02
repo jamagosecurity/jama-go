@@ -35,6 +35,7 @@ const requireRole = (role: UserRole): CanActivateFn => () => {
 export const adminGuard = requireRole('Admin');
 export const staffGuard = requireRole('Staff');
 export const technicianGuard = requireRole('Technician');
+export const clientGuard = requireRole('Client');
 
 /**
  * Gates a route on a permission rather than a role, for capabilities an admin

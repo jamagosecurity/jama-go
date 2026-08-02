@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -12,6 +13,9 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class AdminLayoutComponent {
   readonly auth = inject(AuthService);
+
+  /** VIP nav is permission-gated; admins hold vip.manage implicitly. */
+  readonly canManageVip = computed(() => this.auth.can(PERMISSIONS.vipManage));
 
   readonly initials = computed(() => {
     const name = this.auth.currentUser()?.fullName?.trim() || 'Admin';

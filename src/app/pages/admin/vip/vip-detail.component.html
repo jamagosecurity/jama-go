@@ -1,0 +1,50 @@
+<section class="admin-page">
+  <a class="back-link" routerLink="/admin/vip">
+    <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+    Back to VIP clients
+  </a>
+
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading project…</p></div>
+  } @else if (!client()) {
+    <div class="admin-panel"><p class="admin-error">{{ error() || 'VIP client not found.' }}</p></div>
+  } @else if (client(); as item) {
+    <header class="admin-page-header">
+      <div>
+        <span class="admin-kicker">{{ item.projectName }}</span>
+        <h1>{{ item.clientName }}</h1>
+        <p>{{ item.email }}</p>
+      </div>
+      <div class="vip-head-actions">
+        <a class="btn-admin btn-admin-ghost" [routerLink]="['/admin/vip', item.id, 'edit']">Edit</a>
+        <button type="button" class="btn-admin btn-admin-danger" (click)="deleteClient()">Delete</button>
+      </div>
+    </header>
+
+    @if (error()) {
+      <p class="admin-error">{{ error() }}</p>
+    }
+    @if (notice()) {
+      <p class="admin-success">{{ notice() }}</p>
+    }
+
+    <div class="admin-panel vip-summary">
+      <div>
+        <p class="vip-summary-label">Main folder</p>
+        <strong>{{ item.folderName }}</strong>
+      </div>
+      <span class="admin-badge" [class.admin-badge--hidden]="!item.canSignIn">
+        {{ item.canSignIn ? 'Client can sign in' : 'Sign-in suspended' }}
+      </span>
+    </div>
+
+    <app-vip-folders
+      [folders]="item.folders"
+      [canManage]="true"
+      [busyFolderId]="busyFolderId()"
+      (upload)="upload($event)"
+      (download)="download($event)"
+      (remove)="remove($event)"
+    />
+  }
+</section>

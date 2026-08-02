@@ -115,6 +115,7 @@
 .admin-nav a.nav-staff { --accent: #4bb0e8; --accent-2: #2594d2; }
 .admin-nav a.nav-contacts { --accent: #7d92f0; --accent-2: #4f46e5; }
 .admin-nav a.nav-dia { --accent: #4aa9dd; --accent-2: #0d6fae; }
+.admin-nav a.nav-vip { --accent: #6aa8ea; --accent-2: #3b5fd4; }
 .admin-nav a.nav-site { --accent: #f9b877; --accent-2: #f6993d; }
 
 /* left colour tab, revealed on hover / active */

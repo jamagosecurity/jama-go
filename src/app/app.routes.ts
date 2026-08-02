@@ -7,7 +7,15 @@ import { AdminLayoutComponent } from './pages/admin/layout/admin-layout.componen
 import { AdminStaffComponent } from './pages/admin/staff/admin-staff.component';
 import { StaffEditorComponent } from './pages/admin/staff-editor/staff-editor.component';
 import { AdminContactsComponent } from './pages/admin/contacts/admin-contacts.component';
-import { adminGuard, guestGuard, staffGuard, technicianGuard } from './guards/admin.guard';
+import {
+  adminGuard,
+  clientGuard,
+  guestGuard,
+  permissionGuard,
+  staffGuard,
+  technicianGuard,
+} from './guards/admin.guard';
+import { PERMISSIONS } from './models/auth.model';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Jama Go Security — Protecting What Matters Most' },
@@ -53,9 +61,46 @@ export const routes: Routes = [
             component: AdminContactsComponent,
             title: 'Contact Submissions — Jama Go Admin',
           },
+          {
+            path: 'vip',
+            canActivate: [permissionGuard(PERMISSIONS.vipManage)],
+            children: [
+              {
+                path: 'new',
+                title: 'New VIP Client — Jama Go Admin',
+                loadComponent: () =>
+                  import('./pages/admin/vip/vip-editor.component').then((m) => m.VipEditorComponent),
+              },
+              {
+                path: ':id/edit',
+                title: 'Edit VIP Client — Jama Go Admin',
+                loadComponent: () =>
+                  import('./pages/admin/vip/vip-editor.component').then((m) => m.VipEditorComponent),
+              },
+              {
+                path: ':id',
+                title: 'VIP Client — Jama Go Admin',
+                loadComponent: () =>
+                  import('./pages/admin/vip/vip-detail.component').then((m) => m.VipDetailComponent),
+              },
+              {
+                path: '',
+                title: 'VIP Clients — Jama Go Admin',
+                loadComponent: () =>
+                  import('./pages/admin/vip/vip-list.component').then((m) => m.VipListComponent),
+              },
+            ],
+          },
         ],
       },
     ],
+  },
+  {
+    path: 'client',
+    canActivate: [clientGuard],
+    title: 'My Project — Jama Go',
+    loadComponent: () =>
+      import('./pages/client/client-portal.component').then((m) => m.ClientPortalComponent),
   },
   {
     path: 'technician',

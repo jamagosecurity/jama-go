@@ -1,4 +1,4 @@
-export type UserRole = 'Admin' | 'Staff' | 'Technician';
+export type UserRole = 'Admin' | 'Staff' | 'Technician' | 'Client';
 
 /**
  * Permission keys, mirroring Jama.Application.Common.Permissions on the API.
@@ -12,6 +12,7 @@ export const PERMISSIONS = {
   invoiceView: 'invoice.view',
   contactView: 'contact.view',
   panelsManage: 'panels.manage',
+  vipManage: 'vip.manage',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

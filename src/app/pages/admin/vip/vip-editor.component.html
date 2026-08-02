@@ -1,0 +1,107 @@
+<section class="staff-editor-page">
+  <button type="button" class="back-link" (click)="cancel()">
+    <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+    Back to VIP clients
+  </button>
+
+  <header class="editor-header">
+    <div class="editor-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      </svg>
+    </div>
+    <div>
+      <p class="editor-eyebrow">{{ isEditing ? 'Update project' : 'New handover' }}</p>
+      <h1>{{ isEditing ? 'Edit VIP client' : 'New VIP client' }}</h1>
+      <p>
+        {{
+          isEditing
+            ? 'Update this client’s details and portal access.'
+            : 'Creating the client also sets up their four document folders.'
+        }}
+      </p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="editor-card"><p class="editor-loading">Loading…</p></div>
+  } @else {
+    <form class="editor-card" (submit)="save($event)">
+      @if (error()) {
+        <p class="admin-error">{{ error() }}</p>
+      }
+
+      <div class="form-section-heading">
+        <strong>Client details</strong>
+        <small>Fields marked required must be completed.</small>
+      </div>
+
+      <div class="editor-grid">
+        <label>
+          <span>Client name <i>*</i></span>
+          <input name="clientName" [(ngModel)]="form.clientName" required placeholder="e.g. Al Rayyan Holding" />
+        </label>
+
+        <label>
+          <span>Project name <i>*</i></span>
+          <input name="projectName" [(ngModel)]="form.projectName" required placeholder="e.g. Tower A Fit-out" />
+        </label>
+
+        <label>
+          <span>Client email <i>*</i></span>
+          <input name="email" type="email" [(ngModel)]="form.email" required placeholder="name@client.com" />
+        </label>
+
+        <label>
+          <span>{{ isEditing ? 'New password' : 'Password' }} @if (!isEditing) {<i>*</i>}</span>
+          <input
+            name="password"
+            type="password"
+            [(ngModel)]="form.password"
+            [required]="!isEditing"
+            placeholder="At least 8 characters"
+          />
+          <small class="field-hint">
+            {{ isEditing ? 'Leave blank to keep the current password.' : 'Share this with the client after handover.' }}
+          </small>
+        </label>
+
+        <label class="span-2">
+          <span>Main folder name</span>
+          <input name="folderName" [(ngModel)]="form.folderName" placeholder="Leave blank to use the default" />
+          <small class="field-hint">
+            Will be created as <strong>{{ folderPreview }}</strong>, holding Client input,
+            Quote &amp; Invoice, DSA Docs and DIA Docs.
+          </small>
+        </label>
+      </div>
+
+      @if (isEditing) {
+        <label class="visibility-control">
+          <input type="checkbox" [(ngModel)]="form.canSignIn" name="canSignIn" />
+          <span class="switch-track"><i></i></span>
+          <span>
+            <strong>Allow sign-in</strong>
+            <small>Let this client open their portal. Turn off to suspend access without deleting anything.</small>
+          </span>
+        </label>
+
+        <label class="visibility-control">
+          <input type="checkbox" [(ngModel)]="form.isActive" name="isActive" />
+          <span class="switch-track"><i></i></span>
+          <span>
+            <strong>Project active</strong>
+            <small>Mark the project as still running. Inactive projects stay visible to admins.</small>
+          </span>
+        </label>
+      }
+
+      <footer class="editor-actions">
+        <button type="button" class="btn-admin btn-admin-ghost" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : isEditing ? 'Save changes' : 'Create VIP client' }}
+        </button>
+      </footer>
+    </form>
+  }
+</section>

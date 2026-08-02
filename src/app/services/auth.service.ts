@@ -62,6 +62,7 @@ export class AuthService {
 
   landingRoute(user = this.currentUser()): string {
     if (user?.role === 'Technician') return '/technician';
+    if (user?.role === 'Client') return '/client';
     return user?.role === 'Staff' ? '/staff' : '/admin/staff';
   }
 
@@ -103,7 +104,8 @@ export class AuthService {
     const onPortal =
       this.router.url.startsWith('/admin')
       || this.router.url.startsWith('/staff')
-      || this.router.url.startsWith('/technician');
+      || this.router.url.startsWith('/technician')
+      || this.router.url.startsWith('/client');
     this.clearSession();
 
     if (onPortal && !this.router.url.startsWith('/admin/login')) {

@@ -1,0 +1,29 @@
+<div class="client-shell">
+  <header class="client-topbar">
+    <div class="client-brand">
+      <img src="/JamaGoLogo-trim.png" alt="Jama Go" width="360" height="108" />
+    </div>
+    <div class="client-user">
+      <span>{{ auth.currentUser()?.fullName }}</span>
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="logout()">Sign out</button>
+    </div>
+  </header>
+
+  <main class="client-content">
+    @if (loading()) {
+      <div class="admin-panel"><p>Loading your project…</p></div>
+    } @else if (error()) {
+      <div class="admin-panel"><p class="admin-error">{{ error() }}</p></div>
+    } @else if (project(); as item) {
+      <header class="admin-page-header">
+        <div>
+          <span class="admin-kicker">{{ item.projectName }}</span>
+          <h1>{{ item.folderName }}</h1>
+          <p>Documents shared with you by the Jama Go team.</p>
+        </div>
+      </header>
+
+      <app-vip-folders [folders]="item.folders" (download)="download($event)" />
+    }
+  </main>
+</div>

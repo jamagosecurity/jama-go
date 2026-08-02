@@ -1,0 +1,51 @@
+.client-shell {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(37, 148, 210, 0.16), transparent 32%),
+    radial-gradient(circle at 88% 96%, rgba(246, 153, 61, 0.14), transparent 34%),
+    linear-gradient(180deg, #eef6ff 0%, #fbfdff 44%, #f2f7fd 100%);
+}
+
+.client-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 28px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--admin-line);
+  backdrop-filter: blur(12px);
+  flex-wrap: wrap;
+}
+
+.client-brand img {
+  display: block;
+  width: 100%;
+  max-width: 170px;
+  height: auto;
+}
+
+.client-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.client-user span {
+  color: var(--admin-ink);
+  font-weight: 700;
+}
+
+.client-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 28px 48px;
+}
+
+@media (max-width: 720px) {
+  .client-topbar,
+  .client-content {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

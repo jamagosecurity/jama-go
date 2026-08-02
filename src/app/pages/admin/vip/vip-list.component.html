@@ -1,0 +1,58 @@
+<section class="admin-page">
+  <header class="admin-page-header">
+    <div>
+      <span class="admin-kicker">VIP clients</span>
+      <h1>Client projects</h1>
+      <p>Create a VIP client and hand over their project documents.</p>
+    </div>
+    <a class="btn-admin btn-admin-primary" routerLink="/admin/vip/new">+ New VIP client</a>
+  </header>
+
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading VIP clients…</p></div>
+  } @else if (error()) {
+    <div class="admin-panel">
+      <p class="admin-error">{{ error() }}</p>
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="load()">Try again</button>
+    </div>
+  } @else if (!clients().length) {
+    <div class="admin-panel">
+      <div class="admin-empty">
+        <strong>No VIP clients yet</strong>
+        <p>Create one and its four document folders are set up automatically.</p>
+      </div>
+    </div>
+  } @else {
+    <div class="vip-grid">
+      @for (client of clients(); track client.id) {
+        <article class="vip-card">
+          <header class="vip-card-head">
+            <div>
+              <p class="vip-card-project">{{ client.projectName }}</p>
+              <h2>{{ client.clientName }}</h2>
+              <p class="vip-card-email">{{ client.email }}</p>
+            </div>
+            <span class="admin-badge" [class.admin-badge--hidden]="!client.canSignIn">
+              {{ client.canSignIn ? 'Can sign in' : 'Suspended' }}
+            </span>
+          </header>
+
+          <p class="vip-card-folder">
+            <span aria-hidden="true">📁</span> {{ client.folderName }}
+          </p>
+
+          <footer class="vip-card-foot">
+            <span class="vip-card-meta">
+              {{ client.documentCount }}
+              {{ client.documentCount === 1 ? 'file' : 'files' }} ·
+              added {{ client.createdAt | date: 'mediumDate' }}
+            </span>
+            <a class="btn-admin btn-admin-primary" [routerLink]="['/admin/vip', client.id]">
+              Open
+            </a>
+          </footer>
+        </article>
+      }
+    </div>
+  }
+</section>

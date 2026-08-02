@@ -127,6 +127,11 @@
   gap: 24px 22px;
 }
 
+/* Full-width field within the grid, for inputs whose value runs long. */
+.editor-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
 .editor-grid label {
   display: grid;
   align-content: start;
