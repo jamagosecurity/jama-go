@@ -523,3 +523,27 @@
     flex-direction: column;
   }
 }
+
+/* Field-level validation. Shared by every form using this stylesheet so an
+   invalid field looks the same wherever it appears, rather than each screen
+   inventing its own error treatment. */
+.field-error {
+  display: block;
+  margin-top: 6px;
+  color: var(--admin-rose-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.editor-grid input.is-invalid,
+.editor-grid select.is-invalid {
+  border-color: var(--admin-rose);
+  background: rgba(225, 29, 72, 0.04);
+}
+
+.editor-grid input.is-invalid:focus,
+.editor-grid select.is-invalid:focus {
+  border-color: var(--admin-rose);
+  box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.16);
+}

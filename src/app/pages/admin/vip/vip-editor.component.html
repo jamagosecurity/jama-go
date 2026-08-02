@@ -26,7 +26,7 @@
   @if (loading()) {
     <div class="editor-card"><p class="editor-loading">Loading…</p></div>
   } @else {
-    <form class="editor-card" (submit)="save($event)">
+    <form class="editor-card" [formGroup]="form" (ngSubmit)="save()">
       @if (error()) {
         <p class="admin-error">{{ error() }}</p>
       }
@@ -39,50 +39,87 @@
       <div class="editor-grid">
         <label>
           <span>Client name <i>*</i></span>
-          <input name="clientName" [(ngModel)]="form.clientName" required maxlength="200" placeholder="e.g. Al Rayyan Holding" />
+          <input
+            formControlName="clientName"
+            maxlength="200"
+            placeholder="e.g. Al Rayyan Holding"
+            [class.is-invalid]="showError('clientName')"
+          />
+          @if (showError('clientName')) {
+            <small class="field-error">{{ errorFor('clientName') }}</small>
+          }
         </label>
 
         <label>
           <span>Project name <i>*</i></span>
-          <input name="projectName" [(ngModel)]="form.projectName" required maxlength="200" placeholder="e.g. Tower A Fit-out" />
+          <input
+            formControlName="projectName"
+            maxlength="200"
+            placeholder="e.g. Tower A Fit-out"
+            [class.is-invalid]="showError('projectName')"
+          />
+          @if (showError('projectName')) {
+            <small class="field-error">{{ errorFor('projectName') }}</small>
+          }
         </label>
 
         <label>
           <span>Client email <i>*</i></span>
-          <input name="email" type="email" [(ngModel)]="form.email" required maxlength="200" placeholder="name@client.com" />
+          <input
+            formControlName="email"
+            type="email"
+            maxlength="200"
+            autocomplete="off"
+            placeholder="name@client.com"
+            [class.is-invalid]="showError('email')"
+          />
+          @if (showError('email')) {
+            <small class="field-error">{{ errorFor('email') }}</small>
+          }
         </label>
 
         <label>
           <span>{{ isEditing ? 'New password' : 'Password' }} @if (!isEditing) {<i>*</i>}</span>
           <input
-            name="password"
+            formControlName="password"
             type="password"
-            [(ngModel)]="form.password"
-            [required]="!isEditing"
-            minlength="8"
             maxlength="128"
             autocomplete="new-password"
             placeholder="At least 8 characters"
+            [class.is-invalid]="showError('password')"
           />
-          <small class="field-hint">
-            At least 8 characters with an uppercase letter, a lowercase letter and a number.
-            {{ isEditing ? 'Leave blank to keep the current password.' : '' }}
-          </small>
+          @if (showError('password')) {
+            <small class="field-error">{{ errorFor('password') }}</small>
+          } @else {
+            <small class="field-hint">
+              At least 8 characters with an uppercase letter, a lowercase letter and a number.
+              {{ isEditing ? 'Leave blank to keep the current password.' : '' }}
+            </small>
+          }
         </label>
 
         <label class="span-2">
           <span>Main folder name</span>
-          <input name="folderName" [(ngModel)]="form.folderName" maxlength="400" placeholder="Leave blank to use the default" />
-          <small class="field-hint">
-            Will be created as <strong>{{ folderPreview }}</strong>, holding Client input,
-            Quote &amp; Invoice, DSA Docs and DIA Docs.
-          </small>
+          <input
+            formControlName="folderName"
+            maxlength="400"
+            placeholder="Leave blank to use the default"
+            [class.is-invalid]="showError('folderName')"
+          />
+          @if (showError('folderName')) {
+            <small class="field-error">{{ errorFor('folderName') }}</small>
+          } @else {
+            <small class="field-hint">
+              Will be created as <strong>{{ folderPreview }}</strong>, holding Client input,
+              Quote &amp; Invoice, DSA Docs and DIA Docs.
+            </small>
+          }
         </label>
       </div>
 
       @if (isEditing) {
         <label class="visibility-control">
-          <input type="checkbox" [(ngModel)]="form.canSignIn" name="canSignIn" />
+          <input type="checkbox" formControlName="canSignIn" />
           <span class="switch-track"><i></i></span>
           <span>
             <strong>Allow sign-in</strong>
@@ -91,7 +128,7 @@
         </label>
 
         <label class="visibility-control">
-          <input type="checkbox" [(ngModel)]="form.isActive" name="isActive" />
+          <input type="checkbox" formControlName="isActive" />
           <span class="switch-track"><i></i></span>
           <span>
             <strong>Project active</strong>
