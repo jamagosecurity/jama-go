@@ -3,6 +3,17 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { VipClientDocument, VipClientFolder } from '../../../models/vip-client.model';
 
 /**
+ * Mirrors FileStorageSettings on the API. The server stays authoritative and
+ * re-checks both — this only spares the user a round trip and an upload that
+ * was always going to be refused.
+ */
+export const ACCEPTED_EXTENSIONS = [
+  '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.csv',
+  '.png', '.jpg', '.jpeg', '.webp', '.heic', '.zip',
+];
+export const MAX_UPLOAD_MB = 25;
+
+/**
  * The four project folders and their documents.
  *
  * Shared by the admin detail page and the client portal — the only difference
@@ -38,6 +49,7 @@ import { VipClientDocument, VipClientFolder } from '../../../models/vip-client.m
               <label class="vip-upload">
                 <input
                   type="file"
+                  [attr.accept]="accept"
                   [disabled]="busyFolderId() === folder.id"
                   (change)="pick(folder.id, $event)"
                 />
@@ -102,12 +114,44 @@ export class VipFoldersComponent {
   readonly upload = output<{ folderId: string; file: File }>();
   readonly download = output<VipClientDocument>();
   readonly remove = output<VipClientDocument>();
+  /** Raised instead of `upload` when a file fails the local pre-check. */
+  readonly rejected = output<string>();
+
+  protected readonly accept = ACCEPTED_EXTENSIONS.join(',');
 
   protected pick(folderId: string, event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (file) this.upload.emit({ folderId, file });
-    // Cleared so picking the same file twice in a row still fires a change.
+    // Cleared first so picking the same file twice in a row still fires a change.
     input.value = '';
+    if (!file) return;
+
+    const reason = this.reject(file);
+    if (reason) {
+      this.rejected.emit(reason);
+      return;
+    }
+
+    this.upload.emit({ folderId, file });
+  }
+
+  private reject(file: File): string | null {
+    const dot = file.name.lastIndexOf('.');
+    const extension = dot >= 0 ? file.name.slice(dot).toLowerCase() : '';
+
+    if (!ACCEPTED_EXTENSIONS.includes(extension)) {
+      return `${extension || 'That file type'} is not accepted. Allowed: ${ACCEPTED_EXTENSIONS.join(', ')}.`;
+    }
+
+    if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      return `${file.name} is ${mb} MB. Files must be ${MAX_UPLOAD_MB} MB or smaller.`;
+    }
+
+    if (file.size === 0) {
+      return `${file.name} is empty.`;
+    }
+
+    return null;
   }
 }

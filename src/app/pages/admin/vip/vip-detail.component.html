@@ -43,6 +43,7 @@
       [canManage]="true"
       [busyFolderId]="busyFolderId()"
       (upload)="upload($event)"
+      (rejected)="error.set($event)"
       (download)="download($event)"
       (remove)="remove($event)"
     />

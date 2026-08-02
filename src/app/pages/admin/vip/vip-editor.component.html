@@ -39,17 +39,17 @@
       <div class="editor-grid">
         <label>
           <span>Client name <i>*</i></span>
-          <input name="clientName" [(ngModel)]="form.clientName" required placeholder="e.g. Al Rayyan Holding" />
+          <input name="clientName" [(ngModel)]="form.clientName" required maxlength="200" placeholder="e.g. Al Rayyan Holding" />
         </label>
 
         <label>
           <span>Project name <i>*</i></span>
-          <input name="projectName" [(ngModel)]="form.projectName" required placeholder="e.g. Tower A Fit-out" />
+          <input name="projectName" [(ngModel)]="form.projectName" required maxlength="200" placeholder="e.g. Tower A Fit-out" />
         </label>
 
         <label>
           <span>Client email <i>*</i></span>
-          <input name="email" type="email" [(ngModel)]="form.email" required placeholder="name@client.com" />
+          <input name="email" type="email" [(ngModel)]="form.email" required maxlength="200" placeholder="name@client.com" />
         </label>
 
         <label>
@@ -59,16 +59,20 @@
             type="password"
             [(ngModel)]="form.password"
             [required]="!isEditing"
+            minlength="8"
+            maxlength="128"
+            autocomplete="new-password"
             placeholder="At least 8 characters"
           />
           <small class="field-hint">
-            {{ isEditing ? 'Leave blank to keep the current password.' : 'Share this with the client after handover.' }}
+            At least 8 characters with an uppercase letter, a lowercase letter and a number.
+            {{ isEditing ? 'Leave blank to keep the current password.' : '' }}
           </small>
         </label>
 
         <label class="span-2">
           <span>Main folder name</span>
-          <input name="folderName" [(ngModel)]="form.folderName" placeholder="Leave blank to use the default" />
+          <input name="folderName" [(ngModel)]="form.folderName" maxlength="400" placeholder="Leave blank to use the default" />
           <small class="field-hint">
             Will be created as <strong>{{ folderPreview }}</strong>, holding Client input,
             Quote &amp; Invoice, DSA Docs and DIA Docs.
