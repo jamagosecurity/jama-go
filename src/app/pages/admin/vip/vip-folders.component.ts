@@ -26,9 +26,9 @@ export const MAX_UPLOAD_MB = 25;
   imports: [DatePipe, DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="vip-folders">
+    <div class="vip-folders accent-cycle">
       @for (folder of folders(); track folder.id) {
-        <section class="vip-folder">
+        <section class="vip-folder surface-card surface-card--rail-top">
           <header class="vip-folder-head">
             <div class="vip-folder-title">
               <span class="vip-folder-icon" aria-hidden="true">

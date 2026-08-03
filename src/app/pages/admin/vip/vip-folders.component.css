@@ -4,30 +4,13 @@
   gap: 14px;
 }
 
+/* Surface and top rail come from .surface-card in styles.css. The one hue per
+   folder — they are easier to tell apart by colour than by reading the titles
+   every time — comes from .accent-cycle, since there are always exactly four. */
 .vip-folder {
-  --accent: var(--admin-blue);
-  position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   border-radius: 18px;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 10%, #fff) 0%, #fff 58%);
-  border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
-}
-
-/* One hue per folder, from the brand ramp — the four are easier to tell apart
-   by colour than by reading their titles every time. */
-.vip-folder:nth-child(1) { --accent: var(--admin-blue); }
-.vip-folder:nth-child(2) { --accent: var(--admin-indigo); }
-.vip-folder:nth-child(3) { --accent: var(--admin-blue-deep); }
-.vip-folder:nth-child(4) { --accent: var(--admin-orange); }
-
-.vip-folder::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 4px;
-  background: var(--accent);
 }
 
 .vip-folder-head {

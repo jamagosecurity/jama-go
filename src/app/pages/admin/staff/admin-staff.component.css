@@ -213,42 +213,13 @@
   gap: 14px;
 }
 
-/* Cards rotate through the accent set so a roster reads as a colour sequence
-   rather than a wall of white-on-white. --accent drives the wash, the border,
-   the left rail and the avatar on each card. */
+/* Layout only. The wash, border, rail and hover lift come from .surface-card
+   in styles.css; the hue rotation from .accent-cycle on the grid. --accent is
+   still read here, for the avatar and role chip. */
 .staff-card {
-  --accent: var(--admin-blue);
-  position: relative;
-  overflow: hidden;
   display: grid;
   gap: 14px;
   padding: 18px 18px 18px 22px;
-  border-radius: 20px;
-  background:
-    linear-gradient(160deg, color-mix(in srgb, var(--accent) 11%, #fff) 0%, #fff 58%);
-  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
-  box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--accent) 75%, transparent);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* left colour rail */
-.staff-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #fff));
-}
-
-/* Decorative rotation — the brand ramp only. */
-.staff-card:nth-child(4n + 1) { --accent: var(--admin-blue); }
-.staff-card:nth-child(4n + 2) { --accent: var(--admin-indigo); }
-.staff-card:nth-child(4n + 3) { --accent: var(--admin-blue-deep); }
-.staff-card:nth-child(4n + 4) { --accent: var(--admin-orange); }
-
-.staff-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 26px 44px -24px color-mix(in srgb, var(--accent) 85%, transparent);
 }
 
 .staff-card--hidden {

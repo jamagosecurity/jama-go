@@ -84,22 +84,11 @@
   gap: 12px;
 }
 
+/* Surface and rail come from .surface-card in styles.css. The hues stay local:
+   there are exactly three facts, so they take the first, second and last of the
+   ramp rather than the shared four-step .accent-cycle. */
 .tech-dia-fact {
-  --accent: var(--admin-blue);
-  position: relative;
-  overflow: hidden;
   padding: 14px 16px;
-  border-radius: 16px;
-  background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 10%, #fff) 0%, #fff 62%);
-  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
-}
-
-.tech-dia-fact::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--accent);
 }
 
 .tech-dia-fact:nth-child(2) { --accent: var(--admin-indigo); }

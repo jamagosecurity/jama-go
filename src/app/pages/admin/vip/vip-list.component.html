@@ -23,9 +23,9 @@
       </div>
     </div>
   } @else {
-    <div class="vip-grid">
+    <div class="vip-grid accent-cycle">
       @for (client of clients(); track client.id) {
-        <article class="vip-card">
+        <article class="vip-card surface-card surface-card--rail surface-card--raised">
           <header class="vip-card-head">
             <div>
               <p class="vip-card-project">{{ client.projectName }}</p>

@@ -37,15 +37,15 @@
       </div>
 
       <dl class="tech-dia-facts">
-        <div class="tech-dia-fact">
+        <div class="tech-dia-fact surface-card surface-card--rail surface-card--compact">
           <dt>Activated</dt>
           <dd>{{ (item.activatedDate | date: 'longDate') || '—' }}</dd>
         </div>
-        <div class="tech-dia-fact">
+        <div class="tech-dia-fact surface-card surface-card--rail surface-card--compact">
           <dt>Inspection started</dt>
           <dd>{{ (item.inspectionStartedDate | date: 'longDate') || 'Not started' }}</dd>
         </div>
-        <div class="tech-dia-fact">
+        <div class="tech-dia-fact surface-card surface-card--rail surface-card--compact">
           <dt>Quarter window</dt>
           <dd>
             {{ (item.quarterStartDate | date: 'd MMM y') || '—' }} –

@@ -35,9 +35,12 @@
       </article>
     </div>
 
-    <div class="tech-site-grid">
+    <div class="tech-site-grid accent-cycle">
       @for (item of items(); track item.id) {
-        <article class="tech-site" [class.is-complete]="item.inspectionStatus === 'Completed'">
+        <article
+          class="tech-site surface-card surface-card--rail surface-card--raised"
+          [class.is-complete]="item.inspectionStatus === 'Completed'"
+        >
           <header class="tech-site-head">
             <div>
               <p class="tech-site-dia">{{ item.diaNumber }}</p>

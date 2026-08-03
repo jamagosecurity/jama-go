@@ -7,42 +7,18 @@
   gap: 14px;
 }
 
+/* Layout only — surface, rail and hover come from .surface-card in styles.css,
+   the decorative hue rotation from .accent-cycle on the grid. */
 .tech-site {
-  --accent: var(--admin-blue);
-  position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 18px 18px 16px 22px;
-  border-radius: 20px;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 10%, #fff) 0%, #fff 58%);
-  border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
-  box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--accent) 75%, transparent);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.tech-site::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #fff));
-}
-
-/* Decorative rotation — the brand ramp only. */
-.tech-site:nth-child(4n + 1) { --accent: var(--admin-blue); }
-.tech-site:nth-child(4n + 2) { --accent: var(--admin-indigo); }
-.tech-site:nth-child(4n + 3) { --accent: var(--admin-blue-deep); }
-.tech-site:nth-child(4n + 4) { --accent: var(--admin-orange); }
-
-/* Semantic override: a finished cycle reads teal wherever it sits in the grid. */
+/* Semantic override: a finished cycle reads teal wherever it sits in the grid.
+   Two classes plus Angular's scoping attribute, so it outranks the rotation. */
 .tech-site.is-complete { --accent: var(--admin-teal); }
-
-.tech-site:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 26px 44px -24px color-mix(in srgb, var(--accent) 85%, transparent);
-}
 
 .tech-site-head {
   display: flex;

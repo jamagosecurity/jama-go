@@ -1130,3 +1130,68 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 640px) {
   .admin-stats { grid-template-columns: 1fr; }
 }
+
+/* ===== Surface card =====
+   One definition of the accent-tinted card used across staff, VIP, technician
+   and DIA screens. It was copy-pasted into five component stylesheets, which
+   had already drifted apart — 10% vs 11% tint, 24/26/28% borders, 150 vs 160
+   degrees, 4px vs 5px rails — none of it deliberate.
+
+   Drive it with --accent; the modifiers add the rail and the hover lift. */
+.surface-card {
+  --accent: var(--admin-blue);
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 10%, #fff) 0%, #fff 58%);
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+/* Lifts on hover. Omit for cards that are not themselves clickable. */
+.surface-card--raised {
+  box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--accent) 75%, transparent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.surface-card--raised:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 26px 44px -24px color-mix(in srgb, var(--accent) 85%, transparent);
+}
+
+.surface-card--rail::before,
+.surface-card--rail-top::before {
+  content: "";
+  position: absolute;
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #fff));
+}
+
+.surface-card--rail::before {
+  inset: 0 auto 0 0;
+  width: 5px;
+}
+
+/* Solid rather than the left rail's fade — a 4px band is too short for a
+   gradient to read as anything but a muddier colour. */
+.surface-card--rail-top::before {
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--accent);
+}
+
+/* Denser variant for fact and stat grids, where a full-size radius and rail
+   swamp a card only a couple of lines tall. */
+.surface-card--compact {
+  border-radius: 16px;
+}
+
+.surface-card--compact.surface-card--rail::before {
+  width: 4px;
+  background: var(--accent);
+}
+
+/* Walks children through the brand ramp so a grid of cards is distinguishable
+   at a glance. Replaces the same four nth-child rules repeated per component. */
+.accent-cycle > *:nth-child(4n + 1) { --accent: var(--admin-blue); }
+.accent-cycle > *:nth-child(4n + 2) { --accent: var(--admin-indigo); }
+.accent-cycle > *:nth-child(4n + 3) { --accent: var(--admin-blue-deep); }
+.accent-cycle > *:nth-child(4n + 4) { --accent: var(--admin-orange); }
