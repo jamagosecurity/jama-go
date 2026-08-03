@@ -106,9 +106,20 @@
   position: relative;
   overflow: hidden;
   padding: clamp(56px, 7vw, 96px) 0 0;
+  /* Doha's West Bay skyline sits under the navy wash. The overlay is graded
+     left-to-right: near-opaque behind the headline so contrast holds, easing
+     off toward the right where only the image column sits. */
   background:
-    radial-gradient(circle at 12% 8%, rgba(37, 148, 210, 0.22), transparent 42%),
-    radial-gradient(circle at 78% 4%, rgba(246, 153, 61, 0.14), transparent 40%),
+    radial-gradient(circle at 78% 4%, rgba(246, 153, 61, 0.12), transparent 40%),
+    linear-gradient(
+      100deg,
+      rgba(9, 25, 47, 0.97) 0%,
+      rgba(10, 28, 53, 0.94) 38%,
+      rgba(12, 34, 64, 0.82) 70%,
+      rgba(13, 37, 71, 0.72) 100%
+    ),
+    url("https://images.unsplash.com/photo-1685113872064-de4180a0ea93?auto=format&fit=crop&w=1920&q=80")
+      center / cover no-repeat,
     linear-gradient(165deg, #0a1c35 0%, #0d2547 52%, #0a1b33 100%);
   color: #eaf2fb;
 }
