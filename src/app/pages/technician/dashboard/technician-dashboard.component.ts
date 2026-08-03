@@ -19,6 +19,19 @@ interface DueInfo {
   readonly label: string;
 }
 
+/**
+ * Maps a tone onto the shared status classes in styles.css. Going through one
+ * map means the card and the chip inside it cannot disagree — previously the
+ * card said teal for a completed cycle while its own chip said green.
+ */
+const TONE_CLASS: Readonly<Record<DueTone, string>> = {
+  complete: 'is-done',
+  ok: 'is-active',
+  soon: 'is-due',
+  overdue: 'is-late',
+  idle: 'is-neutral',
+};
+
 @Component({
   selector: 'app-technician-dashboard',
   standalone: true,
@@ -93,6 +106,15 @@ export class TechnicianDashboardComponent implements OnInit {
       return { tone: 'soon', label: `Due in ${this.days(item.remainingDays)}` };
     }
     return { tone: 'ok', label: `Due in ${this.days(item.remainingDays)}` };
+  }
+
+  /**
+   * The one place a technician card's colour is decided. Drives the card, its
+   * status chip and its due chip together, so colour always reports the state
+   * of the work rather than the row's position in the list.
+   */
+  protected statusClass(item: TechnicianDiaListItem): string {
+    return TONE_CLASS[this.dueInfo(item).tone];
   }
 
   /** Which quarter the next visit covers, e.g. "Quarter 3 of 4". */

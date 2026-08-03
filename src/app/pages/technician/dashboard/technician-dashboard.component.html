@@ -35,11 +35,12 @@
       </article>
     </div>
 
-    <div class="tech-site-grid accent-cycle">
+    <div class="tech-site-grid">
       @for (item of items(); track item.id) {
+        <!-- statusClass drives the card and every chip in it, so the whole card
+             carries one colour and that colour reports the state of the work. -->
         <article
-          class="tech-site surface-card surface-card--rail surface-card--raised"
-          [class.is-complete]="item.inspectionStatus === 'Completed'"
+          class="tech-site surface-card surface-card--rail surface-card--raised {{ statusClass(item) }}"
         >
           <header class="tech-site-head">
             <div>
@@ -47,9 +48,7 @@
               <h2>{{ item.clientName }}</h2>
               <p class="tech-site-sub">Client no. {{ item.clientNumber }}</p>
             </div>
-            <span class="tech-status tech-status--{{ item.inspectionStatus.toLowerCase() }}">
-              {{ statusLabel(item.inspectionStatus) }}
-            </span>
+            <span class="status-chip status-chip--sm">{{ statusLabel(item.inspectionStatus) }}</span>
           </header>
 
           <p class="tech-site-loc" [title]="item.clientLocation">{{ item.clientLocation }}</p>
@@ -81,7 +80,7 @@
 
           <!-- Next inspection: the date first, since that is what a technician
                is actually planning around, with the countdown as support. -->
-          <div class="tech-next tech-next--{{ dueInfo(item).tone }}">
+          <div class="tech-next">
             <div class="tech-next-row">
               <span class="tech-next-label">
                 @if (item.inspectionStatus === 'Completed') {
@@ -90,7 +89,7 @@
                   Next inspection
                 }
               </span>
-              <span class="tech-next-chip">
+              <span class="status-chip status-chip--sm">
                 <span class="tech-due-dot" aria-hidden="true"></span>
                 {{ dueInfo(item).label }}
               </span>

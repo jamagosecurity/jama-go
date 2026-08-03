@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, inject, output } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { DiaStatus } from '../../../../models/dia.model';
@@ -34,25 +34,36 @@ export class DiaConfirmationDialogComponent {
   readonly data = inject<ConfirmationDialogData>(MAT_DIALOG_DATA);
 }
 
+/**
+ * Renders a DIA status using the shared .status-chip and status classes from
+ * styles.css. It previously carried its own copy of the six-colour quarter
+ * scale — cyan, purple and green that existed nowhere else in the product, and
+ * which disagreed with how the technician screens coloured the same states.
+ *
+ * A quarter number is not a status worth five separate hues: the label already
+ * says which quarter it is. What matters is whether the cycle is running,
+ * finished, or has not started, so that is what the colour reports.
+ */
 @Component({
   selector: 'app-dia-status-chip',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<span class="dia-status" [class]="'dia-status dia-status--' + status().toLowerCase()">
-    {{ label() }}
-  </span>`,
-  styles: `
-    .dia-status { display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;font-size:.75rem;font-weight:800;white-space:nowrap;background:#e2e8f0;color:#475569 }
-    .dia-status--quarter1 { background:#dbeafe;color:#1d4ed8 }
-    .dia-status--quarter2 { background:#cffafe;color:#0e7490 }
-    .dia-status--quarter3 { background:#ffedd5;color:#c2410c }
-    .dia-status--quarter4 { background:#f3e8ff;color:#7e22ce }
-    .dia-status--completed { background:#dcfce7;color:#15803d }
-  `,
+  template: `<span class="status-chip" [class]="statusClass()">{{ label() }}</span>`,
 })
 export class DiaStatusChipComponent {
   readonly status = input.required<DiaStatus>();
   readonly label = input.required<string>();
+
+  protected readonly statusClass = computed(() => {
+    switch (this.status()) {
+      case 'Completed':
+        return 'is-done';
+      case 'Inactive':
+        return 'is-off';
+      default:
+        return 'is-active';
+    }
+  });
 }
 
 @Component({

@@ -83,12 +83,12 @@
   width: fit-content;
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(246, 153, 61, 0.1);
-  border: 1px solid rgba(246, 153, 61, 0.18);
+  background: color-mix(in srgb, var(--jama-orange-fill) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--jama-orange-fill) 18%, transparent);
 }
 
 .contact-service span {
-  color: #c2410c;
+  color: var(--jama-orange-ink);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -96,7 +96,7 @@
 }
 
 .contact-service strong {
-  color: #9a3412;
+  color: var(--jama-orange-ink);
   font-size: 0.95rem;
 }
 

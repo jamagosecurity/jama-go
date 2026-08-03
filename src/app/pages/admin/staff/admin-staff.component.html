@@ -65,10 +65,12 @@
         </p>
       </div>
     } @else {
-      <div class="staff-grid accent-cycle">
+      <div class="staff-grid">
         @for (member of filteredStaff(); track member.id) {
           <article
             class="staff-card surface-card surface-card--rail surface-card--raised"
+            [class.is-active]="member.isActive"
+            [class.is-off]="!member.isActive"
             [class.staff-card--hidden]="!member.isActive"
           >
             <div class="staff-card-top">
@@ -90,8 +92,8 @@
             <p class="staff-copy">{{ member.responsibility }}</p>
 
             <div class="staff-tags">
-              <span class="tag">{{ member.department || 'General' }}</span>
-              <span class="tag tag-soft">Order {{ member.displayOrder }}</span>
+              <span class="status-chip">{{ member.department || 'General' }}</span>
+              <span class="status-chip status-chip--muted">Order {{ member.displayOrder }}</span>
             </div>
 
             <div class="staff-card-actions">

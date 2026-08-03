@@ -84,7 +84,11 @@
       <div class="admin-panel">
         <div class="tech-dia-section-head">
           <h2>Key inspection info · Quarter {{ inspection.quarter }}</h2>
-          <span class="tech-status tech-status--{{ inspection.status.toLowerCase() }}">
+          <span
+            class="status-chip"
+            [class.is-done]="inspection.status === 'Submitted'"
+            [class.is-active]="inspection.status === 'Draft'"
+          >
             {{ inspection.status }}
           </span>
         </div>

@@ -1,4 +1,47 @@
 /* ===== Jama Go Security — Styles ===== */
+/* ===== Brand ramp — the single source of colour =====
+   Every other colour token in this file, and the Material theme in
+   material-theme.scss, aliases these. Nothing else should introduce a hex.
+
+   Three roles per hue, because one value cannot do all three jobs. The split
+   is a contrast requirement, not a preference — measured against white:
+
+     -fill    the logo colour. Backgrounds, tints, borders, large areas.
+              3.35:1, so it must NEVER carry small text.
+     -action  accessible sibling of the fill. Buttons, links, anything with
+              white text on top. 4.79:1 — clears AA.
+     -ink     text weight for figures and labels drawn on white. 7.0:1 — AAA.
+
+   This is why Material's primary looked like a "different blue" from the admin
+   cards: it was the -action role all along, just never named as one. */
+:root {
+  --jama-blue-fill: #2594d2;     /* Jama Go logo blue */
+  --jama-blue-action: #1478b3;
+  --jama-blue-ink: #0b5c92;
+
+  --jama-orange-fill: #f6993d;   /* Jama Go logo orange */
+  --jama-orange-action: #ef7f16;
+  --jama-orange-ink: #b45309;
+
+  /* One cool depth stop, to give the decorative rotation a third step. */
+  --jama-indigo-fill: #4f46e5;
+  --jama-indigo-ink: #3730a3;
+
+  /* SEMANTIC — these carry meaning and are never decoration. See the status
+     classes further down, which are the only supported way to reach them. */
+  --jama-teal: #0fb9a5;
+  --jama-teal-ink: #0d6d63;
+  --jama-rose: #e11d48;
+  --jama-rose-ink: #9f1239;
+  --jama-amber: #f59e0b;
+  --jama-amber-ink: #b45309;
+
+  /* Deliberately switched off — hidden, suspended, not applicable. Grey rather
+     than a brand hue, so a disabled row recedes instead of competing. */
+  --jama-slate: #64748b;
+  --jama-slate-ink: #3f4c5f;
+}
+
 :root {
   --bg: #f5f8fc;             /* light page background */
   --bg-2: #e9f1f9;           /* light section / gradient tint */
@@ -6,12 +49,12 @@
   --line: rgba(15, 23, 42, 0.1);
   --text: #142033;
   --muted: #5c6b82;
-  --brand: #2594d2;          /* Jama Go logo blue */
-  --brand-strong: #1a7bb5;
-  --brand-2: #f6993d;        /* Jama Go logo orange */
-  --brand-2-strong: #ef7f16;
-  --grad: linear-gradient(120deg, #f6993d, #ef7f16);
-  --grad-mix: linear-gradient(120deg, #f6993d, #2594d2);
+  --brand: var(--jama-blue-fill);
+  --brand-strong: var(--jama-blue-action);
+  --brand-2: var(--jama-orange-fill);
+  --brand-2-strong: var(--jama-orange-action);
+  --grad: linear-gradient(120deg, var(--jama-orange-fill), var(--jama-orange-action));
+  --grad-mix: linear-gradient(120deg, var(--jama-orange-fill), var(--jama-blue-fill));
   --warn: #d98a1a;
   --radius: 16px;
   --container: 1180px;
@@ -504,6 +547,8 @@ a { color: inherit; text-decoration: none; }
   animation: spin 26s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* Floating labels on the marketing "why us" orbit. Unrelated to .status-chip
+   further down — this one is absolutely positioned by .chip-1..4. */
 .chip {
   position: absolute; padding: 8px 14px; border-radius: 999px;
   background: var(--panel); border: 1px solid var(--line);
@@ -712,29 +757,26 @@ a { color: inherit; text-decoration: none; }
   /* Darkened from the old #5d7288 — secondary copy now clears AA on white. */
   --admin-muted: #4b6280;
   /* ===== Palette =====
-     Decorative colour is limited to the Jama Go brand pair plus one cool depth
-     stop (indigo). Rotating accents — nav rows, stat cards, wizard steps —
-     cycle only through these four, so a screen reads as one system.
+     Aliases onto the brand ramp at the top of this file — no hexes here. The
+     admin-* names are kept because they read better at the call site, but they
+     are not a second palette: change a colour in the ramp and it changes here,
+     in the marketing pages and in the Material controls at the same time. */
+  --admin-blue: var(--jama-blue-fill);
+  --admin-blue-deep: var(--jama-blue-action);
+  --admin-indigo: var(--jama-indigo-fill);
+  --admin-orange: var(--jama-orange-fill);
+  --admin-orange-deep: var(--jama-orange-action);
 
-     Teal, rose and amber are SEMANTIC. They mean on-track, overdue/danger and
-     due-soon. Never reach for them as decoration; if a colour is not carrying
-     meaning it must come from the decorative set above. */
-  --admin-blue: #2594d2;
-  --admin-blue-deep: #0d6fae;
-  --admin-indigo: #4f46e5;
-  --admin-orange: #f6993d;
-  --admin-orange-deep: #e87708;
-
-  --admin-teal: #0fb9a5;
-  --admin-rose: #e11d48;
-  --admin-amber: #f59e0b;
+  --admin-teal: var(--jama-teal);
+  --admin-rose: var(--jama-rose);
+  --admin-amber: var(--jama-amber);
 
   /* Readable text weights of the accents, for figures and labels on white. */
-  --admin-blue-ink: #0b5c92;
-  --admin-indigo-ink: #3730a3;
-  --admin-orange-ink: #b45309;
-  --admin-teal-ink: #0d6d63;
-  --admin-rose-ink: #9f1239;
+  --admin-blue-ink: var(--jama-blue-ink);
+  --admin-indigo-ink: var(--jama-indigo-ink);
+  --admin-orange-ink: var(--jama-orange-ink);
+  --admin-teal-ink: var(--jama-teal-ink);
+  --admin-rose-ink: var(--jama-rose-ink);
   --admin-shadow: 0 22px 50px -28px rgba(11, 31, 51, 0.45);
   --admin-radius: 22px;
   /* Shared brand avatar/icon gradient — reused across admin staff cards,
@@ -746,7 +788,7 @@ a { color: inherit; text-decoration: none; }
   --admin-brand-grad: linear-gradient(115deg, var(--admin-orange) 0%, var(--admin-blue) 55%, var(--admin-indigo) 100%);
   /* Same family, deep stops only, so white labels clear 4.5:1 wherever the
      gradient lands. Use this on anything with text on top. */
-  --admin-brand-grad-deep: linear-gradient(115deg, #0b5c92 0%, #1d4ed8 55%, #3730a3 100%);
+  --admin-brand-grad-deep: linear-gradient(115deg, var(--jama-blue-ink) 0%, #1d4ed8 55%, var(--jama-indigo-ink) 100%);
   /* Sidebar body — one cool ramp from indigo into brand blue, warmed by a
      single orange bloom so the rail has depth without turning into a rainbow. */
   --admin-sidebar-grad:
@@ -1015,37 +1057,30 @@ a { color: inherit; text-decoration: none; }
   font-size: 1.1rem;
 }
 
+/* The same pill as .status-chip. Kept under its own name because staff, VIP and
+   contacts templates use it, but the variants are now aliases of the status
+   vocabulary rather than a fourth private set of rgba values. --new moved from
+   orange to amber: "needs looking at" is a meaning, and this file's own rule is
+   that meaning comes from the semantic set, never from a brand hue. */
 .admin-badge {
+  --accent: var(--jama-indigo-fill);
+  --accent-ink: var(--jama-indigo-ink);
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 5px 11px;
   border-radius: 999px;
-  background: rgba(79, 70, 229, 0.1);
-  border: 1px solid rgba(79, 70, 229, 0.22);
-  color: #3730a3;
+  background: color-mix(in srgb, var(--accent) 14%, #fff);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  color: var(--accent-ink);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
 
-.admin-badge--active {
-  background: rgba(15, 185, 165, 0.16);
-  border-color: rgba(15, 185, 165, 0.32);
-  color: #0d6d63;
-}
-
-.admin-badge--hidden {
-  background: rgba(100, 116, 139, 0.14);
-  border-color: rgba(100, 116, 139, 0.26);
-  color: #3f4c5f;
-}
-
-.admin-badge--new {
-  background: rgba(246, 153, 61, 0.16);
-  border-color: rgba(246, 153, 61, 0.36);
-  color: var(--admin-orange-ink);
-}
+.admin-badge--active { --accent: var(--jama-teal);  --accent-ink: var(--jama-teal-ink); }
+.admin-badge--hidden { --accent: var(--jama-slate); --accent-ink: var(--jama-slate-ink); }
+.admin-badge--new    { --accent: var(--jama-amber); --accent-ink: var(--jama-amber-ink); }
 
 .admin-badge--dot::before {
   content: "";
@@ -1138,8 +1173,15 @@ a { color: inherit; text-decoration: none; }
    degrees, 4px vs 5px rails — none of it deliberate.
 
    Drive it with --accent; the modifiers add the rail and the hover lift. */
+/* Default accent, at zero specificity via :where() so any status class beats it
+   no matter what order the stylesheets land in. Without this the default and
+   .is-done would both be one class and the winner would depend on source order. */
+:where(.surface-card, .status-chip) {
+  --accent: var(--jama-blue-fill);
+  --accent-ink: var(--jama-blue-ink);
+}
+
 .surface-card {
-  --accent: var(--admin-blue);
   position: relative;
   overflow: hidden;
   border-radius: 20px;
@@ -1189,9 +1231,62 @@ a { color: inherit; text-decoration: none; }
   background: var(--accent);
 }
 
-/* Walks children through the brand ramp so a grid of cards is distinguishable
-   at a glance. Replaces the same four nth-child rules repeated per component. */
-.accent-cycle > *:nth-child(4n + 1) { --accent: var(--admin-blue); }
-.accent-cycle > *:nth-child(4n + 2) { --accent: var(--admin-indigo); }
-.accent-cycle > *:nth-child(4n + 3) { --accent: var(--admin-blue-deep); }
-.accent-cycle > *:nth-child(4n + 4) { --accent: var(--admin-orange); }
+/* ===== Status colour =====
+   The only supported way to reach the semantic hues. One meaning per colour,
+   identical on every screen, so a colour learned in one place transfers:
+
+     .is-neutral   not started, nothing to report      blue
+     .is-active    in progress, on track, live         indigo
+     .is-due       needs attention soon                amber
+     .is-late      overdue, failed                     rose
+     .is-done      complete                            teal
+     .is-off       switched off — hidden, suspended    slate
+
+   .is-off is deliberately not rose. A suspended client or a hidden staff row
+   is an intended state, not a failure, and colouring it like an emergency
+   teaches people to ignore the emergency colour.
+
+   This replaces .accent-cycle, which coloured a card by its position in the
+   list. Two things were wrong with that: a card changed colour when the list
+   re-sorted or gained a row, and decorative colour sat next to meaningful
+   colour with nothing to tell them apart. Colour now always means something.
+
+   Applies to any element reading --accent, so a card and the chip inside it
+   agree by construction. That was not true before: a completed inspection was
+   teal on the card and green on its own status chip. */
+.is-neutral { --accent: var(--jama-blue-fill);   --accent-ink: var(--jama-blue-ink); }
+.is-active  { --accent: var(--jama-indigo-fill); --accent-ink: var(--jama-indigo-ink); }
+.is-due     { --accent: var(--jama-amber);       --accent-ink: var(--jama-amber-ink); }
+.is-late    { --accent: var(--jama-rose);        --accent-ink: var(--jama-rose-ink); }
+.is-done    { --accent: var(--jama-teal);        --accent-ink: var(--jama-teal-ink); }
+.is-off     { --accent: var(--jama-slate);       --accent-ink: var(--jama-slate-ink); }
+
+/* ===== Chip =====
+   Was written out separately as .tag, .pill, .tech-status and .tech-next-chip,
+   each with its own padding, weight and hardcoded colours. Takes its colour
+   from --accent like everything else, so a status class recolours it. */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 16%, #fff);
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+  color: var(--accent-ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status-chip--sm {
+  padding: 3px 9px;
+  font-size: 0.74rem;
+}
+
+/* For labels that are genuinely not a status — counts, hints, metadata. */
+.status-chip--muted {
+  background: rgba(15, 40, 70, 0.06);
+  border-color: rgba(15, 40, 70, 0.14);
+  color: #3f4c5f;
+}

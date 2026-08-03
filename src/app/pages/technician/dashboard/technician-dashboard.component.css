@@ -16,9 +16,8 @@
   padding: 18px 18px 16px 22px;
 }
 
-/* Semantic override: a finished cycle reads teal wherever it sits in the grid.
-   Two classes plus Angular's scoping attribute, so it outranks the rotation. */
-.tech-site.is-complete { --accent: var(--admin-teal); }
+/* No accent rule here any more — statusClass() puts .is-done/.is-late/etc. on
+   the card and everything inside inherits it. */
 
 .tech-site-head {
   display: flex;
@@ -138,14 +137,14 @@
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ===== Next inspection block ===== */
+/* ===== Next inspection block =====
+   Inherits --accent from the card's status class, so it shades with whatever
+   the card is reporting instead of keeping a private --tone scale. */
 .tech-next {
-  --tone: #64748b;
-  --tone-bg: rgba(100, 116, 139, 0.1);
   padding: 11px 13px;
   border-radius: 14px;
-  background: var(--tone-bg);
-  border: 1px solid color-mix(in srgb, var(--tone) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, #fff);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .tech-next-row {
@@ -161,19 +160,6 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-}
-
-.tech-next-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--tone) 18%, #fff);
-  color: var(--tone);
-  font-size: 0.74rem;
-  font-weight: 800;
-  white-space: nowrap;
 }
 
 .tech-due-dot {
@@ -201,15 +187,10 @@
   font-weight: 600;
 }
 
-.tech-next--overdue { --tone: #9f1239; --tone-bg: rgba(225, 29, 72, 0.1); }
-.tech-next--soon    { --tone: #b45309; --tone-bg: rgba(217, 119, 6, 0.12); }
-.tech-next--ok      { --tone: #0d6d63; --tone-bg: rgba(15, 185, 165, 0.12); }
-.tech-next--complete { --tone: #15803d; --tone-bg: rgba(22, 163, 74, 0.12); }
-.tech-next--idle    { --tone: #3f4c5f; --tone-bg: rgba(100, 116, 139, 0.1); }
-
-/* Overdue is the one state that should catch the eye across a full grid. */
-.tech-next--overdue .tech-next-date {
-  color: #9f1239;
+/* Overdue is the one state that should catch the eye across a full grid. The
+   date picks up the card's status ink rather than a hardcoded rose. */
+.is-late .tech-next-date {
+  color: var(--accent-ink);
 }
 
 /* ===== Footer ===== */

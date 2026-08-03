@@ -13,11 +13,20 @@ html {
     density: 0,
   ));
 
-  --mat-sys-primary: #1478b3;
+  /* Aliased onto the brand ramp in styles.css rather than repeating hexes here.
+     Material's primary is the -action role: it sits under white label text on
+     buttons, so it needs 4.5:1, which the logo blue (-fill, 3.35:1) cannot give.
+     That is the whole reason these two blues differ — before, the difference
+     was real but undocumented, so the controls and the cards simply looked
+     mismatched.
+
+     Custom properties resolve at use time, so it does not matter that this
+     file is loaded before styles.css — both write to the same html element. */
+  --mat-sys-primary: var(--jama-blue-action);
   --mat-sys-on-primary: #ffffff;
   --mat-sys-primary-container: #d9effb;
   --mat-sys-on-primary-container: #082f49;
-  --mat-sys-tertiary: #ef7f16;
+  --mat-sys-tertiary: var(--jama-orange-action);
   --mat-sys-on-tertiary: #ffffff;
   --mat-sys-tertiary-container: #ffead6;
   --mat-sys-on-tertiary-container: #5b2500;

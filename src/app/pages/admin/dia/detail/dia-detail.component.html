@@ -130,7 +130,14 @@
       <div class="admin-panel-title">
         <h2>Quarterly inspection details</h2>
         @if (!submittedLoading()) {
-          <span class="tech-status">{{ submitted().length }} of 4 submitted</span>
+          <span
+            class="status-chip"
+            [class.is-done]="submitted().length === 4"
+            [class.is-active]="submitted().length > 0 && submitted().length < 4"
+            [class.is-neutral]="submitted().length === 0"
+          >
+            {{ submitted().length }} of 4 submitted
+          </span>
         }
       </div>
 
