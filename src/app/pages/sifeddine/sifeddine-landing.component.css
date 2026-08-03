@@ -88,73 +88,176 @@
 .sf-btn--outline-light { color: #fff; border-color: rgba(255, 255, 255, 0.55); }
 .sf-btn--outline-light:hover { background: rgba(255, 255, 255, 0.12); }
 
-/* ================= Hero ================= */
+.sf-btn svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ================= Hero =================
+   Deep navy stage with a single gold accent, a full-bleed equipment photo on
+   the right, and a value strip anchored to the base. */
 .sf-hero {
   position: relative;
   overflow: hidden;
-  padding: clamp(72px, 10vw, 130px) 0 clamp(64px, 8vw, 110px);
+  padding: clamp(56px, 7vw, 96px) 0 0;
   background:
-    radial-gradient(circle at 15% 10%, rgba(37, 148, 210, 0.35), transparent 45%),
-    radial-gradient(circle at 90% 20%, rgba(246, 153, 61, 0.28), transparent 45%),
-    linear-gradient(160deg, #0b1f3d 0%, #10294a 55%, #0b1f3d 100%);
+    radial-gradient(circle at 12% 8%, rgba(37, 148, 210, 0.22), transparent 42%),
+    radial-gradient(circle at 78% 4%, rgba(246, 153, 61, 0.14), transparent 40%),
+    linear-gradient(165deg, #0a1c35 0%, #0d2547 52%, #0a1b33 100%);
   color: #eaf2fb;
 }
-.sf-hero-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.55;
-  animation: sf-float 9s ease-in-out infinite;
-}
-.sf-hero-orb--1 { width: 340px; height: 340px; background: #2594d2; top: -80px; left: -60px; }
-.sf-hero-orb--2 { width: 300px; height: 300px; background: #f6993d; bottom: -90px; right: 8%; animation-delay: 1.5s; }
-.sf-hero-orb--3 { width: 220px; height: 220px; background: #7c3aed; top: 40%; right: 40%; animation-delay: 3s; opacity: 0.4; }
 
 .sf-hero-inner {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  gap: clamp(32px, 5vw, 72px);
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(28px, 4vw, 56px);
   align-items: center;
+  padding-bottom: clamp(48px, 6vw, 84px);
 }
+
 .sf-hero-copy { animation: sf-rise 0.8s ease both; }
+
 .sf-hero-title {
   font-family: "Sora", "Inter", sans-serif;
-  font-size: clamp(2.8rem, 6vw, 5rem);
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
   color: #fff;
-  margin-bottom: 10px;
-}
-.sf-hero-role {
-  font-size: clamp(1.1rem, 2vw, 1.45rem);
-  font-weight: 700;
-  color: #8fd0ff;
   margin-bottom: 20px;
 }
+
+.sf-hero-title-accent {
+  display: block;
+  color: var(--sf-orange);
+}
+
 .sf-hero-lead {
-  font-size: clamp(1rem, 1.5vw, 1.15rem);
-  color: rgba(234, 242, 251, 0.82);
-  max-width: 34em;
-  margin-bottom: 30px;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+  line-height: 1.75;
+  color: rgba(234, 242, 251, 0.78);
+  max-width: 36em;
+  margin-bottom: 32px;
 }
-.sf-hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 28px; }
-.sf-hero-chips { display: flex; flex-wrap: wrap; gap: 10px; }
-.sf-chip {
-  padding: 8px 15px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.08);
+
+.sf-hero-lead strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.sf-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* ---- hero image ---- */
+.sf-hero-visual {
+  position: relative;
+  animation: sf-rise 0.8s ease 0.12s both;
+}
+
+.sf-hero-image {
+  display: block;
+  width: 100%;
+  height: clamp(320px, 42vw, 500px);
+  object-fit: cover;
+  border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(6px);
+  box-shadow:
+    0 40px 90px -40px rgba(0, 0, 0, 0.85),
+    0 0 60px -30px rgba(37, 148, 210, 0.5);
 }
-.sf-chip--gold {
-  color: #ffe6a3;
-  font-weight: 800;
-  background: rgba(212, 175, 55, 0.16);
-  border-color: rgba(212, 175, 55, 0.55);
+
+/* ---- value strip ---- */
+.sf-hero-strip {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(4, 14, 28, 0.5);
+}
+
+.sf-hero-strip-inner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(16px, 2.5vw, 34px);
+  padding-top: 22px;
+  padding-bottom: 22px;
+}
+
+.sf-hero-strip-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: rgba(234, 242, 251, 0.72);
+}
+
+.sf-hero-strip-item strong {
+  display: block;
+  color: #fff;
+  font-weight: 700;
+}
+
+.sf-hero-strip-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(246, 153, 61, 0.14);
+  border: 1px solid rgba(246, 153, 61, 0.28);
+}
+
+.sf-hero-strip-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--sf-orange);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Stack the hero and halve the strip before the two columns get cramped. */
+@media (max-width: 900px) {
+  .sf-hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .sf-hero-visual {
+    order: -1;
+  }
+
+  .sf-hero-image {
+    height: clamp(220px, 45vw, 320px);
+  }
+
+  .sf-hero-strip-inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .sf-hero-actions .sf-btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .sf-hero-strip-inner {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ================= Signature highlight: MOI Qatar ================= */
@@ -225,48 +328,6 @@
   background: rgba(212, 175, 55, 0.1);
   border: 1px solid rgba(212, 175, 55, 0.4);
 }
-
-.sf-hero-card {
-  position: relative;
-  padding: 34px 30px;
-  border-radius: 26px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(14px);
-  animation: sf-rise 0.9s ease 0.1s both;
-}
-.sf-avatar {
-  width: 118px;
-  height: 118px;
-  margin: 0 auto 18px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--sf-orange), var(--sf-blue));
-  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.12), 0 18px 40px -14px rgba(37, 148, 210, 0.8);
-  animation: sf-pulse 4s ease-in-out infinite;
-}
-.sf-avatar-mono {
-  font-family: "Sora", sans-serif;
-  font-size: 2.6rem;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-.sf-hero-card-name { font-family: "Sora", sans-serif; font-size: 1.3rem; font-weight: 800; color: #fff; }
-.sf-hero-card-role { font-size: 0.9rem; color: rgba(234, 242, 251, 0.75); margin-top: 4px; }
-.sf-hero-card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 22px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-}
-.sf-hero-card-grid strong { display: block; font-family: "Sora", sans-serif; font-size: 1.5rem; color: #8fd0ff; }
-.sf-hero-card-grid span { font-size: 0.72rem; color: rgba(234, 242, 251, 0.7); }
 
 /* ================= Marquee ================= */
 .sf-marquee {
@@ -489,10 +550,8 @@
 
 /* ================= Animations ================= */
 @keyframes sf-rise { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes sf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-26px); } }
-@keyframes sf-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 @keyframes sf-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .sf-hero-orb, .sf-avatar, .sf-marquee-track, .sf-hero-copy, .sf-hero-card { animation: none; }
+  .sf-marquee-track, .sf-hero-copy, .sf-hero-visual { animation: none; }
 }

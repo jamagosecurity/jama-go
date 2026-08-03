@@ -31,7 +31,7 @@
   @if (loading()) {
     <div class="editor-card editor-loading">Loading staff account…</div>
   } @else {
-    <form class="editor-card" (submit)="save($event)">
+    <form class="editor-card" [formGroup]="form" (submit)="save($event)">
       <div class="form-section-heading">
         <span>Account details</span>
         <small>Fields marked required must be completed.</small>
@@ -41,60 +41,58 @@
         <label>
           <span>Full name <i>*</i></span>
           <input
-            [(ngModel)]="form.fullName"
-            name="fullName"
-            required
+            formControlName="fullName"
+            maxlength="150"
             autocomplete="name"
             placeholder="e.g. Sara Al-Harbi"
+            [class.is-invalid]="showError('fullName')"
           />
+          @if (showError('fullName')) {
+            <small class="field-error">{{ errorFor('fullName') }}</small>
+          }
         </label>
 
         <label>
           <span>Email <i>*</i></span>
           <input
             type="email"
-            [(ngModel)]="form.email"
-            name="email"
-            required
+            formControlName="email"
+            maxlength="256"
             autocomplete="off"
             placeholder="name@jamago.qa"
+            [class.is-invalid]="showError('email')"
           />
+          @if (showError('email')) {
+            <small class="field-error">{{ errorFor('email') }}</small>
+          }
         </label>
 
         <label>
           <span>
             {{ isEditing ? 'New password' : 'Password' }}
-            @if (!isEditing || !hasLoginAccount()) { <i>*</i> }
+            @if (!isEditing) { <i>*</i> }
           </span>
           <input
             type="password"
-            [(ngModel)]="form.password"
-            name="password"
-            [required]="!isEditing || !hasLoginAccount()"
-            minlength="8"
+            formControlName="password"
+            maxlength="128"
             autocomplete="new-password"
             placeholder="At least 8 characters"
+            [class.is-invalid]="showError('password')"
           />
-          <small>
-            {{
-              isEditing && hasLoginAccount()
-                ? 'Leave blank to keep the current password.'
-                : 'Use uppercase, lowercase, and a number.'
-            }}
-          </small>
+          @if (showError('password')) {
+            <small class="field-error">{{ errorFor('password') }}</small>
+          } @else {
+            <small class="field-hint">
+              At least 8 characters with an uppercase letter, a lowercase letter and a number.
+              {{ isEditing && hasLoginAccount() ? 'Leave blank to keep the current password.' : '' }}
+            </small>
+          }
         </label>
 
         <label>
           <span>Department</span>
-          <!-- One-way [ngModel] with an explicit handler. Pairing [(ngModel)]
-               with a second (ngModelChange) leaves two output bindings on the
-               element and the two-way assignment stops being reliable, which
-               silently saved a null department. -->
-          <select
-            [ngModel]="form.department"
-            name="department"
-            (ngModelChange)="departmentChanged($event)"
-          >
+          <select formControlName="department">
             <option [ngValue]="null">Select department</option>
             @for (department of departments; track department.value) {
               <option [ngValue]="department.value">{{ department.label }}</option>
@@ -112,7 +110,7 @@
       </div>
 
       <label class="visibility-control">
-        <input type="checkbox" [(ngModel)]="form.canSignIn" name="canSignIn" />
+        <input type="checkbox" formControlName="canSignIn" />
         <span class="switch-track"><i></i></span>
         <span>
           <strong>Allow sign-in</strong>
@@ -124,7 +122,7 @@
       </label>
 
       <label class="visibility-control">
-        <input type="checkbox" [(ngModel)]="form.isActive" name="isActive" />
+        <input type="checkbox" formControlName="isActive" />
         <span class="switch-track"><i></i></span>
         <span>
           <strong>Show on public site</strong>
@@ -135,7 +133,7 @@
         </span>
       </label>
 
-      @if (!form.canSignIn) {
+      @if (!form.controls.canSignIn.value) {
         <p class="access-warning">
           Sign-in is off — this person cannot log in, and the permissions below will not apply
           until you turn it back on.
@@ -156,7 +154,7 @@
             <span class="permission-count">
               {{ selectedCount() }} of {{ permissionCatalogue().length }} selected
             </span>
-            @if (form.department && !matchesDepartmentDefaults()) {
+            @if (form.controls.department.value && !matchesDepartmentDefaults()) {
               <button type="button" class="permission-link" (click)="resetToDepartmentDefaults()">
                 Reset to department defaults
               </button>

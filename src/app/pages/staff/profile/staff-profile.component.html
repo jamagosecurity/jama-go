@@ -60,40 +60,44 @@
       <h2>Editable details</h2>
     </div>
 
-    <form class="staff-form" (submit)="save($event)" novalidate>
+    <form class="staff-form" [formGroup]="form" (submit)="save($event)" novalidate>
       <div class="staff-field">
         <label for="staff-full-name">Full name</label>
         <input
           id="staff-full-name"
-          name="fullName"
           type="text"
-          [(ngModel)]="fullName"
+          formControlName="fullName"
           maxlength="150"
-          required
-          [disabled]="loading()"
+          [class.is-invalid]="showError('fullName')"
         />
+        @if (showError('fullName')) {
+          <small class="field-error">{{ errorFor('fullName') }}</small>
+        }
       </div>
 
       <div class="staff-field">
         <label for="staff-responsibility">Responsibility</label>
         <textarea
           id="staff-responsibility"
-          name="responsibility"
-          [(ngModel)]="responsibility"
+          formControlName="responsibility"
           maxlength="1000"
-          [disabled]="loading()"
           placeholder="Describe what you are responsible for."
+          [class.is-invalid]="showError('responsibility')"
         ></textarea>
-        <p class="staff-hint">
-          Your role, department, email and account status are managed by an administrator.
-        </p>
+        @if (showError('responsibility')) {
+          <small class="field-error">{{ errorFor('responsibility') }}</small>
+        } @else {
+          <p class="staff-hint">
+            Your role, department, email and account status are managed by an administrator.
+          </p>
+        }
       </div>
 
       <div class="staff-actions">
         <button
           type="submit"
           class="btn-admin btn-admin-primary"
-          [disabled]="saving() || loading() || !fullName.trim()"
+          [disabled]="saving() || loading()"
         >
           {{ saving() ? 'Saving…' : 'Save changes' }}
         </button>

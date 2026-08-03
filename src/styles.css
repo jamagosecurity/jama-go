@@ -1290,3 +1290,39 @@ a { color: inherit; text-decoration: none; }
   border-color: rgba(15, 40, 70, 0.14);
   color: #3f4c5f;
 }
+
+/* ===== Form validation =====
+   Lived inside staff-editor.component.css, where Angular's view encapsulation
+   kept it away from every other form — so the staff profile and technician
+   inspection screens had no error styling available to them at all. Global, so
+   an invalid field looks the same wherever it appears. */
+.field-error {
+  display: block;
+  margin-top: 6px;
+  color: var(--jama-rose-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid {
+  border-color: var(--jama-rose);
+  background: color-mix(in srgb, var(--jama-rose) 4%, #fff);
+}
+
+input.is-invalid:focus,
+select.is-invalid:focus,
+textarea.is-invalid:focus {
+  border-color: var(--jama-rose);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--jama-rose) 16%, transparent);
+}

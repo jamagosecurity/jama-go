@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, switchMap } from 'rxjs';
 import {
@@ -19,23 +19,16 @@ import {
 } from '../../../models/staff.model';
 import { StaffService } from '../../../services/staff.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
-
-interface StaffAccountForm {
-  fullName: string;
-  email: string;
-  password: string;
-  department: StaffDepartment | null;
-  /** Public "Our Team" visibility. */
-  isActive: boolean;
-  /** Login enabled. Deliberately separate — internal staff sign in without
-   *  appearing on the marketing site. */
-  canSignIn: boolean;
-}
+import {
+  fieldErrorMessage,
+  shouldShowError,
+  strongPassword,
+} from '../../../utils/form-validators.util';
 
 @Component({
   selector: 'app-staff-editor',
   standalone: true,
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './staff-editor.component.html',
   styleUrl: './staff-editor.component.css',
@@ -44,6 +37,7 @@ export class StaffEditorComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly staffService = inject(StaffService);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly staffId = this.route.snapshot.paramMap.get('id');
@@ -91,15 +85,17 @@ export class StaffEditorComponent {
 
   /**
    * Whether the selection still matches the department's defaults. A method
-   * rather than a computed: form.department is a plain property, so a computed
-   * would not recompute when the department changes.
+   * rather than a computed: the department lives in a form control, not a
+   * signal, so a computed would not recompute when it changes.
    */
   matchesDepartmentDefaults(): boolean {
-    const defaults = this.form.department
-      ? (this.departmentDefaults()[this.form.department] ?? [])
-      : [];
+    const defaults = this.defaultsFor(this.form.controls.department.value);
     const selected = this.selectedPermissions();
     return defaults.length === selected.size && defaults.every((key) => selected.has(key));
+  }
+
+  private defaultsFor(department: StaffDepartment | null): string[] {
+    return department ? (this.departmentDefaults()[department] ?? []) : [];
   }
 
   selectAllPermissions(): void {
@@ -114,10 +110,7 @@ export class StaffEditorComponent {
 
   /** Puts the department's usual permissions back after manual edits. */
   resetToDepartmentDefaults(): void {
-    const defaults = this.form.department
-      ? (this.departmentDefaults()[this.form.department] ?? [])
-      : [];
-    this.selectedPermissions.set(new Set(defaults));
+    this.selectedPermissions.set(new Set(this.defaultsFor(this.form.controls.department.value)));
   }
   /** Department -> the permissions that department starts with, from the API. */
   private readonly departmentDefaults = signal<Record<string, string[]>>({});
@@ -140,15 +133,10 @@ export class StaffEditorComponent {
    * Applying them here makes the consequence visible in the form, and still
    * editable, rather than being decided invisibly on save.
    */
-  departmentChanged(department: StaffDepartment | null): void {
-    // Assigns the model itself — the template binds [ngModel] one-way so this
-    // is the only writer, rather than racing a two-way binding.
-    this.form.department = department;
-
+  private applyDepartmentDefaults(department: StaffDepartment | null): void {
+    // Never overwrite a choice the admin has already made by hand.
     if (this.permissionsTouched) return;
-
-    const defaults = department ? (this.departmentDefaults()[department] ?? []) : [];
-    this.selectedPermissions.set(new Set(defaults));
+    this.selectedPermissions.set(new Set(this.defaultsFor(department)));
   }
 
   togglePermission(key: string, checked: boolean): void {
@@ -162,16 +150,48 @@ export class StaffEditorComponent {
     this.selectedPermissions.set(next);
   }
 
-  form: StaffAccountForm = {
-    fullName: '',
-    email: '',
-    password: '',
-    department: null,
-    isActive: true,
-    canSignIn: true,
+  /**
+   * Reactive, matching the DIA and VIP editors. Previously template-driven with
+   * no per-field messages at all: an invalid email or a weak password only
+   * surfaced as a single API error banner after pressing save.
+   */
+  readonly form = this.formBuilder.nonNullable.group({
+    fullName: ['', [Validators.required, Validators.maxLength(150)]],
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(256)]],
+    // Required only when creating — blank on edit keeps the current password.
+    password: ['', this.isEditing ? [strongPassword] : [Validators.required, strongPassword]],
+    department: this.formBuilder.nonNullable.control<StaffDepartment | null>(null),
+    /** Public "Our Team" visibility. */
+    isActive: [true],
+    /**
+     * Login enabled. Deliberately separate from isActive — internal staff sign
+     * in without appearing on the marketing site.
+     */
+    canSignIn: [true],
+  });
+
+  private static readonly LABELS: Record<string, string> = {
+    fullName: 'Full name',
+    email: 'Email',
+    password: 'Password',
+    department: 'Department',
   };
 
+  showError(name: string): boolean {
+    return shouldShowError(this.form.get(name));
+  }
+
+  errorFor(name: string): string {
+    return fieldErrorMessage(this.form.get(name), StaffEditorComponent.LABELS[name] ?? 'This field');
+  }
+
   constructor() {
+    // Department drives the starting permissions, so react to it rather than
+    // relying on the template to call back.
+    this.form.controls.department.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((department) => this.applyDepartmentDefaults(department));
+
     this.staffService
       .getPermissionCatalogue()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -180,7 +200,11 @@ export class StaffEditorComponent {
           this.permissionCatalogue.set(catalogue.permissions);
           this.departmentDefaults.set(catalogue.departmentDefaults ?? {});
           // A brand new account starts on whatever department is preselected.
-          if (!this.isEditing) this.departmentChanged(this.form.department);
+          // Applied here rather than on a valueChanges event, because the
+          // defaults only become known once this response lands.
+          if (!this.isEditing) {
+            this.applyDepartmentDefaults(this.form.controls.department.value);
+          }
         },
         error: () => undefined,
       });
@@ -194,15 +218,22 @@ export class StaffEditorComponent {
     event.preventDefault();
     if (this.saving()) return;
 
+    if (this.form.invalid) {
+      // Reveals every message at once rather than only the field just left.
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.saving.set(true);
     this.error.set(null);
 
+    const value = this.form.getRawValue();
     const baseRequest = {
-      fullName: this.form.fullName.trim(),
-      email: this.form.email.trim().toLowerCase(),
-      department: this.form.department,
-      isActive: this.form.isActive,
-      canSignIn: this.form.canSignIn,
+      fullName: value.fullName.trim(),
+      email: value.email.trim().toLowerCase(),
+      department: value.department,
+      isActive: value.isActive,
+      canSignIn: value.canSignIn,
     };
 
     const permissions = [...this.selectedPermissions()];
@@ -210,11 +241,11 @@ export class StaffEditorComponent {
     const action = this.staffId
       ? this.staffService.update(this.staffId, {
           ...baseRequest,
-          password: this.form.password || null,
+          password: value.password || null,
         } satisfies UpdateStaffRequest)
       : this.staffService.create({
           ...baseRequest,
-          password: this.form.password,
+          password: value.password,
           permissions,
         } satisfies CreateStaffRequest);
 
@@ -248,15 +279,23 @@ export class StaffEditorComponent {
         next: (member) => {
           this.hasLoginAccount.set(member.hasLoginAccount);
           this.selectedPermissions.set(new Set(member.permissions ?? []));
-          this.form = {
-            fullName: member.fullName,
-            email: member.email ?? '',
-            password: '',
-            department:
-              STAFF_DEPARTMENTS.find((option) => option.label === member.department)?.value ?? null,
-            isActive: member.isActive,
-            canSignIn: member.canSignIn,
-          };
+
+          // emitEvent: false so seeding the form does not look like the admin
+          // changing the department, which would overwrite the account's saved
+          // permissions with the department defaults. Changing it by hand
+          // afterwards still applies them.
+          this.form.patchValue(
+            {
+              fullName: member.fullName,
+              email: member.email ?? '',
+              password: '',
+              department:
+                STAFF_DEPARTMENTS.find((option) => option.label === member.department)?.value ?? null,
+              isActive: member.isActive,
+              canSignIn: member.canSignIn,
+            },
+            { emitEvent: false },
+          );
         },
         error: (error: unknown) =>
           this.error.set(getApiErrorMessage(error, 'Could not load staff member.')),

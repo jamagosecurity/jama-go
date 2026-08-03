@@ -1,12 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import {
@@ -15,23 +9,11 @@ import {
 } from '../../../models/vip-client.model';
 import { VipClientService } from '../../../services/vip-client.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
-
-/**
- * Mirrors Common/PasswordRules on the API. Reported per-rule so the admin sees
- * exactly what is missing rather than one combined "invalid password".
- */
-function strongPassword(control: AbstractControl): ValidationErrors | null {
-  const value = (control.value as string) ?? '';
-  if (!value) return null;
-
-  const failures: string[] = [];
-  if (value.length < 8) failures.push('at least 8 characters');
-  if (!/[A-Z]/.test(value)) failures.push('an uppercase letter');
-  if (!/[a-z]/.test(value)) failures.push('a lowercase letter');
-  if (!/[0-9]/.test(value)) failures.push('a number');
-
-  return failures.length ? { weakPassword: failures } : null;
-}
+import {
+  fieldErrorMessage,
+  shouldShowError,
+  strongPassword,
+} from '../../../utils/form-validators.util';
 
 @Component({
   selector: 'app-vip-editor',
@@ -74,33 +56,20 @@ export class VipEditorComponent {
     if (this.vipId) this.load(this.vipId);
   }
 
-  /** Errors show once the field has been touched, not while it is being typed. */
+  private static readonly LABELS: Record<string, string> = {
+    clientName: 'Client name',
+    projectName: 'Project name',
+    email: 'Email',
+    password: 'Password',
+    folderName: 'Folder name',
+  };
+
   showError(name: string): boolean {
-    const control = this.form.get(name);
-    return !!control && control.invalid && (control.touched || control.dirty);
+    return shouldShowError(this.form.get(name));
   }
 
   errorFor(name: string): string {
-    const control = this.form.get(name);
-    if (!control?.errors) return '';
-
-    const labels: Record<string, string> = {
-      clientName: 'Client name',
-      projectName: 'Project name',
-      email: 'Email',
-      folderName: 'Folder name',
-    };
-    const label = labels[name] ?? 'This field';
-
-    if (control.errors['required']) return `${label} is required.`;
-    if (control.errors['email']) return 'Enter a valid email address.';
-    if (control.errors['maxlength']) {
-      return `${label} must be ${control.errors['maxlength'].requiredLength} characters or fewer.`;
-    }
-    if (control.errors['weakPassword']) {
-      return `Password needs ${(control.errors['weakPassword'] as string[]).join(', ')}.`;
-    }
-    return `${label} is not valid.`;
+    return fieldErrorMessage(this.form.get(name), VipEditorComponent.LABELS[name] ?? 'This field');
   }
 
   /**

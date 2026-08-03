@@ -1,72 +1,86 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
+import {
+  fieldErrorMessage,
+  fieldsDiffer,
+  fieldsMatch,
+  shouldShowError,
+  strongPassword,
+} from '../../../utils/form-validators.util';
 
 @Component({
   selector: 'app-staff-change-password',
   standalone: true,
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './staff-change-password.component.html',
   styleUrl: '../staff.styles.css',
 })
 export class StaffChangePasswordComponent {
   private readonly auth = inject(AuthService);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
   readonly saved = signal(false);
 
-  currentPassword = '';
-  newPassword = '';
-  confirmPassword = '';
+  /**
+   * The password policy used to be spelled out a fourth time here, as a getter
+   * returning a string. It now comes from the shared strongPassword validator,
+   * which is the single client-side mirror of Common/PasswordRules on the API.
+   */
+  readonly form = this.formBuilder.nonNullable.group(
+    {
+      currentPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, strongPassword]],
+      confirmPassword: ['', [Validators.required]],
+    },
+    {
+      validators: [
+        fieldsMatch('newPassword', 'confirmPassword'),
+        fieldsDiffer('newPassword', 'currentPassword'),
+      ],
+    },
+  );
 
-  /** Client-side mirror of the server's password policy, for immediate feedback. */
-  get passwordProblem(): string | null {
-    if (!this.newPassword) {
-      return null;
-    }
-    if (this.newPassword.length < 8) {
-      return 'Password must be at least 8 characters.';
-    }
-    if (!/[A-Z]/.test(this.newPassword)) {
-      return 'Password must include an uppercase letter.';
-    }
-    if (!/[a-z]/.test(this.newPassword)) {
-      return 'Password must include a lowercase letter.';
-    }
-    if (!/[0-9]/.test(this.newPassword)) {
-      return 'Password must include a number.';
-    }
-    if (this.currentPassword && this.newPassword === this.currentPassword) {
+  private static readonly LABELS: Record<string, string> = {
+    currentPassword: 'Current password',
+    newPassword: 'New password',
+    confirmPassword: 'Confirmation',
+  };
+
+  showError(name: string): boolean {
+    return shouldShowError(this.form.get(name));
+  }
+
+  errorFor(name: string): string {
+    return fieldErrorMessage(
+      this.form.get(name),
+      StaffChangePasswordComponent.LABELS[name] ?? 'This field',
+    );
+  }
+
+  /** Group-level problems, shown once the user has engaged with the fields. */
+  get formProblem(): string | null {
+    if (!this.form.touched && !this.form.dirty) return null;
+    if (this.form.hasError('fieldsMismatch')) return 'The two passwords do not match.';
+    if (this.form.hasError('fieldsIdentical')) {
       return 'New password must be different from your current password.';
     }
     return null;
   }
 
-  get mismatch(): boolean {
-    return !!this.confirmPassword && this.newPassword !== this.confirmPassword;
-  }
-
-  get canSubmit(): boolean {
-    return (
-      !this.saving()
-      && !!this.currentPassword
-      && !!this.newPassword
-      && !this.passwordProblem
-      && !this.mismatch
-      && this.newPassword === this.confirmPassword
-    );
-  }
-
   submit(event: Event): void {
     event.preventDefault();
+    if (this.saving()) return;
 
-    if (!this.canSubmit) {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
@@ -74,10 +88,12 @@ export class StaffChangePasswordComponent {
     this.error.set(null);
     this.saved.set(false);
 
+    const value = this.form.getRawValue();
+
     this.auth
       .changePassword({
-        currentPassword: this.currentPassword,
-        newPassword: this.newPassword,
+        currentPassword: value.currentPassword,
+        newPassword: value.newPassword,
       })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -86,9 +102,7 @@ export class StaffChangePasswordComponent {
       .subscribe({
         next: () => {
           this.saved.set(true);
-          this.currentPassword = '';
-          this.newPassword = '';
-          this.confirmPassword = '';
+          this.form.reset();
         },
         error: (error: unknown) =>
           this.error.set(getApiErrorMessage(error, 'Could not change your password.')),
