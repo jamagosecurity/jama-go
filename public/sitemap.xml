@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Public pages only. The admin, staff, technician and client portals are behind
+  auth guards and are excluded here and disallowed in robots.txt.
+
+  No <changefreq> or <priority>: Google has stated it ignores both, and stale
+  values are worse than none. <lastmod> is honoured, so it is the one hint kept
+  — and it must stay truthful, or it gets ignored too. Update it when a page's
+  content actually changes.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://jamago.qa/</loc>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://jamago.qa/contact</loc>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://jamago.qa/sifeddine</loc>
+    <lastmod>2026-08-06</lastmod>
+  </url>
+</urlset>

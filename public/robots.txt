@@ -1,0 +1,15 @@
+# https://jamago.qa/robots.txt
+
+User-agent: *
+Allow: /
+
+# Private portals. Every one of these is behind an auth guard, but this is a
+# client-rendered app: any URL still returns the app shell, so without these
+# rules a crawler would happily fetch and index login screens and empty
+# dashboards. Blocking the crawl keeps them out of results entirely.
+Disallow: /admin
+Disallow: /client
+Disallow: /staff
+Disallow: /technician
+
+Sitemap: https://jamago.qa/sitemap.xml
