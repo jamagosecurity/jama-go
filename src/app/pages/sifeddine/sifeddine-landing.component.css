@@ -106,38 +106,40 @@
   position: relative;
   overflow: hidden;
   padding: clamp(56px, 7vw, 96px) 0 0;
-  /* Doha's West Bay skyline sits under the navy wash. The overlay is graded
-     left-to-right: near-opaque behind the headline so contrast holds, easing
-     off toward the right where only the image column sits. */
+  /* Client-supplied composite: West Bay skyline with a wall-mounted camera on
+     the right. The overlay is graded left-to-right — near-opaque behind the
+     headline where contrast has to hold, then falling away so the camera and
+     skyline read clearly on the right. A flat scrim dark enough for the text
+     would have buried both. */
   background:
-    radial-gradient(circle at 78% 4%, rgba(246, 153, 61, 0.12), transparent 40%),
     linear-gradient(
       100deg,
-      rgba(9, 25, 47, 0.97) 0%,
-      rgba(10, 28, 53, 0.94) 38%,
-      rgba(12, 34, 64, 0.82) 70%,
-      rgba(13, 37, 71, 0.72) 100%
+      rgba(8, 22, 42, 0.96) 0%,
+      rgba(9, 25, 47, 0.92) 34%,
+      rgba(11, 30, 57, 0.62) 56%,
+      rgba(12, 34, 64, 0.3) 78%,
+      rgba(13, 37, 71, 0.16) 100%
     ),
-    url("https://images.unsplash.com/photo-1685113872064-de4180a0ea93?auto=format&fit=crop&w=1920&q=80")
-      center / cover no-repeat,
+    url("/sifeddine-hero.jpg") center / cover no-repeat,
     linear-gradient(165deg, #0a1c35 0%, #0d2547 52%, #0a1b33 100%);
   color: #eaf2fb;
 }
 
+/* Single column: the background image supplies the right-hand visual, so the
+   copy is capped rather than sharing the row with an <img>. */
 .sf-hero-inner {
   position: relative;
   z-index: 2;
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: clamp(28px, 4vw, 56px);
+  min-height: clamp(340px, 38vw, 460px);
+  display: flex;
   align-items: center;
   padding-bottom: clamp(48px, 6vw, 84px);
 }
 
-/* min-width:0 — grid items default to min-width:auto and refuse to shrink below
-   their content, which pushed the column past the viewport on narrow screens. */
 .sf-hero-copy {
   min-width: 0;
+  /* Stops short of the camera in the background image. */
+  max-width: 620px;
   animation: sf-rise 0.8s ease both;
 }
 
@@ -173,28 +175,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-}
-
-/* ---- hero image ---- */
-.sf-hero-visual {
-  position: relative;
-  min-width: 0;
-  animation: sf-rise 0.8s ease 0.12s both;
-}
-
-.sf-hero-image {
-  display: block;
-  width: 100%;
-  height: clamp(320px, 42vw, 500px);
-  object-fit: cover;
-  /* Source is portrait with the cameras below centre — bias the crop down so
-     they stay in frame at every width. */
-  object-position: 50% 62%;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow:
-    0 40px 90px -40px rgba(0, 0, 0, 0.85),
-    0 0 60px -30px rgba(37, 148, 210, 0.5);
 }
 
 /* ---- value strip ---- */
@@ -249,18 +229,19 @@
   stroke-linejoin: round;
 }
 
-/* Stack the hero and halve the strip before the two columns get cramped. */
 @media (max-width: 900px) {
-  .sf-hero-inner {
-    grid-template-columns: 1fr;
+  /* The camera sits on the right of the background image; below this width
+     there is no room beside it, so the overlay becomes an even scrim and the
+     copy spans the full column. */
+  .sf-hero {
+    background:
+      linear-gradient(180deg, rgba(8, 22, 42, 0.9) 0%, rgba(9, 25, 47, 0.93) 100%),
+      url("/sifeddine-hero.jpg") center / cover no-repeat,
+      linear-gradient(165deg, #0a1c35 0%, #0d2547 52%, #0a1b33 100%);
   }
 
-  .sf-hero-visual {
-    order: -1;
-  }
-
-  .sf-hero-image {
-    height: clamp(220px, 45vw, 320px);
+  .sf-hero-copy {
+    max-width: none;
   }
 
   .sf-hero-strip-inner {
@@ -573,5 +554,5 @@
 @keyframes sf-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .sf-marquee-track, .sf-hero-copy, .sf-hero-visual { animation: none; }
+  .sf-marquee-track, .sf-hero-copy { animation: none; }
 }
