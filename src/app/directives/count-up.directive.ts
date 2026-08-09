@@ -4,8 +4,11 @@ import {
   Input,
   AfterViewInit,
   OnDestroy,
+  PLATFORM_ID,
+  inject,
   numberAttribute,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Directive({
   selector: '[appCountUp]',
@@ -21,10 +24,21 @@ export class CountUpDirective implements AfterViewInit, OnDestroy {
   private observer?: IntersectionObserver;
   private frameId = 0;
   private started = false;
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(private readonly el: ElementRef<HTMLElement>) {}
 
   ngAfterViewInit(): void {
+    // The host element is empty in the template — this directive is what puts
+    // a number in it. During prerendering, write the final figure rather than
+    // skipping: the static HTML then carries the real stat for a crawler, and
+    // the element is not left blank. IntersectionObserver does not exist there,
+    // so the animation is browser-only.
+    if (!this.isBrowser) {
+      this.render(this.target);
+      return;
+    }
+
     this.render(0);
 
     this.observer = new IntersectionObserver(

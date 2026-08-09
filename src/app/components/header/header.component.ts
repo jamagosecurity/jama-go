@@ -3,7 +3,10 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  PLATFORM_ID,
+  inject,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { LogoComponent } from '../logo/logo.component';
@@ -32,7 +35,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   openDropdown: string | null = null;
   isDesktopNav = true;
 
-  private mediaQuery = window.matchMedia(DESKTOP_MQ);
+  /**
+   * Resolved in ngOnInit rather than as a field initialiser: the home page is
+   * prerendered at build time, where there is no window and a field initialiser
+   * would run during that render and crash the build.
+   */
+  private mediaQuery: MediaQueryList | null = null;
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   private onHashChange = () => this.syncNavState();
   private onMediaChange = (e: MediaQueryListEvent) => {
     this.isDesktopNav = e.matches;
@@ -51,6 +61,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.syncNavState();
+    // Prerender renders the desktop nav, which is also the sensible default
+    // before hydration on a phone: it is the markup that matches the CSS at
+    // any width, and the real match is applied the moment we are in a browser.
+    if (!this.isBrowser) return;
+
+    this.mediaQuery = window.matchMedia(DESKTOP_MQ);
     this.isDesktopNav = this.mediaQuery.matches;
     window.addEventListener('hashchange', this.onHashChange);
     this.mediaQuery.addEventListener('change', this.onMediaChange);
@@ -59,8 +75,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.navSub.unsubscribe();
+    if (!this.isBrowser) return;
+
     window.removeEventListener('hashchange', this.onHashChange);
-    this.mediaQuery.removeEventListener('change', this.onMediaChange);
+    this.mediaQuery?.removeEventListener('change', this.onMediaChange);
     document.removeEventListener('keydown', this.onKeyDown);
   }
 
@@ -135,7 +153,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private syncNavState(): void {
     const [path, hash = ''] = this.router.url.split('#');
     this.activePath = path || '/';
-    this.activeHash = hash ? `#${hash}` : window.location.hash;
+    // The router URL is the source of truth; window.location is only consulted
+    // for a hash the router did not see, and only when there is a window.
+    this.activeHash = hash ? `#${hash}` : this.isBrowser ? window.location.hash : '';
   }
 
   private closeDropdown(): void {

@@ -6,9 +6,15 @@
     "jamago-security": {
       "projectType": "application",
       "schematics": {
-        "@schematics/angular:component": { "skipTests": true },
-        "@schematics/angular:directive": { "skipTests": true },
-        "@schematics/angular:service": { "skipTests": true }
+        "@schematics/angular:component": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
       },
       "root": "",
       "sourceRoot": "src",
@@ -20,19 +26,47 @@
             "outputPath": "dist/jamago-security",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
-            "assets": [{ "glob": "**/*", "input": "public" }],
-            "styles": ["src/material-theme.scss", "src/styles.css"],
-            "scripts": []
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/fonts.css",
+              "src/material-theme.scss",
+              "src/styles.css"
+            ],
+            "scripts": [],
+            "outputMode": "static",
+            "server": "src/main.server.ts",
+            "prerender": true
           },
           "configurations": {
             "production": {
               "budgets": [
-                { "type": "initial", "maximumWarning": "500kB", "maximumError": "1MB" },
-                { "type": "anyComponentStyle", "maximumWarning": "28kB", "maximumError": "36kB" }
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "28kB",
+                  "maximumError": "36kB"
+                }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "sourceMap": {
+                "scripts": true,
+                "styles": false,
+                "hidden": false,
+                "vendor": false
+              }
             },
             "development": {
               "optimization": false,
@@ -54,8 +88,12 @@
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
-            "production": { "buildTarget": "jamago-security:build:production" },
-            "development": { "buildTarget": "jamago-security:build:development" }
+            "production": {
+              "buildTarget": "jamago-security:build:production"
+            },
+            "development": {
+              "buildTarget": "jamago-security:build:development"
+            }
           },
           "defaultConfiguration": "development"
         }

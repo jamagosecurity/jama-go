@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, OnInit, WritableSignal, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  PLATFORM_ID,
+  WritableSignal,
+  inject,
+  signal,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 interface ExperienceItem {
@@ -26,6 +35,8 @@ interface FocusItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SifeddineLandingComponent implements OnInit {
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   protected readonly years = signal(0);
   protected readonly connections = signal(0);
   protected readonly roles = signal(0);
@@ -118,6 +129,14 @@ export class SifeddineLandingComponent implements OnInit {
   }
 
   private countTo(target: WritableSignal<number>, end: number, duration: number): void {
+    // Prerendering has no requestAnimationFrame. Land on the final figure so
+    // the static HTML shows the real number rather than a zero that only the
+    // animation would have corrected.
+    if (!this.isBrowser) {
+      target.set(end);
+      return;
+    }
+
     const start = performance.now();
     const step = (now: number): void => {
       const progress = Math.min(1, (now - start) / duration);

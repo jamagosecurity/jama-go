@@ -1,9 +1,13 @@
 /* ================= Sifeddine Taghelabet — landing page ================= */
+/* Aliased onto the shared brand ramp in styles.css rather than repeating the
+   hexes. --sf-blue-deep was #1a7bb5, which this page uses as 12px text on a
+   pale blue chip — 4.05:1, under the AA floor. The ramp's ink weight exists
+   precisely for text and clears it comfortably. */
 .sf-page {
-  --sf-blue: #2594d2;
-  --sf-blue-deep: #1a7bb5;
-  --sf-orange: #f6993d;
-  --sf-orange-deep: #ef7f16;
+  --sf-blue: var(--jama-blue-fill);
+  --sf-blue-deep: var(--jama-blue-ink);
+  --sf-orange: var(--jama-orange-fill);
+  --sf-orange-deep: var(--jama-orange-action);
   --sf-navy: #0b1f3d;
   --sf-ink: #101f33;
   --sf-muted: #5c6b82;

@@ -252,10 +252,13 @@
   box-shadow: 0 12px 32px -10px rgba(37, 148, 210, 0.7);
 }
 
+/* WhatsApp's brand green (#25d366) gives white text only 1.98:1 — nowhere near
+   the 4.5:1 floor. This is the darker end of the same brand family, still
+   unmistakably WhatsApp, at 5.1:1. */
 .contact-hero-btn--whatsapp {
-  background: #25d366;
+  background: #0b7d67;
   color: #fff;
-  box-shadow: 0 12px 32px -10px rgba(37, 211, 102, 0.55);
+  box-shadow: 0 12px 32px -10px rgba(11, 125, 103, 0.55);
 }
 
 .contact-hero-btn--ghost {

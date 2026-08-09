@@ -1,12 +1,5 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
-import { ContactComponent } from './components/contact/contact.component';
-import { SifeddineLandingComponent } from './pages/sifeddine/sifeddine-landing.component';
-import { AdminLoginComponent } from './pages/admin/login/admin-login.component';
-import { AdminLayoutComponent } from './pages/admin/layout/admin-layout.component';
-import { AdminStaffComponent } from './pages/admin/staff/admin-staff.component';
-import { StaffEditorComponent } from './pages/admin/staff-editor/staff-editor.component';
-import { AdminContactsComponent } from './pages/admin/contacts/admin-contacts.component';
 import {
   adminGuard,
   clientGuard,
@@ -17,27 +10,44 @@ import {
 } from './guards/admin.guard';
 import { PERMISSIONS } from './models/auth.model';
 
+/**
+ * Only the home page is imported eagerly. Everything else is lazy.
+ *
+ * These were all static imports, which put the entire admin panel — layout,
+ * staff editor, contacts, the Material dialogs and tables they pull in — into
+ * the initial bundle of the public marketing site. A visitor reading the home
+ * page was downloading the staff management screens: 582 kB of JavaScript for
+ * a page that needs a fraction of it.
+ */
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Jama Go Security — Protecting What Matters Most' },
-  { path: 'contact', component: ContactComponent, title: 'Contact Us — Jama Go Security' },
+  {
+    path: 'contact',
+    title: 'Contact Us — Jama Go Security',
+    loadComponent: () =>
+      import('./components/contact/contact.component').then((m) => m.ContactComponent),
+  },
   {
     path: 'sifeddine',
-    component: SifeddineLandingComponent,
     title: 'Sifeddine Taghelabet — Business Development Specialist | Jama Go',
+    loadComponent: () =>
+      import('./pages/sifeddine/sifeddine-landing.component').then((m) => m.SifeddineLandingComponent),
   },
   {
     path: 'admin',
     children: [
       {
         path: 'login',
-        component: AdminLoginComponent,
         canActivate: [guestGuard],
         title: 'Secure Login — Jama Go Security',
+        loadComponent: () =>
+          import('./pages/admin/login/admin-login.component').then((m) => m.AdminLoginComponent),
       },
       {
         path: '',
-        component: AdminLayoutComponent,
         canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./pages/admin/layout/admin-layout.component').then((m) => m.AdminLayoutComponent),
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'staff' },
           {
@@ -47,19 +57,33 @@ export const routes: Routes = [
           },
           {
             path: 'staff/new',
-            component: StaffEditorComponent,
             title: 'Add Staff — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/admin/staff-editor/staff-editor.component').then(
+                (m) => m.StaffEditorComponent,
+              ),
           },
           {
             path: 'staff/:id/edit',
-            component: StaffEditorComponent,
             title: 'Edit Staff — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/admin/staff-editor/staff-editor.component').then(
+                (m) => m.StaffEditorComponent,
+              ),
           },
-          { path: 'staff', component: AdminStaffComponent, title: 'Manage Staff — Jama Go Admin' },
+          {
+            path: 'staff',
+            title: 'Manage Staff — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/admin/staff/admin-staff.component').then((m) => m.AdminStaffComponent),
+          },
           {
             path: 'contacts',
-            component: AdminContactsComponent,
             title: 'Contact Submissions — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/admin/contacts/admin-contacts.component').then(
+                (m) => m.AdminContactsComponent,
+              ),
           },
           {
             path: 'vip',
