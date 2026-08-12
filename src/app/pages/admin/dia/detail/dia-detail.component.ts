@@ -64,6 +64,8 @@ export class DiaDetailComponent implements OnInit {
   /** Submitted quarters only — a draft is a technician's work in progress. */
   protected readonly submitted = signal<TechnicianInspection[]>([]);
   protected readonly submittedLoading = signal(true);
+  /** Set when the details could not be fetched, to distinguish that from none. */
+  protected readonly submittedError = signal('');
 
   /** "25.286106, 51.534817", or empty when the site has not been pinned. */
   protected coordinates(item: Dia): string {
@@ -95,8 +97,15 @@ export class DiaDetailComponent implements OnInit {
               .filter((inspection) => inspection.status === 'Submitted')
               .sort((a, b) => a.quarter - b.quarter),
           ),
-        // Non-fatal: the rest of the record is still worth showing.
-        error: () => this.submitted.set([]),
+        // Non-fatal: the rest of the record is still worth showing. But an empty
+        // list here reads as "nothing has been submitted", so a failed call must
+        // say so rather than quietly claim a site has done no inspections.
+        error: (failure: unknown) => {
+          this.submitted.set([]);
+          this.submittedError.set(
+            getApiErrorMessage(failure, 'Could not load the quarterly inspection details.'),
+          );
+        },
       });
   }
 

@@ -145,7 +145,7 @@
     <section class="admin-panel">
       <div class="admin-panel-title">
         <h2>Quarterly inspection details</h2>
-        @if (!submittedLoading()) {
+        @if (!submittedLoading() && !submittedError()) {
           <span
             class="status-chip"
             [class.is-done]="submitted().length === 4"
@@ -159,6 +159,10 @@
 
       @if (submittedLoading()) {
         <p class="tech-muted">Loading inspection details…</p>
+      } @else if (submittedError()) {
+        <!-- Distinct from "none submitted": the count is unknown here, and
+             claiming zero would contradict the progress figure above. -->
+        <p class="admin-error">{{ submittedError() }}</p>
       } @else if (!submitted().length) {
         <p class="tech-muted">
           No quarters have been submitted yet. Details appear here once a technician submits an
