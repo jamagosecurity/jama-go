@@ -55,13 +55,24 @@
 
           <!-- Cycle progress: one pip per quarter, plus the done/left tally. -->
           <div class="tech-cycle">
-            <div class="tech-pips" aria-hidden="true">
+            <!-- Each quarter carries its own opening date, so the whole year is
+                 readable off the card. No longer aria-hidden: the pips used to
+                 restate the "x of 4" line, but the dates are only here. -->
+            <div class="tech-pips">
               @for (q of quarterSlots; track q) {
-                <span class="tech-pip tech-pip--{{ quarterState(item, q) }}">
-                  @if (quarterState(item, q) === 'done') {
-                    <svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7" /></svg>
-                  } @else {
-                    Q{{ q }}
+                <span
+                  class="tech-pip tech-pip--{{ quarterState(item, q) }}"
+                  [attr.aria-label]="quarterLabel(item, q)"
+                >
+                  <span class="tech-pip-mark">
+                    @if (quarterState(item, q) === 'done') {
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7" /></svg>
+                    } @else {
+                      Q{{ q }}
+                    }
+                  </span>
+                  @if (quarterDate(item, q); as opensOn) {
+                    <span class="tech-pip-date">{{ opensOn | date: 'd MMM yy' }}</span>
                   }
                 </span>
               }

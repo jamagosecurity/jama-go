@@ -75,10 +75,35 @@ export class TechnicianDashboardComponent implements OnInit {
     return Math.max(0, QUARTERS_PER_CYCLE - item.submittedQuarters);
   }
 
-  protected quarterState(item: TechnicianDiaListItem, quarter: number): 'done' | 'current' | 'todo' {
+  protected quarterState(
+    item: TechnicianDiaListItem,
+    quarter: number,
+  ): 'done' | 'current' | 'overdue' | 'todo' {
     if (quarter <= item.submittedQuarters) return 'done';
     if (item.currentQuarter === quarter) return 'current';
+    // Behind the quarter now open and never submitted: its window has closed, so
+    // it reads as missed rather than as work still ahead.
+    if (item.currentQuarter !== null && quarter < item.currentQuarter) return 'overdue';
     return 'todo';
+  }
+
+  /** Opening date of a given quarter, or null before the site has a schedule. */
+  protected quarterDate(item: TechnicianDiaListItem, quarter: number): string | null {
+    return item.quarterDates?.[quarter - 1] ?? null;
+  }
+
+  protected quarterLabel(item: TechnicianDiaListItem, quarter: number): string {
+    const state = this.quarterState(item, quarter);
+    const wording =
+      state === 'done'
+        ? 'complete'
+        : state === 'current'
+          ? 'due now'
+          : state === 'overdue'
+            ? 'missed'
+            : 'upcoming';
+    const date = this.quarterDate(item, quarter);
+    return date ? `Quarter ${quarter}, ${wording}, opens ${date.slice(0, 10)}` : `Quarter ${quarter}, ${wording}`;
   }
 
   /**

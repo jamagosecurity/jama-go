@@ -76,13 +76,31 @@
 .tech-pip {
   display: grid;
   place-items: center;
+  gap: 1px;
   flex: 1 1 0;
-  height: 34px;
+  /* Taller than the old single-row pip: it now stacks the quarter over the date
+     it opens, so the technician can read the year off the card. */
+  min-height: 44px;
+  padding: 5px 2px;
   border-radius: 11px;
   background: rgba(15, 40, 70, 0.07);
   color: var(--admin-muted);
   font-size: 0.76rem;
   font-weight: 800;
+}
+
+.tech-pip-mark {
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
+.tech-pip-date {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  opacity: 0.75;
+  white-space: nowrap;
 }
 
 .tech-pip svg {
@@ -106,6 +124,14 @@
   background: color-mix(in srgb, var(--accent) 16%, #fff);
   color: color-mix(in srgb, var(--accent) 74%, #000);
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+/* A quarter whose window closed with nothing submitted. Amber rather than red:
+   it is a backlog to work through, not an error, and several sites carry two. */
+.tech-pip--overdue {
+  background: color-mix(in srgb, #f6993d 18%, #fff);
+  color: #8a4b06;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #f6993d 45%, transparent);
 }
 
 .tech-cycle-count {

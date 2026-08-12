@@ -43,6 +43,11 @@ export interface TechnicianDiaListItem {
   currentInspectionId: string | null;
   /** Quarters submitted so far, 0–4. */
   submittedQuarters: number;
+  /**
+   * Opening date of each of the four quarters, oldest first — the same four dates
+   * the MOI workflow sheet lists per site. Null before a site has a schedule.
+   */
+  quarterDates: string[] | null;
   /** Opening date of the quarter currently due. */
   quarterStartDate: string | null;
   /** Deadline for the quarter currently open; null once the cycle is done. */
