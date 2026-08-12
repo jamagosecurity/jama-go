@@ -15,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, debounceTime, distinctUntilChanged, filter, finalize, switchMap } from 'rxjs';
 import { DIA_STATUSES, Dia, DiaListQuery, DiaStatus, PaginatedData } from '../../../../models/dia.model';
+import { AuthService } from '../../../../services/auth.service';
 import { DiaService } from '../../../../services/dia.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
 import { DIA_BASE_PATH } from '../dia-base-path';
@@ -60,6 +61,13 @@ export class DiaListComponent implements OnInit {
   protected readonly base = inject(DIA_BASE_PATH);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+
+  /**
+   * Only the seeded root account sees the permanent-delete action. Cosmetic —
+   * the SuperAdmin policy on the API is the actual gate, so a hidden button is
+   * a courtesy rather than a control.
+   */
+  protected readonly canDeletePermanently = inject(AuthService).isSuperAdmin();
 
   protected readonly statuses = DIA_STATUSES;
   protected readonly searchControl = new FormControl('', { nonNullable: true });
@@ -156,7 +164,7 @@ export class DiaListComponent implements OnInit {
 
   protected confirmAction(
     item: Dia,
-    action: 'activate' | 'deactivate' | 'archive' | 'restore',
+    action: 'activate' | 'deactivate' | 'archive' | 'restore' | 'delete',
   ): void {
     const definitions: Record<typeof action, ConfirmationDialogData> = {
       activate: {
@@ -183,6 +191,13 @@ export class DiaListComponent implements OnInit {
         message: `${item.diaNumber} will return to the register as inactive. Activate it separately to restart its quarterly schedule.`,
         confirmLabel: 'Restore',
       },
+      delete: {
+        title: 'Delete DIA inspection permanently?',
+        // This one really is permanent, unlike Archive — so it says so plainly.
+        message: `${item.diaNumber} and its history will be erased. This cannot be undone, and Restore will not bring it back.`,
+        confirmLabel: 'Delete permanently',
+        danger: true,
+      },
     };
     this.dialog
       .open(DiaConfirmationDialogComponent, { data: definitions[action], width: '460px' })
@@ -191,15 +206,14 @@ export class DiaListComponent implements OnInit {
         filter((confirmed): confirmed is true => confirmed === true),
         switchMap(() => {
           this.actionId.set(item.id);
-          const request: Observable<unknown> =
-            action === 'activate'
-              ? this.service.activate(item.id)
-              : action === 'deactivate'
-                ? this.service.deactivate(item.id)
-                : action === 'restore'
-                  ? this.service.restore(item.id)
-                  : this.service.archive(item.id);
-          return request.pipe(finalize(() => this.actionId.set(null)));
+          const requests: Record<typeof action, () => Observable<unknown>> = {
+            activate: () => this.service.activate(item.id),
+            deactivate: () => this.service.deactivate(item.id),
+            archive: () => this.service.archive(item.id),
+            restore: () => this.service.restore(item.id),
+            delete: () => this.service.deletePermanently(item.id),
+          };
+          return requests[action]().pipe(finalize(() => this.actionId.set(null)));
         }),
         takeUntilDestroyed(this.destroyRef),
       )

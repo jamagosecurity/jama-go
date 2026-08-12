@@ -24,6 +24,12 @@ export interface UserSummary {
   role: UserRole;
   /** Effective permissions, already including everything an Admin holds. */
   permissions: string[];
+  /**
+   * The seeded root account, per the server's AdminSeed:Email. Only used to hide
+   * actions no other admin may take — the API enforces the same rule itself, so
+   * this never has to be trusted.
+   */
+  isSuperAdmin: boolean;
 }
 
 export interface LoginResponse {

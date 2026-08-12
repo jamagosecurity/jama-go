@@ -93,4 +93,13 @@ export class DiaService {
       .post<ApiResult<Dia>>(`${this.baseUrl}/${id}/restore`, {})
       .pipe(map(unwrapApiResult));
   }
+
+  /**
+   * Destroys an archived DIA outright, for clearing test rows and mistakes.
+   * Super admin only, and the server refuses any record carrying submitted
+   * inspections — a 409 whose message is shown to the operator.
+   */
+  deletePermanently(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}/permanent`);
+  }
 }

@@ -43,6 +43,16 @@ export class AuthService {
     return this.currentUser()?.role === 'Admin';
   }
 
+  /**
+   * The seeded root account. Gates the handful of destructive actions an ordinary
+   * Admin must not reach — see the SuperAdmin policy on the API, which is what
+   * actually enforces it. Defaults to false for tokens issued before the flag
+   * existed, so an old session loses the button rather than gaining it.
+   */
+  isSuperAdmin(): boolean {
+    return this.currentUser()?.isSuperAdmin === true;
+  }
+
   isStaff(): boolean {
     return this.currentUser()?.role === 'Staff';
   }
