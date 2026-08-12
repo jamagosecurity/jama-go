@@ -6,6 +6,7 @@ import { finalize } from 'rxjs';
 import { TechnicianDiaDetail } from '../../../models/technician.model';
 import { TechnicianService } from '../../../services/technician.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
+import { formatCoordinates, navigationUrl } from '../../../utils/geo.util';
 
 import { TechnicianInspectionSectionsComponent } from '../shared/technician-inspection-sections.component';
 
@@ -65,6 +66,18 @@ export class TechnicianDiaDetailComponent implements OnInit {
 
   private days(count: number): string {
     return count === 1 ? '1 day' : `${count} days`;
+  }
+
+  /**
+   * Directions to the site: the exact pin when the DIA has one, otherwise a map
+   * search on the address, so the button never dead-ends.
+   */
+  protected navigateTo(item: TechnicianDiaDetail): string {
+    return navigationUrl(item);
+  }
+
+  protected coordinates(item: TechnicianDiaDetail): string {
+    return formatCoordinates(item.latitude, item.longitude);
   }
 
   protected start(): void {

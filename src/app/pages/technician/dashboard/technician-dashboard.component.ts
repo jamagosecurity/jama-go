@@ -6,6 +6,7 @@ import { finalize } from 'rxjs';
 import { TechnicianCycleStatus, TechnicianDiaListItem } from '../../../models/technician.model';
 import { TechnicianService } from '../../../services/technician.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
+import { navigationUrl, toSitePin } from '../../../utils/geo.util';
 
 const QUARTERS_PER_CYCLE = 4;
 const DUE_SOON_DAYS = 14;
@@ -151,6 +152,21 @@ export class TechnicianDashboardComponent implements OnInit {
 
   private days(count: number): string {
     return count === 1 ? '1 day' : `${count} days`;
+  }
+
+  // ===== Getting there =====
+
+  /**
+   * Directions to the site: exact coordinates when the DIA is pinned, otherwise
+   * a map search on the address so every card stays navigable while the
+   * register is still being pinned.
+   */
+  protected navigateTo(item: TechnicianDiaListItem): string {
+    return navigationUrl(item);
+  }
+
+  protected isPinned(item: TechnicianDiaListItem): boolean {
+    return toSitePin(item.latitude, item.longitude) !== null;
   }
 
   // ===== Labels & links (unchanged behaviour) =====

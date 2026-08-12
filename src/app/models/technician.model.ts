@@ -36,6 +36,9 @@ export interface TechnicianDiaListItem {
   clientNumber: string;
   clientName: string;
   clientLocation: string;
+  /** Site pin used by the Navigate action. Null when the site has not been pinned. */
+  latitude: number | null;
+  longitude: number | null;
   activatedDate: string | null;
   inspectionStatus: TechnicianCycleStatus;
   currentQuarter: number | null;
@@ -131,6 +134,8 @@ export interface TechnicianDiaDetail {
   clientNumber: string;
   clientName: string;
   clientLocation: string;
+  latitude: number | null;
+  longitude: number | null;
   activatedDate: string | null;
   inspectionStartedDate: string | null;
   inspectionStatus: TechnicianCycleStatus;

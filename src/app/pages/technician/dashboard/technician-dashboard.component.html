@@ -51,7 +51,24 @@
             <span class="status-chip status-chip--sm">{{ statusLabel(item.inspectionStatus) }}</span>
           </header>
 
-          <p class="tech-site-loc" [title]="item.clientLocation">{{ item.clientLocation }}</p>
+          <!-- Tap-to-navigate: a technician standing at their van should get
+               directions from the address itself, not have to retype it into a
+               maps app. Unpinned sites fall back to an address search. -->
+          <a
+            class="tech-site-nav"
+            [class.is-pinned]="isPinned(item)"
+            [href]="navigateTo(item)"
+            target="_blank"
+            rel="noopener noreferrer"
+            [attr.aria-label]="'Navigate to ' + item.clientName + ', ' + item.clientLocation"
+          >
+            <svg class="tech-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+              <circle cx="12" cy="10" r="2.6" />
+            </svg>
+            <span class="tech-site-loc" [title]="item.clientLocation">{{ item.clientLocation }}</span>
+            <span class="tech-nav-go">{{ isPinned(item) ? 'Navigate' : 'Search map' }}</span>
+          </a>
 
           <!-- Cycle progress: one pip per quarter, plus the done/left tally. -->
           <div class="tech-cycle">

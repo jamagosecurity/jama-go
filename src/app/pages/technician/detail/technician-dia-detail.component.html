@@ -52,9 +52,29 @@
             {{ (item.quarterEndDate | date: 'd MMM y') || '—' }}
           </dd>
         </div>
+        <div class="tech-dia-fact surface-card surface-card--rail surface-card--compact">
+          <dt>Site pin</dt>
+          <dd>{{ coordinates(item) || 'Not pinned — directions search the address' }}</dd>
+        </div>
       </dl>
 
       <div class="tech-dia-actions">
+        <!-- Directions sit with the inspection actions because that is the order
+             the work happens in: drive there, then start the quarter. -->
+        <a
+          mat-stroked-button
+          class="tech-dia-nav"
+          [href]="navigateTo(item)"
+          target="_blank"
+          rel="noopener noreferrer"
+          [attr.aria-label]="'Navigate to ' + item.clientName + ', ' + item.clientLocation"
+        >
+          <svg class="tech-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+            <circle cx="12" cy="10" r="2.6" />
+          </svg>
+          Navigate
+        </a>
         @if (item.action === 'StartInspection') {
           <button
             mat-flat-button

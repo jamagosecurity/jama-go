@@ -137,6 +137,24 @@
   box-shadow: 0 20px 38px -12px rgba(246, 153, 61, 0.6);
 }
 
+/* Directions sit beside the primary action, deliberately quieter than it —
+   getting there matters, but submitting the quarter is the job. */
+.tech-dia-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tech-dia-nav .tech-nav-icon {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .tech-dia-section-head {
   display: flex;
   align-items: center;

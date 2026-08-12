@@ -15,6 +15,7 @@ import { DiaService } from '../../../../services/dia.service';
 import { DIA_BASE_PATH } from '../dia-base-path';
 import { InvoiceService } from '../../../../services/invoice.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
+import { formatCoordinates, navigationUrl } from '../../../../utils/geo.util';
 import {
   ConfirmationDialogData,
   DiaConfirmationDialogComponent,
@@ -63,6 +64,16 @@ export class DiaDetailComponent implements OnInit {
   /** Submitted quarters only — a draft is a technician's work in progress. */
   protected readonly submitted = signal<TechnicianInspection[]>([]);
   protected readonly submittedLoading = signal(true);
+
+  /** "25.286106, 51.534817", or empty when the site has not been pinned. */
+  protected coordinates(item: Dia): string {
+    return formatCoordinates(item.latitude, item.longitude);
+  }
+
+  /** Same link the technician gets, so an admin can verify the pin lands right. */
+  protected mapUrl(item: Dia): string {
+    return navigationUrl(item);
+  }
 
   ngOnInit(): void {
     this.load();

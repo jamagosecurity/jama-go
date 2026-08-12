@@ -56,6 +56,22 @@
           <div><dt>Client Number</dt><dd>{{ item.clientNumber }}</dd></div>
           <div><dt>Client Name</dt><dd>{{ item.clientName }}</dd></div>
           <div><dt>Client Location</dt><dd>{{ item.clientLocation }}</dd></div>
+          <div>
+            <dt>Site Pin</dt>
+            <dd>
+              @if (coordinates(item); as pin) {
+                {{ pin }}
+                <a class="dia-map-link" [href]="mapUrl(item)" target="_blank" rel="noopener noreferrer">
+                  Open in Maps
+                </a>
+              } @else {
+                <!-- Unpinned sites still navigate, by address search — but the
+                     technician gets a search result rather than the gate. -->
+                Not pinned —
+                <a class="dia-map-link" [routerLink]="[base, item.id, 'edit']">add coordinates</a>
+              }
+            </dd>
+          </div>
           <div><dt>Active</dt><dd>{{ item.isActive ? 'Yes' : 'No' }}</dd></div>
           <div><dt>Status</dt><dd>{{ statusLabel(item.status) }}</dd></div>
         </dl>

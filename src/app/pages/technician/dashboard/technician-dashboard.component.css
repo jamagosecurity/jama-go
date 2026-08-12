@@ -50,6 +50,62 @@
   font-weight: 600;
 }
 
+/* ===== Tap to navigate =====
+   The address is the row a technician reaches for on the way out, so the whole
+   row is the target — 44px+ tall, which is the minimum comfortable touch size
+   on a phone held in a work glove. */
+.tech-site-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+  border-radius: 13px;
+  background: rgba(15, 40, 70, 0.035);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.tech-site-nav:hover,
+.tech-site-nav:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 9%, #fff);
+  transform: translateY(-1px);
+}
+
+.tech-nav-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--admin-muted);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* A pinned site routes to the gate; an unpinned one only searches the address,
+   so the icon says which one this is before the technician sets off. */
+.tech-site-nav.is-pinned .tech-nav-icon {
+  stroke: var(--accent-ink, var(--accent));
+}
+
+.tech-site-nav .tech-site-loc {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tech-nav-go {
+  flex: none;
+  margin-left: auto;
+  color: var(--accent-ink, var(--accent));
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Long site addresses were pushing table rows to four lines — clamp instead,
    with the full text on hover. */
 .tech-site-loc {

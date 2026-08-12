@@ -12,6 +12,9 @@ export interface Dia {
   clientNumber: string;
   clientName: string;
   clientLocation: string;
+  /** WGS 84 site pin. Null until pinned; latitude and longitude move together. */
+  latitude: number | null;
+  longitude: number | null;
   createdDate: string;
   activatedDate: string | null;
   isActive: boolean;
@@ -34,6 +37,9 @@ export interface DiaWriteRequest {
   clientNumber: string;
   clientName: string;
   clientLocation: string;
+  /** Send both or neither — the API rejects half a pin. */
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export interface DiaListQuery {

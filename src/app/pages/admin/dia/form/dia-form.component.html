@@ -48,6 +48,66 @@
           @if (hasError('clientLocation')) { <mat-error>Client Location is required.</mat-error> }
         </mat-form-field>
 
+        <!-- The pin is what turns the address above into a one-tap Navigate
+             button on the technician's card, so it sits with the location. -->
+        <fieldset class="dia-pin">
+          <legend>Site pin <span>optional</span></legend>
+          <p class="dia-pin-hint">
+            Paste a Google Maps link or “25.286106, 51.534817” into either box and both fill in.
+            Pinned sites give the technician turn-by-turn directions instead of an address to retype.
+          </p>
+
+          <div class="dia-pin-fields">
+            <mat-form-field appearance="outline">
+              <mat-label>Latitude</mat-label>
+              <input
+                matInput
+                formControlName="latitude"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="25.286106"
+                (paste)="pasteCoordinates($event)"
+              />
+              @if (coordinateError('latitude'); as message) { <mat-error>{{ message }}</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Longitude</mat-label>
+              <input
+                matInput
+                formControlName="longitude"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="51.534817"
+                (paste)="pasteCoordinates($event)"
+              />
+              @if (coordinateError('longitude'); as message) { <mat-error>{{ message }}</mat-error> }
+            </mat-form-field>
+          </div>
+
+          @if (pinError(); as message) {
+            <p class="dia-pin-error" role="alert">{{ message }}</p>
+          }
+
+          <div class="dia-pin-actions">
+            @if (canLocate) {
+              <button
+                mat-stroked-button
+                type="button"
+                [disabled]="locating() || saving()"
+                matTooltip="Pin the site to where this device is right now"
+                (click)="useCurrentLocation()"
+              >
+                {{ locating() ? 'Locating…' : 'Use my location' }}
+              </button>
+            }
+            @if (previewUrl(); as url) {
+              <a mat-button [href]="url" target="_blank" rel="noopener noreferrer">Preview on map</a>
+              <button mat-button type="button" (click)="clearPin()">Clear pin</button>
+            }
+          </div>
+        </fieldset>
+
         <div class="dia-form-actions">
           <a mat-button [routerLink]="[base, 'list']">Cancel</a>
           <button mat-flat-button type="submit" [disabled]="saving()">
