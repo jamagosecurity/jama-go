@@ -80,10 +80,20 @@ export class DiaListComponent implements OnInit {
   protected readonly loading = signal(true);
   protected readonly actionId = signal<string | null>(null);
   protected readonly error = signal('');
+  /**
+   * Sorted by status rather than creation date. DiaStatus runs Inactive(0)
+   * through Completed(5), so descending puts the sites furthest through their
+   * cycle at the top and the ones with no schedule yet at the bottom.
+   *
+   * Newest-first buried the register: importing a batch of sites that have no
+   * activation date yet filled the whole first page with rows reading "—" in
+   * every column, while the sites actually running their quarters sat on page
+   * two. Column headers still re-sort, and the choice rides in the URL.
+   */
   protected readonly query = signal<DiaListQuery>({
     pageNumber: 1,
     pageSize: 10,
-    sortBy: 'createdDate',
+    sortBy: 'status',
     sortDirection: 'desc',
   });
   protected readonly displayedColumns = [
@@ -114,7 +124,7 @@ export class DiaListComponent implements OnInit {
         search: params.get('search')?.trim() || undefined,
         status,
         archived,
-        sortBy: params.get('sortBy') || 'createdDate',
+        sortBy: params.get('sortBy') || 'status',
         sortDirection: params.get('sortDirection') === 'asc' ? 'asc' : 'desc',
       };
       this.query.set(query);
