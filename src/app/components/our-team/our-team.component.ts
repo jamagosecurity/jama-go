@@ -38,7 +38,12 @@ export class OurTeamComponent {
     // is live data anyway, so baking a build-time copy into static HTML would
     // go stale the moment someone is added.
     if (!isPlatformBrowser(inject(PLATFORM_ID))) {
+      // The prerender has no session and the roster is never public, so the
+      // section is left out of the static HTML too. Rendering it here and
+      // hiding it on hydration would shift the page as it loaded, and would put
+      // a heading about staff into a page that cannot show any.
       this.loading.set(false);
+      this.restricted.set(true);
       return;
     }
 
