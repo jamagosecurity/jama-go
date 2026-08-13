@@ -36,6 +36,28 @@
       type="font/woff2"
       crossorigin
     />
+
+    <!--
+      Google Analytics. The connection is opened early so the async script does
+      not pay for DNS and TLS when it finally arrives; it is only a hint, so it
+      costs nothing if the tag is blocked.
+
+      send_page_view is off on purpose. Angular changes routes without a page
+      load, so the tag on its own would record the landing page and nothing
+      after it — AnalyticsService reports each navigation instead. That also
+      keeps the signed-in portals out of the report: their URLs carry record ids
+      and, on an invoice share link, a token in the query string.
+    -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-52WG4T69E3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-52WG4T69E3', { send_page_view: false });
+    </script>
   </head>
   <body>
     <app-root></app-root>
