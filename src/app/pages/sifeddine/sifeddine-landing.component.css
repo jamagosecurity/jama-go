@@ -88,6 +88,24 @@
 }
 .sf-btn--ghost { color: #fff; border-color: rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.05); }
 .sf-btn--ghost:hover { background: rgba(255, 255, 255, 0.14); }
+
+/* The one colour on this page from outside the Jama ramp, and it earns the
+   exception: #25d366 is WhatsApp's own, and people recognise it before they
+   read the label. It is held to the glyph and the edge rather than filling the
+   button, so the orange stays the single loudest thing in the hero — two solid
+   CTAs of equal weight would leave the eye with no idea where to go first.
+   The glass fill matches the value-strip cards below it. */
+.sf-btn--whatsapp {
+  color: #fff;
+  border-color: rgba(37, 211, 102, 0.45);
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+  backdrop-filter: blur(8px);
+}
+.sf-btn--whatsapp:hover {
+  border-color: rgba(37, 211, 102, 0.9);
+  background: rgba(37, 211, 102, 0.16);
+  box-shadow: 0 16px 34px -18px rgba(37, 211, 102, 0.7);
+}
 .sf-btn--light { color: var(--sf-navy); background: #fff; box-shadow: 0 16px 34px -18px rgba(0, 0, 0, 0.4); }
 .sf-btn--outline-light { color: #fff; border-color: rgba(255, 255, 255, 0.55); }
 .sf-btn--outline-light:hover { background: rgba(255, 255, 255, 0.12); }
@@ -103,53 +121,148 @@
   stroke-linejoin: round;
 }
 
+/* Brand glyphs get their own tile, the way the real app icons are drawn:
+   WhatsApp is a green tile with a white mark, Gmail a white tile with a red
+   envelope. The tile is also what makes the colours usable — Gmail red laid
+   straight onto the orange button measures 1.78:1 and disappears, but on its
+   own white ground it clears the 3:1 icon threshold.
+
+   These must stay below `.sf-btn svg`: that rule is the same specificity and
+   paints every glyph in currentColor, which put a white envelope on a white
+   tile and made it vanish. */
+.sf-btn-app {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+}
+.sf-btn-app svg { width: 16px; height: 16px; }
+.sf-btn-app--wa { background: #25d366; }
+.sf-btn-app--wa svg { fill: #fff; stroke: none; }
+.sf-btn-app--mail { background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06); }
+.sf-btn-app--mail svg { fill: none; stroke: #ea4335; stroke-width: 2.1; }
+
 /* ================= Hero =================
-   Deep navy stage with a single gold accent, a full-bleed equipment photo on
-   the right, and a value strip anchored to the base. */
+   Copy on the left, the equipment reel on the right as a lit screen, and a
+   value strip anchored to the base.
+
+   The reel was tried full-bleed behind the copy first and it does not work as
+   wallpaper: it is a produced piece with burnt-in captions and scene cuts, so
+   the scrim needed to keep the headline legible also flattened it to a muddy
+   wash and left the right half dead. Given its own frame it plays ungraded —
+   the captions read as part of a video instead of colliding with the H1, and
+   16:9 content gets a 16:9 box rather than a cover-crop that slices it. That
+   leaves the stage itself to be built from light rather than a photograph. */
 .sf-hero {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
-  padding: clamp(56px, 7vw, 96px) 0 0;
-  /* Client-supplied composite: West Bay skyline with a wall-mounted camera on
-     the right. The overlay is graded left-to-right — near-opaque behind the
-     headline where contrast has to hold, then falling away so the camera and
-     skyline read clearly on the right. A flat scrim dark enough for the text
-     would have buried both. */
-  background:
-    linear-gradient(
-      100deg,
-      rgba(8, 22, 42, 0.96) 0%,
-      rgba(9, 25, 47, 0.92) 34%,
-      rgba(11, 30, 57, 0.62) 56%,
-      rgba(12, 34, 64, 0.3) 78%,
-      rgba(13, 37, 71, 0.16) 100%
-    ),
-    url("/sifeddine-hero.jpg") center / cover no-repeat,
-    linear-gradient(165deg, #0a1c35 0%, #0d2547 52%, #0a1b33 100%);
+  display: flex;
+  flex-direction: column;
+  /* Copy sits at the base, not the middle. That is what makes the scrim work:
+     the reel's captions all live in the top half, and the top half is exactly
+     where nothing of ours is written. */
+  justify-content: flex-end;
+  /* 940px is the most that still clears a 1080px screen once the 104px nav is
+     taken off, and it drops the crop from 28% of the frame to 13%. The loop
+     behind it is the caption-free first 15s, so the extra height costs nothing
+     — on the full reel this much frame would have put the scene titles back on
+     screen. */
+  min-height: min(88vh, 940px);
+  background: #071627;
   color: #eaf2fb;
 }
 
-/* Single column: the background image supplies the right-hand visual, so the
-   copy is capped rather than sharing the row with an <img>. */
+.sf-hero-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* A 16:9 source in a 2.5:1 stage has to lose ~28% of its height somewhere.
+   Anchoring to the bottom takes all of it off the top, which is where the reel
+   sets every one of its captions — so the trim full-bleed forces on us is the
+   same trim that removes them. Centred, the crop cut those caption boxes
+   through the middle and the clipped shapes read as a broken layout; part-way
+   down (72%) it still caught the lower ones. Only the full shift clears them,
+   and the subjects sit centre-frame, so nothing of value goes with it. */
+.sf-hero-still,
+.sf-hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+.sf-hero-video {
+  pointer-events: none;
+  /* Held back until the first frame is actually on screen, so a slow decode
+     shows the still rather than a black rectangle. */
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.sf-hero-video.is-playing {
+  opacity: 1;
+}
+
+/* Fades upward, not downward. The reel plays close to ungraded through the
+   top and middle — that is the whole point of giving it the full frame — and
+   the weight is banked at the base where the headline actually sits. The
+   horizontal pass adds a little more hold on the left for the same reason. */
+.sf-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(6, 17, 32, 0.72) 0%,
+      rgba(6, 17, 32, 0.34) 38%,
+      rgba(6, 17, 32, 0) 68%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(6, 17, 32, 0.55) 0%,
+      rgba(6, 17, 32, 0.22) 10%,
+      rgba(6, 17, 32, 0.12) 24%,
+      rgba(6, 17, 32, 0.26) 46%,
+      rgba(6, 17, 32, 0.8) 76%,
+      rgba(6, 17, 32, 0.95) 100%
+    );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-hero-video {
+    display: none;
+  }
+}
+
 .sf-hero-inner {
   position: relative;
   z-index: 2;
-  min-height: clamp(340px, 38vw, 460px);
-  display: flex;
-  align-items: center;
-  padding-bottom: clamp(48px, 6vw, 84px);
+  padding-top: clamp(90px, 16vh, 180px);
+  padding-bottom: clamp(34px, 5vh, 58px);
 }
 
+/* "handled end to end" measures 11.8em in Sora at this weight, so at the 4rem
+   cap it wants 756px. The full container gives 1084px, which is the reason
+   this layout can carry the headline at full size where the split could not. */
 .sf-hero-copy {
   min-width: 0;
-  /* Stops short of the camera in the background image. */
-  max-width: 620px;
+  max-width: 880px;
   animation: sf-rise 0.8s ease both;
 }
 
 .sf-hero-title {
   font-family: "Sora", "Inter", sans-serif;
-  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-size: clamp(2.4rem, 4.6vw, 4rem);
   font-weight: 800;
   line-height: 1.08;
   letter-spacing: -0.035em;
@@ -181,71 +294,137 @@
   gap: 14px;
 }
 
-/* ---- value strip ---- */
+/* ---- value strip ----
+   Each item carries its own --accent off the global ramp, the same mechanism
+   the focus cards and timeline use, so the four points read as a set rather
+   than four identical grey rows. The blur lives on the bar rather than on each
+   card: one backdrop-filter over a playing video instead of four. */
 .sf-hero-strip {
   position: relative;
   z-index: 2;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(4, 14, 28, 0.5);
+  background: rgba(4, 14, 28, 0.42);
+  backdrop-filter: blur(10px);
 }
 
 .sf-hero-strip-inner {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(16px, 2.5vw, 34px);
-  padding-top: 22px;
-  padding-bottom: 22px;
+  gap: clamp(10px, 1.4vw, 18px);
+  padding-top: 18px;
+  padding-bottom: 18px;
 }
 
 .sf-hero-strip-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.92rem;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-size: 0.86rem;
   line-height: 1.4;
-  color: rgba(234, 242, 251, 0.72);
+  color: rgba(234, 242, 251, 0.66);
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.sf-hero-strip-item:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow:
+    0 18px 34px -20px rgba(0, 0, 0, 0.85),
+    0 0 22px -10px color-mix(in srgb, var(--accent) 60%, transparent);
 }
 
 .sf-hero-strip-item strong {
   display: block;
+  margin-bottom: 1px;
   color: #fff;
   font-weight: 700;
+  font-size: 0.98rem;
+  letter-spacing: -0.01em;
 }
 
+/* Solid, lit tiles rather than a tinted outline. Against a moving video a 14%
+   wash barely registered; a filled gradient with the accent thrown below it as
+   coloured light is what makes these read at a glance.
+
+   The lighting is built from five passes, which is what stops it looking like
+   a flat swatch: a specular highlight top-left where the light lands, a body
+   ramp that runs light -> accent -> slightly darkened so the tile turns, a
+   1px ring of the accent to define the edge against the video, a coloured
+   glow cast below it, and inner highlight/shade to give the face depth. */
 .sf-hero-strip-icon {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: rgba(246, 153, 61, 0.14);
-  border: 1px solid rgba(246, 153, 61, 0.28);
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background:
+    radial-gradient(
+      78% 68% at 26% 18%,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0) 62%
+    ),
+    linear-gradient(
+      152deg,
+      color-mix(in srgb, var(--accent) 68%, white) 0%,
+      var(--accent) 62%,
+      color-mix(in srgb, var(--accent) 82%, black) 100%
+    );
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 12px 26px -10px color-mix(in srgb, var(--accent) 85%, transparent),
+    0 0 32px -8px color-mix(in srgb, var(--accent) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -7px 12px -7px rgba(0, 0, 0, 0.4);
+  transition: box-shadow 0.22s ease;
+}
+
+/* Hovering the card lifts the light on its tile too, so the whole item reads
+   as one object rather than a box with a picture in it. */
+.sf-hero-strip-item:hover .sf-hero-strip-icon {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 75%, transparent),
+    0 14px 30px -10px color-mix(in srgb, var(--accent) 95%, transparent),
+    0 0 42px -6px color-mix(in srgb, var(--accent) 75%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -7px 12px -7px rgba(0, 0, 0, 0.4);
 }
 
 .sf-hero-strip-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   fill: none;
-  stroke: var(--sf-orange);
-  stroke-width: 1.8;
+  stroke: #fff;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+  /* Keeps the white strokes crisp over the lighter top of the tile. */
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.3));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-hero-strip-item {
+    transition: none;
+  }
+
+  .sf-hero-strip-item:hover {
+    transform: none;
+  }
 }
 
 @media (max-width: 900px) {
-  /* The camera sits on the right of the background image; below this width
-     there is no room beside it, so the overlay becomes an even scrim and the
-     copy spans the full column. */
+  /* Also the breakpoint below which the video is never attached, so the stage
+     here is always the still. A portrait viewport crops a 16:9 frame hard, so
+     the hero gives back some height rather than showing a sliver blown up. */
   .sf-hero {
-    background:
-      linear-gradient(180deg, rgba(8, 22, 42, 0.9) 0%, rgba(9, 25, 47, 0.93) 100%),
-      url("/sifeddine-hero.jpg") center / cover no-repeat,
-      linear-gradient(165deg, #0a1c35 0%, #0d2547 52%, #0a1b33 100%);
-  }
-
-  .sf-hero-copy {
-    max-width: none;
+    min-height: min(76vh, 620px);
   }
 
   .sf-hero-strip-inner {
@@ -417,6 +596,45 @@
 .sf-focus-icon svg { width: 28px; height: 28px; }
 .sf-focus-card h3 { font-family: "Sora", sans-serif; font-size: 1.2rem; color: var(--sf-navy); margin-bottom: 10px; }
 .sf-focus-card p { color: var(--sf-muted); font-size: 0.98rem; }
+
+/* ================= Reel =================
+   The full cut, on the same navy stage as the hero so the two read as a pair.
+   Click-to-play with preload="none": nothing is fetched until someone asks for
+   it, which is what lets this section carry the heavier 7 MB file that the
+   hero could not. */
+.sf-reel {
+  padding: clamp(60px, 8vw, 110px) 0;
+  background:
+    radial-gradient(
+      90% 70% at 82% 8%,
+      rgba(37, 148, 210, 0.2) 0%,
+      rgba(37, 148, 210, 0) 60%
+    ),
+    linear-gradient(165deg, #0a1c35 0%, #0d2547 55%, #091a31 100%);
+}
+
+.sf-section-sub--light {
+  color: rgba(234, 242, 251, 0.78);
+}
+
+.sf-reel-frame {
+  max-width: 960px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #08182c;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 34px 80px -34px rgba(0, 0, 0, 0.85),
+    0 22px 64px -32px rgba(37, 148, 210, 0.45);
+}
+
+.sf-reel-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #08182c;
+}
 
 /* ================= Timeline ================= */
 .sf-timeline { position: relative; max-width: 780px; margin: 0 auto; padding-left: 34px; }

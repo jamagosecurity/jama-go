@@ -4,6 +4,11 @@ dist
 .angular
 *.local
 
+# Raw source media dropped at the repo root. Only the compressed, web-ready
+# derivatives under public/ are committed — the masters are far too large.
+/*.mp4
+/*.mov
+
 # Logs
 logs
 *.log

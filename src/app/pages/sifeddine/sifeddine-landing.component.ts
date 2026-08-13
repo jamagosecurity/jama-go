@@ -1,11 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   OnInit,
   PLATFORM_ID,
   WritableSignal,
+  effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -26,6 +29,18 @@ interface FocusItem {
   icon: string;
 }
 
+/** Not in lib.dom yet, and only Chromium ships it — hence every field optional. */
+interface NetworkInformation {
+  readonly saveData?: boolean;
+  readonly effectiveType?: string;
+}
+
+/** Effective types where a 3.4 MB decorative download is not defensible. */
+const METERED_CONNECTIONS = new Set(['slow-2g', '2g', '3g']);
+
+/** Below this the 16:9 clip crops down to a strip; the poster reads better. */
+const HERO_VIDEO_MIN_WIDTH = 900;
+
 @Component({
   selector: 'app-sifeddine-landing',
   standalone: true,
@@ -41,6 +56,33 @@ export class SifeddineLandingComponent implements OnInit {
   protected readonly connections = signal(0);
   protected readonly roles = signal(0);
   protected readonly countries = signal(0);
+
+  /** Whether the hero clip has been attached to the DOM at all. */
+  protected readonly heroVideo = signal(false);
+  /** Flips on the first decoded frame, which is what fades the clip in. */
+  protected readonly heroVideoPlaying = signal(false);
+
+  private readonly heroVideoEl = viewChild<ElementRef<HTMLVideoElement>>('heroVideoEl');
+
+  /**
+   * Starts the clip the moment @if puts it in the DOM.
+   *
+   * The `muted` in the template is not enough on its own: Angular applies it
+   * with setAttribute, and the muted IDL property is only seeded from that
+   * attribute by the HTML parser — never for an element built at runtime. The
+   * element therefore counts as unmuted, autoplay policy refuses it, and the
+   * poster is all anyone ever sees. Setting the property directly is the fix;
+   * play() is then called explicitly rather than trusting the attribute.
+   */
+  private readonly startHeroVideo = effect(() => {
+    const video = this.heroVideoEl()?.nativeElement;
+    if (!video) return;
+
+    video.muted = true;
+    // A refusal here is a valid outcome, not a failure: the poster is already
+    // the designed fallback, so there is nothing to recover or report.
+    void video.play().catch(() => undefined);
+  });
 
   protected readonly skills: string[] = [
     'Business Development',
@@ -126,6 +168,37 @@ export class SifeddineLandingComponent implements OnInit {
     this.countTo(this.roles, 3, 1200);
     this.countTo(this.countries, 2, 1000);
     this.countTo(this.connections, 128, 1700);
+    this.attachHeroVideo();
+  }
+
+  protected onHeroVideoPlaying(): void {
+    this.heroVideoPlaying.set(true);
+  }
+
+  /**
+   * The hero clip is ~3.4 MB, so it never belongs in the initial page load:
+   * the markup ships without it and it is attached once the browser is idle,
+   * past LCP. Even then it is only worth the bytes where all three hold —
+   * motion is welcome, the viewport is wide enough for a 16:9 crop to survive,
+   * and the connection is neither metered nor slow. Everywhere else the poster
+   * still stays put and nothing is downloaded.
+   */
+  private attachHeroVideo(): void {
+    if (!this.isBrowser) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.innerWidth < HERO_VIDEO_MIN_WIDTH) return;
+
+    const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
+    if (connection?.saveData) return;
+    if (connection?.effectiveType && METERED_CONNECTIONS.has(connection.effectiveType)) return;
+
+    const attach = (): void => this.heroVideo.set(true);
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(attach, { timeout: 3000 });
+    } else {
+      // Older Safari has no idle callback; a fixed delay clears LCP well enough.
+      window.setTimeout(attach, 1200);
+    }
   }
 
   private countTo(target: WritableSignal<number>, end: number, duration: number): void {
