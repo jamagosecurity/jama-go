@@ -59,6 +59,9 @@
   --radius: 16px;
   --container: 1180px;
   --header-pad: clamp(20px, 3.5vw, 64px);
+  /* Mirrors .header-inner's min-height at each breakpoint. The home hero pulls
+     itself up by exactly this so the header can float over the dark stage. */
+  --header-h: 96px;
   --shadow: 0 18px 45px -22px rgba(15, 23, 42, 0.28);
 }
 
@@ -393,30 +396,269 @@ a { color: inherit; text-decoration: none; }
   transition: .3s;
 }
 
-/* ===== Hero ===== */
-.hero { position: relative; overflow: hidden; padding: 90px 0 80px; }
-.hero-bg {
+/* ----- Header floating over the home hero -----
+   Applied only on the home route and only while the page is at the top, so
+   every other page keeps the solid white bar it has always had. */
+.site-header {
+  transition: background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.site-header--over-hero {
+  background: transparent;
+  border-bottom-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+/* The wordmark is a fully transparent PNG, so flattening it to white gives a
+   clean silhouette on the dark stage. It returns to full colour on scroll. */
+.site-header--over-hero .brand-logo--header { filter: brightness(0) invert(1); }
+.site-header--over-hero .nav-link { color: rgba(255, 255, 255, .8); }
+.site-header--over-hero .nav-link:hover,
+.site-header--over-hero .nav-link.active,
+.site-header--over-hero .nav-dropdown.open > .nav-link,
+.site-header--over-hero .nav-dropdown.active > .nav-link { color: #fff; }
+.site-header--over-hero .nav-caret { border-top-color: rgba(255, 255, 255, .8); }
+.site-header--over-hero .nav-toggle span { background: #fff; }
+@media (min-width: 901px) {
+  .site-header--over-hero .nav-dropdown:hover > .nav-link,
+  .site-header--over-hero .nav-dropdown:focus-within > .nav-link { color: #fff; }
+}
+
+/* ===== Hero — "Qatar, Live" =====
+   A dark full-bleed stage carrying one object that *is* the business: the
+   country we cover, with the sites we cover in it. The map is drawn from real
+   coordinates and the clock is the real Doha time — the two things on this
+   stage that assert a fact both check out. Nothing here mocks up a product
+   that does not exist. */
+.qh {
+  --qh-ink: #050a14;
+  --qh-ink-2: #0a1524;
+  --qh-edge: rgba(125, 185, 235, 0.2);
+  --qh-dim: #9db1cd;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(100svh, 920px);
+  background: var(--qh-ink);
+  color: #fff;
+  /* Slides the stage up under the sticky header, which goes transparent over
+     it, so the artwork runs edge to edge. The copy is padded back down by the
+     same amount so nothing lands beneath the nav. */
+  margin-top: calc(-1 * var(--header-h));
+  padding-top: var(--header-h);
+}
+
+.qh-stage { position: absolute; inset: 0; z-index: 0; }
+.qh-halo {
   position: absolute; inset: 0;
   background:
-    radial-gradient(60% 60% at 80% 10%, rgba(37, 148, 210, 0.18), transparent 70%),
-    radial-gradient(50% 50% at 10% 20%, rgba(246, 153, 61, 0.15), transparent 70%),
-    linear-gradient(180deg, var(--bg-2), var(--bg));
+    radial-gradient(58% 52% at 78% 14%, rgba(246, 153, 61, 0.26), transparent 68%),
+    radial-gradient(64% 58% at 88% 62%, rgba(37, 148, 210, 0.24), transparent 70%),
+    radial-gradient(50% 40% at 8% 88%, rgba(37, 148, 210, 0.1), transparent 72%);
 }
-.hero-grid {
+.qh-vignette {
   position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(37,99,175,0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37,99,175,0.07) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(70% 70% at 50% 30%, #000, transparent);
+  background: linear-gradient(100deg, var(--qh-ink) 22%, rgba(5, 10, 20, 0.72) 46%, transparent 68%);
 }
-.hero-inner {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 56px;
-  align-items: center;
+
+/* Locked to the viewBox ratio so the labels and the sweep, which are placed in
+   percentages, land exactly on their SVG coordinates at every size. */
+.qh-map-wrap {
+  position: absolute;
+  top: 50%;
+  right: clamp(-60px, -2vw, 0px);
+  transform: translateY(-50%);
+  height: 138%;
+  aspect-ratio: 400 / 720;
 }
+.qh-map { display: block; width: 100%; height: 100%; overflow: visible; }
+.qh-land { fill: rgba(37, 148, 210, 0.07); }
+.qh-fill circle, .qh-map pattern circle { fill: rgba(125, 185, 235, 0.42); }
+.qh-coast {
+  fill: none;
+  stroke: rgba(150, 205, 245, 0.85);
+  stroke-width: 2.2;
+  stroke-dasharray: 0.1 8;
+  stroke-linecap: round;
+}
+.qh-rings circle { fill: none; stroke: rgba(125, 185, 235, 0.14); stroke-width: 1.2; }
+.qh-route {
+  fill: none;
+  stroke: var(--jama-orange-fill);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+  opacity: .75;
+  animation: qh-draw 3.4s ease-out forwards;
+}
+.qh-route:nth-child(2) { animation-delay: .15s; }
+.qh-route:nth-child(3) { animation-delay: .3s; }
+.qh-route:nth-child(4) { animation-delay: .45s; }
+.qh-route:nth-child(5) { animation-delay: .6s; }
+.qh-route:nth-child(6) { animation-delay: .75s; }
+@keyframes qh-draw { to { stroke-dashoffset: 0; } }
+
+.qh-dot { fill: #cfe6fa; }
+.qh-dot.is-hub {
+  fill: var(--jama-orange-fill);
+  filter: drop-shadow(0 0 10px rgba(246, 153, 61, 0.9));
+  animation: qh-throb 2.6s ease-in-out infinite;
+}
+@keyframes qh-throb { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+
+/* Radar, centred on the Doha hub at 82.5% / 52.5% of the viewBox. */
+.qh-sweep {
+  position: absolute;
+  left: 82.5%;
+  top: 52.5%;
+  width: 170%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(246, 153, 61, 0.3), rgba(246, 153, 61, 0) 26%, transparent 100%);
+  mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, .55) 42%, transparent 68%);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, .55) 42%, transparent 68%);
+  animation: qh-spin 8s linear infinite;
+}
+@keyframes qh-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+.qh-label {
+  position: absolute;
+  transform: translate(14px, -50%);
+  padding: 3px 8px;
+  border: 1px solid var(--qh-edge);
+  border-radius: 4px;
+  background: rgba(5, 10, 20, 0.74);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #d6e6f7;
+  font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.qh-label.is-hub { border-color: rgba(246, 153, 61, .6); color: #ffd7ab; }
+
+/* ----- Copy ----- */
+.qh-inner { position: relative; z-index: 1; padding-top: clamp(40px, 6vh, 76px); padding-bottom: clamp(40px, 6vh, 76px); }
+.qh-copy { max-width: 620px; }
+.qh-eyebrow {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 22px;
+  font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--jama-orange-fill);
+}
+.qh-eyebrow-place { position: relative; padding-left: 16px; }
+.qh-eyebrow-place::before {
+  content: ""; position: absolute; left: 0; top: 50%;
+  width: 8px; height: 1px; background: currentColor;
+}
+/* Reserves its own width so the clock arriving after hydration cannot shift
+   the headline underneath it. */
+.qh-clock {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-width: 92px; min-height: 14px;
+  color: var(--qh-dim); letter-spacing: .14em;
+}
+.qh-clock-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--jama-teal);
+  box-shadow: 0 0 8px rgba(15, 185, 165, .9);
+}
+.qh-clock-tz { opacity: .6; }
+
+.qh-title {
+  font-size: clamp(2.6rem, 6.2vw, 5.2rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 26px;
+}
+.qh-title-accent {
+  background: linear-gradient(100deg, var(--jama-orange-fill), #ffc182);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.qh-lead {
+  max-width: 520px;
+  margin-bottom: 34px;
+  color: var(--qh-dim);
+  font-size: clamp(15px, 1.15vw, 18px);
+  line-height: 1.65;
+}
+
+.qh-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
+.qh-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 15px 28px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600; font-size: 15px;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .25s ease, background .25s ease, border-color .25s ease;
+}
+.qh-btn--primary {
+  background: var(--grad);
+  color: #241200;
+  box-shadow: 0 14px 38px -14px rgba(246, 153, 61, .8);
+}
+.qh-btn--primary:hover { transform: translateY(-2px); box-shadow: 0 20px 46px -14px rgba(246, 153, 61, .95); }
+.qh-btn--ghost { border-color: rgba(190, 220, 245, .32); color: #fff; }
+.qh-btn--ghost:hover { background: rgba(255, 255, 255, .08); border-color: rgba(190, 220, 245, .6); transform: translateY(-2px); }
+
+.qh-facts {
+  display: flex; gap: clamp(22px, 3.5vw, 44px); flex-wrap: wrap;
+  list-style: none;
+  padding-top: 26px;
+  border-top: 1px solid rgba(150, 190, 230, .18);
+}
+.qh-facts li { color: var(--qh-dim); font-size: 13px; letter-spacing: .01em; }
+.qh-facts strong {
+  display: block;
+  margin-bottom: 2px;
+  color: #fff;
+  font-family: "Sora", sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+/* ----- Capability strip ----- */
+.qh-strip {
+  position: relative; z-index: 1;
+  overflow: hidden;
+  border-top: 1px solid rgba(150, 190, 230, .16);
+  background: var(--qh-ink-2);
+  padding: 15px 0;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.qh-strip-track { display: flex; width: max-content; animation: qh-marquee 34s linear infinite; }
+.qh-strip-run { display: flex; }
+.qh-strip-item {
+  display: inline-flex; align-items: center;
+  padding: 0 30px;
+  color: #b6c8e0;
+  font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+  font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.qh-strip-item::before {
+  content: "";
+  width: 5px; height: 5px; margin-right: 14px;
+  border-radius: 50%;
+  background: var(--jama-orange-fill);
+}
+@keyframes qh-marquee { to { transform: translateX(-50%); } }
+
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 7px 14px; border-radius: 999px;
@@ -437,52 +679,8 @@ a { color: inherit; text-decoration: none; }
   70% { box-shadow: 0 0 0 10px rgba(246,153,61,0); }
   100% { box-shadow: 0 0 0 0 rgba(246,153,61,0); }
 }
-.hero-copy h1 {
-  font-size: clamp(2.4rem, 5.2vw, 4rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  font-weight: 800;
-  margin-bottom: 20px;
-}
-.hero-sub { color: var(--muted); font-size: 18px; max-width: 520px; margin-bottom: 30px; }
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 34px; }
-.hero-badges {
-  display: flex; gap: 30px; list-style: none; flex-wrap: wrap;
-  padding-top: 26px; border-top: 1px solid var(--line);
-}
-.hero-badges li { color: var(--muted); font-size: 14px; }
-.hero-badges strong { display: block; color: var(--text); font-size: 20px; font-family: "Sora", sans-serif; }
-
-/* Hero card */
-.hero-card { display: flex; justify-content: center; }
-.glass-card {
-  width: 100%; max-width: 400px;
-  background: linear-gradient(160deg, #ffffff, #f2f7fc);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 22px;
-  box-shadow: var(--shadow);
-  animation: float 6s ease-in-out infinite;
-}
-@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+/* Retained for the admin login panel, which is the only remaining user. */
 .live { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--brand); }
-.card-time { font-size: 12px; color: var(--muted); }
-.card-rows { display: flex; flex-direction: column; gap: 10px; }
-.card-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 14px; border-radius: 12px;
-  background: rgba(15,23,42,0.03);
-  border: 1px solid var(--line);
-  font-size: 14px;
-}
-.card-row span { color: var(--muted); }
-.card-row b { font-weight: 600; }
-.card-row .ok { color: var(--brand); }
-.card-row .warn { color: var(--warn); }
-.card-foot { margin-top: 18px; font-size: 12px; color: var(--muted); }
-.mini-bar { height: 6px; border-radius: 999px; background: rgba(15,23,42,0.08); overflow: hidden; margin-bottom: 8px; }
-.mini-bar i { display: block; height: 100%; width: var(--w); background: var(--grad-mix); border-radius: 999px; }
 
 /* ===== Trust bar ===== */
 .trust-bar { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #eef4fa; }
@@ -638,6 +836,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ===== Responsive ===== */
 @media (min-width: 901px) and (max-width: 1280px) {
+  :root { --header-h: 88px; }
   .header-inner {
     gap: 16px;
     min-height: 88px;
@@ -649,6 +848,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (min-width: 1600px) {
+  :root { --header-h: 104px; }
   .header-inner {
     min-height: 104px;
     gap: 56px;
@@ -659,8 +859,21 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 900px) {
-  .hero-inner, .why-inner, .cta-inner { grid-template-columns: 1fr; }
-  .hero-card { order: -1; }
+  :root { --header-h: 88px; }
+  .why-inner, .cta-inner { grid-template-columns: 1fr; }
+
+  /* The map slides right and dims to a backdrop: at this width it cannot both
+     hold its detail and stay out of the headline's way, so the copy wins. */
+  .qh { min-height: auto; }
+  .qh-map-wrap { right: -34%; height: 104%; opacity: .55; }
+  .qh-vignette {
+    background: linear-gradient(175deg, rgba(5, 10, 20, .82) 30%, rgba(5, 10, 20, .68) 62%, var(--qh-ink) 96%);
+  }
+  .qh-label { display: none; }
+  .qh-copy { max-width: none; }
+  .qh-inner { padding-top: clamp(48px, 9vh, 84px); padding-bottom: clamp(48px, 9vh, 84px); }
+  .qh-facts { gap: 22px 30px; }
+
   .cards { grid-template-columns: repeat(2, 1fr); }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .header-inner {
@@ -749,6 +962,12 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
+
+  /* The routes are drawn *by* their animation, so killing it would leave them
+     dashed out of sight. Land them on their finished state instead. */
+  .qh-route { stroke-dashoffset: 0; }
+  /* A frozen radar wedge reads as an error rather than a design, so drop it. */
+  .qh-sweep { display: none; }
 }
 
 /* ===== Admin command panel ===== */

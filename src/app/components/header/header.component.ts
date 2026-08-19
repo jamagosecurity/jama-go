@@ -3,6 +3,7 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  NgZone,
   PLATFORM_ID,
   inject,
 } from '@angular/core';
@@ -34,6 +35,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
   activeHash = '';
   openDropdown: string | null = null;
   isDesktopNav = true;
+  scrolled = false;
+
+  /**
+   * The home hero is a dark full-bleed stage that the header floats over. Once
+   * the page scrolls past it — or the mobile menu opens over it — the bar has
+   * to become solid again or the links lose their background.
+   */
+  get overHero(): boolean {
+    return this.activePath === '/' && !this.scrolled && !this.mobileOpen;
+  }
 
   /**
    * Resolved in ngOnInit rather than as a field initialiser: the home page is
@@ -51,7 +62,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') this.closeDropdown();
   };
+  /**
+   * Bound outside the Angular zone: scroll fires continuously and only the
+   * moment the threshold is crossed is worth a round of change detection.
+   */
+  private onScroll = () => {
+    const next = window.scrollY > 24;
+    if (next === this.scrolled) return;
+    this.zone.run(() => (this.scrolled = next));
+  };
   private readonly navSub;
+  private readonly zone = inject(NgZone);
 
   constructor(private readonly router: Router) {
     this.navSub = this.router.events
@@ -71,6 +92,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     window.addEventListener('hashchange', this.onHashChange);
     this.mediaQuery.addEventListener('change', this.onMediaChange);
     document.addEventListener('keydown', this.onKeyDown);
+
+    // Reloading part-way down the page must not leave a transparent bar.
+    this.scrolled = window.scrollY > 24;
+    this.zone.runOutsideAngular(() =>
+      window.addEventListener('scroll', this.onScroll, { passive: true }),
+    );
   }
 
   ngOnDestroy(): void {
@@ -78,6 +105,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (!this.isBrowser) return;
 
     window.removeEventListener('hashchange', this.onHashChange);
+    window.removeEventListener('scroll', this.onScroll);
     this.mediaQuery?.removeEventListener('change', this.onMediaChange);
     document.removeEventListener('keydown', this.onKeyDown);
   }

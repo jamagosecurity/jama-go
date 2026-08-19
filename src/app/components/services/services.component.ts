@@ -21,7 +21,7 @@ export class ServicesComponent {
       id: 'manned-guarding',
       icon: '🛡️',
       title: 'Manned Guarding',
-      text: 'Vetted, SIA-licensed security officers providing a professional on-site presence day and night.',
+      text: 'Vetted, trained security officers providing a professional on-site presence day and night.',
     },
     {
       id: 'mobile-patrols',

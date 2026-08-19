@@ -1,27 +1,93 @@
-<section class="hero">
-  <div class="hero-bg" aria-hidden="true"></div>
-  <div class="hero-grid" aria-hidden="true"></div>
-  <div class="container hero-inner">
-    <div class="hero-copy">
-      <span class="eyebrow">
-        <span class="pulse-dot"></span>
-        Trusted 24/7 Security Partner
-      </span>
-      <h1>
-        Protecting what
-        <br />
-        <span class="grad-text">matters most</span> to you.
-      </h1>
-      <p class="hero-sub">
-        Jama Go Security provides professional manned guarding, rapid mobile patrols, event
-        protection and round-the-clock monitoring — so your people, property and peace of mind are
-        always secure.
+<section class="qh">
+  <div class="qh-stage" aria-hidden="true">
+    <div class="qh-halo"></div>
+
+    <!-- Sized by aspect-ratio to match the viewBox exactly, so the HTML labels
+         and the radar sweep can be placed by percentage and land precisely on
+         the SVG coordinates they belong to. -->
+    <div class="qh-map-wrap">
+      <svg class="qh-map" [attr.viewBox]="'0 0 ' + mapW + ' ' + mapH" preserveAspectRatio="none">
+        <defs>
+          <pattern id="qhDots" width="11" height="11" patternUnits="userSpaceOnUse">
+            <circle cx="2.2" cy="2.2" r="1.5" />
+          </pattern>
+          <clipPath id="qhLand">
+            <path [attr.d]="qatarPath" />
+          </clipPath>
+        </defs>
+
+        <g clip-path="url(#qhLand)">
+          <rect class="qh-land" [attr.width]="mapW" [attr.height]="mapH" />
+          <rect class="qh-fill" [attr.width]="mapW" [attr.height]="mapH" fill="url(#qhDots)" />
+        </g>
+
+        <path class="qh-coast" [attr.d]="qatarPath" />
+
+        <g class="qh-rings">
+          <circle cx="330" cy="378" r="58" />
+          <circle cx="330" cy="378" r="112" />
+          <circle cx="330" cy="378" r="172" />
+        </g>
+
+        @for (route of routes; track route) {
+          <path class="qh-route" [attr.d]="route" />
+        }
+
+        @for (marker of markers; track marker.name) {
+          <circle
+            class="qh-dot"
+            [class.is-hub]="marker.hub"
+            [attr.cx]="marker.x"
+            [attr.cy]="marker.y"
+            [attr.r]="marker.hub ? 6 : 3.4"
+          />
+        }
+      </svg>
+
+      <div class="qh-sweep"></div>
+
+      @for (marker of markers; track marker.name) {
+        @if (!marker.quiet) {
+          <span
+            class="qh-label"
+            [class.is-hub]="marker.hub"
+            [style.left]="marker.leftPct"
+            [style.top]="marker.topPct"
+            >{{ marker.name }}</span
+          >
+        }
+      }
+    </div>
+
+    <div class="qh-vignette"></div>
+  </div>
+
+  <div class="container qh-inner">
+    <div class="qh-copy">
+      <p class="qh-eyebrow">
+        <span class="qh-eyebrow-place">Doha, Qatar</span>
+        <span class="qh-clock">
+          @if (qatarTime(); as time) {
+            <span class="qh-clock-dot"></span>{{ time }} <span class="qh-clock-tz">AST</span>
+          }
+        </span>
       </p>
 
-      <div class="hero-actions">
-        <a href="/contact" class="btn btn-primary">
-          Request Free Assessment
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+      <h1 class="qh-title">
+        Every camera.<br />
+        Every door.<br />
+        <span class="qh-title-accent">Every site.</span>
+      </h1>
+
+      <p class="qh-lead">
+        CCTV, access control, alarms and gate barriers — surveyed, installed and maintained across
+        Qatar by one team you can call directly.
+      </p>
+
+      <div class="qh-actions">
+        <a href="/contact" class="qh-btn qh-btn--primary">
+          Book a free site survey
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
             <path
               d="M5 12h14m-6-6 6 6-6 6"
               stroke="currentColor"
@@ -31,37 +97,26 @@
             />
           </svg>
         </a>
-        <a href="/#services" class="btn btn-ghost">Explore Services</a>
+        <a href="/#services" class="qh-btn qh-btn--ghost">Our services</a>
       </div>
 
-      <ul class="hero-badges">
-        <li><strong>SIA</strong> Licensed Officers</li>
-        <li><strong>&lt;15 min</strong> Response Time</li>
-        <li><strong>500+</strong> Sites Protected</li>
+      <ul class="qh-facts">
+        <li><strong>24/7</strong> AMC support</li>
+        <li><strong>Doha</strong> Salwa Road showroom</li>
+        <li><strong>Free</strong> Survey &amp; quote</li>
       </ul>
     </div>
+  </div>
 
-    <div class="hero-card" aria-hidden="true">
-      <div class="glass-card">
-        <div class="card-head">
-          <span class="live"><span class="pulse-dot"></span> LIVE MONITORING</span>
-          <span class="card-time">Secure • Online</span>
-        </div>
-        <div class="card-rows">
-          @for (row of monitorRows; track row.label) {
-            <div class="card-row">
-              <span>{{ row.label }}</span>
-              <b [class]="row.tone">{{ row.value }}</b>
-            </div>
+  <div class="qh-strip" aria-hidden="true">
+    <div class="qh-strip-track">
+      @for (pass of [1, 2]; track pass) {
+        <div class="qh-strip-run">
+          @for (item of capabilities; track item) {
+            <span class="qh-strip-item">{{ item }}</span>
           }
         </div>
-        <div class="card-foot">
-          <div class="mini-bar">
-            <i style="--w: 92%"></i>
-          </div>
-          <span>System integrity 92%</span>
-        </div>
-      </div>
+      }
     </div>
   </div>
 </section>
