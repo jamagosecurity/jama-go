@@ -1,0 +1,320 @@
+<section class="plan">
+  <header class="plan-head">
+    <p class="plan-kicker">Engineering reference</p>
+    <h1>CCTV storage sizing</h1>
+    <p class="plan-lede">
+      The calculation model behind
+      <code>DAHUA CCTV STORAGE CALCULATION -V5 (2).xlsx</code>, read cell by cell — every formula
+      shown working, and checked against Dahua's own Storage Selector.
+    </p>
+
+    <div class="plan-kpis">
+      <div class="plan-kpi is-good"><b>327.53 TB</b><span>Dahua says 327.5</span></div>
+      <div class="plan-kpi is-good"><b>250 Mbps</b><span>Bandwidth, matched</span></div>
+      <div class="plan-kpi is-bad"><b>7</b><span>Defects found</span></div>
+      <div class="plan-kpi is-warn"><b>−14.3%</b><span>ANPR capacity fix</span></div>
+    </div>
+  </header>
+
+  <!-- ===== block 1 ===== -->
+  <article class="admin-panel plan-panel">
+    <div class="admin-panel-title">
+      <h2>Camera video storage</h2>
+      <span class="plan-cell">cell G4</span>
+    </div>
+
+    <p class="plan-note">
+      The workbook does six unit conversions on one line, which is why it is hard to check. Here
+      they are separated, for the Dahua fixture of 2 MP × 100 cameras over 120 days. The
+      <code>÷ 8</code> turns bits into bytes; the two <code>÷ 1024</code> make the answer binary
+      TB — comparable to what an NVR reports, not the number on the disk label.
+    </p>
+
+    <ol class="plan-chain">
+      @for (hop of chain; track hop.unit) {
+        <li class="plan-hop" [class.is-final]="hop.final">
+          <span class="plan-hop-op">{{ hop.op }}</span>
+          <span class="plan-hop-value">{{ hop.value }}</span>
+          <span class="plan-hop-unit">{{ hop.unit }}</span>
+        </li>
+      }
+    </ol>
+
+    <h3 class="plan-sub">Scaled to the project</h3>
+    <ul class="plan-steps">
+      @for (step of projectSteps; track step.label) {
+        <li>
+          <span class="plan-step-label">{{ step.label }}</span>
+          <span class="plan-step-working">{{ step.working }}</span>
+          <span class="plan-step-result">{{ step.result }}</span>
+        </li>
+      }
+    </ul>
+
+    <p class="plan-callout is-good">
+      <strong>Why ×1.06 is correct.</strong>
+      The sheet calls H4 "Capacity loss due to formatting", which is wrong — and it stayed on the
+      suspected-bug list until the Storage Selector screenshot embedded in the workbook at
+      <code>xl/media/image1.png</code> settled it. That screenshot reads
+      <em>Video Redundancy 1.06</em>. The multiplier is Dahua's official allowance, so the
+      arithmetic is right and only the label needed fixing.
+    </p>
+  </article>
+
+  <!-- ===== model inputs ===== -->
+  <article class="admin-panel plan-panel">
+    <div class="admin-panel-title">
+      <h2>What should be an input</h2>
+    </div>
+    <p class="plan-note">
+      Five quantities drive every figure in the workbook. None of them is currently editable
+      without opening a formula.
+    </p>
+    <div class="plan-table-wrap">
+      <table class="plan-table">
+        <thead>
+          <tr><th>Symbol</th><th>Name</th><th class="num">Value</th><th>Where it hides today</th></tr>
+        </thead>
+        <tbody>
+          @for (input of modelInputs; track input.symbol) {
+            <tr>
+              <td class="num">{{ input.symbol }}</td>
+              <td>{{ input.name }}</td>
+              <td class="num">{{ input.value }}</td>
+              <td class="plan-muted">{{ input.origin }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- ===== raid ===== -->
+  <article class="admin-panel plan-panel">
+    <div class="admin-panel-title">
+      <h2>RAID group capacity</h2>
+      <span class="plan-cell">column H</span>
+    </div>
+
+    <p class="plan-note">
+      A RAID group gives up whole disks to parity, and those disks hold no video:
+      <code>usable = total − parity</code>, then
+      <code>capacity = disk size × usable × 0.90</code>. The workbook applies this in the main
+      table but not in the ANPR one.
+    </p>
+
+    <h3 class="plan-sub">RAID-5 topology — primary recording</h3>
+    <div class="plan-table-wrap">
+      <table class="plan-table">
+        <thead>
+          <tr>
+            <th>NVR</th><th>Group</th><th class="num">Disks</th><th class="num">Parity</th>
+            <th class="num">Data</th><th class="num">Disk TB</th><th class="num">Spares</th>
+            <th class="num">Available TB</th><th class="num">Ceiling</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of raid5; track $index) {
+            <tr [class.is-continuation]="row.continuation">
+              <td>{{ row.continuation ? '↳' : row.nvr }}</td>
+              <td>{{ row.group }}</td>
+              <td class="num">{{ row.totalDisks }}</td>
+              <td class="num">{{ row.parity }}</td>
+              <td class="num">{{ row.dataDisks }}</td>
+              <td class="num">{{ row.diskTb }}</td>
+              <td class="num">{{ row.spares }}</td>
+              <td class="num">{{ row.availableTb }}</td>
+              <td class="num">{{ row.ceiling }}</td>
+            </tr>
+          }
+          <tr class="is-total">
+            <td>Total</td><td>—</td><td class="num">95</td><td class="num">—</td>
+            <td class="num">—</td><td class="num">—</td><td class="num">4</td>
+            <td class="num">1224.0</td><td class="num">391</td>
+          </tr>
+          <tr class="is-result">
+            <td colspan="6">Disks to order — RAID total plus global hot spares</td>
+            <td class="num" colspan="3">99</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="plan-sub">RAID-6 topology — two parity disks per group</h3>
+    <div class="plan-table-wrap">
+      <table class="plan-table">
+        <thead>
+          <tr>
+            <th>NVR</th><th>Group</th><th class="num">Disks</th><th class="num">Parity</th>
+            <th class="num">Data</th><th class="num">Disk TB</th><th class="num">Spares</th>
+            <th class="num">Available TB</th><th class="num">Ceiling</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of raid6; track $index) {
+            <tr [class.is-continuation]="row.continuation">
+              <td>{{ row.continuation ? '↳' : row.nvr }}</td>
+              <td>{{ row.group }}</td>
+              <td class="num">{{ row.totalDisks }}</td>
+              <td class="num">{{ row.parity }}</td>
+              <td class="num">{{ row.dataDisks }}</td>
+              <td class="num">{{ row.diskTb }}</td>
+              <td class="num">{{ row.spares }}</td>
+              <td class="num">{{ row.availableTb }}</td>
+              <td class="num">{{ row.ceiling }}</td>
+            </tr>
+          }
+          <tr class="is-total">
+            <td>Total</td><td>—</td><td class="num">92</td><td class="num">—</td>
+            <td class="num">—</td><td class="num">—</td><td class="num">4</td>
+            <td class="num">1065.6</td><td class="num">339</td>
+          </tr>
+          <tr class="is-result">
+            <td colspan="6">Disks to order — RAID total plus global hot spares</td>
+            <td class="num" colspan="3">96</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="plan-note">
+      Three fewer disks, but <strong>158.4 TB</strong> less capacity (1224.0 → 1065.6). That is
+      the price of surviving a second simultaneous disk failure, and it is the trade a RAID
+      dropdown would make explicit instead of splitting across two sheets.
+    </p>
+  </article>
+
+  <!-- ===== the bug ===== -->
+  <article class="admin-panel plan-panel">
+    <div class="admin-panel-title">
+      <h2>The parity defect</h2>
+      <span class="plan-cell">sheet1 H37:H40 · sheet2 H35:H38</span>
+    </div>
+
+    <p class="plan-note">
+      The ANPR table computes <code>F × E × 90%</code>, where F is <em>total</em> disks including
+      parity. The parity disk is counted as usable space.
+    </p>
+
+    <div class="plan-table-wrap">
+      <table class="plan-table">
+        <thead>
+          <tr>
+            <th>Server</th><th>Group</th><th class="num">Disks</th><th class="num">Data</th>
+            <th class="num">Disk TB</th><th class="num">Sheet says</th><th class="num">Correct</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of anprRows; track $index) {
+            <tr [class.is-continuation]="!row.server">
+              <td>{{ row.server || '↳' }}</td>
+              <td>{{ row.group }}</td>
+              <td class="num">{{ row.totalDisks }}</td>
+              <td class="num">{{ row.dataDisks }}</td>
+              <td class="num">{{ row.diskTb }}</td>
+              <td class="num is-wrong">{{ row.sheetSays }}</td>
+              <td class="num is-right">{{ row.correct }}</td>
+            </tr>
+          }
+          <tr class="is-total">
+            <td>Total</td><td>—</td><td class="num">29</td><td class="num">25</td>
+            <td class="num">—</td><td class="num is-wrong">208.8</td>
+            <td class="num is-right">180.0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="plan-callout is-bad">
+      <strong>The one number that moves.</strong>
+      Across the array the overstatement is 208.8 → 180.0 TB — a gap of
+      <strong>28.8 TB</strong>, which is exactly the four parity disks being counted as usable
+      space. If a quote or a disk order was sized on the old figure, it is worth re-checking
+      before a corrected tool starts producing different counts.
+    </p>
+  </article>
+
+  <!-- ===== failover + anpr ===== -->
+  <div class="plan-pair">
+    <article class="admin-panel plan-panel">
+      <div class="admin-panel-title">
+        <h2>Failover storage</h2>
+        <span class="plan-cell">column J</span>
+      </div>
+      <p class="plan-note">
+        Column J reads <code>=SUM(I11:I11)*$G$4/4</code>. The <code>÷4</code> is never explained:
+        it means 30 days out of 120. Change retention and failover retention changes with it,
+        unasked.
+      </p>
+      <ul class="plan-steps">
+        @for (step of failoverSteps; track step.label) {
+          <li>
+            <span class="plan-step-label">{{ step.label }}</span>
+            <span class="plan-step-working">{{ step.working }}</span>
+            <span class="plan-step-result">{{ step.result }}</span>
+          </li>
+        }
+      </ul>
+    </article>
+
+    <article class="admin-panel plan-panel">
+      <div class="admin-panel-title">
+        <h2>ANPR snapshots</h2>
+        <span class="plan-cell">cell E46</span>
+      </div>
+      <p class="plan-note">
+        Number-plate capture stores stills, not video, so it needs its own block. Disk count
+        rounds <em>up</em> — you cannot buy 0.4 of a disk.
+      </p>
+      <ul class="plan-steps">
+        @for (step of anprSteps; track step.label) {
+          <li>
+            <span class="plan-step-label">{{ step.label }}</span>
+            <span class="plan-step-working">{{ step.working }}</span>
+            <span class="plan-step-result">{{ step.result }}</span>
+          </li>
+        }
+      </ul>
+    </article>
+  </div>
+
+  <!-- ===== defects ===== -->
+  <article class="admin-panel plan-panel">
+    <div class="admin-panel-title">
+      <h2>Seven defects</h2>
+    </div>
+    <p class="plan-note">
+      The workbook's headline numbers are right. These are the reasons it does not survive
+      contact with a second project.
+    </p>
+    <ol class="plan-defects">
+      @for (defect of defects; track defect.title) {
+        <li>
+          <span class="plan-defect-title">{{ defect.title }}</span>
+          <span class="plan-defect-detail">{{ defect.detail }}</span>
+          <span class="plan-defect-fix">{{ defect.fix }}</span>
+        </li>
+      }
+    </ol>
+  </article>
+
+  <!-- ===== next ===== -->
+  <article class="admin-panel plan-panel">
+    <div class="admin-panel-title">
+      <h2>What building it would take</h2>
+    </div>
+    <p class="plan-note">
+      This page documents the model. Turning it into a working tool is a calculator screen here
+      in the admin panel, backed by a stateless
+      <code>POST /api/storage-designs/calculate</code> in <code>jamago-api</code> that follows the
+      existing CQRS layout and reuses <code>TypedResult&lt;T&gt;</code> — no new infrastructure,
+      no entity and no migration, so nothing touches the shared database.
+    </p>
+    <p class="plan-note">
+      The tests are already written down: 327.53 TB and 250 Mbps for the Dahua fixture, 28.8 TB
+      and a ceiling of 9 for the RAID-5 group, 72.0 TB and 23 for RAID-6, 6.95 TB of failover,
+      0.78231 TB per ANPR camera — and 43.2 TB, not 50.4, for the ANPR group, which is the one
+      assertion that deliberately disagrees with the workbook.
+    </p>
+  </article>
+</section>

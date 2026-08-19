@@ -1,0 +1,409 @@
+/* CCTV storage sizing reference.
+   Colours come from the admin ramp in styles.css; the only literals here are
+   low-alpha tints of those same variables, which CSS cannot express directly. */
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ---- header ---- */
+
+.plan-head {
+  animation: admin-rise 0.35s ease both;
+}
+
+.plan-kicker {
+  margin: 0 0 6px;
+  color: var(--admin-blue-deep);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.plan-head h1 {
+  margin: 0 0 8px;
+  color: var(--admin-ink);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.plan-lede {
+  margin: 0 0 18px;
+  max-width: 70ch;
+  color: var(--admin-muted);
+  font-size: 0.95rem;
+}
+
+.plan-kpis {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.plan-kpi {
+  padding: 14px 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 16px;
+  background: var(--admin-panel);
+  box-shadow: var(--admin-shadow);
+}
+
+.plan-kpi b {
+  display: block;
+  font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  font-size: 1.28rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.plan-kpi span {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.plan-kpi.is-good b { color: var(--admin-teal-ink); }
+.plan-kpi.is-bad b { color: var(--admin-rose-ink); }
+.plan-kpi.is-warn b { color: var(--admin-orange-ink); }
+
+/* ---- panels ---- */
+
+.plan-panel {
+  animation: admin-rise 0.35s ease both;
+}
+
+.plan-pair {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1080px) {
+  .plan-pair {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.plan-cell {
+  font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--admin-muted);
+  white-space: nowrap;
+}
+
+.plan-sub {
+  margin: 24px 0 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.plan-note {
+  margin: 0 0 16px;
+  max-width: 72ch;
+  color: var(--admin-ink-soft);
+  font-size: 0.9rem;
+}
+
+.plan-note:last-child {
+  margin-bottom: 0;
+}
+
+.plan-muted {
+  color: var(--admin-muted);
+}
+
+code {
+  font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  font-size: 0.85em;
+  background: rgba(15, 40, 70, 0.06);
+  border-radius: 4px;
+  padding: 0.08em 0.36em;
+}
+
+/* ---- unit chain ---- */
+
+.plan-chain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-hop {
+  flex: 1 1 130px;
+  min-width: 130px;
+  padding: 11px 13px;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  background: rgba(15, 40, 70, 0.04);
+}
+
+.plan-hop-op {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--admin-blue-ink);
+}
+
+.plan-hop-value {
+  display: block;
+  font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  font-size: 0.92rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-ink);
+  word-break: break-all;
+}
+
+.plan-hop-unit {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.plan-hop.is-final {
+  background: rgba(246, 153, 61, 0.12);
+  border-color: var(--admin-orange);
+}
+
+.plan-hop.is-final .plan-hop-op,
+.plan-hop.is-final .plan-hop-value {
+  color: var(--admin-orange-ink);
+}
+
+/* ---- worked steps ---- */
+
+.plan-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-steps li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dotted var(--admin-line);
+}
+
+.plan-steps li:last-child {
+  border-bottom: none;
+}
+
+.plan-step-label {
+  flex: none;
+  width: 128px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.plan-step-working {
+  flex: 1 1 190px;
+  min-width: 0;
+  font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  font-size: 0.84rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-ink-soft);
+  word-break: break-word;
+}
+
+.plan-step-result {
+  flex: none;
+  font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  font-size: 0.88rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-orange-ink);
+}
+
+/* ---- tables ---- */
+
+.plan-table-wrap {
+  overflow-x: auto;
+  margin: 0 0 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.plan-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.plan-table th,
+.plan-table td {
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--admin-line);
+  vertical-align: top;
+}
+
+.plan-table thead th {
+  background: rgba(15, 40, 70, 0.05);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--admin-ink-soft);
+  white-space: nowrap;
+}
+
+.plan-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.plan-table .num {
+  font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.plan-table tr.is-continuation td:first-child {
+  padding-left: 24px;
+  color: var(--admin-muted);
+}
+
+.plan-table tr.is-total td {
+  background: rgba(15, 40, 70, 0.05);
+  font-weight: 800;
+}
+
+.plan-table tr.is-result td {
+  background: rgba(246, 153, 61, 0.12);
+  font-weight: 800;
+  color: var(--admin-orange-ink);
+}
+
+.plan-table td.is-wrong {
+  color: var(--admin-rose-ink);
+  text-decoration: line-through;
+}
+
+.plan-table td.is-right {
+  color: var(--admin-teal-ink);
+  font-weight: 800;
+}
+
+/* ---- callouts ---- */
+
+.plan-callout {
+  margin: 0;
+  padding: 14px 17px;
+  border: 1px solid var(--admin-line);
+  border-left: 3px solid var(--admin-blue);
+  border-radius: 14px;
+  background: rgba(37, 148, 210, 0.08);
+  color: var(--admin-ink-soft);
+  font-size: 0.88rem;
+}
+
+.plan-callout.is-good {
+  border-left-color: var(--admin-teal);
+  background: rgba(32, 158, 138, 0.09);
+}
+
+.plan-callout.is-bad {
+  border-left-color: var(--admin-rose);
+  background: rgba(200, 60, 80, 0.08);
+}
+
+/* ---- defects ---- */
+
+.plan-defects {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: defect;
+  display: grid;
+  gap: 10px;
+}
+
+.plan-defects li {
+  counter-increment: defect;
+  position: relative;
+  padding: 14px 16px 14px 52px;
+  border: 1px solid var(--admin-line);
+  border-left: 3px solid var(--admin-rose);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.plan-defects li::before {
+  content: counter(defect);
+  position: absolute;
+  left: 15px;
+  top: 14px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: rgba(200, 60, 80, 0.12);
+  color: var(--admin-rose-ink);
+  font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.plan-defect-title {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+  color: var(--admin-ink);
+  font-size: 0.92rem;
+}
+
+.plan-defect-detail {
+  display: block;
+  color: var(--admin-muted);
+  font-size: 0.85rem;
+}
+
+.plan-defect-fix {
+  display: block;
+  margin-top: 8px;
+  color: var(--admin-teal-ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.plan-defect-fix::before {
+  content: '→ ';
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-head,
+  .plan-panel {
+    animation: none;
+  }
+}

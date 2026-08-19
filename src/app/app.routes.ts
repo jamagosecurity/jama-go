@@ -78,6 +78,14 @@ export const routes: Routes = [
               import('./pages/admin/staff/admin-staff.component').then((m) => m.AdminStaffComponent),
           },
           {
+            path: 'storage',
+            title: 'CCTV Storage Sizing — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/admin/storage/storage-plan.component').then(
+                (m) => m.StoragePlanComponent,
+              ),
+          },
+          {
             path: 'contacts',
             title: 'Contact Submissions — Jama Go Admin',
             loadComponent: () =>
