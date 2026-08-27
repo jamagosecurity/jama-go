@@ -165,6 +165,12 @@ a { color: inherit; text-decoration: none; }
   height: clamp(58px, 5.5vw, 76px);
   transform: scale(3.68);
   transform-origin: left center;
+  /* A transform grows the painted box and its hit area but not the layout box,
+     so this mark spills roughly 90px below the header and 330px across — and
+     swallowed clicks on whatever the page put in its top-left corner. The
+     surrounding <a class="brand"> keeps its own untransformed box, so the home
+     link still works everywhere it looks like it should. */
+  pointer-events: none;
 }
 .brand-logo--footer { height: 50px; margin-bottom: 6px; }
 
