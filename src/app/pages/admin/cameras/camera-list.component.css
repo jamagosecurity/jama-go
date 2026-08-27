@@ -1,0 +1,1757 @@
+/* Field styling follows the staff editor's .editor-grid so the two admin forms
+   look like one product. Those rules are scoped to that component, so the
+   shared look has to be restated rather than inherited.
+
+   The one deliberate difference is height: the staff editor has eight fields and
+   can afford 52px rows, this form has twenty-one and would run to three screens
+   at that size. */
+
+.camera-field {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: #1a334d;
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.camera-field > span i {
+  color: #e11d48;
+  font-style: normal;
+}
+
+.camera-field input,
+.camera-field select,
+.camera-field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 13px;
+  color: var(--admin-ink);
+  background: #fff;
+  font: inherit;
+  font-weight: 500;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.camera-field textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.camera-field input:focus,
+.camera-field select:focus,
+.camera-field textarea:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+}
+
+/* ===== Header stat tiles ===== */
+
+.camera-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+}
+
+.camera-stats > div {
+  min-width: 116px;
+  padding: 12px 18px;
+  border: 1px solid var(--admin-line);
+  border-radius: 16px;
+  background: var(--admin-panel);
+}
+
+.camera-stats dt {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.camera-stats dd {
+  margin: 2px 0 0;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 750;
+  line-height: 1.1;
+  color: var(--admin-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== Brand combobox =====
+   A native <select> cannot put a logo next to an option, and brand has to stay
+   free text for the makes we hold no artwork for. So this is an input with a
+   menu attached: type anything, or pick one of the four with its mark. */
+
+.camera-combo {
+  position: relative;
+}
+
+.camera-combo-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 4px 0 12px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 13px;
+  background: #fff;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.camera-combo-control:focus-within {
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+}
+
+.camera-combo-control.is-invalid {
+  border-color: var(--jama-rose);
+  background: color-mix(in srgb, var(--jama-rose) 4%, #fff);
+}
+
+/* The chosen brand's mark, shown in the field itself so the icon is visible
+   without opening the menu. */
+.camera-combo-mark {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 17px;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Resets the shared .camera-field input styling: the border now belongs to the
+   wrapper, so the input inside must be invisible chrome. */
+.camera-combo-control input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.camera-combo-control input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.camera-combo-toggle {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--admin-muted);
+  cursor: pointer;
+}
+
+.camera-combo-toggle:hover {
+  background: rgba(15, 40, 70, 0.05);
+  color: var(--admin-ink);
+}
+
+.camera-combo-toggle svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.18s ease;
+}
+
+.camera-combo-control.is-open .camera-combo-toggle svg {
+  transform: rotate(180deg);
+}
+
+.camera-combo-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--admin-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(15, 40, 70, 0.16);
+}
+
+.camera-combo-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--admin-ink-soft);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.camera-combo-menu img {
+  /* Fixed box with contain, so wordmarks of very different proportions —
+     Hikvision is nearly 8:1, UNV about 2:1 — carry the same visual weight
+     instead of one dwarfing the rest. */
+  flex: 0 0 auto;
+  width: 46px;
+  height: 20px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.camera-combo-menu span {
+  flex: 1 1 auto;
+}
+
+.camera-combo-menu button:hover,
+.camera-combo-menu button.is-active {
+  background: rgba(37, 148, 210, 0.1);
+  color: var(--admin-blue-ink);
+}
+
+.camera-combo-tick {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: var(--admin-blue-deep);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ===== Add / edit form ===== */
+
+.camera-form-panel {
+  margin-bottom: 22px;
+}
+
+.camera-form {
+  display: grid;
+  /* Four equal columns. Weighted ones made the last column narrow enough that
+     "Unit of measurement" wrapped to two lines and shoved its select out of
+     line with the rest of the row; equal widths fit every label on one line. */
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 16px 18px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+/* The two descriptions share a row under the four boxes: English on the left,
+   Arabic on the right, which is also the reading order of each. */
+.camera-field--desc {
+  grid-column: span 2;
+}
+
+.camera-lang {
+  margin-left: 6px;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Arabic label reads right-to-left, so the field header is flipped to match the
+   box beneath it. */
+.camera-field--ar > span {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 6px;
+  font-family: "Noto Sans Arabic", "Inter", sans-serif;
+}
+
+.camera-field--ar .camera-lang {
+  margin-left: 0;
+}
+
+.camera-field--ar textarea {
+  font-family: "Noto Sans Arabic", "Inter", sans-serif;
+  /* Arabic ascenders and descenders sit taller than Latin at the same size. */
+  line-height: 1.7;
+}
+
+.camera-form-actions {
+  display: flex;
+  gap: 10px;
+  /* Sits outside .camera-form on the Images tab, so it needs its own separation
+     rather than relying on the form grid's gap — without it the buttons butted
+     straight up against the last image tile. */
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--admin-line);
+}
+
+/* ===== Filters ===== */
+
+.camera-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.camera-filters .camera-field {
+  min-width: 220px;
+}
+
+/* ===== Table ===== */
+
+.camera-table-wrap {
+  /* The table scrolls inside its panel instead of pushing the page sideways. */
+  overflow-x: auto;
+}
+
+.camera-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.94rem;
+}
+
+.camera-table th,
+.camera-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(15, 40, 70, 0.08);
+  vertical-align: middle;
+}
+
+.camera-table th {
+  color: #63758a;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.camera-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.camera-table tbody tr.is-editing {
+  background: rgba(37, 148, 210, 0.07);
+}
+
+.camera-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.camera-brandcell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.9rem;
+}
+
+.camera-brandmark {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 20px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.camera-brandmark--text {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 20px;
+  border-radius: 7px;
+  background: rgba(15, 40, 70, 0.07);
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.camera-model {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.86rem;
+  color: var(--admin-ink-soft);
+}
+
+.camera-descs {
+  display: grid;
+  gap: 4px;
+}
+
+/* Long notes must not stretch the row; the full text is in the title attribute. */
+.camera-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 32ch;
+  color: var(--admin-muted);
+  font-size: 0.88rem;
+}
+
+/* The Arabic line stays left-aligned in the column so the two descriptions form
+   a tidy stack; dir=rtl on the element still orders the text itself correctly. */
+.camera-desc--ar {
+  font-family: "Noto Sans Arabic", "Inter", sans-serif;
+  line-height: 1.7;
+  text-align: left;
+  color: var(--admin-ink-soft);
+}
+
+.camera-blank {
+  color: var(--admin-muted);
+  opacity: 0.6;
+}
+
+.camera-type-chip {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(37, 148, 210, 0.12);
+  color: #14547d;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.camera-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.camera-confirm {
+  color: var(--admin-muted, #63758a);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.camera-delete:hover {
+  color: #e11d48;
+}
+
+/* ===== Footer / pager ===== */
+
+.camera-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.camera-count {
+  margin: 0;
+  color: var(--admin-muted, #63758a);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.camera-pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+/* Announced by screen readers, absent for everyone else. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== Narrow screens ===== */
+
+@media (max-width: 900px) {
+  .camera-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .camera-field--brand,
+  .camera-field--model,
+  .camera-field--desc {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .camera-form {
+    grid-template-columns: 1fr;
+  }
+
+  /* The table becomes a stack of labelled cards — five columns cannot stay
+     legible at this width, and a horizontal scrollbar hides the actions. */
+  .camera-table thead {
+    display: none;
+  }
+
+  .camera-table,
+  .camera-table tbody,
+  .camera-table tr,
+  .camera-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .camera-table tr {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(15, 40, 70, 0.08);
+  }
+
+  .camera-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 4px;
+    border-bottom: none;
+  }
+
+  .camera-table td::before {
+    content: attr(data-label);
+    color: #63758a;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .camera-table .num {
+    text-align: left;
+  }
+
+  /* Stacked as a card, the notes have the whole width and no reason to clamp. */
+  .camera-descs {
+    justify-items: end;
+  }
+
+  .camera-desc {
+    -webkit-line-clamp: initial;
+    line-clamp: initial;
+    max-width: none;
+    text-align: right;
+  }
+
+  .camera-row-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding-top: 10px;
+  }
+
+  /* The brand is the card's heading here, so it leads rather than sitting in a
+     right-aligned value column like the other fields. */
+  .camera-table td[data-label='Brand'] {
+    display: block;
+  }
+
+  .camera-table td[data-label='Brand']::before {
+    display: none;
+  }
+
+  .camera-stats {
+    width: 100%;
+  }
+
+  .camera-stats > div {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 12px;
+  }
+
+  .camera-stats dd {
+    font-size: 1.2rem;
+  }
+}
+
+/* ===== Form sections =====
+   Stacked down the page rather than behind tabs, so nothing is hidden and the
+   whole item can be read in one pass. Each is separated by a rule instead of a
+   card, which would nest a panel inside a panel. */
+
+.camera-section + .camera-section {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.camera-section:first-of-type {
+  margin-top: 20px;
+}
+
+.camera-section-head h3 {
+  margin: 0;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--admin-ink);
+}
+
+.camera-section-head p {
+  margin: 4px 0 0;
+  color: var(--admin-muted);
+  font-size: 0.88rem;
+}
+
+/* A field that wants the whole row — long names, search keys, notes. */
+.camera-field--wide {
+  grid-column: 1 / -1;
+}
+
+.camera-cur {
+  color: var(--admin-muted);
+  font-weight: 700;
+}
+
+.camera-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 14px;
+  color: #1a334d;
+  font-size: 0.92rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.camera-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--admin-blue-deep);
+}
+
+/* ===== Images ===== */
+
+.camera-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.camera-shot {
+  position: relative;
+  margin: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.camera-shot img {
+  display: block;
+  width: 100%;
+  height: 112px;
+  object-fit: contain;
+  background: #f6f8fb;
+}
+
+.camera-shot figcaption {
+  padding: 8px 10px;
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  /* File names run long and must not stretch the tile. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.camera-shot-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(8, 25, 43, 0.62);
+  color: #fff;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.camera-shot-remove:hover {
+  background: var(--jama-rose, #e11d48);
+}
+
+.camera-shot.is-pending {
+  border-style: dashed;
+}
+
+.camera-shot-flag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(246, 153, 61, 0.92);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.camera-drop {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  min-height: 148px;
+  padding: 12px;
+  border: 1.5px dashed rgba(37, 148, 210, 0.4);
+  border-radius: 14px;
+  background: rgba(37, 148, 210, 0.04);
+  color: var(--admin-blue-ink);
+  font-size: 0.86rem;
+  font-weight: 750;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.camera-drop:hover {
+  border-color: var(--admin-blue-deep);
+  background: rgba(37, 148, 210, 0.09);
+}
+
+.camera-drop input {
+  /* Off-screen rather than display:none so the label stays a real control. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.camera-drop-plus {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+/* ===== Table additions ===== */
+
+.camera-itemcell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.camera-thumb {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #f6f8fb;
+  border: 1px solid var(--admin-line);
+}
+
+.camera-thumb--empty {
+  display: grid;
+  place-items: center;
+  color: var(--admin-muted);
+  opacity: 0.5;
+}
+
+.camera-thumb--empty svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.camera-itemtext {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.camera-itemtext small {
+  color: var(--admin-muted);
+  font-size: 0.8rem;
+  /* One line each; the row must not grow with the description. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 34ch;
+}
+
+.camera-qty {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.camera-qty.is-low {
+  color: var(--jama-rose-ink, #9f1239);
+}
+
+.camera-lowflag {
+  margin-left: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(225, 29, 72, 0.12);
+  color: var(--jama-rose-ink, #9f1239);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.camera-stats > div.is-warn {
+  border-color: rgba(225, 29, 72, 0.35);
+  background: rgba(225, 29, 72, 0.06);
+}
+
+.camera-stats > div.is-warn dd {
+  color: var(--jama-rose-ink, #9f1239);
+}
+
+@media (max-width: 640px) {
+  .camera-tabs {
+    gap: 4px;
+  }
+
+  .camera-tabs button {
+    padding: 8px 12px;
+    font-size: 0.84rem;
+  }
+
+  .camera-itemcell {
+    justify-content: flex-end;
+  }
+
+  .camera-itemtext small {
+    max-width: none;
+    text-align: right;
+  }
+}
+
+
+/* ===== Polish ===== */
+
+/* A quiet accent bar so each section heading reads as a divider rather than
+   just another line of bold text. */
+.camera-section-head h3 {
+  position: relative;
+  padding-left: 12px;
+}
+
+.camera-section-head h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--admin-orange), var(--admin-blue-deep));
+}
+
+.camera-section-head p {
+  padding-left: 12px;
+}
+
+/* The header stays put while a long inventory scrolls under it. */
+.camera-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff;
+  box-shadow: inset 0 -1px 0 rgba(15, 40, 70, 0.1);
+}
+
+.camera-table tbody tr {
+  transition: background 0.14s ease;
+}
+
+.camera-table tbody tr:hover {
+  background: rgba(37, 148, 210, 0.045);
+}
+
+/* Actions stay out of the way until the row is under the pointer — with two
+   buttons on every row the table read as a wall of pills. */
+.camera-row-actions .btn-admin {
+  opacity: 0.55;
+  transition: opacity 0.14s ease;
+}
+
+.camera-table tbody tr:hover .camera-row-actions .btn-admin,
+.camera-row-actions:focus-within .btn-admin {
+  opacity: 1;
+}
+
+/* Touch has no hover, so never dim them there. */
+@media (hover: none) {
+  .camera-row-actions .btn-admin {
+    opacity: 1;
+  }
+}
+
+.camera-table td {
+  /* Slightly tighter than the 14px default now that rows carry a thumbnail. */
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+.camera-form-panel {
+  padding-bottom: 4px;
+}
+
+.camera-filters {
+  padding: 14px 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 16px;
+  background: var(--admin-panel);
+}
+
+/* ===== Save confirmation ===== */
+
+.camera-toast {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  max-width: min(92vw, 460px);
+  padding: 12px 14px 12px 13px;
+  border-radius: 14px;
+  background: #0f2846;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  box-shadow: 0 18px 40px rgba(15, 40, 70, 0.28);
+  animation: camera-toast-in 0.22s ease both;
+}
+
+@keyframes camera-toast-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.camera-toast-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(28, 133, 119, 0.9);
+}
+
+.camera-toast.is-bad .camera-toast-icon {
+  background: rgba(225, 29, 72, 0.9);
+}
+
+.camera-toast-icon svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.camera-toast button {
+  margin-left: 4px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.camera-toast button:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+/* The row just written. Held long enough to find after the list reloads, then
+   faded out rather than switched off, so it does not blink. */
+.camera-table tbody tr.is-saved {
+  animation: camera-saved 6s ease forwards;
+}
+
+.camera-table tbody tr.is-saved td:first-child {
+  box-shadow: inset 3px 0 0 var(--admin-teal, #1c8577);
+}
+
+@keyframes camera-saved {
+  0%, 55% { background: rgba(28, 133, 119, 0.14); }
+  100% { background: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-toast { animation: none; }
+  .camera-table tbody tr.is-saved { animation: none; background: rgba(28, 133, 119, 0.1); }
+}
+
+/* ===== List / editor split ===== */
+
+.camera-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.camera-back {
+  display: block;
+  width: fit-content;
+  margin-bottom: 8px;
+  color: var(--admin-blue-ink);
+  font-size: 0.86rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.camera-back:hover {
+  text-decoration: underline;
+}
+
+/* ===== List table, tightened =====
+   Fixed layout with explicit column widths. Auto layout let the item column
+   collapse around long words and handed the leftover width to the actions
+   column, which is why the buttons floated a long way from the last figure. */
+
+.camera-table {
+  table-layout: fixed;
+}
+
+.camera-table .col-item { width: auto; }
+.camera-table .col-brand { width: 168px; }
+.camera-table .col-type { width: 104px; }
+.camera-table .col-rate { width: 118px; }
+.camera-table .col-qty { width: 92px; }
+.camera-table .col-actions { width: 156px; }
+
+.camera-table tbody td {
+  /* One consistent row height whatever a cell holds. */
+  height: 66px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.camera-itemcell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.camera-itemtext {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+/* Name and meta each stay on a single line — a wrapped name was what made the
+   rows ragged. Both carry a title attribute with the full text. */
+.camera-itemtext > strong,
+.camera-meta {
+  display: block;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.camera-itemtext > strong {
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
+.camera-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.camera-meta > span {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Separators between the meta parts, drawn rather than typed so they never
+   appear next to a missing value. */
+.camera-meta > span + span::before {
+  content: "·";
+  margin-right: 8px;
+  color: rgba(15, 40, 70, 0.28);
+}
+
+.camera-meta .camera-model {
+  flex: 0 0 auto;
+  font-size: 0.76rem;
+  color: var(--admin-ink-soft);
+}
+
+.camera-meta .camera-warranty {
+  flex: 0 0 auto;
+  color: var(--admin-teal-ink, #0f766e);
+  font-weight: 700;
+}
+
+.camera-brandcell > span:last-child {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.camera-rate {
+  font-weight: 750;
+  color: var(--admin-ink);
+}
+
+/* "Not priced" reads as a state; a bare dash read as missing data. */
+.camera-table .camera-blank {
+  font-size: 0.78rem;
+  font-style: italic;
+  opacity: 0.75;
+}
+
+.camera-thumb--empty {
+  background: linear-gradient(140deg, #f3f7fb, #eaf1f8);
+  border-color: rgba(15, 40, 70, 0.07);
+}
+
+.camera-row-actions {
+  gap: 6px;
+}
+
+/* Compact enough that both fit the column without wrapping. */
+.camera-row-actions .btn-admin {
+  padding: 7px 13px;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 900px) {
+  /* Fixed widths only help while the table is a table. */
+  .camera-table { table-layout: auto; }
+  .camera-table tbody td { height: auto; }
+
+  .camera-itemtext > strong,
+  .camera-meta,
+  .camera-meta > span {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .camera-meta { flex-wrap: wrap; }
+}
+
+/* ===== Visual pass =====
+   The screen worked but read as four white boxes above a plain grid. This gives
+   each element enough identity to be recognised without reading it. */
+
+/* --- Stat tiles --- */
+
+.camera-stats > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 168px;
+  padding: 13px 18px 13px 14px;
+  border: 1px solid var(--admin-line);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.65)),
+    var(--tone-wash, transparent);
+  box-shadow: 0 6px 18px rgba(15, 40, 70, 0.05);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.camera-stats > div:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(15, 40, 70, 0.09);
+}
+
+.camera-stat-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--tone-chip, rgba(37, 148, 210, 0.12));
+  color: var(--tone-ink, var(--admin-blue-deep));
+}
+
+.camera-stat-icon svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* One accent per figure — money, units, lines, warning. */
+.camera-stats > div[data-tone="value"] {
+  --tone-wash: rgba(28, 133, 119, 0.07);
+  --tone-chip: rgba(28, 133, 119, 0.14);
+  --tone-ink: var(--admin-teal-ink, #0f766e);
+}
+
+.camera-stats > div[data-tone="units"] {
+  --tone-wash: rgba(37, 148, 210, 0.07);
+  --tone-chip: rgba(37, 148, 210, 0.14);
+  --tone-ink: var(--admin-blue-ink);
+}
+
+.camera-stats > div[data-tone="lines"] {
+  --tone-wash: rgba(124, 92, 214, 0.07);
+  --tone-chip: rgba(124, 92, 214, 0.14);
+  --tone-ink: var(--admin-indigo-ink, #4f46e5);
+}
+
+.camera-stats > div[data-tone="low"] {
+  --tone-wash: rgba(15, 40, 70, 0.04);
+  --tone-chip: rgba(15, 40, 70, 0.08);
+  --tone-ink: var(--admin-muted);
+}
+
+/* Only when there is something to warn about. */
+.camera-stats > div[data-tone="low"].is-warn {
+  --tone-wash: rgba(225, 29, 72, 0.08);
+  --tone-chip: rgba(225, 29, 72, 0.15);
+  --tone-ink: var(--jama-rose-ink, #9f1239);
+  border-color: rgba(225, 29, 72, 0.3);
+}
+
+.camera-stats dd {
+  font-size: 1.42rem;
+  letter-spacing: -0.02em;
+}
+
+/* --- Table card --- */
+
+.camera-table thead th {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  background: linear-gradient(180deg, #fbfdff, #f5f9fc);
+  box-shadow: inset 0 -1px 0 rgba(15, 40, 70, 0.09);
+}
+
+.camera-table thead th:first-child { border-top-left-radius: 12px; }
+.camera-table thead th:last-child { border-top-right-radius: 12px; }
+
+.camera-table tbody td {
+  border-bottom-color: rgba(15, 40, 70, 0.055);
+}
+
+.camera-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(37, 148, 210, 0.06), rgba(37, 148, 210, 0.02));
+}
+
+.camera-thumb {
+  border-radius: 11px;
+  box-shadow: 0 1px 3px rgba(15, 40, 70, 0.08);
+}
+
+/* --- Type chips, one hue each ---
+   Colour is a second channel on top of the label, so the column can be scanned
+   without reading every row. Never the only signal — the word is always there. */
+
+.camera-type-chip {
+  padding: 5px 11px;
+  border: 1px solid var(--chip-line, rgba(37, 148, 210, 0.22));
+  border-radius: 8px;
+  background: var(--chip-bg, rgba(37, 148, 210, 0.1));
+  color: var(--chip-ink, #14547d);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.camera-type-chip[data-type="Bullet"] {
+  --chip-bg: rgba(37, 148, 210, 0.11); --chip-line: rgba(37, 148, 210, 0.24); --chip-ink: #14547d;
+}
+.camera-type-chip[data-type="Dome"] {
+  --chip-bg: rgba(124, 92, 214, 0.11); --chip-line: rgba(124, 92, 214, 0.24); --chip-ink: #4c35a3;
+}
+.camera-type-chip[data-type="Ptz"] {
+  --chip-bg: rgba(14, 159, 140, 0.12); --chip-line: rgba(14, 159, 140, 0.26); --chip-ink: #0b6b5f;
+}
+.camera-type-chip[data-type="Fisheye"] {
+  --chip-bg: rgba(217, 130, 43, 0.13); --chip-line: rgba(217, 130, 43, 0.28); --chip-ink: #96550f;
+}
+.camera-type-chip[data-type="Thermal"] {
+  --chip-bg: rgba(225, 29, 72, 0.1); --chip-line: rgba(225, 29, 72, 0.22); --chip-ink: #9f1239;
+}
+.camera-type-chip[data-type="Anpr"] {
+  --chip-bg: rgba(15, 40, 70, 0.08); --chip-line: rgba(15, 40, 70, 0.18); --chip-ink: #24405e;
+}
+.camera-type-chip[data-type="Box"] {
+  --chip-bg: rgba(100, 116, 139, 0.12); --chip-line: rgba(100, 116, 139, 0.26); --chip-ink: #44546a;
+}
+
+/* --- Filters --- */
+
+.camera-filters {
+  border-radius: 18px;
+  box-shadow: 0 4px 14px rgba(15, 40, 70, 0.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-stats > div { transition: none; }
+  .camera-stats > div:hover { transform: none; }
+}
+
+/* ===== Search =====
+   Given the width it earns: it is the control used most, and sitting at the
+   same size as the two dropdowns made it look like just another filter. */
+
+.camera-filters {
+  align-items: center;
+  gap: 12px;
+}
+
+.camera-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Takes the slack in the row; the dropdowns keep their natural size. */
+  flex: 1 1 320px;
+  min-width: 260px;
+}
+
+.camera-search input {
+  width: 100%;
+  height: 54px;
+  padding: 0 44px 0 46px;
+  border: 1px solid rgba(15, 40, 70, 0.14);
+  border-radius: 15px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(15, 40, 70, 0.04);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.camera-search input::placeholder {
+  color: #93a5b8;
+}
+
+.camera-search input:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.6);
+  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.13), 0 4px 14px rgba(15, 40, 70, 0.06);
+}
+
+/* Clears the browser's own search decorations so ours are the only ones. */
+.camera-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.camera-search-icon {
+  position: absolute;
+  left: 15px;
+  display: grid;
+  place-items: center;
+  color: var(--admin-muted);
+  pointer-events: none;
+}
+
+.camera-search-icon svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.camera-search:focus-within .camera-search-icon {
+  color: var(--admin-blue-deep);
+}
+
+.camera-search-clear {
+  position: absolute;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 40, 70, 0.08);
+  color: var(--admin-muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.camera-search-clear:hover {
+  background: rgba(15, 40, 70, 0.16);
+  color: var(--admin-ink);
+}
+
+/* The dropdowns keep their labels but stop competing for width. */
+.camera-filters .camera-field {
+  min-width: 0;
+  flex: 0 0 auto;
+  width: 190px;
+}
+
+/* ===== Stat tiles, in full colour =====
+   Overrides the washed-out version above. Each figure now sits on a saturated
+   gradient in its own hue, which is what makes the four readable as four
+   different things from across the room rather than four white boxes. */
+
+.camera-stats {
+  gap: 12px;
+}
+
+.camera-stats > div {
+  min-width: 186px;
+  padding: 15px 20px 15px 15px;
+  border: none;
+  border-radius: 20px;
+  background: var(--tile-grad);
+  box-shadow:
+    0 14px 26px -14px var(--tile-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.camera-stats > div:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 20px 34px -14px var(--tile-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+
+/* Icon chip is frosted glass over the gradient rather than another block of
+   colour, so the tile stays one object. */
+.camera-stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+.camera-stat-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.camera-stats dt {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+}
+
+.camera-stats dd {
+  color: #fff;
+  font-size: 1.5rem;
+  text-shadow: 0 1px 2px rgba(8, 25, 43, 0.18);
+}
+
+.camera-stats .camera-cur {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Money, units, lines — then a warning that only lights up when it means it. */
+.camera-stats > div[data-tone="value"] {
+  --tile-grad: linear-gradient(135deg, #12a594 0%, #0d7d70 55%, #0a6459 100%);
+  --tile-shadow: rgba(13, 125, 112, 0.55);
+}
+
+.camera-stats > div[data-tone="units"] {
+  --tile-grad: linear-gradient(135deg, #38a9e6 0%, #1a7bb5 55%, #135f8d 100%);
+  --tile-shadow: rgba(26, 123, 181, 0.55);
+}
+
+.camera-stats > div[data-tone="lines"] {
+  --tile-grad: linear-gradient(135deg, #8b7bea 0%, #6d4fd0 55%, #5539ad 100%);
+  --tile-shadow: rgba(109, 79, 208, 0.5);
+}
+
+/* Nothing to report: stays a quiet slate so it does not shout alongside three
+   colours for a figure that is zero. */
+.camera-stats > div[data-tone="low"] {
+  --tile-grad: linear-gradient(135deg, #7c8ea3 0%, #5c6f86 55%, #47576b 100%);
+  --tile-shadow: rgba(71, 87, 107, 0.42);
+}
+
+.camera-stats > div[data-tone="low"].is-warn {
+  --tile-grad: linear-gradient(135deg, #f2557a 0%, #d92352 55%, #ad1740 100%);
+  --tile-shadow: rgba(217, 35, 82, 0.55);
+}
+
+/* ===== Brand column, mark only =====
+   The wordmark is the name, so the column no longer repeats it in text. Width
+   drops from 168px to 118px and the item column gains the difference. */
+
+.camera-table .col-brand {
+  width: 118px;
+}
+
+.camera-brandmark {
+  width: 84px;
+  height: 24px;
+}
+
+/* Brands with no artwork fall back to their name, sized to sit at the same
+   visual weight as a logo rather than shouting next to one. */
+.camera-brandname {
+  min-width: 0;
+  color: var(--admin-ink-soft);
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== Table header =====
+   A deep navy band instead of the near-white one, picking up the sidebar so the
+   two read as the same product. White on this sits well clear of contrast
+   minimums, where the old muted grey on off-white did not. */
+
+.camera-table thead th {
+  background: linear-gradient(135deg, #1b357c 0%, #12548f 55%, #0d6fae 100%);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  box-shadow: none;
+  text-align: center;
+}
+
+.camera-table thead th:first-child {
+  /* The item column is long text, so its label stays over the text it labels. */
+  text-align: left;
+  padding-left: 16px;
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
+}
+
+.camera-table thead th:last-child {
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* Body cells follow their header across, so a centred label never sits over a
+   left- or right-aligned value. Item alone stays left. */
+.camera-table tbody td.col-brand,
+.camera-table tbody td.col-type,
+.camera-table tbody td.col-rate,
+.camera-table tbody td.col-qty {
+  text-align: center;
+}
+
+.camera-table tbody td.col-brand .camera-brandcell {
+  justify-content: center;
+}
+
+.camera-table tbody td.col-rate,
+.camera-table tbody td.col-qty {
+  /* Overrides .num's right alignment now that the header is centred. */
+  text-align: center;
+}
+
+.camera-table tbody td.col-actions {
+  text-align: center;
+}
+
+.camera-table tbody td.col-actions.camera-row-actions {
+  justify-content: center;
+}
+
+/* A little air under the band so the first row does not touch it. */
+.camera-table thead th {
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+
+.camera-table tbody tr:first-child td {
+  padding-top: 14px;
+}
+
+/* ===== Row actions =====
+   Were ghost pills dimmed to 55% until hover, which made the busiest control on
+   the row the faintest thing on it. Solid, legible, and tinted to what they do:
+   blue for edit, red for delete. */
+
+.camera-table .col-actions {
+  width: 178px;
+}
+
+.camera-row-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+/* Overrides the earlier fade — these are always fully visible now. */
+.camera-row-actions .row-btn {
+  opacity: 1;
+}
+
+.row-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 1px solid var(--btn-line, rgba(15, 40, 70, 0.14));
+  border-radius: 10px;
+  background: var(--btn-bg, #fff);
+  color: var(--btn-ink, var(--admin-ink-soft));
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.row-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.row-btn:hover {
+  transform: translateY(-1px);
+}
+
+.row-btn:focus-visible {
+  outline: 2px solid var(--admin-blue-deep);
+  outline-offset: 2px;
+}
+
+.row-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+/* Edit reads as the primary of the pair — it is the one used most. */
+.row-btn--edit {
+  --btn-bg: rgba(37, 148, 210, 0.1);
+  --btn-line: rgba(37, 148, 210, 0.28);
+  --btn-ink: #14547d;
+}
+
+.row-btn--edit:hover {
+  --btn-bg: var(--admin-blue-deep, #1a7bb5);
+  --btn-line: var(--admin-blue-deep, #1a7bb5);
+  --btn-ink: #fff;
+}
+
+/* Delete stays quiet until pointed at — destructive, so it should not compete
+   for attention on every row. */
+.row-btn--delete {
+  --btn-bg: #fff;
+  --btn-line: rgba(15, 40, 70, 0.14);
+  --btn-ink: var(--admin-muted);
+}
+
+.row-btn--delete:hover {
+  --btn-bg: rgba(225, 29, 72, 0.1);
+  --btn-line: rgba(225, 29, 72, 0.4);
+  --btn-ink: var(--jama-rose-ink, #9f1239);
+}
+
+/* The confirm step: now it is filled, because it is the one you meant. */
+.row-btn--danger {
+  --btn-bg: linear-gradient(135deg, #f2557a, #d92352);
+  --btn-line: #c81d48;
+  --btn-ink: #fff;
+  box-shadow: 0 4px 12px -4px rgba(217, 35, 82, 0.6);
+}
+
+.row-btn--danger:hover {
+  --btn-bg: linear-gradient(135deg, #e8446b, #c01c46);
+}
+
+/* ===== Column widths, rebalanced =====
+   Item was `width: auto`, so in a fixed-layout table it absorbed every spare
+   pixel — leaving a long empty run between the item name and the brand while
+   the other columns stayed cramped. Now it is sized to its longest name and the
+   remaining four share the slack equally. Their content is centred, so that
+   space spreads evenly across the row instead of pooling in one gap. */
+
+.camera-table .col-item { width: 380px; }
+.camera-table .col-brand,
+.camera-table .col-type,
+.camera-table .col-rate,
+.camera-table .col-qty { width: auto; }
+.camera-table .col-actions { width: 178px; }
+
+/* Hint under the bitrate field, with the one-click "use it" beside it. */
+.camera-hint {
+  margin-top: 6px;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.camera-linkbtn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--admin-blue-ink);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.camera-linkbtn:hover { text-decoration: none; }

@@ -27,6 +27,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/contact/contact.component').then((m) => m.ContactComponent),
   },
+  // Public, no sign-in — and read-only. Prices are set in the admin panel; this
+  // page only lists what is in stock and what it costs.
+  {
+    path: 'cameras',
+    title: 'Camera Catalogue — Jama Go',
+    loadComponent: () =>
+      import('./pages/public/camera-catalogue.component').then((m) => m.CameraCatalogueComponent),
+  },
   {
     path: 'sifeddine',
     title: 'Sifeddine Taghelabet — Business Development Specialist | Jama Go',
@@ -84,6 +92,36 @@ export const routes: Routes = [
               import('./pages/admin/storage/storage-plan.component').then(
                 (m) => m.StoragePlanComponent,
               ),
+          },
+          {
+            path: 'cameras',
+            canActivate: [permissionGuard(PERMISSIONS.cameraManage)],
+            children: [
+              {
+                path: 'new',
+                title: 'Add Stock Item — Jama Go Admin',
+                loadComponent: () =>
+                  import('./pages/admin/cameras/camera-editor.component').then(
+                    (m) => m.CameraEditorComponent,
+                  ),
+              },
+              {
+                path: ':id/edit',
+                title: 'Edit Stock Item — Jama Go Admin',
+                loadComponent: () =>
+                  import('./pages/admin/cameras/camera-editor.component').then(
+                    (m) => m.CameraEditorComponent,
+                  ),
+              },
+              {
+                path: '',
+                title: 'Stock Inventory — Jama Go Admin',
+                loadComponent: () =>
+                  import('./pages/admin/cameras/camera-list.component').then(
+                    (m) => m.CameraListComponent,
+                  ),
+              },
+            ],
           },
           {
             path: 'contacts',

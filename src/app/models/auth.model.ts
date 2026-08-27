@@ -13,6 +13,7 @@ export const PERMISSIONS = {
   contactView: 'contact.view',
   panelsManage: 'panels.manage',
   vipManage: 'vip.manage',
+  cameraManage: 'camera.manage',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

@@ -1,0 +1,369 @@
+/* The public catalogue. Deliberately its own styling rather than the admin
+   panel's: this is a page a customer reads, not a console someone works in. */
+
+.cat-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 36px 28px 64px;
+}
+
+.cat-head {
+  margin-bottom: 26px;
+}
+
+.cat-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 148, 210, 0.3);
+  background: linear-gradient(120deg, rgba(37, 148, 210, 0.14), rgba(246, 153, 61, 0.14));
+  color: var(--admin-blue-ink);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cat-head h1 {
+  margin: 10px 0 4px;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  color: var(--admin-ink);
+}
+
+.cat-head p {
+  margin: 0;
+  color: var(--admin-muted);
+}
+
+.cat-note,
+.cat-onrequest {
+  color: var(--admin-muted);
+  font-size: 0.9rem;
+}
+
+.cat-error {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(225, 29, 72, 0.08);
+  color: var(--jama-rose-ink, #9f1239);
+  font-weight: 700;
+}
+
+.cat-retry {
+  margin-top: 10px;
+  padding: 9px 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+/* ===== Sections ===== */
+
+.cat-sections {
+  display: grid;
+  gap: 12px;
+}
+
+.cat-section {
+  border: 1px solid var(--admin-line);
+  border-radius: 18px;
+  background: #fff;
+  overflow: hidden;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.cat-section.is-open {
+  border-color: rgba(37, 148, 210, 0.35);
+  box-shadow: 0 10px 30px rgba(15, 40, 70, 0.07);
+}
+
+.cat-section h2 {
+  margin: 0;
+}
+
+.cat-section-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px 18px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cat-section-head:hover {
+  background: rgba(37, 148, 210, 0.04);
+}
+
+.cat-section-head:focus-visible {
+  outline: 2px solid var(--admin-blue-deep);
+  outline-offset: -3px;
+}
+
+.cat-section-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: rgba(37, 148, 210, 0.1);
+  color: var(--admin-blue-deep);
+}
+
+.cat-section-icon svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cat-section-text {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cat-section-text strong {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.06rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+}
+
+.cat-section-text small {
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+}
+
+.cat-chevron {
+  flex: 0 0 auto;
+  color: var(--admin-muted);
+}
+
+.cat-chevron svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s ease;
+}
+
+.cat-section.is-open .cat-chevron svg {
+  transform: rotate(180deg);
+}
+
+.cat-panel {
+  padding: 4px 18px 20px;
+  border-top: 1px solid var(--admin-line);
+}
+
+/* ===== Cards ===== */
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cat-card {
+  display: grid;
+  /* Body stretches, price pinned to the bottom, so cards of different text
+     length still line their prices up across a row. */
+  grid-template-rows: auto 1fr auto;
+  border: 1px solid var(--admin-line);
+  border-radius: 15px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.cat-card:hover {
+  border-color: rgba(37, 148, 210, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(15, 40, 70, 0.09);
+}
+
+.cat-shot {
+  display: grid;
+  place-items: center;
+  height: 150px;
+  background: #f5f8fb;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.cat-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 12px;
+}
+
+.cat-shot-empty {
+  color: var(--admin-muted);
+  opacity: 0.4;
+}
+
+.cat-shot-empty svg {
+  width: 40px;
+  height: 40px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cat-card-body {
+  padding: 13px 15px 6px;
+}
+
+.cat-brandline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.cat-brandmark {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 16px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.cat-brandmark--text {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 16px;
+  border-radius: 5px;
+  background: rgba(15, 40, 70, 0.07);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.cat-card-body h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 750;
+  line-height: 1.3;
+  color: var(--admin-ink);
+}
+
+.cat-model {
+  margin: 4px 0 0;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.78rem;
+  color: var(--admin-ink-soft);
+}
+
+.cat-desc {
+  /* Two lines each; a long note must not stretch one card past its row. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 6px 0 0;
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.cat-desc--ar {
+  font-family: "Noto Sans Arabic", "Inter", sans-serif;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.cat-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 15px 14px;
+  border-top: 1px solid var(--admin-line);
+  background: #fbfdff;
+}
+
+.cat-amount {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.18rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.cat-amount small {
+  font-size: 0.82rem;
+  color: var(--admin-muted);
+}
+
+.cat-was {
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  text-decoration: line-through;
+}
+
+.cat-warranty {
+  flex: 1 1 100%;
+  color: var(--admin-teal-ink, #0f766e);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.cat-empty {
+  padding: 40px 20px;
+  border: 1px dashed var(--admin-line);
+  border-radius: 18px;
+  text-align: center;
+  color: var(--admin-muted);
+}
+
+.cat-empty strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--admin-ink);
+  font-size: 1.05rem;
+}
+
+@media (max-width: 640px) {
+  .cat-page {
+    padding: 24px 16px 44px;
+  }
+
+  .cat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cat-section-head {
+    padding: 14px;
+  }
+}

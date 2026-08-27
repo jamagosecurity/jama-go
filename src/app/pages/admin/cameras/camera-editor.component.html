@@ -1,0 +1,391 @@
+<section class="admin-page camera-page">
+  <header class="admin-page-header">
+    <div>
+      <a class="camera-back" routerLink="/admin/cameras">← All stock items</a>
+      <span class="admin-kicker">Inventory</span>
+      <h1>{{ isEditing() ? 'Edit item' : 'Add item' }}</h1>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading item…</p></div>
+  } @else {
+    <div class="admin-panel camera-form-panel">
+
+      <form [formGroup]="form" (submit)="save($event)">
+        <section class="camera-section">
+          <header class="camera-section-head">
+            <h3>Item details</h3>
+            <p>What the item is, who makes it and how it is described.</p>
+          </header>
+
+            <div class="camera-form">
+              <label class="camera-field camera-field--wide">
+                <span>Item name <i aria-hidden="true">*</i></span>
+                <input formControlName="itemName" [maxlength]="itemNameMaxLength"
+                  placeholder="e.g. Hikvision 4MP ColorVu Dome" autocomplete="off"
+                  [class.is-invalid]="showError('itemName')" />
+                @if (showError('itemName')) {
+                  <small class="field-error">{{ errorFor('itemName', 'Item name') }}</small>
+                }
+              </label>
+
+              <!-- A div rather than a label: the toggle button lives inside, and a
+                   label would forward clicks on it to the input as well. -->
+              <div class="camera-field camera-field--brand">
+                <span id="brand-label">Brand <i aria-hidden="true">*</i></span>
+
+                <!-- keydown sits on the wrapper, not the input: clicking the
+                     chevron focuses the button, and an Escape pressed there has to
+                     close the menu too. Key events bubble, so both are covered. -->
+                <div class="camera-combo" (focusout)="onBrandFocusOut($event)"
+                  (keydown)="onBrandKeydown($event)">
+                  <div class="camera-combo-control" [class.is-invalid]="showError('brand')"
+                    [class.is-open]="brandOpen()">
+                    @if (selectedBrand(); as known) {
+                      <img class="camera-combo-mark" [src]="known.logo" alt="" aria-hidden="true" />
+                    }
+                    <input formControlName="brand" [maxlength]="brandMaxLength"
+                      placeholder="e.g. Hikvision" autocomplete="off"
+                      role="combobox" aria-labelledby="brand-label" aria-autocomplete="list"
+                      [attr.aria-expanded]="brandOpen()" aria-controls="brand-menu"
+                      (focus)="openBrandMenu()" (input)="onBrandInput($event)" />
+                    <button type="button" class="camera-combo-toggle" (click)="toggleBrandMenu()"
+                      [attr.aria-label]="brandOpen() ? 'Hide brands' : 'Show brands'" tabindex="-1">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                    </button>
+                  </div>
+
+                  @if (brandOpen() && brandOptions().length) {
+                    <ul class="camera-combo-menu" id="brand-menu" role="listbox">
+                      @for (brand of brandOptions(); track brand.name; let i = $index) {
+                        <li role="option" [attr.aria-selected]="selectedBrand()?.name === brand.name">
+                          <!-- mousedown is prevented so the click lands before the
+                               input loses focus and closes the menu underneath it. -->
+                          <button type="button" [class.is-active]="i === brandActiveIndex()"
+                            (mousedown)="$event.preventDefault()" (click)="pickBrand(brand)">
+                            <img [src]="brand.logo" alt="" aria-hidden="true" loading="lazy" />
+                            <span>{{ brand.name }}</span>
+                            @if (selectedBrand()?.name === brand.name) {
+                              <svg class="camera-combo-tick" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m5 12 5 5L20 7" />
+                              </svg>
+                            }
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+
+                @if (showError('brand')) {
+                  <small class="field-error">{{ errorFor('brand', 'Brand') }}</small>
+                }
+              </div>
+
+              <label class="camera-field">
+                <span>Model no</span>
+                <input formControlName="modelNo" [maxlength]="modelNoMaxLength"
+                  placeholder="e.g. DS-2CD2143G0-I" autocomplete="off"
+                  [class.is-invalid]="showError('modelNo')" />
+                @if (showError('modelNo')) {
+                  <small class="field-error">{{ errorFor('modelNo', 'Model no') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>Product category <i aria-hidden="true">*</i></span>
+                <select formControlName="category">
+                  @for (option of categories; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="camera-field">
+                <span>Camera type <i aria-hidden="true">*</i></span>
+                <select formControlName="type">
+                  @for (option of cameraTypes; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="camera-field camera-field--wide">
+                <span>Search key</span>
+                <input formControlName="searchKey" [maxlength]="searchKeyMaxLength"
+                  placeholder="Extra words to find this by — trade names, alternate part numbers"
+                  autocomplete="off" [class.is-invalid]="showError('searchKey')" />
+                @if (showError('searchKey')) {
+                  <small class="field-error">{{ errorFor('searchKey', 'Search key') }}</small>
+                }
+              </label>
+
+              <label class="camera-field camera-field--desc">
+                <span>Description <small class="camera-lang">English</small></span>
+                <textarea formControlName="descriptionEn" [maxlength]="descriptionMaxLength" rows="3"
+                  dir="ltr" placeholder="Optional notes — lens, resolution, where it is stored…"
+                  [class.is-invalid]="showError('descriptionEn')"></textarea>
+                @if (showError('descriptionEn')) {
+                  <small class="field-error">{{ errorFor('descriptionEn', 'Description (English)') }}</small>
+                }
+              </label>
+
+              <label class="camera-field camera-field--desc camera-field--ar">
+                <span>الوصف <small class="camera-lang">Arabic</small></span>
+                <!-- dir=rtl on the control itself, not the page: only this value is
+                     Arabic, so the caret, punctuation and alignment belong to the
+                     field rather than to the surrounding left-to-right form. -->
+                <textarea formControlName="descriptionAr" [maxlength]="descriptionMaxLength" rows="3"
+                  dir="rtl" lang="ar" placeholder="ملاحظات اختيارية — العدسة، الدقة، مكان التخزين…"
+                  [class.is-invalid]="showError('descriptionAr')"></textarea>
+                @if (showError('descriptionAr')) {
+                  <small class="field-error">{{ errorFor('descriptionAr', 'Description (Arabic)') }}</small>
+                }
+              </label>
+            </div>
+        </section>
+
+        <section class="camera-section">
+          <header class="camera-section-head">
+            <h3>Pricing &amp; inventory</h3>
+            <p>Set up item pricing, margins, and stock alerts.</p>
+          </header>
+
+            <div class="camera-form">
+              <label class="camera-field">
+                <span>Supplier cost <small class="camera-cur">﷼</small></span>
+                <input type="number" formControlName="supplierCost" min="0" step="0.01"
+                  inputmode="decimal" placeholder="0.00"
+                  [class.is-invalid]="showError('supplierCost')" />
+                @if (showError('supplierCost')) {
+                  <small class="field-error">{{ errorFor('supplierCost', 'Supplier cost') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>Margin (%)</span>
+                <input type="number" formControlName="margin" min="0" step="0.01" inputmode="decimal"
+                  placeholder="0" (change)="applyMargin()"
+                  [class.is-invalid]="showError('margin')" />
+                <small class="field-hint">Fills the rate from cost + margin.</small>
+                @if (showError('margin')) {
+                  <small class="field-error">{{ errorFor('margin', 'Margin') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>Rate <small class="camera-cur">﷼</small></span>
+                <input type="number" formControlName="rate" min="0" step="0.01" inputmode="decimal"
+                  placeholder="0.00" (change)="applyRate()"
+                  [class.is-invalid]="showError('rate')" />
+                <small class="field-hint">Editing this fills the margin instead.</small>
+                @if (showError('rate')) {
+                  <small class="field-error">{{ errorFor('rate', 'Rate') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>Discount (%)</span>
+                <input type="number" formControlName="discount" min="0" max="100" step="0.01"
+                  inputmode="decimal" placeholder="0"
+                  [class.is-invalid]="showError('discount')" />
+                @if (netRate() !== null) {
+                  <small class="field-hint">Sells at {{ netRate() | number: '1.2-2' }} ﷼</small>
+                }
+                @if (showError('discount')) {
+                  <small class="field-error">{{ errorFor('discount', 'Discount') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>Quantity <i aria-hidden="true">*</i></span>
+                <input type="number" formControlName="quantity" min="0" step="1" inputmode="numeric"
+                  [class.is-invalid]="showError('quantity')" />
+                @if (showError('quantity')) {
+                  <small class="field-error">{{ errorFor('quantity', 'Quantity') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>Low stock</span>
+                <input type="number" formControlName="lowStock" min="0" step="1" inputmode="numeric"
+                  placeholder="Alert at" [class.is-invalid]="showError('lowStock')" />
+                <small class="field-hint">Flags the item at or below this.</small>
+                @if (showError('lowStock')) {
+                  <small class="field-error">{{ errorFor('lowStock', 'Low stock') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>HSN code</span>
+                <input formControlName="hsnCode" [maxlength]="hsnCodeMaxLength" autocomplete="off"
+                  placeholder="e.g. 85258900" [class.is-invalid]="showError('hsnCode')" />
+                @if (showError('hsnCode')) {
+                  <small class="field-error">{{ errorFor('hsnCode', 'HSN code') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>Unit of measurement <i aria-hidden="true">*</i></span>
+                <select formControlName="uom">
+                  @for (option of units; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="camera-field">
+                <span>Choose tax</span>
+                <select formControlName="taxRate">
+                  @for (option of taxOptions; track option.label) {
+                    <option [ngValue]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="camera-field">
+                <span>Item type <i aria-hidden="true">*</i></span>
+                <select formControlName="itemType">
+                  @for (option of itemTypes; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+        </section>
+
+        <section class="camera-section">
+          <header class="camera-section-head">
+            <h3>Recording profile</h3>
+            <p>
+              What the storage calculator sizes an NVR array from. Leave both blank for
+              anything that is not a camera.
+            </p>
+          </header>
+
+          <div class="camera-grid">
+            <label class="camera-field">
+              <span>Resolution</span>
+              <select formControlName="resolution">
+                @for (option of resolutions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+
+            <label class="camera-field">
+              <span>Bitrate (Mbps)</span>
+              <input type="number" formControlName="bitrateMbps" min="0" max="100" step="0.1"
+                [placeholder]="suggestedBitrate() ?? 'e.g. 4'"
+                [class.is-invalid]="showError('bitrateMbps')" />
+              @if (showError('bitrateMbps')) {
+                <small class="field-error">{{ errorFor('bitrateMbps', 'Bitrate') }}</small>
+              } @else if (suggestedBitrate(); as suggested) {
+                <small class="camera-hint">
+                  Typical for this resolution: {{ suggested }} Mbps.
+                  <button type="button" class="camera-linkbtn" (click)="useSuggestedBitrate()">Use it</button>
+                </small>
+              }
+            </label>
+          </div>
+        </section>
+
+        <section class="camera-section">
+          <header class="camera-section-head">
+            <h3>Warranty &amp; notes</h3>
+            <p>How long the item is covered, and anything else worth recording.</p>
+          </header>
+
+            <div class="camera-form">
+              <label class="camera-field">
+                <span>Warranty period</span>
+                <input type="number" formControlName="warrantyValue" min="1" step="1"
+                  inputmode="numeric" placeholder="e.g. 2"
+                  [class.is-invalid]="showError('warrantyValue')" />
+                @if (showError('warrantyValue')) {
+                  <small class="field-error">{{ errorFor('warrantyValue', 'Warranty period') }}</small>
+                }
+              </label>
+
+              <label class="camera-field">
+                <span>Unit</span>
+                <select formControlName="warrantyUnit">
+                  <option [ngValue]="null">—</option>
+                  @for (option of warrantyUnits; track option.value) {
+                    <option [ngValue]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+                <small class="field-hint">A period needs a unit, and the other way round.</small>
+              </label>
+
+              <label class="camera-field camera-field--wide">
+                <span>Notes</span>
+                <textarea formControlName="notes" [maxlength]="notesMaxLength" rows="3"
+                  placeholder="Internal notes — supplier terms, what is in the box…"
+                  [class.is-invalid]="showError('notes')"></textarea>
+                @if (showError('notes')) {
+                  <small class="field-error">{{ errorFor('notes', 'Notes') }}</small>
+                }
+              </label>
+            </div>
+        </section>
+
+        <section class="camera-section">
+          <header class="camera-section-head">
+            <h3>Add image(s)</h3>
+            <p>
+              JPG, PNG or WebP, up to 5 MB each and 8 per item.
+              @if (!isEditing()) {
+                Pictures chosen now upload as soon as the item is saved.
+              }
+            </p>
+          </header>
+
+            <div class="camera-gallery">
+              @for (image of images(); track image.id) {
+                <figure class="camera-shot">
+                  <img [src]="image.url" [alt]="image.fileName" loading="lazy" />
+                  <figcaption>{{ image.fileName }}</figcaption>
+                  <button type="button" class="camera-shot-remove" (click)="removeImage(image)"
+                    [attr.aria-label]="'Remove ' + image.fileName">×</button>
+                </figure>
+              }
+
+              @for (file of pendingFiles(); track file.name + $index) {
+                <figure class="camera-shot is-pending">
+                  <img [src]="previewUrl(file)" [alt]="file.name" />
+                  <figcaption>{{ file.name }}</figcaption>
+                  <button type="button" class="camera-shot-remove" (click)="removePendingFile($index)"
+                    [attr.aria-label]="'Remove ' + file.name">×</button>
+                  <span class="camera-shot-flag">Pending</span>
+                </figure>
+              }
+
+              <label class="camera-drop">
+                <input type="file" accept="image/jpeg,image/png,image/webp" multiple
+                  (change)="onFilesPicked($event)" [disabled]="uploading()" />
+                <span class="camera-drop-plus" aria-hidden="true">+</span>
+                <span>{{ uploading() ? 'Uploading…' : 'Add image(s)' }}</span>
+              </label>
+            </div>
+
+          @if (imageError()) {
+            <p class="admin-error" role="alert">{{ imageError() }}</p>
+          }
+        </section>
+
+        <div class="camera-form-actions">
+          <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : isEditing() ? 'Save changes' : 'Add item' }}
+          </button>
+          <a class="btn-admin btn-admin-ghost" routerLink="/admin/cameras">Cancel</a>
+        </div>
+
+        @if (formError()) {
+          <p class="admin-error" role="alert">{{ formError() }}</p>
+        }
+      </form>
+    </div>
+  }
+</section>

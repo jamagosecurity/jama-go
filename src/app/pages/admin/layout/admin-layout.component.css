@@ -117,6 +117,7 @@
 .admin-nav a.nav-dia { --accent: #4aa9dd; --accent-2: #0d6fae; }
 .admin-nav a.nav-storage { --accent: #57c2b0; --accent-2: #1c8577; }
 .admin-nav a.nav-vip { --accent: #6aa8ea; --accent-2: #3b5fd4; }
+.admin-nav a.nav-cameras { --accent: #9b8ceb; --accent-2: #6d4fd0; }
 .admin-nav a.nav-site { --accent: #f9b877; --accent-2: #f6993d; }
 
 /* left colour tab, revealed on hover / active */
