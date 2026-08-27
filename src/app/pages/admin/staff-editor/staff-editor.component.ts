@@ -55,6 +55,9 @@ export class StaffEditorComponent {
     { prefix: 'invoice.', label: 'Invoices' },
     { prefix: 'contact.', label: 'Website enquiries' },
     { prefix: 'panels.', label: 'Control panels' },
+    { prefix: 'vip.', label: 'VIP clients' },
+    { prefix: 'camera.', label: 'Stock inventory' },
+    { prefix: 'boq.', label: 'Quotations & storage' },
   ];
 
   /** Icon path data per permission, so each card is scannable at a glance. */
@@ -65,17 +68,33 @@ export class StaffEditorComponent {
     'invoice.view': ['M6 2h9l3 3v17H6z', 'M9 9h6M9 13h6M9 17h4'],
     'contact.view': ['M4 5h16v14H4z', 'm20 6-8 6-8-6'],
     'panels.manage': ['M4 4h16v16H4z', 'M9 9h6v6H9z', 'M4 10h5M15 10h5M4 14h5M15 14h5'],
+    'vip.manage': ['M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
+    'camera.manage': ['M3 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z', 'm16 11 5-3v8l-5-3z', 'M6 20h5'],
+    'boq.manage': ['M9 3h6l1 2h3v16H5V5h3z', 'M9 11h6M9 15h6M9 19h3'],
   };
 
   readonly permissionCatalogue = signal<PermissionDefinition[]>([]);
 
   /** Catalogue split into areas, preserving catalogue order within each. */
-  readonly permissionAreas = computed(() =>
-    StaffEditorComponent.AREAS.map((area) => ({
+  readonly permissionAreas = computed(() => {
+    const catalogue = this.permissionCatalogue();
+
+    const areas = StaffEditorComponent.AREAS.map((area) => ({
       label: area.label,
-      permissions: this.permissionCatalogue().filter((p) => p.key.startsWith(area.prefix)),
-    })).filter((area) => area.permissions.length > 0),
-  );
+      permissions: catalogue.filter((p) => p.key.startsWith(area.prefix)),
+    })).filter((area) => area.permissions.length > 0);
+
+    // Anything the prefix list does not recognise still has to appear. Without
+    // this, adding a permission to the API and forgetting to add its area here
+    // made it invisible in the editor — counted in the total, impossible to
+    // grant — which is exactly how vip.manage went missing.
+    const grouped = new Set(areas.flatMap((a) => a.permissions.map((p) => p.key)));
+    const ungrouped = catalogue.filter((p) => !grouped.has(p.key));
+
+    return ungrouped.length
+      ? [...areas, { label: 'Other', permissions: ungrouped }]
+      : areas;
+  });
 
   readonly selectedCount = computed(() => this.selectedPermissions().size);
 
