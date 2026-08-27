@@ -1,0 +1,261 @@
+<section class="admin-page quote-page">
+  <header class="admin-page-header">
+    <div>
+      <a class="quote-back" routerLink="/quotations">← All quotations</a>
+      <span class="admin-kicker">Quotation</span>
+      <h1>{{ quotation()?.quoteNumber ?? 'New quotation' }}</h1>
+      <p>Pick items from stock, set quantities and prices, then save or send as a PDF.</p>
+    </div>
+
+    <div class="quote-head-actions">
+      @if (quotation(); as quote) {
+        <span class="quote-status" [attr.data-status]="quote.status">{{ quote.status }}</span>
+        <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"
+          (click)="download()">
+          {{ downloading() ? 'Preparing…' : 'Download PDF' }}
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading quotation…</p></div>
+  } @else {
+    <form [formGroup]="form" (submit)="save($event)">
+      <div class="quote-layout">
+        <div class="quote-main">
+          <!-- ===== Items ===== -->
+          <div class="admin-panel">
+            <div class="admin-panel-title">
+              <h2>Items</h2>
+              <small>Added from stock, or typed in for anything not in the catalogue.</small>
+            </div>
+
+            <div class="quote-picker">
+              <label class="camera-field quote-picker-search">
+                <span>Add from stock</span>
+                <input type="search" [formControl]="pickerControl" autocomplete="off"
+                  placeholder="Search by name, brand, model or HSN" />
+              </label>
+              <button type="button" class="btn-admin btn-admin-ghost" (click)="addBlankLine()">
+                Add blank line
+              </button>
+            </div>
+
+            @if (pickerBusy()) {
+              <p class="quote-picker-note">Searching…</p>
+            } @else if (pickerResults().length) {
+              <ul class="quote-picker-results">
+                @for (item of pickerResults(); track item.id) {
+                  <li>
+                    <button type="button" (click)="addFromCatalogue(item)">
+                      @if (brandLogo(item.brand); as known) {
+                        <img class="quote-pick-mark" [src]="known.logo" alt="" aria-hidden="true" />
+                      } @else {
+                        <span class="quote-pick-mark quote-pick-mark--text" aria-hidden="true">
+                          {{ item.brand.slice(0, 2).toUpperCase() }}
+                        </span>
+                      }
+                      <span class="quote-pick-text">
+                        <strong>{{ item.itemName }}</strong>
+                        <small>
+                          {{ item.brand }}@if (item.modelNo) { · {{ item.modelNo }} }
+                          · {{ item.quantity }} in stock
+                        </small>
+                      </span>
+                      <span class="quote-pick-rate">
+                        @if (item.rate !== null) {
+                          {{ item.rate | number: '1.2-2' }} ﷼
+                        } @else {
+                          <span class="camera-blank">no rate</span>
+                        }
+                      </span>
+                      <span class="quote-pick-add" aria-hidden="true">+</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="quote-picker-note">No stock items match that search.</p>
+            }
+
+            @if (lines().length) {
+              <div class="camera-table-wrap quote-lines">
+                <table class="camera-table">
+                  <caption class="visually-hidden">Quotation lines</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Item</th>
+                      <th scope="col" class="num">Qty</th>
+                      <th scope="col" class="num">Rate (﷼)</th>
+                      <th scope="col" class="num">Disc %</th>
+                      <th scope="col" class="num">Tax %</th>
+                      <th scope="col" class="num">Amount</th>
+                      <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (line of lines(); track line.key; let i = $index) {
+                      <tr>
+                        <td data-label="Item">
+                          <input class="quote-line-name" [value]="line.itemName"
+                            placeholder="Item name" [attr.aria-label]="'Item name, line ' + (i + 1)"
+                            (input)="onLineInput(i, 'itemName', $event)" />
+                          @if (line.brand || line.modelNo) {
+                            <small class="quote-line-meta">
+                              {{ line.brand }}@if (line.modelNo) { · {{ line.modelNo }} }
+                            </small>
+                          }
+                        </td>
+                        <td data-label="Qty" class="num">
+                          <input class="quote-line-num" type="number" min="0.01" step="1"
+                            [value]="line.quantity" [attr.aria-label]="'Quantity, line ' + (i + 1)"
+                            (input)="onLineInput(i, 'quantity', $event)" />
+                        </td>
+                        <td data-label="Rate (﷼)" class="num">
+                          <input class="quote-line-num" type="number" min="0" step="0.01"
+                            [value]="line.unitRate" [attr.aria-label]="'Rate, line ' + (i + 1)"
+                            (input)="onLineInput(i, 'unitRate', $event)" />
+                        </td>
+                        <td data-label="Disc %" class="num">
+                          <input class="quote-line-num quote-line-num--pct" type="number" min="0" max="100"
+                            step="0.01" [value]="line.discountPercent"
+                            [attr.aria-label]="'Discount, line ' + (i + 1)"
+                            (input)="onLineInput(i, 'discountPercent', $event)" />
+                        </td>
+                        <td data-label="Tax %" class="num">
+                          <input class="quote-line-num quote-line-num--pct" type="number" min="0" max="100"
+                            step="0.01" [value]="line.taxPercent"
+                            [attr.aria-label]="'Tax, line ' + (i + 1)"
+                            (input)="onLineInput(i, 'taxPercent', $event)" />
+                        </td>
+                        <td data-label="Amount" class="num">
+                          <strong>{{ lineTotal(line) | number: '1.2-2' }}</strong>
+                        </td>
+                        <td class="quote-line-actions">
+                          <button type="button" [disabled]="i === 0" (click)="moveLine(i, -1)"
+                            aria-label="Move up">↑</button>
+                          <button type="button" [disabled]="i === lines().length - 1"
+                            (click)="moveLine(i, 1)" aria-label="Move down">↓</button>
+                          <button type="button" class="quote-line-remove" (click)="removeLine(i)"
+                            aria-label="Remove line">×</button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <div class="admin-empty quote-empty">
+                <strong>No items yet</strong>
+                <p>Search your stock above and click an item to add it.</p>
+              </div>
+            }
+          </div>
+
+          <!-- ===== Notes ===== -->
+          <div class="admin-panel">
+            <div class="admin-panel-title"><h2>Notes &amp; terms</h2></div>
+            <div class="camera-form quote-notes">
+              <label class="camera-field camera-field--wide">
+                <span>Notes</span>
+                <textarea formControlName="notes" rows="3" maxlength="2000"
+                  placeholder="Anything the customer should read alongside the prices"></textarea>
+              </label>
+              <label class="camera-field camera-field--wide">
+                <span>Terms &amp; conditions</span>
+                <textarea formControlName="terms" rows="3" maxlength="2000"
+                  placeholder="Payment terms, delivery, validity"></textarea>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Sidebar ===== -->
+        <aside class="quote-side">
+          <div class="admin-panel">
+            <div class="admin-panel-title"><h2>Customer</h2></div>
+            <div class="quote-side-form">
+              <label class="camera-field">
+                <span>Name <i aria-hidden="true">*</i></span>
+                <input formControlName="customerName" maxlength="200" autocomplete="off"
+                  [class.is-invalid]="showError('customerName')" />
+                @if (showError('customerName')) {
+                  <small class="field-error">{{ errorFor('customerName', 'Customer name') }}</small>
+                }
+              </label>
+              <label class="camera-field">
+                <span>Company</span>
+                <input formControlName="customerCompany" maxlength="200" autocomplete="off" />
+              </label>
+              <label class="camera-field">
+                <span>Email</span>
+                <input type="email" formControlName="customerEmail" maxlength="256" autocomplete="off"
+                  [class.is-invalid]="showError('customerEmail')" />
+                @if (showError('customerEmail')) {
+                  <small class="field-error">{{ errorFor('customerEmail', 'Email') }}</small>
+                }
+              </label>
+              <label class="camera-field">
+                <span>Phone</span>
+                <input formControlName="customerPhone" maxlength="40" autocomplete="off"
+                  placeholder="+974 …" />
+              </label>
+              <label class="camera-field">
+                <span>Address</span>
+                <textarea formControlName="customerAddress" rows="2" maxlength="500"></textarea>
+              </label>
+            </div>
+          </div>
+
+          <div class="admin-panel">
+            <div class="admin-panel-title"><h2>Details</h2></div>
+            <div class="quote-side-form">
+              <label class="camera-field">
+                <span>Issue date <i aria-hidden="true">*</i></span>
+                <input type="date" formControlName="issueDate" />
+              </label>
+              <label class="camera-field">
+                <span>Valid until</span>
+                <input type="date" formControlName="validUntil" />
+              </label>
+              <label class="camera-field">
+                <span>Status</span>
+                <select formControlName="status">
+                  @for (option of statuses; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="admin-panel quote-totals">
+            <div class="admin-panel-title"><h2>Totals</h2></div>
+            <dl>
+              <div><dt>Subtotal</dt><dd>{{ totals().subtotal | number: '1.2-2' }}</dd></div>
+              <div><dt>Discount</dt><dd>−{{ totals().discountTotal | number: '1.2-2' }}</dd></div>
+              <div><dt>Tax</dt><dd>{{ totals().taxTotal | number: '1.2-2' }}</dd></div>
+              <div class="is-grand">
+                <dt>Total (﷼)</dt>
+                <dd>{{ totals().grandTotal | number: '1.2-2' }}</dd>
+              </div>
+            </dl>
+            <p class="quote-totals-note">Recalculated on the server when you save.</p>
+          </div>
+
+          @if (formError()) {
+            <p class="admin-error" role="alert">{{ formError() }}</p>
+          }
+
+          <div class="quote-save">
+            <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
+              {{ saving() ? 'Saving…' : isEditing() ? 'Save changes' : 'Create quotation' }}
+            </button>
+            <a class="btn-admin btn-admin-ghost" routerLink="/quotations">Cancel</a>
+          </div>
+        </aside>
+      </div>
+    </form>
+  }
+</section>

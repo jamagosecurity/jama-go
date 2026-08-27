@@ -1,0 +1,649 @@
+/* Shared by the quotation list and editor. Both reuse the admin panel, field and
+   table classes from the inventory page, so this only adds what is specific to
+   quoting: the layout, the item picker, the line rows and the totals block. */
+
+/* These routes sit directly under AppComponent, which supplies the marketing
+   header and footer but no page padding — /cameras gets its from the wrapper
+   component around it. Without this the content ran edge to edge and the first
+   element sat under the sticky header's overhanging logo, which swallowed
+   clicks on it. */
+.quote-page {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 28px 28px 56px;
+}
+
+@media (max-width: 640px) {
+  .quote-page {
+    padding: 18px 16px 40px;
+  }
+}
+
+.quote-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.quote-back {
+  /* Block so the "Quotation" kicker below starts its own line; width:fit-content
+     keeps the underline to the text rather than the full column. */
+  display: block;
+  width: fit-content;
+  margin-bottom: 8px;
+  color: var(--admin-blue-ink);
+  font-size: 0.86rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.quote-back:hover {
+  text-decoration: underline;
+}
+
+.quote-number {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--admin-blue-ink);
+  text-decoration: none;
+}
+
+.quote-number:hover {
+  text-decoration: underline;
+}
+
+/* ===== Status pill ===== */
+
+.quote-status {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(15, 40, 70, 0.08);
+  color: var(--admin-muted);
+}
+
+.quote-status[data-status="Sent"] {
+  background: rgba(37, 148, 210, 0.14);
+  color: var(--admin-blue-ink);
+}
+
+.quote-status[data-status="Accepted"] {
+  background: rgba(28, 133, 119, 0.15);
+  color: var(--admin-teal-ink, #0f766e);
+}
+
+.quote-status[data-status="Rejected"] {
+  background: rgba(225, 29, 72, 0.12);
+  color: var(--jama-rose-ink, #9f1239);
+}
+
+.quote-status[data-status="Expired"] {
+  background: rgba(246, 153, 61, 0.16);
+  color: var(--admin-orange-ink, #b45309);
+}
+
+/* ===== Editor layout ===== */
+
+.quote-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.quote-main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.quote-side {
+  display: grid;
+  gap: 16px;
+  /* Follows the lines table down a long quote so the total and the save button
+     stay reachable without scrolling back up. */
+  position: sticky;
+  top: 16px;
+}
+
+.quote-side-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* ===== Item picker ===== */
+
+.quote-picker {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.quote-picker-search {
+  flex: 1 1 auto;
+}
+
+.quote-picker-note {
+  margin: 12px 0 0;
+  color: var(--admin-muted);
+  font-size: 0.88rem;
+}
+
+.quote-picker-results {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quote-picker-results button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.quote-picker-results button:hover {
+  border-color: rgba(37, 148, 210, 0.45);
+  background: rgba(37, 148, 210, 0.05);
+}
+
+.quote-pick-mark {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 20px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.quote-pick-mark--text {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 20px;
+  border-radius: 7px;
+  background: rgba(15, 40, 70, 0.07);
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.quote-pick-text {
+  display: grid;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.quote-pick-text strong {
+  font-size: 0.9rem;
+  color: var(--admin-ink);
+  /* Long item names must not push the price off the row. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quote-pick-text small {
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.quote-pick-rate {
+  flex: 0 0 auto;
+  font-size: 0.86rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-ink-soft);
+}
+
+.quote-pick-add {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(37, 148, 210, 0.12);
+  color: var(--admin-blue-ink);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+/* ===== Line rows ===== */
+
+.quote-lines {
+  margin-top: 18px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.quote-line-name,
+.quote-line-num {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.quote-line-name:focus,
+.quote-line-num:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
+}
+
+.quote-line-num {
+  width: 92px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.quote-line-num--pct {
+  width: 74px;
+}
+
+.quote-line-meta {
+  display: block;
+  margin-top: 4px;
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+}
+
+.quote-line-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.quote-line-actions button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--admin-muted);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.quote-line-actions button:hover:not(:disabled) {
+  border-color: rgba(37, 148, 210, 0.45);
+  color: var(--admin-blue-ink);
+}
+
+.quote-line-actions button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.quote-line-remove:hover:not(:disabled) {
+  border-color: var(--jama-rose, #e11d48) !important;
+  color: var(--jama-rose-ink, #9f1239) !important;
+}
+
+.quote-empty {
+  margin-top: 18px;
+}
+
+.quote-notes {
+  grid-template-columns: 1fr;
+}
+
+/* ===== Totals ===== */
+
+.quote-totals dl {
+  margin: 14px 0 0;
+}
+
+.quote-totals dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.quote-totals dt {
+  color: var(--admin-muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.quote-totals dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  color: var(--admin-ink);
+}
+
+.quote-totals .is-grand {
+  margin-top: 6px;
+  padding: 11px 12px;
+  border-bottom: none;
+  border-radius: 12px;
+  background: linear-gradient(100deg, var(--admin-blue-deep), var(--admin-indigo, #4f46e5));
+}
+
+.quote-totals .is-grand dt,
+.quote-totals .is-grand dd {
+  color: #fff;
+}
+
+.quote-totals .is-grand dd {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.3rem;
+}
+
+.quote-totals-note {
+  margin: 10px 0 0;
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+}
+
+.quote-save {
+  display: flex;
+  gap: 10px;
+}
+
+.quote-save .btn-admin {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+@media (max-width: 1080px) {
+  .quote-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .quote-side {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .quote-picker {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quote-line-num {
+    width: 100%;
+  }
+
+  .quote-line-actions {
+    justify-content: flex-start;
+    padding-top: 8px;
+  }
+}
+
+
+/* ===== Borrowed admin primitives =====
+   The templates reuse the field, form and table classes from the inventory
+   page, but those rules live in camera-list.component.css and Angular's view
+   encapsulation keeps them there — nothing was reaching these components, so
+   labels sat inline beside their inputs. Restated here, scoped under
+   .quote-page so they cannot leak anywhere else.
+
+   Worth folding both copies into one global admin-form stylesheet later; doing
+   that now would mean editing the inventory page's styling at the same time. */
+
+.quote-page .camera-field {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: #1a334d;
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.quote-page .camera-field > span i {
+  color: #e11d48;
+  font-style: normal;
+}
+
+.quote-page .camera-field input,
+.quote-page .camera-field select,
+.quote-page .camera-field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 13px;
+  color: var(--admin-ink);
+  background: #fff;
+  font: inherit;
+  font-weight: 500;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.quote-page .camera-field textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.quote-page .camera-field input:focus,
+.quote-page .camera-field select:focus,
+.quote-page .camera-field textarea:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+}
+
+.quote-page .camera-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 16px 18px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.quote-page .camera-field--wide {
+  grid-column: 1 / -1;
+}
+
+.quote-page .camera-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 16px;
+  background: var(--admin-panel);
+}
+
+.quote-page .camera-filters .camera-field {
+  min-width: 220px;
+}
+
+.quote-page .camera-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+}
+
+.quote-page .camera-stats > div {
+  min-width: 116px;
+  padding: 12px 18px;
+  border: 1px solid var(--admin-line);
+  border-radius: 16px;
+  background: var(--admin-panel);
+}
+
+.quote-page .camera-stats dt {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.quote-page .camera-stats dd {
+  margin: 2px 0 0;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 750;
+  line-height: 1.1;
+  color: var(--admin-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.quote-page .camera-cur {
+  color: var(--admin-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.quote-page .camera-table-wrap {
+  overflow-x: auto;
+}
+
+.quote-page .camera-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.94rem;
+}
+
+.quote-page .camera-table th,
+.quote-page .camera-table td {
+  padding: 11px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(15, 40, 70, 0.08);
+  vertical-align: middle;
+}
+
+.quote-page .camera-table th {
+  color: #63758a;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: #fff;
+}
+
+.quote-page .camera-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.quote-page .camera-table tbody tr:hover {
+  background: rgba(37, 148, 210, 0.045);
+}
+
+.quote-page .camera-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.quote-page .camera-itemtext {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.quote-page .camera-itemtext small {
+  color: var(--admin-muted);
+  font-size: 0.8rem;
+}
+
+.quote-page .camera-blank {
+  color: var(--admin-muted);
+  opacity: 0.6;
+}
+
+.quote-page .camera-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.quote-page .camera-confirm {
+  color: var(--admin-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.quote-page .camera-delete:hover {
+  color: #e11d48;
+}
+
+.quote-page .camera-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.quote-page .camera-count {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.quote-page .camera-pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.quote-page .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Notes sit two-up on the editor rather than filling four columns each. */
+.quote-page .quote-notes {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.quote-page .quote-notes .camera-field--wide {
+  grid-column: auto;
+}
+
+@media (max-width: 900px) {
+  .quote-page .camera-form,
+  .quote-page .quote-notes {
+    grid-template-columns: 1fr;
+  }
+}

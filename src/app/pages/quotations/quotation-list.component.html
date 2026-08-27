@@ -1,0 +1,166 @@
+<section class="admin-page quote-page">
+  <header class="admin-page-header">
+    <div>
+      <span class="admin-kicker">Quotations</span>
+      <h1>Customer quotes</h1>
+      <p>Priced from the stock inventory. Save, revise and send as a PDF.</p>
+    </div>
+
+    <div class="quote-head-actions">
+      @if (summary(); as totals) {
+        <dl class="camera-stats">
+          <div>
+            <dt>Accepted</dt>
+            <dd>{{ totals.acceptedValue | number: '1.0-0' }} <span class="camera-cur">﷼</span></dd>
+          </div>
+          <div>
+            <dt>Open</dt>
+            <dd>{{ totals.openValue | number: '1.0-0' }} <span class="camera-cur">﷼</span></dd>
+          </div>
+          <div>
+            <dt>Quotes</dt>
+            <dd>{{ totals.totalQuotations | number }}</dd>
+          </div>
+        </dl>
+      }
+      <a class="btn-admin btn-admin-primary" routerLink="/quotations/new">New quotation</a>
+    </div>
+  </header>
+
+  <div class="camera-filters">
+    <label class="camera-field">
+      <span>Search</span>
+      <input type="search" [formControl]="searchControl" autocomplete="off"
+        placeholder="Quote number, customer or company" />
+    </label>
+
+    <label class="camera-field">
+      <span>Status</span>
+      <select [formControl]="statusControl">
+        <option value="">All statuses</option>
+        @for (option of statuses; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    @if (hasFilters()) {
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="clearFilters()">
+        Clear filters
+      </button>
+    }
+  </div>
+
+  <div class="admin-panel">
+    @if (loading()) {
+      <p>Loading quotations…</p>
+    } @else if (listError()) {
+      <p class="admin-error" role="alert">{{ listError() }}</p>
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="load()">Try again</button>
+    } @else if (result(); as page) {
+      @if (page.items.length) {
+        <div class="camera-table-wrap">
+          <table class="camera-table">
+            <caption class="visually-hidden">Quotations: number, customer, status and total</caption>
+            <thead>
+              <tr>
+                <th scope="col">Quote</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Issued</th>
+                <th scope="col">Valid until</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="num">Items</th>
+                <th scope="col" class="num">Total (﷼)</th>
+                <th scope="col"><span class="visually-hidden">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (quote of page.items; track quote.id) {
+                <tr>
+                  <td data-label="Quote">
+                    <a class="quote-number" [routerLink]="['/quotations', quote.id]">
+                      {{ quote.quoteNumber }}
+                    </a>
+                  </td>
+                  <td data-label="Customer">
+                    <span class="camera-itemtext">
+                      <strong>{{ quote.customerName }}</strong>
+                      @if (quote.customerCompany) {
+                        <small>{{ quote.customerCompany }}</small>
+                      }
+                    </span>
+                  </td>
+                  <td data-label="Issued">{{ quote.issueDate | date: 'mediumDate' }}</td>
+                  <td data-label="Valid until">
+                    @if (quote.validUntil) {
+                      {{ quote.validUntil | date: 'mediumDate' }}
+                    } @else {
+                      <span class="camera-blank">—</span>
+                    }
+                  </td>
+                  <td data-label="Status">
+                    <span class="quote-status" [attr.data-status]="quote.status">{{ quote.status }}</span>
+                  </td>
+                  <td data-label="Items" class="num">{{ quote.lineCount }}</td>
+                  <td data-label="Total (﷼)" class="num">
+                    <strong>{{ quote.grandTotal | number: '1.2-2' }}</strong>
+                  </td>
+                  <td class="camera-row-actions">
+                    @if (pendingDeleteId() === quote.id) {
+                      <span class="camera-confirm">Delete {{ quote.quoteNumber }}?</span>
+                      <button type="button" class="btn-admin btn-admin-danger"
+                        [disabled]="busyId() === quote.id" (click)="confirmDelete(quote)">
+                        {{ busyId() === quote.id ? 'Deleting…' : 'Yes, delete' }}
+                      </button>
+                      <button type="button" class="btn-admin btn-admin-ghost"
+                        [disabled]="busyId() === quote.id" (click)="cancelDelete()">Keep</button>
+                    } @else {
+                      <a class="btn-admin btn-admin-ghost" [routerLink]="['/quotations', quote.id]">Open</a>
+                      <button type="button" class="btn-admin btn-admin-ghost"
+                        [disabled]="busyId() === quote.id" (click)="download(quote)">
+                        {{ busyId() === quote.id ? 'Preparing…' : 'PDF' }}
+                      </button>
+                      <button type="button" class="btn-admin btn-admin-ghost camera-delete"
+                        (click)="askDelete(quote)">Delete</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="camera-foot">
+          <p class="camera-count">
+            Showing {{ rangeStart() }}–{{ rangeEnd() }} of {{ page.totalCount }}
+            {{ page.totalCount === 1 ? 'quotation' : 'quotations' }}
+          </p>
+
+          @if (page.totalPages > 1) {
+            <nav class="camera-pager" aria-label="Quotation pages">
+              <button type="button" class="btn-admin btn-admin-ghost"
+                [disabled]="page.pageNumber <= 1" (click)="goToPage(page.pageNumber - 1)">Previous</button>
+              <span>Page {{ page.pageNumber }} of {{ page.totalPages }}</span>
+              <button type="button" class="btn-admin btn-admin-ghost"
+                [disabled]="page.pageNumber >= page.totalPages" (click)="goToPage(page.pageNumber + 1)">Next</button>
+            </nav>
+          }
+        </div>
+      } @else {
+        <div class="admin-empty">
+          <strong>{{ hasFilters() ? 'No quotations match those filters' : 'No quotations yet' }}</strong>
+          <p>
+            {{
+              hasFilters()
+                ? 'Try a different search or clear the filters.'
+                : 'Create the first one from your stock items.'
+            }}
+          </p>
+          @if (!hasFilters()) {
+            <a class="btn-admin btn-admin-primary" routerLink="/quotations/new">New quotation</a>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>

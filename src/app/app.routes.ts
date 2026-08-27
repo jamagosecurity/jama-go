@@ -35,6 +35,36 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/public/camera-catalogue.component').then((m) => m.CameraCatalogueComponent),
   },
+  // The quotation panel. Public like the inventory it prices from.
+  {
+    path: 'quotations',
+    children: [
+      {
+        path: 'new',
+        title: 'New Quotation — Jama Go',
+        loadComponent: () =>
+          import('./pages/quotations/quotation-editor.component').then(
+            (m) => m.QuotationEditorComponent,
+          ),
+      },
+      {
+        path: ':id',
+        title: 'Quotation — Jama Go',
+        loadComponent: () =>
+          import('./pages/quotations/quotation-editor.component').then(
+            (m) => m.QuotationEditorComponent,
+          ),
+      },
+      {
+        path: '',
+        title: 'Quotations — Jama Go',
+        loadComponent: () =>
+          import('./pages/quotations/quotation-list.component').then(
+            (m) => m.QuotationListComponent,
+          ),
+      },
+    ],
+  },
   {
     path: 'sifeddine',
     title: 'Sifeddine Taghelabet — Business Development Specialist | Jama Go',
