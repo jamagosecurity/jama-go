@@ -199,37 +199,6 @@
   flex-direction: column;
 }
 
-.staff-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 22px 28px 8px;
-  flex-wrap: wrap;
-}
-
-.staff-topbar-kicker {
-  color: var(--admin-blue-deep);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.staff-topbar h1 {
-  margin-top: 4px;
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: clamp(1.35rem, 2vw, 1.7rem);
-  letter-spacing: -0.03em;
-  color: var(--admin-ink);
-}
-
-.staff-topbar-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
 .pill {
   display: inline-flex;
   align-items: center;
@@ -258,7 +227,8 @@
 }
 
 .staff-content {
-  padding: 12px 28px 36px;
+  /* Was spaced by the top bar above it, which is gone. */
+  padding: 28px 28px 36px;
   min-width: 0;
 }
 
@@ -282,9 +252,4 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .staff-topbar,
-  .staff-content {
-    padding-left: 18px;
-    padding-right: 18px;
   }
-}

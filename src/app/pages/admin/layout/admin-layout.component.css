@@ -300,51 +300,10 @@
   flex-direction: column;
 }
 
-.admin-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 22px 28px 8px;
-  flex-wrap: wrap;
-}
-
-.admin-topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-}
-
-.admin-topbar-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(37, 148, 210, 0.3);
-  background: linear-gradient(120deg, rgba(37, 148, 210, 0.16), rgba(246, 153, 61, 0.16));
-  color: var(--admin-blue-ink);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.admin-topbar h1 {
-  margin-top: 6px;
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: clamp(1.35rem, 2vw, 1.7rem);
-  letter-spacing: -0.03em;
-  /* Deep stops only — this is body-weight display text on a near-white bar. */
-  background: linear-gradient(100deg, var(--admin-blue-ink) 0%, var(--admin-indigo-ink) 55%, var(--admin-orange-ink) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .admin-content {
-  padding: 12px 28px 36px;
+  /* Was 12px because the top bar sat above it. That bar is gone, so this is now
+     the page's only top spacing. */
+  padding: 28px 28px 36px;
   min-width: 0;
 }
 
@@ -387,12 +346,7 @@
     margin: 0 auto;
   }
 
-  .admin-topbar,
-  .admin-content {
-    padding-left: 18px;
-    padding-right: 18px;
   }
-}
 
 @media (max-width: 720px) {
   .admin-nav {

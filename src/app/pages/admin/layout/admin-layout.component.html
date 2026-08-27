@@ -100,15 +100,6 @@
   </aside>
 
   <div class="admin-main">
-    <header class="admin-topbar">
-      <div class="admin-topbar-left">
-        <div>
-          <p class="admin-topbar-kicker">{{ greeting() }}</p>
-          <h1>{{ auth.currentUser()?.fullName || 'Administrator' }}</h1>
-        </div>
-      </div>
-    </header>
-
     <div class="admin-content">
       <router-outlet />
     </div>

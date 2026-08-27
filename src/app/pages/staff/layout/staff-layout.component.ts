@@ -27,12 +27,6 @@ export class StaffLayoutComponent {
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   });
 
-  readonly greeting = computed(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  });
 
   logout(): void {
     this.auth.logout();
