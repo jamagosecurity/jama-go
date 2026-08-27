@@ -31,6 +31,34 @@ export const STAFF_ROUTES: Routes = [
           ),
       },
       {
+        // Quotations, as staff call them. The route, API and entity keep the
+        // "boq" name — renaming those would rewrite a document reference that
+        // may already be circulating. Gated on boq.manage, so only staff an admin has
+        // granted it ever see the screens.
+        path: 'boq',
+        canActivate: [permissionGuard(PERMISSIONS.boqManage)],
+        children: [
+          {
+            path: 'new',
+            title: 'New Quotation — Jama Go Staff',
+            loadComponent: () =>
+              import('./boq/boq-editor.component').then((m) => m.BoqEditorComponent),
+          },
+          {
+            path: ':id',
+            title: 'Quotation — Jama Go Staff',
+            loadComponent: () =>
+              import('./boq/boq-editor.component').then((m) => m.BoqEditorComponent),
+          },
+          {
+            path: '',
+            title: 'Quotations — Jama Go Staff',
+            loadComponent: () =>
+              import('./boq/boq-list.component').then((m) => m.BoqListComponent),
+          },
+        ],
+      },
+      {
         // The admin DIA screens, mounted inside the staff shell. Gated on
         // dia.upload so only staff an admin granted it ever see them.
         path: 'dia',

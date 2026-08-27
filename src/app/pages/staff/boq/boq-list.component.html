@@ -1,0 +1,129 @@
+<section class="admin-page boq-page">
+  <header class="admin-page-header">
+    <div>
+      <h1>Quotations</h1>
+    </div>
+    <a class="btn-admin btn-admin-primary" routerLink="/staff/boq/new">New quotation</a>
+  </header>
+
+  <div class="boq-filters">
+    <label class="boq-search">
+      <span class="visually-hidden">Search quotations</span>
+      <span class="boq-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      </span>
+      <input type="search" [formControl]="searchControl" autocomplete="off"
+        placeholder="Search by number, project, site or client…" />
+    </label>
+
+    <label class="boq-field">
+      <span>Status</span>
+      <select [formControl]="statusControl">
+        <option value="">All statuses</option>
+        @for (option of statuses; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="boq-check">
+      <input type="checkbox" [formControl]="mineControl" />
+      <span>Only mine</span>
+    </label>
+
+    @if (hasFilters()) {
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="clearFilters()">Clear</button>
+    }
+  </div>
+
+  <div class="admin-panel">
+    @if (loading()) {
+      <p>Loading quotations…</p>
+    } @else if (listError()) {
+      <p class="admin-error" role="alert">{{ listError() }}</p>
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="load()">Try again</button>
+    } @else if (result(); as page) {
+      @if (page.items.length) {
+        <div class="boq-table-wrap">
+          <table class="boq-table">
+            <caption class="visually-hidden">Quotations</caption>
+            <thead>
+              <tr>
+                <th scope="col">Number</th>
+                <th scope="col">Project</th>
+                <th scope="col">Date</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="num">Lines</th>
+                <th scope="col" class="num">Total (﷼)</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (boq of page.items; track boq.id) {
+                <tr>
+                  <td data-label="Number">
+                    <a class="boq-number" [routerLink]="['/staff/boq', boq.id]">{{ boq.boqNumber }}</a>
+                  </td>
+                  <td data-label="Project">
+                    <span class="boq-projectcell">
+                      <strong>{{ boq.projectName }}</strong>
+                      <small>
+                        {{ boq.siteLocation || 'No site recorded' }}
+                        @if (boq.preparedByName) { · {{ boq.preparedByName }} }
+                      </small>
+                    </span>
+                  </td>
+                  <td data-label="Date">{{ boq.issueDate | date: 'mediumDate' }}</td>
+                  <td data-label="Status">
+                    <span class="boq-status" [attr.data-status]="boq.status">{{ boq.status }}</span>
+                  </td>
+                  <td data-label="Lines" class="num">{{ boq.lineCount }}</td>
+                  <td data-label="Total (﷼)" class="num">
+                    <strong>{{ boq.total | number: '1.2-2' }}</strong>
+                  </td>
+                  <td class="boq-row-actions">
+                    @if (pendingDeleteId() === boq.id) {
+                      <button type="button" class="row-btn row-btn--danger"
+                        [disabled]="busyId() === boq.id" (click)="confirmDelete(boq)">
+                        {{ busyId() === boq.id ? 'Deleting…' : 'Delete' }}
+                      </button>
+                      <button type="button" class="row-btn" [disabled]="busyId() === boq.id"
+                        (click)="cancelDelete()">Keep</button>
+                    } @else {
+                      <a class="row-btn row-btn--edit" [routerLink]="['/staff/boq', boq.id]">Open</a>
+                      <button type="button" class="row-btn" [disabled]="busyId() === boq.id"
+                        (click)="download(boq)">
+                        {{ busyId() === boq.id ? '…' : 'PDF' }}
+                      </button>
+                      <button type="button" class="row-btn row-btn--delete"
+                        (click)="askDelete(boq)">Delete</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (page.totalPages > 1) {
+          <nav class="boq-pager" aria-label="Quotation pages">
+            <button type="button" class="btn-admin btn-admin-ghost" [disabled]="page.pageNumber <= 1"
+              (click)="goToPage(page.pageNumber - 1)">Previous</button>
+            <span>Page {{ page.pageNumber }} of {{ page.totalPages }}</span>
+            <button type="button" class="btn-admin btn-admin-ghost"
+              [disabled]="page.pageNumber >= page.totalPages"
+              (click)="goToPage(page.pageNumber + 1)">Next</button>
+          </nav>
+        }
+      } @else {
+        <div class="admin-empty">
+          <strong>{{ hasFilters() ? 'Nothing matches those filters' : 'No quotations yet' }}</strong>
+          <p>{{ hasFilters() ? 'Try a different search.' : 'Build the first one from the catalogue.' }}</p>
+          @if (!hasFilters()) {
+            <a class="btn-admin btn-admin-primary" routerLink="/staff/boq/new">New quotation</a>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>

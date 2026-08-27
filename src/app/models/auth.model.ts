@@ -14,6 +14,7 @@ export const PERMISSIONS = {
   panelsManage: 'panels.manage',
   vipManage: 'vip.manage',
   cameraManage: 'camera.manage',
+  boqManage: 'boq.manage',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

@@ -1,0 +1,350 @@
+<section class="admin-page boq-page">
+  <!-- No page title: the form below says what this is. Everything here is an
+       action, so the whole row sits right. -->
+  <header class="admin-page-header boq-page-header">
+    <div class="boq-head-actions">
+      @if (boq(); as saved) {
+        <span class="boq-status" [attr.data-status]="saved.status">{{ saved.status }}</span>
+        <!-- Only once it is saved: the calculator reads the quotation back from
+             the server, so an unsaved draft has nothing for it to read. -->
+        <a class="btn-admin btn-admin-ghost" [routerLink]="['/staff/storage']"
+          [queryParams]="{ quotation: saved.id }">Calculate storage</a>
+        <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"
+          (click)="download()">{{ downloading() ? 'Preparing…' : 'Download PDF' }}</button>
+      }
+      <a class="btn-admin btn-admin-ghost boq-back" routerLink="/staff/boq">← All quotations</a>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading quotation…</p></div>
+  } @else {
+    <form [formGroup]="form" (submit)="save($event)">
+      <!-- Project details run across the top, not down the side: they describe the
+           whole quotation, and a narrow rail forced seven fields into a column
+           taller than the item list beside it. -->
+      <div class="admin-panel boq-project">
+        <div class="admin-panel-title"><h2>Project</h2></div>
+        <div class="boq-project-form">
+          <label class="boq-field">
+            <span>Project name <i aria-hidden="true">*</i></span>
+            <input formControlName="projectName" maxlength="200" autocomplete="off"
+              [class.is-invalid]="showError('projectName')" />
+            @if (showError('projectName')) {
+              <small class="field-error">{{ errorFor('projectName', 'Project name') }}</small>
+            }
+          </label>
+          <label class="boq-field">
+            <span>Client</span>
+            <input formControlName="clientName" maxlength="200" autocomplete="off" />
+          </label>
+          <label class="boq-field">
+            <span>Contact number</span>
+            <input formControlName="contactNumber" maxlength="40" autocomplete="off"
+              inputmode="tel" placeholder="e.g. +974 3312 3456" />
+          </label>
+          <label class="boq-field">
+            <span>Site / location</span>
+            <input formControlName="siteLocation" maxlength="200" autocomplete="off"
+              placeholder="e.g. Al Waab, Doha" />
+          </label>
+          <label class="boq-field">
+            <span>Date <i aria-hidden="true">*</i></span>
+            <input type="date" formControlName="issueDate" />
+          </label>
+          <label class="boq-field">
+            <span>Status</span>
+            <select formControlName="status">
+              @for (option of statuses; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="boq-field boq-field--wide">
+            <span>Notes</span>
+            <textarea formControlName="notes" rows="2" maxlength="2000"
+              placeholder="Anything that should appear under the bill"></textarea>
+          </label>
+        </div>
+      </div>
+
+      <div class="boq-main">
+
+          @for (section of sections(); track section.key; let s = $index) {
+            <div class="admin-panel boq-section"
+              [class.is-filled]="section.lines.length > 0"
+>
+              <div class="boq-section-head">
+                <span class="boq-section-lead">
+                  <span class="boq-section-no">{{ s + 1 }}</span>
+                  <h3 class="boq-section-title">{{ section.title }}</h3>
+                </span>
+                <span class="boq-section-meta">
+                  @if (section.lines.length) {
+                    <span class="boq-section-count">
+                      {{ section.lines.length }} {{ section.lines.length === 1 ? 'item' : 'items' }}
+                    </span>
+                  }
+                </span>
+              </div>
+
+              <!-- The table and its header are always on screen, empty or not:
+                   the columns are what tell a reader what the section holds, and
+                   the last row is where the next item is chosen. -->
+              <div class="boq-table-wrap">
+                <table class="boq-table boq-lines">
+                  <caption class="visually-hidden">Lines in {{ section.title }}</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">S.No</th>
+                      <th scope="col">Brand</th>
+                      <th scope="col" class="col-img">Image</th>
+                      <th scope="col">Model</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">Unit</th>
+                      <th scope="col" class="num">Qty</th>
+                      <th scope="col" class="num">Unit price (﷼)</th>
+                      <th scope="col" class="num">Total amount</th>
+                      <th scope="col"><span class="visually-hidden">Remove</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (line of section.lines; track line.key; let i = $index) {
+                      <tr>
+                        <td data-label="S.No">{{ s + 1 }}.{{ i + 1 }}</td>
+                        <td data-label="Brand">
+                          @if (brandLogo(line.brand || ''); as known) {
+                            <img class="boq-brandmark" [src]="known.logo"
+                              [alt]="line.brand" [title]="line.brand" loading="lazy" />
+                          } @else {
+                            {{ line.brand || '—' }}
+                          }
+                        </td>
+                        <td data-label="Image" class="col-img">
+                          @if (line.imageUrl) {
+                            <img class="boq-thumb" [src]="line.imageUrl" alt=""
+                              width="56" height="56" loading="lazy" />
+                          } @else {
+                            <span class="boq-thumb boq-thumb--none" aria-hidden="true">—</span>
+                          }
+                        </td>
+                        <td data-label="Model" class="boq-model">{{ line.modelNo || '—' }}</td>
+                        <td data-label="Description">
+                          <span class="boq-linetext">
+                            <strong>{{ line.itemName }}</strong>
+                            @if (line.description) {
+                              <small>{{ line.description }}</small>
+                            }
+                            @if (line.descriptionAr) {
+                              <small class="boq-ar" dir="rtl" lang="ar">{{ line.descriptionAr }}</small>
+                            }
+                          </span>
+                        </td>
+                        <td data-label="Unit">{{ unit(line.uom) }}</td>
+                        <td data-label="Qty" class="num">
+                          <input class="boq-qty" type="number" min="1" step="1" [value]="line.quantity"
+                            [attr.aria-label]="'Quantity for ' + line.itemName"
+                            (input)="onQuantityInput(s, i, $event)" />
+                        </td>
+                        <td data-label="Unit price (﷼)" class="num">
+                          <!-- Shown, never editable: the catalogue owns this. -->
+                          <span class="boq-rate" title="Set by your administrator">
+                            {{ line.unitRate | number: '1.2-2' }}
+                          </span>
+                        </td>
+                        <td data-label="Total amount" class="num">
+                          <strong>{{ lineTotal(line) | number: '1.2-2' }}</strong>
+                        </td>
+                        <td class="boq-line-remove">
+                          <button type="button" class="row-btn row-btn--delete"
+                            (click)="removeLine(s, i)"
+                            [attr.aria-label]="'Remove ' + line.itemName">×</button>
+                        </td>
+                      </tr>
+                    }
+
+                    <!-- Entry row: each dropdown sits under the column it fills,
+                         so choosing a brand and a model reads as building the
+                         next line rather than as a form beside the table. -->
+                    @if (itemsIn(section.title).length) {
+                      <tr class="boq-newrow">
+                        <td data-label="S.No">{{ s + 1 }}.{{ section.lines.length + 1 }}</td>
+
+                        <td data-label="Brand">
+                          <select class="boq-cell-select" [value]="choice()[section.title]?.brand || ''"
+                            [attr.aria-label]="'Brand for the next line in ' + section.title"
+                            (change)="setBrand(section.title, $event)">
+                            <option value="">Brand…</option>
+                            @for (brand of brandsIn(section.title); track brand) {
+                              <option [value]="brand" [selected]="brand === choice()[section.title]?.brand">
+                                {{ brand }}
+                              </option>
+                            }
+                          </select>
+                        </td>
+
+                        <td data-label="Image" class="col-img">
+                          <span class="boq-thumb boq-thumb--none" aria-hidden="true">—</span>
+                        </td>
+
+                        <td data-label="Model">
+                          <select class="boq-cell-select" [value]="choice()[section.title]?.model || ''"
+                            [disabled]="!choice()[section.title]?.brand || !modelsIn(section.title).length"
+                            [attr.aria-label]="'Model for the next line in ' + section.title"
+                            (change)="setModel(section.title, $event)">
+                            <option value="">
+                              @if (!choice()[section.title]?.brand) {
+                                Brand first
+                              } @else if (!modelsIn(section.title).length) {
+                                No model no.
+                              } @else {
+                                Model…
+                              }
+                            </option>
+                            @for (model of modelsIn(section.title); track model) {
+                              <option [value]="model" [selected]="model === choice()[section.title]?.model">
+                                {{ modelLabel(model) }}
+                              </option>
+                            }
+                          </select>
+                        </td>
+
+                        <td data-label="Description">
+                          @if (matchesIn(section.title).length > 1) {
+                            <!-- Brand and model do not identify a stock item on
+                                 their own; where two body types share a number,
+                                 the description is what decides. -->
+                            <select class="boq-cell-select"
+                              (change)="pickItem(section.title, $event)">
+                              <option value="">Two share this model — choose…</option>
+                              @for (item of matchesIn(section.title); track item.id) {
+                                <option [value]="item.id">{{ item.descriptionEn || item.itemName }}</option>
+                              }
+                            </select>
+                          } @else {
+                            <span class="boq-newrow-hint">Choose a brand to begin</span>
+                          }
+                        </td>
+
+                        <td data-label="Unit" class="boq-newrow-blank">—</td>
+
+                        <td data-label="Qty" class="num boq-newrow-blank">—</td>
+
+                        <td data-label="Unit price (﷼)" class="num boq-newrow-blank">—</td>
+                        <td data-label="Total amount" class="num boq-newrow-blank">—</td>
+                        <td class="boq-line-remove"></td>
+                      </tr>
+                    }
+
+                    <!-- The section's money sits under the Total amount column,
+                         where a reader adding the rows up arrives at it, rather
+                         than beside the heading. -->
+                    @if (section.lines.length) {
+                      <tr class="boq-subtotal">
+                        <td colspan="8" class="num">Section total</td>
+                        <td class="num">
+                          <strong>{{ sectionTotal(section) | number: '1.2-2' }} ﷼</strong>
+                        </td>
+                        <td></td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              @if (!itemsIn(section.title).length) {
+                <p class="boq-section-empty">
+                  @if (stockLoading()) {
+                    Loading the catalogue…
+                  } @else {
+                    No stock is filed under this heading yet. Add inventory with a
+                    matching product category and it appears here.
+                  }
+                </p>
+              }
+            </div>
+          }
+
+          <!-- Stock filed under no section. Quotable, but only once told where
+               it belongs, so each row carries its own chooser. -->
+          @if (itemsIn(unsortedGroup.title).length) {
+            <div class="admin-panel boq-section boq-section--unsorted">
+              <div class="boq-section-head">
+                <span class="boq-section-lead">
+                  <span class="boq-section-no boq-section-no--muted" aria-hidden="true">?</span>
+                  <h3 class="boq-section-title">Other stock</h3>
+                </span>
+                <span class="boq-section-meta"></span>
+              </div>
+
+              <div class="boq-cascade">
+                <label class="boq-field">
+                  <span>Section</span>
+                  <select [value]="unsortedSection()" (change)="setUnsortedSection($event)">
+                    <option value="">Choose a section…</option>
+                    @for (title of sectionTitles; track title) {
+                      <option [value]="title" [selected]="title === unsortedSection()">{{ title }}</option>
+                    }
+                  </select>
+                </label>
+
+                <label class="boq-field">
+                  <span>Brand</span>
+                  <select [value]="choice()[unsortedGroup.title]?.brand || ''"
+                    (change)="setBrand(unsortedGroup.title, $event)">
+                    <option value="">Choose a brand…</option>
+                    @for (brand of brandsIn(unsortedGroup.title); track brand) {
+                      <option [value]="brand">{{ brand }}</option>
+                    }
+                  </select>
+                </label>
+
+                <label class="boq-field boq-field--grow">
+                  <span>Description</span>
+                  <select [disabled]="!unsortedSection() || !matchesIn(unsortedGroup.title).length"
+                    (change)="pickItem(unsortedGroup.title, $event)">
+                    <option value="">
+                      @if (!unsortedSection()) {
+                        Choose a section first
+                      } @else if (!matchesIn(unsortedGroup.title).length) {
+                        Choose a brand first
+                      } @else {
+                        Choose to add…
+                      }
+                    </option>
+                    @for (item of matchesIn(unsortedGroup.title); track item.id) {
+                      <option [value]="item.id">{{ item.descriptionEn || item.itemName }}</option>
+                    }
+                  </select>
+                </label>
+              </div>
+            </div>
+          }
+        </div>
+
+      <!-- Total sits at the end, where a reader arrives after the last line —
+           not in a rail beside them. Compact: it is a confirmation of what the
+           lines already say, not the headline of the page. -->
+      <div class="boq-foot">
+        <div class="boq-total">
+          <span class="boq-total-label">Total</span>
+          <span class="boq-total-figure">{{ total() | number: '1.2-2' }} <span>﷼</span></span>
+        </div>
+        <p class="boq-total-note">
+          Rates come from the stock catalogue. The server recalculates on save.
+        </p>
+      </div>
+
+      @if (formError()) {
+        <p class="admin-error" role="alert">{{ formError() }}</p>
+      }
+
+      <div class="boq-save">
+        <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : isEditing() ? 'Save changes' : 'Create quotation' }}
+        </button>
+        <a class="btn-admin btn-admin-ghost" routerLink="/staff/boq">Cancel</a>
+      </div>
+    </form>
+  }
+</section>

@@ -18,6 +18,10 @@ export class StaffLayoutComponent {
    *  removes the link on the next session refresh without a reload. */
   readonly canUploadDia = computed(() => this.auth.can(PERMISSIONS.diaUpload));
 
+  /** Same for the BOQ screens. Hiding the link is a courtesy — the route guard
+   *  and every endpoint check boq.manage themselves. */
+  readonly canBuildBoq = computed(() => this.auth.can(PERMISSIONS.boqManage));
+
   readonly initials = computed(() => {
     const name = this.auth.currentUser()?.fullName?.trim() || 'Staff';
     const parts = name.split(/\s+/).filter(Boolean);

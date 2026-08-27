@@ -1,0 +1,929 @@
+/* Shared by the BOQ list and builder. Both sit inside the staff shell, whose
+   panel and button classes are global; this adds only what BOQ needs. */
+
+.boq-page { max-width: 1500px; }
+
+/* Sits in the header's action row now, beside Download PDF, so it takes button
+   metrics rather than the stacked-link ones it had under the old page title. */
+.boq-back {
+  color: var(--admin-blue-ink);
+  text-decoration: none;
+}
+
+/* Only actions left in this header — nothing to space them away from. */
+.boq-page-header {
+  justify-content: flex-end;
+}
+
+.boq-head-actions { display: flex; align-items: center; gap: 12px; }
+
+.boq-number {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--admin-blue-ink);
+  text-decoration: none;
+}
+.boq-number:hover { text-decoration: underline; }
+
+/* ===== Fields ===== */
+
+.boq-field {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: #1a334d;
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.boq-field > span i { color: #e11d48; font-style: normal; }
+
+.boq-field input,
+.boq-field select,
+.boq-field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 13px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-weight: 500;
+}
+
+.boq-field textarea { resize: vertical; line-height: 1.5; }
+
+.boq-field input:focus,
+.boq-field select:focus,
+.boq-field textarea:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+}
+
+.boq-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1a334d;
+  font-size: 0.9rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.boq-check input { width: 18px; height: 18px; accent-color: var(--admin-blue-deep); }
+
+/* ===== Search ===== */
+
+.boq-search { position: relative; display: flex; align-items: center; flex: 1 1 320px; }
+
+.boq-search input {
+  width: 100%;
+  height: 50px;
+  padding: 0 16px 0 44px;
+  border: 1px solid rgba(15, 40, 70, 0.14);
+  border-radius: 14px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.96rem;
+}
+
+.boq-search input:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.6);
+  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.13);
+}
+
+.boq-search-icon {
+  position: absolute;
+  left: 15px;
+  display: grid;
+  place-items: center;
+  color: var(--admin-muted);
+  pointer-events: none;
+}
+.boq-search-icon svg {
+  width: 18px; height: 18px; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round;
+}
+
+.boq-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 18px;
+  background: var(--admin-panel);
+}
+.boq-filters .boq-field { flex: 0 0 auto; width: 190px; }
+
+/* ===== Status ===== */
+
+.boq-status {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(15, 40, 70, 0.08);
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.boq-status[data-status="Submitted"] { background: rgba(37,148,210,.14); color: var(--admin-blue-ink); }
+.boq-status[data-status="Approved"]  { background: rgba(28,133,119,.15); color: var(--admin-teal-ink, #0f766e); }
+.boq-status[data-status="Rejected"]  { background: rgba(225,29,72,.12); color: var(--jama-rose-ink, #9f1239); }
+
+/* ===== Tables ===== */
+
+.boq-table-wrap { overflow-x: auto; }
+
+.boq-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+
+.boq-table th,
+.boq-table td {
+  padding: 11px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(15, 40, 70, 0.07);
+  vertical-align: middle;
+}
+
+.boq-table thead th {
+  background: linear-gradient(135deg, #1b357c 0%, #12548f 55%, #0d6fae 100%);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.boq-table thead th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+.boq-table thead th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+.boq-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.boq-table tbody tr:last-child td { border-bottom: none; }
+.boq-table tbody tr:hover { background: rgba(37, 148, 210, 0.04); }
+
+.boq-projectcell,
+.boq-linetext { display: grid; gap: 2px; min-width: 0; }
+.boq-projectcell small,
+.boq-linetext small { color: var(--admin-muted); font-size: 0.79rem; }
+
+.boq-row-actions { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
+
+.boq-blank { color: var(--admin-muted); font-style: italic; opacity: 0.75; }
+
+.boq-pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+/* ===== Builder layout ===== */
+
+.boq-main { display: grid; gap: 18px; min-width: 0; }
+
+.boq-project { margin-bottom: 20px; }
+
+/* Four across, so the seven fields land in two tidy rows on a laptop. Notes
+   takes the width of two so it is wide enough to be worth writing in. */
+.boq-project-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px 16px;
+  margin-top: 14px;
+  align-items: start;
+}
+
+.boq-field--wide { grid-column: span 2; }
+
+@media (max-width: 1180px) {
+  .boq-project-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .boq-project-form { grid-template-columns: 1fr; }
+  .boq-field--wide { grid-column: auto; }
+}
+
+/* ===== Picker ===== */
+
+.boq-picker { margin-top: 16px; }
+
+.boq-note { margin: 12px 0 0; color: var(--admin-muted); font-size: 0.88rem; }
+
+.boq-target {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 0;
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.boq-target-chip {
+  padding: 5px 11px;
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--admin-ink-soft);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.boq-target-chip.is-active {
+  border-color: var(--admin-blue-deep);
+  background: rgba(37, 148, 210, 0.12);
+  color: var(--admin-blue-ink);
+}
+
+.boq-picker-results { display: grid; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+
+.boq-picker-results button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.boq-picker-results button:hover {
+  border-color: rgba(37, 148, 210, 0.45);
+  background: rgba(37, 148, 210, 0.05);
+}
+
+/* ===== Picker filters ===== */
+
+.boq-picker-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.boq-picker-filters .boq-field { flex: 1 1 170px; min-width: 150px; }
+.boq-picker-filters .boq-field select { min-height: 42px; padding: 9px 12px; }
+.boq-clearfilters { flex: 0 0 auto; }
+
+/* ===== Picker rows =====
+   Enough on each row to choose without opening anything: what it is, its type
+   and unit, the model, how many are in stock, the warranty, and the rate. */
+
+.boq-picker-results button {
+  align-items: stretch;
+  gap: 14px;
+  padding: 11px 14px;
+}
+
+.boq-pick-shot {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  background: #f5f8fb;
+  overflow: hidden;
+}
+
+.boq-pick-shot img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+.boq-pick-logo { padding: 8px !important; }
+
+.boq-pick-initials {
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.boq-pick-text {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.boq-pick-text strong {
+  font-size: 0.94rem;
+  color: var(--admin-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boq-pick-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.boq-chip {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(37, 148, 210, 0.11);
+  color: #14547d;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.boq-chip--soft { background: rgba(15, 40, 70, 0.07); color: var(--admin-muted); }
+
+.boq-chip[data-type="Dome"]    { background: rgba(124, 92, 214, .12); color: #4c35a3; }
+.boq-chip[data-type="Ptz"]     { background: rgba(14, 159, 140, .13); color: #0b6b5f; }
+.boq-chip[data-type="Fisheye"] { background: rgba(217, 130, 43, .14); color: #96550f; }
+.boq-chip[data-type="Thermal"] { background: rgba(225, 29, 72, .11); color: #9f1239; }
+.boq-chip[data-type="Anpr"]    { background: rgba(15, 40, 70, .09); color: #24405e; }
+.boq-chip[data-type="Box"]     { background: rgba(100, 116, 139, .13); color: #44546a; }
+
+.boq-pick-model {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.74rem;
+  color: var(--admin-ink-soft);
+}
+
+.boq-pick-desc {
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 46ch;
+}
+
+.boq-pick-facts {
+  flex: 0 0 auto;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.boq-pick-stock { color: var(--admin-muted); font-size: 0.78rem; font-weight: 600; }
+.boq-pick-stock strong { color: var(--admin-ink); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.boq-pick-stock.is-low,
+.boq-pick-stock.is-low strong { color: var(--jama-rose-ink, #9f1239); }
+.boq-pick-facts small { color: var(--admin-teal-ink, #0f766e); font-size: 0.72rem; font-weight: 700; }
+
+.boq-pick-rate {
+  flex: 0 0 auto;
+  display: grid;
+  align-content: center;
+  min-width: 104px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.boq-pick-rate strong {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+}
+
+.boq-pick-rate small { color: var(--admin-muted); font-size: 0.78rem; }
+
+@media (max-width: 900px) {
+  .boq-picker-results button { flex-wrap: wrap; }
+  .boq-pick-facts, .boq-pick-rate { text-align: left; }
+}
+.boq-pick-add {
+  flex: 0 0 auto;
+  align-self: center; display: grid; place-items: center; width: 24px; height: 24px;
+  border-radius: 50%; background: rgba(37,148,210,.12); color: var(--admin-blue-ink);
+  font-size: 1.05rem; line-height: 1;
+}
+
+/* ===== Sections ===== */
+
+/* Three tracks with equal outer columns, so the number and title sit dead centre
+   of the panel however wide the count and subtotal on the right grow. A plain
+   flex row with text-align:center would push the heading off-centre by exactly
+   the width of those chips. */
+.boq-section-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.boq-section-lead {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.boq-section-meta {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.boq-section-no {
+  display: grid;
+  place-items: center;
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #38a9e6, #1a7bb5);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.boq-section-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 11px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+  /* A <select> now, not a text box — the headings are fixed. */
+  cursor: pointer;
+}
+.boq-section-title:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
+}
+
+.boq-section-total {
+  flex: 0 0 auto;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-ink);
+}
+
+.boq-section-empty { margin: 0; }
+
+.boq-qty {
+  width: 84px;
+  padding: 7px 10px;
+  border: 1px solid rgba(15, 40, 70, 0.14);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.boq-qty:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
+}
+
+/* Read-only by design — the catalogue owns the rate. */
+.boq-rate { color: var(--admin-muted); font-variant-numeric: tabular-nums; cursor: help; }
+
+.boq-line-remove { text-align: right; }
+.boq-line-remove button {
+  width: 26px; height: 26px;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--admin-muted);
+  font-size: 1rem; line-height: 1;
+  cursor: pointer;
+}
+.boq-line-remove button:hover {
+  border-color: rgba(225, 29, 72, 0.4);
+  color: var(--jama-rose-ink, #9f1239);
+}
+
+.boq-addsection { width: fit-content; }
+
+/* ===== Total ===== */
+
+/* A strip at the end of the form, aligned to the right where the amounts are.
+   Was a 1.9rem figure in a panel of its own; it is a confirmation of the lines
+   above, so it no longer competes with them. */
+.boq-foot {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  margin-top: 18px;
+}
+
+.boq-total {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+}
+
+.boq-total-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.boq-total-figure {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--admin-ink);
+  font-variant-numeric: tabular-nums;
+}
+.boq-total-figure span { font-size: 0.8rem; color: var(--admin-muted); }
+.boq-total-note { margin: 0; color: var(--admin-muted); font-size: 0.76rem; }
+
+/* Actions sit under the total, right-aligned to follow it rather than stretch. */
+.boq-save {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+
+
+/* ===== Line table: the client's nine columns ===== */
+
+/* Nine columns plus an action need every point of width, so the type steps down
+   rather than the table scrolling on a normal laptop. */
+.boq-lines { font-size: 0.86rem; }
+
+.boq-lines th,
+.boq-lines td { padding-left: 9px; padding-right: 9px; }
+
+/* Shrinks to the thumbnail; the description column takes the slack. */
+.boq-lines .col-img { width: 72px; }
+
+/* Fixed box, contained inside it: a source photo may be 4000px wide or 200px
+   tall, and every row must still show the same size picture. `contain` rather
+   than `cover` so a camera body is never cropped out of its own thumbnail. */
+.boq-thumb {
+  display: block;
+  width: 56px;
+  height: 56px;
+  padding: 3px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #f5f8fb;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+}
+
+/* Same footprint whether or not there is a picture, so rows stay aligned. */
+.boq-thumb--none {
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  color: var(--admin-muted);
+  font-size: 0.8rem;
+}
+
+.boq-model {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.78rem;
+  color: var(--admin-muted);
+}
+
+/* ===== Sections as the document ===== */
+
+/* All nine headings are always on screen, so an empty one has to read as
+   "not used on this job" rather than as a broken panel. */
+.boq-section-title {
+  min-width: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+}
+
+.boq-section-count {
+  flex: 0 0 auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(37, 148, 210, 0.1);
+  color: #14618d;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.boq-section-no--muted {
+  background: rgba(15, 40, 70, 0.12) !important;
+  color: var(--admin-muted) !important;
+  box-shadow: none !important;
+}
+
+.boq-section--unsorted { border-style: dashed; }
+
+
+.boq-group-note { margin-top: 12px; }
+
+/* A row that needs a section chosen before it can be added. */
+.boq-pick--unsorted {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 10px 12px;
+}
+
+.boq-pick-section {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid rgba(15, 40, 70, 0.16);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--admin-ink);
+  cursor: pointer;
+}
+
+/* ===== Section states ===== */
+
+/* Nine headings are on screen at all times, so they have to say which of them
+   are actually in use. A section in use gets brand colour and full contrast; an
+   unused one recedes without disappearing. */
+.boq-section {
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.boq-section::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: rgba(15, 40, 70, 0.1);
+  transition: background 0.22s ease;
+}
+
+.boq-section.is-filled::before { background: linear-gradient(180deg, #4bb0e8, #1a7bb5); }
+
+.boq-section:not(.is-filled):not(.is-picking) .boq-section-title { color: var(--admin-muted); }
+
+.boq-section:not(.is-filled) .boq-section-no {
+  background: rgba(15, 40, 70, 0.08);
+  color: var(--admin-muted);
+  box-shadow: none;
+}
+
+
+/* One quiet line, so an unused heading reads as a choice not yet made rather
+   than as a panel that failed to load. */
+.boq-section-empty {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px dashed rgba(15, 40, 70, 0.14);
+  color: var(--admin-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.boq-section-empty strong { color: var(--admin-ink); font-weight: 750; }
+
+/* The item the brand and model already settled: read it, then add it. */
+.boq-resolved {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 7px 8px 7px 13px;
+  border-radius: 11px;
+  border: 1px solid rgba(37, 148, 210, 0.34);
+  background: #fff;
+}
+
+.boq-resolved-text {
+  display: grid;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.boq-resolved-text strong {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--admin-ink);
+}
+
+.boq-resolved-text small {
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+}
+
+/* Dashed and quiet while the steps above it are still unanswered. */
+.boq-resolved--waiting {
+  margin: 0;
+  border-style: dashed;
+  border-color: rgba(15, 40, 70, 0.16);
+  background: rgba(15, 40, 70, 0.03);
+  color: var(--admin-muted);
+  font-size: 0.86rem;
+}
+
+.boq-addnow {
+  flex: 0 0 auto;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 750;
+  color: #fff;
+  background: linear-gradient(120deg, #2594d2, #1a7bb5);
+  box-shadow: 0 8px 18px -10px rgba(26, 123, 181, 0.9);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.22s ease;
+}
+
+.boq-addnow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px -10px rgba(26, 123, 181, 0.95);
+}
+
+.boq-addnow:focus-visible { outline: 2px solid #1a7bb5; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .boq-addnow { transition: none; }
+  .boq-addnow:hover { transform: none; }
+}
+
+/* Arabic sits under the English, right-aligned within its own line so the two
+   read as a pair rather than one wrapped sentence. */
+.boq-ar {
+  display: block;
+  text-align: right;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--admin-muted);
+}
+
+.boq-resolved-text .boq-ar {
+  text-align: left;
+  color: var(--admin-ink);
+  font-size: 0.86rem;
+}
+
+/* ===== Entry row ===== */
+
+/* The last row of every table is where the next line is chosen. Tinted and
+   dashed above so it reads as a row being written rather than one already on the
+   quotation. */
+.boq-newrow td {
+  background: rgba(37, 148, 210, 0.045);
+  border-top: 1px dashed rgba(37, 148, 210, 0.4);
+  border-bottom: 0;
+  vertical-align: middle;
+}
+
+.boq-newrow td[data-label="S.No"] { color: var(--admin-muted); }
+
+/* Sits inside its own column, so picking a brand happens under the Brand
+   heading rather than in a panel somewhere else on the page. */
+.boq-cell-select {
+  width: 100%;
+  min-width: 96px;
+  padding: 7px 9px;
+  border: 1px solid rgba(37, 148, 210, 0.45);
+  border-radius: 9px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--admin-ink);
+  cursor: pointer;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* A column whose turn has not come — visibly waiting, not broken. */
+.boq-cell-select:disabled {
+  border-color: rgba(15, 40, 70, 0.14);
+  background: rgba(15, 40, 70, 0.04);
+  color: var(--admin-muted);
+  font-weight: 550;
+  cursor: not-allowed;
+}
+
+.boq-cell-select:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.75);
+  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.14);
+}
+
+.boq-newrow-hint {
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.boq-addrow {
+  padding: 7px 16px;
+  border: none;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  color: #fff;
+  background: linear-gradient(120deg, #2594d2, #1a7bb5);
+  box-shadow: 0 8px 16px -10px rgba(26, 123, 181, 0.9);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.22s ease;
+}
+
+.boq-addrow:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px -10px rgba(26, 123, 181, 0.95);
+}
+
+/* Dimmed until a brand and model actually resolve to one item. */
+.boq-addrow:disabled {
+  background: rgba(15, 40, 70, 0.12);
+  color: var(--admin-muted);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.boq-addrow:focus-visible { outline: 2px solid #1a7bb5; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .boq-addrow { transition: none; }
+  .boq-addrow:hover { transform: none; }
+}
+
+/* Cells the empty row cannot fill until a line exists — dashes, not blanks, so
+   the row still reads as a row. */
+.boq-newrow-blank { color: rgba(15, 40, 70, 0.28); }
+
+/* The maker's mark instead of its name. Held to a fixed height so a wide
+   wordmark and a square badge occupy the same row space; the name stays in the
+   title and alt text for anyone who needs it read out. */
+.boq-brandmark {
+  display: block;
+  height: 20px;
+  max-width: 84px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* Section money, under the Total amount column. Ruled off above so it reads as
+   a sum of the rows rather than another line item. */
+.boq-subtotal td {
+  padding-top: 11px;
+  padding-bottom: 11px;
+  border-top: 2px solid rgba(15, 40, 70, 0.14);
+  border-bottom: 0;
+  background: rgba(37, 148, 210, 0.05);
+}
+
+.boq-subtotal td:first-child {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.boq-subtotal strong {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
