@@ -1,0 +1,587 @@
+/* Scoped to this component. The quotation screens' primitives are encapsulated
+   to their own component, so the ones this page needs are restated here. */
+
+.storage-page {
+  padding: 4px 0 40px;
+}
+
+/* Only an action in the header, so the row sits right. */
+.storage-page-header {
+  justify-content: flex-end;
+}
+
+.storage-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.storage-panel {
+  margin-bottom: 18px;
+}
+
+/* ===== Step heading =====
+   The page is an order of operations — quotation, then plan, then cameras, then
+   the array — so each panel is numbered. The number is the heading's anchor;
+   without it five near-identical panels read as one long undifferentiated form. */
+
+.storage-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.storage-step-no {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  /* Ink on the bright fill: white drops under 3:1 on this blue. */
+  color: #08192b;
+  background: linear-gradient(140deg, #7fc7ef, #2594d2);
+  box-shadow:
+    0 8px 18px -10px rgba(37, 148, 210, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.storage-step-no--done {
+  color: #fff;
+  background: linear-gradient(140deg, #34b98a, #16805c);
+  box-shadow:
+    0 8px 18px -10px rgba(22, 128, 92, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.storage-step-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.storage-step-copy h2 {
+  margin: 0;
+  font-size: 1.06rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+}
+
+.storage-step-copy p {
+  margin: 2px 0 0;
+  color: var(--admin-muted);
+  font-size: 0.84rem;
+}
+
+/* Running count on the right of a step heading. */
+.storage-count {
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 148, 210, 0.28);
+  background: rgba(37, 148, 210, 0.09);
+  color: #14618d;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* ===== Fields ===== */
+
+.storage-source {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  max-width: 620px;
+}
+
+.storage-settings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .storage-settings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .storage-settings { grid-template-columns: 1fr; }
+}
+
+.boq-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.boq-field > span {
+  font-size: 0.8rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+}
+
+/* Unit hint inside a label, quieter than the name it follows. */
+.boq-field > span em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--admin-muted);
+}
+
+.boq-field input,
+.boq-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(15, 40, 70, 0.14);
+  border-radius: 11px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.94rem;
+  color: var(--admin-ink);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.boq-field input:focus,
+.boq-field select:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
+}
+
+/* The quotation, once chosen — a card rather than a sentence, so what is being
+   sized stays visible while you scroll the inputs below it. */
+.storage-loaded {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  border: 1px solid rgba(37, 148, 210, 0.26);
+  background: linear-gradient(120deg, rgba(37, 148, 210, 0.09), rgba(246, 153, 61, 0.06));
+}
+
+.storage-loaded-no {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #14618d;
+}
+
+.storage-loaded-name {
+  font-weight: 750;
+  color: var(--admin-ink);
+}
+
+.storage-loaded-meta {
+  color: var(--admin-muted);
+  font-size: 0.84rem;
+}
+
+.storage-note {
+  margin: 4px 0 0;
+  color: var(--admin-muted);
+  font-size: 0.88rem;
+}
+
+/* ===== Notices ===== */
+
+.storage-warn,
+.storage-skipped {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 16px 0 0;
+  padding: 11px 14px;
+  border-radius: 13px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* Amber, not red: a missing bitrate is something to fill in, not a failure. */
+.storage-warn {
+  border: 1px solid rgba(194, 102, 15, 0.26);
+  background: rgba(246, 153, 61, 0.1);
+  color: #7d4406;
+}
+
+/* Neutral: an excluded line is a decision the page made, not a problem. */
+.storage-skipped {
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  background: rgba(15, 40, 70, 0.035);
+  color: var(--admin-muted);
+}
+
+.storage-warn-tag,
+.storage-skipped-tag {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.storage-warn-tag { color: #fff; background: #c2660f; }
+.storage-skipped-tag { color: #fff; background: #64748b; }
+
+/* ===== Empty states ===== */
+
+.storage-empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 30px 20px;
+  border-radius: 14px;
+  border: 1px dashed rgba(15, 40, 70, 0.16);
+  background: rgba(15, 40, 70, 0.02);
+  text-align: center;
+}
+
+.storage-empty p {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.88rem;
+}
+
+.storage-empty--quiet {
+  padding: 18px 20px;
+}
+
+.storage-empty-icon svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: rgba(15, 40, 70, 0.3);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ===== Tables ===== */
+
+.storage-table-wrap {
+  margin-top: 16px;
+  /* Wide tables scroll inside their own box rather than pushing the page. */
+  overflow-x: auto;
+  border-radius: 13px;
+  border: 1px solid rgba(15, 40, 70, 0.09);
+}
+
+.storage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+/* Tinted, not a gradient slab. Five tables on one page each shouting in brand
+   blue turned the screen into stripes; the emphasis belongs on the result. */
+.storage-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #4a6480;
+  background: #f2f7fb;
+  border-bottom: 1px solid rgba(15, 40, 70, 0.09);
+  white-space: nowrap;
+}
+
+.storage-table th em {
+  font-style: normal;
+  font-weight: 600;
+  color: #8298ae;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.storage-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(15, 40, 70, 0.06);
+  color: var(--admin-ink);
+}
+
+.storage-table tbody tr:last-child td { border-bottom: 0; }
+
+.storage-table .num,
+.storage-table th.num { text-align: right; }
+
+/* Shrinks to its content so the action column steals no width from the name. */
+.storage-table .shrink,
+.storage-table th.shrink { width: 1%; white-space: nowrap; }
+
+.storage-item { font-weight: 650; }
+
+/* Supporting figures — intermediate values, not the answer. */
+.storage-dim { color: var(--admin-muted); }
+
+.storage-table tbody tr.is-missing td {
+  background: rgba(246, 153, 61, 0.06);
+}
+
+.storage-flag {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(246, 153, 61, 0.18);
+  color: #7d4406;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.storage-table--read tbody tr:hover td {
+  background: rgba(37, 148, 210, 0.035);
+}
+
+.storage-input {
+  width: 100%;
+  max-width: 120px;
+  padding: 7px 10px;
+  border: 1px solid rgba(15, 40, 70, 0.14);
+  border-radius: 9px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: right;
+  color: var(--admin-ink);
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.storage-input--text {
+  max-width: 240px;
+  text-align: left;
+}
+
+.storage-input:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
+}
+
+.row-btn {
+  padding: 5px 11px;
+  border-radius: 9px;
+  border: 1px solid rgba(15, 40, 70, 0.14);
+  background: #fff;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--admin-muted);
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.row-btn--delete:hover {
+  color: #b91c1c;
+  border-color: rgba(185, 28, 28, 0.4);
+  background: rgba(185, 28, 28, 0.06);
+}
+
+.storage-add { margin-top: 16px; }
+
+/* ===== Call to action ===== */
+
+.storage-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 16px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+  background: linear-gradient(120deg, #ffffff, #f5faff);
+  box-shadow: 0 14px 34px -26px rgba(15, 40, 70, 0.5);
+}
+
+.storage-cta-note {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.88rem;
+}
+
+.storage-cta-btn {
+  padding: 13px 26px;
+  font-size: 0.98rem;
+}
+
+.storage-cta-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ===== Result ===== */
+
+.storage-verdict {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(22, 128, 92, 0.24);
+  background: linear-gradient(120deg, rgba(22, 163, 116, 0.1), rgba(22, 163, 116, 0.03));
+}
+
+.storage-verdict.is-short {
+  border-color: rgba(185, 28, 28, 0.26);
+  background: linear-gradient(120deg, rgba(185, 28, 28, 0.09), rgba(185, 28, 28, 0.03));
+}
+
+.storage-verdict-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.storage-verdict-badge {
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #16805c;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.storage-verdict.is-short .storage-verdict-badge { background: #b91c1c; }
+
+.storage-verdict-pct {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.75rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: #0f5a42;
+  font-variant-numeric: tabular-nums;
+}
+
+.storage-verdict.is-short .storage-verdict-pct { color: #8f1616; }
+
+/* Coverage as a bar as well as a number: "141%" and "94%" look alike in text
+   and could not be more different in what they mean for the job. */
+.storage-bar {
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(15, 40, 70, 0.09);
+  overflow: hidden;
+}
+
+.storage-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #34b98a, #16805c);
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.storage-verdict.is-short .storage-bar-fill {
+  background: linear-gradient(90deg, #ef6a6a, #b91c1c);
+}
+
+.storage-verdict-figure {
+  margin: 0;
+  color: var(--admin-ink);
+  font-size: 0.92rem;
+}
+
+.storage-verdict-figure strong { font-weight: 800; }
+
+.storage-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.storage-stat {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Accent edge rather than a tinted fill — the numbers stay on white. */
+.storage-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, #7fc7ef, #2594d2);
+}
+
+.storage-stat--total {
+  border-color: rgba(37, 148, 210, 0.34);
+  background: linear-gradient(120deg, rgba(37, 148, 210, 0.08), rgba(37, 148, 210, 0.02));
+}
+
+.storage-stat--total::before {
+  background: linear-gradient(180deg, #f9b877, #f6993d);
+}
+
+.storage-stat-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.storage-stat strong {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--admin-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.storage-stat strong em {
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--admin-muted);
+}
+
+.storage-stat small {
+  color: var(--admin-muted);
+  font-size: 0.75rem;
+}
+
+.storage-subhead {
+  margin: 22px 0 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.storage-subhead + .storage-table-wrap { margin-top: 8px; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storage-bar-fill { transition: none; }
+}

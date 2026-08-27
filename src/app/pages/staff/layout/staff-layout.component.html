@@ -38,6 +38,22 @@
       }
 
       @if (canBuildBoq()) {
+        <a routerLink="/staff/storage" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="6" rx="2" />
+              <rect x="3" y="14" width="18" height="6" rx="2" />
+              <path d="M7 7h.01M7 17h.01" />
+            </svg>
+          </span>
+          <span>
+            <strong>Storage</strong>
+            <small>Size the NVR array</small>
+          </span>
+        </a>
+      }
+
+      @if (canBuildBoq()) {
         <a routerLink="/staff/boq" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">

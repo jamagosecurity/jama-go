@@ -1,0 +1,475 @@
+<section class="admin-page storage-page">
+  <header class="admin-page-header storage-page-header">
+    <div class="storage-head-actions">
+      <a class="btn-admin btn-admin-ghost" [routerLink]="backLink">{{ backLabel }}</a>
+    </div>
+  </header>
+
+  @if (error(); as message) {
+    <p class="admin-error" role="alert">{{ message }}</p>
+  }
+
+  <!-- ===== 1. Source ===== -->
+  <div class="admin-panel storage-panel">
+    <div class="storage-step">
+      <span class="storage-step-no" aria-hidden="true">1</span>
+      <div class="storage-step-copy">
+        <h2>Quotation</h2>
+        <p>Build the quotation first. Its camera lines are what gets sized.</p>
+      </div>
+    </div>
+
+    <div class="storage-source">
+      <label class="boq-field">
+        <span>Choose a quotation</span>
+        <select [formControl]="quotationControl" (change)="onQuotationChange($event)">
+          <option value="">Choose a quotation…</option>
+          @for (option of quotations(); track option.id) {
+            <option [value]="option.id">{{ option.boqNumber }} — {{ option.projectName }}</option>
+          }
+        </select>
+      </label>
+
+      @if (loadingQuotation()) {
+        <p class="storage-note">Loading its lines…</p>
+      } @else if (loadedQuotation(); as loaded) {
+        <div class="storage-loaded">
+          <span class="storage-loaded-no">{{ loaded.boqNumber }}</span>
+          <span class="storage-loaded-name">{{ loaded.projectName }}</span>
+          @if (loaded.clientName) {
+            <span class="storage-loaded-meta">{{ loaded.clientName }}</span>
+          }
+          @if (loaded.siteLocation) {
+            <span class="storage-loaded-meta">{{ loaded.siteLocation }}</span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ===== 2. Recording plan ===== -->
+  <div class="admin-panel storage-panel">
+    <div class="storage-step">
+      <span class="storage-step-no" aria-hidden="true">2</span>
+      <div class="storage-step-copy">
+        <h2>Recording plan</h2>
+        <p>Retention drives every figure below. In the old workbook it was buried in each formula.</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="storage-settings">
+      <label class="boq-field">
+        <span>Retention <em>days</em></span>
+        <input type="number" formControlName="retentionDays" min="1" max="3650" />
+      </label>
+      <label class="boq-field">
+        <span>RAID level</span>
+        <select formControlName="raidLevel">
+          @for (option of raidLevels; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+      <label class="boq-field">
+        <span>Video redundancy</span>
+        <input type="number" formControlName="redundancy" min="1" max="3" step="0.01" />
+      </label>
+      <label class="boq-field">
+        <span>Filesystem factor</span>
+        <input type="number" formControlName="filesystemFactor" min="0.5" max="1" step="0.01" />
+      </label>
+      <label class="boq-field">
+        <span>Failover cameras</span>
+        <input type="number" formControlName="failoverCameras" min="0" />
+      </label>
+      <label class="boq-field">
+        <span>Failover retention <em>days</em></span>
+        <input type="number" formControlName="failoverDays" min="0" max="3650" />
+      </label>
+    </form>
+  </div>
+
+  <!-- ===== 3. Cameras ===== -->
+  <div class="admin-panel storage-panel">
+    <div class="storage-step">
+      <span class="storage-step-no" aria-hidden="true">3</span>
+      <div class="storage-step-copy">
+        <h2>Cameras</h2>
+        <p>Pulled from the quotation. Bitrate comes off each stock item.</p>
+      </div>
+      @if (cameraRows().length) {
+        <span class="storage-count">{{ cameraCount() }} cameras</span>
+      }
+    </div>
+
+    @if (skipped().length) {
+      <p class="storage-skipped">
+        <span class="storage-skipped-tag">Cameras only</span>
+        {{ skipped().length }}
+        {{ skipped().length === 1 ? 'line was' : 'lines were' }} left out —
+        {{ skipped().join(', ') }} —
+        {{ skipped().length === 1 ? 'it records' : 'they record' }} nothing.
+      </p>
+    }
+
+    @if (cameraRows().length) {
+      @if (unpricedRows().length) {
+        <p class="storage-warn" role="status">
+          <span class="storage-warn-tag">Bitrate needed</span>
+          {{ unpricedRows().length }}
+          {{ unpricedRows().length === 1 ? 'item has' : 'items have' }}
+          none on the stock record. Enter one below, or set it on the item so every
+          future quotation sizes itself.
+        </p>
+      }
+
+      <div class="storage-table-wrap">
+        <table class="storage-table">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col" class="num">Qty</th>
+              <th scope="col" class="num">Bitrate <em>Mbps</em></th>
+              <th scope="col" class="shrink"><span class="visually-hidden">Remove</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of cameraRows(); track row.key; let i = $index) {
+              <tr [class.is-missing]="!row.bitrateMbps">
+                <td class="storage-item">
+                  {{ row.label }}
+                  @if (!row.bitrateMbps) { <span class="storage-flag">no bitrate</span> }
+                </td>
+                <td class="num">
+                  <input type="number" class="storage-input" min="1" [value]="row.count"
+                    [attr.aria-label]="'Quantity for ' + row.label"
+                    (change)="setCameraCount(i, $event)" />
+                </td>
+                <td class="num">
+                  <input type="number" class="storage-input" min="0.1" max="100" step="0.1"
+                    [value]="row.bitrateMbps" placeholder="—"
+                    [attr.aria-label]="'Bitrate for ' + row.label"
+                    (change)="setCameraBitrate(i, $event)" />
+                </td>
+                <td class="shrink">
+                  <button type="button" class="row-btn row-btn--delete" (click)="removeCameraRow(i)"
+                    [attr.aria-label]="'Remove ' + row.label">Remove</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="storage-empty">
+        <span class="storage-empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z" />
+            <path d="m16 11 5-3v8l-5-3z" />
+          </svg>
+        </span>
+        <p>No cameras yet — choose a quotation in step 1 to pull its lines in.</p>
+      </div>
+    }
+  </div>
+
+  <!-- ===== 4. ANPR ===== -->
+  <div class="admin-panel storage-panel">
+    <div class="storage-step">
+      <span class="storage-step-no" aria-hidden="true">4</span>
+      <div class="storage-step-copy">
+        <h2>ANPR snapshots</h2>
+        <p>Number-plate capture stores stills, not video, so it is sized on its own terms.</p>
+      </div>
+      @if (anprRows().length) {
+        <span class="storage-count">
+          {{ anprRows().length }} {{ anprRows().length === 1 ? 'group' : 'groups' }}
+        </span>
+      }
+    </div>
+
+    @if (anprRows().length) {
+      <div class="storage-table-wrap">
+        <table class="storage-table">
+          <thead>
+            <tr>
+              <th scope="col">Label</th>
+              <th scope="col" class="num">Cameras</th>
+              <th scope="col" class="num">KB <em>/ image</em></th>
+              <th scope="col" class="num">Images <em>/ event</em></th>
+              <th scope="col" class="num">Events <em>/ day</em></th>
+              <th scope="col" class="shrink"><span class="visually-hidden">Remove</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of anprRows(); track row.key; let i = $index) {
+              <tr>
+                <td>
+                  <input class="storage-input storage-input--text" [value]="row.label"
+                    aria-label="ANPR group label" (change)="setAnpr(i, 'label', $event)" />
+                </td>
+                <td class="num">
+                  <input type="number" class="storage-input" min="1" [value]="row.count"
+                    aria-label="ANPR camera count" (change)="setAnpr(i, 'count', $event)" />
+                </td>
+                <td class="num">
+                  <input type="number" class="storage-input" min="1" [value]="row.kilobytesPerImage"
+                    aria-label="Kilobytes per image" (change)="setAnpr(i, 'kilobytesPerImage', $event)" />
+                </td>
+                <td class="num">
+                  <input type="number" class="storage-input" min="1" [value]="row.imagesPerEvent"
+                    aria-label="Images per event" (change)="setAnpr(i, 'imagesPerEvent', $event)" />
+                </td>
+                <td class="num">
+                  <input type="number" class="storage-input" min="1" [value]="row.eventsPerDay"
+                    aria-label="Events per day" (change)="setAnpr(i, 'eventsPerDay', $event)" />
+                </td>
+                <td class="shrink">
+                  <button type="button" class="row-btn row-btn--delete"
+                    (click)="removeAnprRow(i)" aria-label="Remove ANPR group">Remove</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="storage-empty storage-empty--quiet">
+        <p>None. ANPR cameras on the quotation land here automatically.</p>
+      </div>
+    }
+
+    <button type="button" class="btn-admin btn-admin-ghost storage-add" (click)="addAnprRow()">
+      + Add ANPR group
+    </button>
+  </div>
+
+  <!-- ===== 5. Array ===== -->
+  <div class="admin-panel storage-panel">
+    <div class="storage-step">
+      <span class="storage-step-no" aria-hidden="true">5</span>
+      <div class="storage-step-copy">
+        <h2>Disk array</h2>
+        <p>Parity is subtracted before the filesystem factor — in every group, including ANPR.</p>
+      </div>
+      <span class="storage-count">RAID-{{ raidLevelValue() }}</span>
+    </div>
+
+    <div class="storage-table-wrap">
+      <table class="storage-table">
+        <thead>
+          <tr>
+            <th scope="col">Group</th>
+            <th scope="col" class="num">Disks</th>
+            <th scope="col" class="num">Disk size</th>
+            <th scope="col" class="shrink"><span class="visually-hidden">Remove</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of groupRows(); track row.key; let i = $index) {
+            <tr>
+              <td>
+                <input class="storage-input storage-input--text" [value]="row.label"
+                  aria-label="Group label" (change)="setGroup(i, 'label', $event)" />
+              </td>
+              <td class="num">
+                <input type="number" class="storage-input" min="2" max="96" [value]="row.totalDisks"
+                  aria-label="Total disks" (change)="setGroup(i, 'totalDisks', $event)" />
+              </td>
+              <td class="num">
+                <select class="storage-input" [value]="row.diskTerabytes"
+                  aria-label="Disk size" (change)="setGroup(i, 'diskTerabytes', $event)">
+                  @for (size of diskSizes; track size) {
+                    <option [value]="size" [selected]="size === row.diskTerabytes">{{ size }} TB</option>
+                  }
+                </select>
+              </td>
+              <td class="shrink">
+                @if (groupRows().length > 1) {
+                  <button type="button" class="row-btn row-btn--delete"
+                    (click)="removeGroupRow(i)" aria-label="Remove group">Remove</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <button type="button" class="btn-admin btn-admin-ghost storage-add" (click)="addGroupRow()">
+      + Add group
+    </button>
+  </div>
+
+  <!-- ===== Calculate ===== -->
+  <div class="storage-cta">
+    <p class="storage-cta-note">
+      @if (!cameraRows().length && !anprRows().length) {
+        Choose a quotation to size.
+      } @else if (unpricedRows().length) {
+        Fill in the missing bitrates to continue.
+      } @else {
+        {{ cameraCount() }} cameras over {{ retentionValue() }} days, across
+        {{ groupRows().length }} {{ groupRows().length === 1 ? 'group' : 'groups' }}.
+      }
+    </p>
+    <button type="button" class="btn-admin btn-admin-primary storage-cta-btn"
+      [disabled]="!canCalculate() || calculating()" (click)="calculate()">
+      {{ calculating() ? 'Calculating…' : 'Calculate storage' }}
+    </button>
+  </div>
+
+  <!-- ===== Result ===== -->
+  @if (design(); as result) {
+    <div class="admin-panel storage-panel storage-result">
+      <div class="storage-step">
+        <span class="storage-step-no storage-step-no--done" aria-hidden="true">✓</span>
+        <div class="storage-step-copy">
+          <h2>Result</h2>
+          <p>{{ result.retentionDays }} days · RAID-{{ result.raidLevel }} · {{ result.cameraCount }} cameras</p>
+        </div>
+      </div>
+
+      <div class="storage-verdict" [class.is-short]="!result.covered">
+        <div class="storage-verdict-head">
+          <span class="storage-verdict-badge">{{ result.covered ? 'Covered' : 'Short' }}</span>
+          <span class="storage-verdict-pct">{{ result.coveragePercent | number: '1.0-1' }}%</span>
+        </div>
+
+        <!-- Clamped, so 400% coverage does not try to paint four bars wide. -->
+        <div class="storage-bar" role="img"
+          [attr.aria-label]="'Coverage ' + (result.coveragePercent | number: '1.0-1') + ' percent'">
+          <span class="storage-bar-fill" [style.width.%]="coverageWidth(result.coveragePercent)"></span>
+        </div>
+
+        <p class="storage-verdict-figure">
+          <strong>{{ result.availableTerabytes | number: '1.2-2' }} TB</strong> available of
+          <strong>{{ result.requiredTerabytes | number: '1.2-2' }} TB</strong> needed
+          @if (result.covered) {
+            — {{ result.surplusTerabytes | number: '1.2-2' }} TB spare
+          } @else {
+            — {{ -result.surplusTerabytes | number: '1.2-2' }} TB short
+          }
+        </p>
+      </div>
+
+      <div class="storage-stats">
+        <div class="storage-stat">
+          <span class="storage-stat-label">Video</span>
+          <strong>{{ result.videoTerabytes | number: '1.2-2' }} <em>TB</em></strong>
+          <small>{{ result.videoTerabytesRaw | number: '1.2-2' }} TB × {{ result.redundancy }} redundancy</small>
+        </div>
+        <div class="storage-stat">
+          <span class="storage-stat-label">Bandwidth</span>
+          <strong>{{ result.bandwidthMbps | number: '1.1-1' }} <em>Mbps</em></strong>
+          <small>Aggregate at the recorder</small>
+        </div>
+        @if (result.anprTerabytes > 0) {
+          <div class="storage-stat">
+            <span class="storage-stat-label">ANPR</span>
+            <strong>{{ result.anprTerabytes | number: '1.2-2' }} <em>TB</em></strong>
+            <small>Snapshots, not video</small>
+          </div>
+        }
+        @if (result.failoverTerabytes > 0) {
+          <div class="storage-stat">
+            <span class="storage-stat-label">Failover</span>
+            <strong>{{ result.failoverTerabytes | number: '1.2-2' }} <em>TB</em></strong>
+            <small>Shorter copy of some cameras</small>
+          </div>
+        }
+        <div class="storage-stat storage-stat--total">
+          <span class="storage-stat-label">Required</span>
+          <strong>{{ result.requiredTerabytes | number: '1.2-2' }} <em>TB</em></strong>
+          <small>Video + ANPR + failover</small>
+        </div>
+      </div>
+
+      <h3 class="storage-subhead">Per camera</h3>
+      <div class="storage-table-wrap">
+        <table class="storage-table storage-table--read">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col" class="num">Qty</th>
+              <th scope="col" class="num">Mbps</th>
+              <th scope="col" class="num">TB each</th>
+              <th scope="col" class="num">TB total</th>
+              <th scope="col" class="num">Bandwidth</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (line of result.cameras; track line.label) {
+              <tr>
+                <td class="storage-item">{{ line.label }}</td>
+                <td class="num">{{ line.count }}</td>
+                <td class="num">{{ line.bitrateMbps | number: '1.1-2' }}</td>
+                <td class="num storage-dim">{{ line.perCameraTerabytes | number: '1.4-4' }}</td>
+                <td class="num"><strong>{{ line.terabytesRaw | number: '1.2-2' }}</strong></td>
+                <td class="num storage-dim">{{ line.bandwidthMbps | number: '1.1-1' }} Mbps</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (result.anpr.length) {
+        <h3 class="storage-subhead">ANPR</h3>
+        <div class="storage-table-wrap">
+          <table class="storage-table storage-table--read">
+            <thead>
+              <tr>
+                <th scope="col">Group</th>
+                <th scope="col" class="num">Cameras</th>
+                <th scope="col" class="num">TB each</th>
+                <th scope="col" class="num">TB total</th>
+                <th scope="col" class="num">Disks</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (line of result.anpr; track line.label) {
+                <tr>
+                  <td class="storage-item">{{ line.label }}</td>
+                  <td class="num">{{ line.count }}</td>
+                  <td class="num storage-dim">{{ line.perCameraTerabytes | number: '1.4-4' }}</td>
+                  <td class="num"><strong>{{ line.terabytes | number: '1.2-2' }}</strong></td>
+                  <td class="num">{{ line.disksNeeded }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <h3 class="storage-subhead">Disk groups</h3>
+      <div class="storage-table-wrap">
+        <table class="storage-table storage-table--read">
+          <thead>
+            <tr>
+              <th scope="col">Group</th>
+              <th scope="col" class="num">Disks</th>
+              <th scope="col" class="num">Parity</th>
+              <th scope="col" class="num">Data</th>
+              <th scope="col" class="num">Disk TB</th>
+              <th scope="col" class="num">Usable TB</th>
+              <th scope="col" class="num">Camera ceiling</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (group of result.groups; track group.label) {
+              <tr>
+                <td class="storage-item">{{ group.label }}</td>
+                <td class="num">{{ group.totalDisks }}</td>
+                <td class="num storage-dim">{{ group.parityDisks }}</td>
+                <td class="num storage-dim">{{ group.dataDisks }}</td>
+                <td class="num storage-dim">{{ group.diskTerabytes }}</td>
+                <td class="num"><strong>{{ group.availableTerabytes | number: '1.2-2' }}</strong></td>
+                <td class="num">{{ group.cameraCeiling }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</section>

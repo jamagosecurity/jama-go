@@ -116,6 +116,15 @@ export const routes: Routes = [
               import('./pages/admin/staff/admin-staff.component').then((m) => m.AdminStaffComponent),
           },
           {
+            path: 'storage/calculator',
+            canActivate: [permissionGuard(PERMISSIONS.boqManage)],
+            title: 'Storage Calculator — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/staff/storage/storage-calculator.component').then(
+                (m) => m.StorageCalculatorComponent,
+              ),
+          },
+          {
             path: 'storage',
             title: 'CCTV Storage Sizing — Jama Go Admin',
             loadComponent: () =>

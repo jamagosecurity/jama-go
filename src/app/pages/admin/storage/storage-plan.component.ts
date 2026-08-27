@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 /**
  * The CCTV storage sizing plan, derived from
@@ -65,6 +66,7 @@ export interface Defect {
 @Component({
   selector: 'app-storage-plan',
   standalone: true,
+  imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './storage-plan.component.html',
   styleUrl: './storage-plan.component.css',

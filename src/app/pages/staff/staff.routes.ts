@@ -59,6 +59,17 @@ export const STAFF_ROUTES: Routes = [
         ],
       },
       {
+        // Sizes the array for a quotation, so it rides the same permission:
+        // anyone who can build one can size its storage.
+        path: 'storage',
+        canActivate: [permissionGuard(PERMISSIONS.boqManage)],
+        title: 'Storage Calculator — Jama Go Staff',
+        loadComponent: () =>
+          import('./storage/storage-calculator.component').then(
+            (m) => m.StorageCalculatorComponent,
+          ),
+      },
+      {
         // The admin DIA screens, mounted inside the staff shell. Gated on
         // dia.upload so only staff an admin granted it ever see them.
         path: 'dia',
