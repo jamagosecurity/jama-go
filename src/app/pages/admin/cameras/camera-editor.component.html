@@ -1,7 +1,7 @@
 <section class="admin-page camera-page">
   <header class="admin-page-header">
     <div>
-      <a class="camera-back" routerLink="/admin/cameras">← All stock items</a>
+      <a class="camera-back" [routerLink]="base">← All stock items</a>
       <span class="admin-kicker">Inventory</span>
       <h1>{{ isEditing() ? 'Edit item' : 'Add item' }}</h1>
     </div>
@@ -379,7 +379,7 @@
           <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
             {{ saving() ? 'Saving…' : isEditing() ? 'Save changes' : 'Add item' }}
           </button>
-          <a class="btn-admin btn-admin-ghost" routerLink="/admin/cameras">Cancel</a>
+          <a class="btn-admin btn-admin-ghost" [routerLink]="base">Cancel</a>
         </div>
 
         @if (formError()) {

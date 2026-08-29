@@ -8,6 +8,7 @@ import {
   staffGuard,
   technicianGuard,
 } from './guards/admin.guard';
+import { createCameraRoutes } from './pages/admin/cameras/cameras.routes';
 import { PERMISSIONS } from './models/auth.model';
 
 /**
@@ -135,32 +136,7 @@ export const routes: Routes = [
           {
             path: 'cameras',
             canActivate: [permissionGuard(PERMISSIONS.cameraManage)],
-            children: [
-              {
-                path: 'new',
-                title: 'Add Stock Item — Jama Go Admin',
-                loadComponent: () =>
-                  import('./pages/admin/cameras/camera-editor.component').then(
-                    (m) => m.CameraEditorComponent,
-                  ),
-              },
-              {
-                path: ':id/edit',
-                title: 'Edit Stock Item — Jama Go Admin',
-                loadComponent: () =>
-                  import('./pages/admin/cameras/camera-editor.component').then(
-                    (m) => m.CameraEditorComponent,
-                  ),
-              },
-              {
-                path: '',
-                title: 'Stock Inventory — Jama Go Admin',
-                loadComponent: () =>
-                  import('./pages/admin/cameras/camera-list.component').then(
-                    (m) => m.CameraListComponent,
-                  ),
-              },
-            ],
+            children: createCameraRoutes('/admin/cameras'),
           },
           {
             path: 'contacts',

@@ -26,6 +26,7 @@ import {
 } from '../../../models/camera.model';
 import { CameraService } from '../../../services/camera.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
+import { CAMERAS_BASE_PATH } from './cameras-base-path';
 
 const PAGE_SIZE = 20;
 
@@ -44,6 +45,9 @@ const PAGE_SIZE = 20;
 export class CameraListComponent implements OnInit {
   private readonly service = inject(CameraService);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Portal this screen is mounted under — see CAMERAS_BASE_PATH. */
+  protected readonly base = inject(CAMERAS_BASE_PATH);
 
   protected readonly cameraTypes = CAMERA_TYPES;
   protected readonly categories = PRODUCT_CATEGORIES;

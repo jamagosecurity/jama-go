@@ -22,6 +22,10 @@ export class StaffLayoutComponent {
    *  and every endpoint check boq.manage themselves. */
   readonly canBuildBoq = computed(() => this.auth.can(PERMISSIONS.boqManage));
 
+  /** And for the stock inventory. Without this the permission was grantable but
+   *  invisible: nothing in the staff portal led to the screens it unlocks. */
+  readonly canManageCameras = computed(() => this.auth.can(PERMISSIONS.cameraManage));
+
   readonly initials = computed(() => {
     const name = this.auth.currentUser()?.fullName?.trim() || 'Staff';
     const parts = name.split(/\s+/).filter(Boolean);

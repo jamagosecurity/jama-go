@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { permissionGuard } from '../../guards/admin.guard';
 import { PERMISSIONS } from '../../models/auth.model';
+import { createCameraRoutes } from '../admin/cameras/cameras.routes';
 import { createDiaRoutes } from '../admin/dia/dia.routes';
 
 export const STAFF_ROUTES: Routes = [
@@ -68,6 +69,15 @@ export const STAFF_ROUTES: Routes = [
           import('./storage/storage-calculator.component').then(
             (m) => m.StorageCalculatorComponent,
           ),
+      },
+      {
+        // The stock inventory, mounted inside the staff shell. camera.manage is
+        // grantable to a staff account, but the screens only existed under
+        // /admin, which is behind adminGuard — so the grant showed a tick in the
+        // permission editor and gave the holder nothing they could reach.
+        path: 'cameras',
+        canActivate: [permissionGuard(PERMISSIONS.cameraManage)],
+        children: createCameraRoutes('/staff/cameras'),
       },
       {
         // The admin DIA screens, mounted inside the staff shell. Gated on

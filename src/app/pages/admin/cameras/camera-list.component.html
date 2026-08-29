@@ -24,7 +24,7 @@
     </div>
 
     <div class="camera-head-actions">
-      <a class="btn-admin btn-admin-primary" routerLink="/admin/cameras/new">Add item</a>
+      <a class="btn-admin btn-admin-primary" [routerLink]="[base, 'new']">Add item</a>
     </div>
 
     @if (summary(); as totals) {
@@ -227,7 +227,7 @@
                         [disabled]="deletingId() === camera.id" (click)="cancelDelete()">Keep</button>
                     } @else {
                       <a class="row-btn row-btn--edit"
-                        [routerLink]="['/admin/cameras', camera.id, 'edit']"
+                        [routerLink]="[base, camera.id, 'edit']"
                         [attr.aria-label]="'Edit ' + camera.itemName">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                           <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
@@ -282,7 +282,7 @@
             }}
           </p>
           @if (!hasFilters()) {
-            <a class="btn-admin btn-admin-primary" routerLink="/admin/cameras/new">Add item</a>
+            <a class="btn-admin btn-admin-primary" [routerLink]="[base, 'new']">Add item</a>
           }
         </div>
       }

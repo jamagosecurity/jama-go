@@ -29,6 +29,7 @@ import {
 import { CameraService } from '../../../services/camera.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { fieldErrorMessage, shouldShowError } from '../../../utils/form-validators.util';
+import { CAMERAS_BASE_PATH } from './cameras-base-path';
 
 /** Matches CameraFieldRules on the API, so the two reject the same values. */
 const ITEM_NAME_MAX_LENGTH = 200;
@@ -63,6 +64,9 @@ export class CameraEditorComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Portal this screen is mounted under — see CAMERAS_BASE_PATH. */
+  protected readonly base = inject(CAMERAS_BASE_PATH);
 
   protected readonly cameraTypes = CAMERA_TYPES;
   protected readonly categories = PRODUCT_CATEGORIES;
@@ -411,9 +415,11 @@ export class CameraEditorComponent implements OnInit {
       });
   }
 
-  /** Hands the list what it needs to confirm and highlight the row just written. */
+  /** Hands the list what it needs to confirm and highlight the row just written.
+   *  Returns to whichever portal this screen was mounted under: hardcoding
+   *  /admin/cameras here sent a staff member into adminGuard on every save. */
   private returnToList(saved: Camera, created: boolean): void {
-    void this.router.navigate(['/admin/cameras'], {
+    void this.router.navigate([this.base], {
       state: { savedId: saved.id, savedName: saved.itemName, created },
     });
   }

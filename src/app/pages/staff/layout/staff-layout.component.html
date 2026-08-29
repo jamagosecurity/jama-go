@@ -53,6 +53,22 @@
         </a>
       }
 
+      @if (canManageCameras()) {
+        <a routerLink="/staff/cameras" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z" />
+              <path d="m16 11 5-3v8l-5-3z" />
+              <path d="M6 20h5" />
+            </svg>
+          </span>
+          <span>
+            <strong>Stock Inventory</strong>
+            <small>Brand, type &amp; price</small>
+          </span>
+        </a>
+      }
+
       @if (canBuildBoq()) {
         <a routerLink="/staff/boq" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
