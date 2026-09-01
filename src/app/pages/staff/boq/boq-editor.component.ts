@@ -15,6 +15,7 @@ import {
   ProductCategory,
   cameraTypeLabel,
   matchCameraBrand,
+  unitLabel,
 } from '../../../models/camera.model';
 import { BoqService } from '../../../services/boq.service';
 import { CameraService } from '../../../services/camera.service';
@@ -244,11 +245,12 @@ export class BoqEditorComponent implements OnInit {
   );
 
   /**
-   * How a unit is written on screen. The enum member stays "Piece" — it is the
-   * stored value — so only the printed form changes, and it matches the PDF.
+   * How a unit is written on screen. The stored enum name stays put, so only
+   * the printed form changes; the mapping lives with the dropdown it has to
+   * agree with rather than being spelled out a second time here.
    */
   protected unit(uom: string): string {
-    return uom.toLowerCase() === 'piece' ? 'pcs' : uom;
+    return unitLabel(uom);
   }
 
   protected lineTotal(line: DraftLine): number {

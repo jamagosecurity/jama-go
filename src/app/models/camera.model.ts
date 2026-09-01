@@ -39,7 +39,7 @@ export type ProductCategory =
   | 'Cable'
   | 'AccessControl';
 
-export type UnitOfMeasurement = 'Piece' | 'Box' | 'Set' | 'Metre' | 'Roll' | 'Pack' | 'Pair';
+export type UnitOfMeasurement = 'Piece' | 'Box' | 'Set' | 'Metre' | 'Roll' | 'Location';
 
 export type ItemType = 'Product' | 'Service';
 
@@ -72,16 +72,34 @@ export const PRODUCT_CATEGORIES: readonly Option<ProductCategory>[] = [
   { value: 'AccessControl', label: 'Access Control System' },
 ];
 
+/**
+ * Mirrors Jama.Domain.Enums.UnitOfMeasurement.
+ *
+ * The value is what is stored; the label is what anyone reads. They differ for
+ * the three the trade abbreviates, and the stored names stay put because they
+ * are in every existing row.
+ */
 export const UNITS_OF_MEASUREMENT: readonly Option<UnitOfMeasurement>[] = [
-  // Stored as 'Piece'; written as 'pcs' wherever it is shown, including the PDF.
-  { value: 'Piece', label: 'pcs' },
+  { value: 'Piece', label: 'Pcs' },
   { value: 'Box', label: 'Box' },
   { value: 'Set', label: 'Set' },
-  { value: 'Metre', label: 'Metre' },
+  { value: 'Metre', label: 'Mtr' },
   { value: 'Roll', label: 'Roll' },
-  { value: 'Pack', label: 'Pack' },
-  { value: 'Pair', label: 'Pair' },
+  { value: 'Location', label: 'Loc' },
 ];
+
+/**
+ * The printed form of a stored unit, for screens that show a saved line rather
+ * than the dropdown. Derived from the list above so the BOQ and the editor
+ * cannot drift from each other — they were two separate hardcoded mappings.
+ */
+const UOM_LABELS: ReadonlyMap<string, string> = new Map(
+  UNITS_OF_MEASUREMENT.map((option) => [option.value.toLowerCase(), option.label]),
+);
+
+export function unitLabel(uom: string): string {
+  return UOM_LABELS.get(uom?.toLowerCase()) ?? uom;
+}
 
 /** Mirrors Jama.Domain.Enums.CameraResolution. */
 export type CameraResolution =
