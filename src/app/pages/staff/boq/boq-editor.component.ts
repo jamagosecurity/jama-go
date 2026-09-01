@@ -8,7 +8,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { BOQ_SECTION_TITLES, BOQ_STATUSES, Boq, BoqStatus, SaveBoqRequest } from '../../../models/boq.model';
 import {
-  CAMERA_TYPES,
   Camera,
   CameraBrandCount,
   CameraType,
@@ -30,6 +29,9 @@ interface DraftLine {
   itemName: string;
   modelNo: string | null;
   brand: string | null;
+  /** Form factor, shown beside brand and model — the server copies it onto the
+   *  saved line from the catalogue, the same way it copies those two. */
+  type: string | null;
   uom: string;
   quantity: number;
   /** Catalogue price, for the running total only — the server sets the real one. */
@@ -64,12 +66,6 @@ interface PickerGroup {
   /** A section title, or the catch-all label. */
   title: string;
   categories: ProductCategory[];
-  /** Cctv splits in two: number-plate cameras belong under KPOI, not the main
-   *  system, so one group takes only ANPR and the other takes everything else. */
-  anprOnly?: boolean;
-  excludeAnpr?: boolean;
-  /** The catch-all cannot guess a section, so its rows carry a chooser. */
-  unsorted?: boolean;
 }
 
 interface DraftSection {
@@ -105,21 +101,29 @@ export class BoqEditorComponent implements OnInit {
   protected readonly sectionTitles = BOQ_SECTION_TITLES;
 
   /** In the order the document prints them, so browsing follows the quotation. */
+  /**
+   * One category per section, in document order.
+   *
+   * This used to be a translation table — "Power supply" into "Rack & UPS", KPOI
+   * faked as the ANPR half of Cctv — because categories and sections were named
+   * differently. They are the same list now, so the mapping is one to one and
+   * there is nothing left to drift.
+   *
+   * KPOI is its own category rather than a filter over Cctv. The two are not the
+   * same thing: a submission counts KPOI separately from the main system, while
+   * number-plate cameras are sized on a page of their own. ANPR cameras stay
+   * under Main CCTV, which is where they are quoted.
+   */
   protected readonly pickerGroups: readonly PickerGroup[] = [
-    { title: 'Main CCTV System', categories: ['Cctv'], excludeAnpr: true },
+    { title: 'Main CCTV System', categories: ['Cctv'] },
     { title: 'Camera Accessories', categories: ['Accessory'] },
     { title: 'NVR & Storage', categories: ['Storage'] },
     { title: 'Monitors and Work Stations', categories: ['Monitor'] },
     { title: 'Switch & Components', categories: ['Network'] },
     { title: 'Rack & UPS', categories: ['PowerSupply'] },
-    { title: 'Key Point of Interest Camera (KPOI)', categories: ['Cctv'], anprOnly: true },
+    { title: 'Key Point of Interest Camera (KPOI)', categories: ['Kpoi'] },
     { title: 'Passive Components & Cables', categories: ['Cable'] },
-    // Alarm panels are part of the access & security system on a real job.
-    { title: 'Access Control System', categories: ['AccessControl', 'Alarm'] },
-    // Nothing may be unreachable: stock filed under "Other" would otherwise be
-    // impossible to quote, which is the same trap the staff permission list fell
-    // into. These rows carry a section chooser instead of guessing.
-    { title: 'Other stock', categories: ['Other'], unsorted: true },
+    { title: 'Access Control System', categories: ['AccessControl'] },
   ];
 
   /**
@@ -136,10 +140,9 @@ export class BoqEditorComponent implements OnInit {
    * Where each section's cascade has got to: brand chosen, then model.
    * Keyed by section title, so nine cascades run independently.
    */
-  protected readonly choice = signal<Record<string, { brand: string; model: string }>>({});
+  protected readonly choice = signal<Record<string, { brand: string; type: string; model: string }>>({});
 
   /** The section chosen for an unfiled item, which has no heading of its own. */
-  protected readonly unsortedSection = signal('');
 
   /** Quantity typed into a section's entry row before the line is added. */
   protected readonly newQty = signal<Record<string, number>>({});
@@ -193,7 +196,6 @@ export class BoqEditorComponent implements OnInit {
   protected readonly typeControl = new FormControl<CameraType | ''>('', { nonNullable: true });
 
   protected readonly categories = PRODUCT_CATEGORIES;
-  protected readonly cameraTypes = CAMERA_TYPES;
   protected readonly typeLabel = cameraTypeLabel;
   /** Read from the catalogue, since brand is free text. */
   protected readonly brandOptions = signal<CameraBrandCount[]>([]);
@@ -323,6 +325,7 @@ export class BoqEditorComponent implements OnInit {
                   itemName: line.itemName,
                   modelNo: line.modelNo,
                   brand: line.brand,
+                  type: line.type,
                   uom: line.uom,
                   quantity: line.quantity,
                   unitRate: line.unitRate,
@@ -444,20 +447,12 @@ export class BoqEditorComponent implements OnInit {
     return this.pickerGroups.find((group) => group.title === title);
   }
 
-  /** Stock that belongs to no section — quotable, but only once told where. */
-  protected readonly unsortedGroup = this.pickerGroups.find((group) => group.unsorted)!;
-
   /** The stock that belongs under a heading, by the group's category rule. */
   protected itemsIn(title: string): Camera[] {
     const group = this.groupFor(title);
     if (!group) return [];
 
-    return this.allStock().filter((item) => {
-      if (!group.categories.includes(item.category)) return false;
-      if (group.anprOnly) return item.type === 'Anpr';
-      if (group.excludeAnpr) return item.type !== 'Anpr';
-      return true;
-    });
+    return this.allStock().filter((item) => group.categories.includes(item.category));
   }
 
   // ===== Brand → model → description =====
@@ -468,6 +463,27 @@ export class BoqEditorComponent implements OnInit {
     return [...new Set(this.itemsIn(title).map((item) => item.brand))].sort((a, b) =>
       a.localeCompare(b),
     );
+  }
+
+  /**
+   * Types stocked in this section, for the brand already chosen.
+   *
+   * Derived from the items actually filed under the section rather than from a
+   * list, so a section holding only domes offers only "Dome" — asking a staff
+   * member to choose between form factors nobody stocks is a question with a
+   * wrong answer available.
+   */
+  protected typesIn(title: string): string[] {
+    const brand = this.choice()[title]?.brand;
+    if (!brand) return [];
+
+    return [
+      ...new Set(
+        this.itemsIn(title)
+          .filter((item) => item.brand === brand && !!item.type)
+          .map((item) => item.type),
+      ),
+    ].sort((a, b) => a.localeCompare(b));
   }
 
   /** Models for the brand already chosen. Empty until one is. */
@@ -481,11 +497,22 @@ export class BoqEditorComponent implements OnInit {
    */
   protected readonly noModel = '__no-model__';
 
+  /**
+   * Models for the brand AND type already chosen.
+   *
+   * Deliberately empty until both are answered. Listing every model a brand
+   * makes the moment the brand is picked offered domes, bullets and ANPR
+   * together — the reader then had to know which model was which form factor,
+   * which is the question the type step exists to answer.
+   */
   protected modelsIn(title: string): string[] {
-    const brand = this.choice()[title]?.brand;
-    if (!brand) return [];
+    const chosen = this.choice()[title];
+    if (!chosen?.brand) return [];
 
-    const mine = this.itemsIn(title).filter((item) => item.brand === brand);
+    // A brand whose items carry no type at all has nothing to wait for.
+    if (!chosen.type && this.typesIn(title).length) return [];
+
+    const mine = this.narrow(title, chosen.brand, chosen.type);
 
     const numbered = [...new Set(mine.filter((item) => item.modelNo).map((item) => item.modelNo))].sort(
       (a, b) => a.localeCompare(b),
@@ -507,13 +534,25 @@ export class BoqEditorComponent implements OnInit {
    * them. Items with no model number appear as soon as their brand is chosen,
    * since there is nothing for the middle step to offer.
    */
+  /** Items in this section for a brand, narrowed by type when one is chosen. */
+  private narrow(title: string, brand: string, type?: string): Camera[] {
+    return this.itemsIn(title).filter(
+      (item) => item.brand === brand && (!type || item.type === type),
+    );
+  }
+
   protected matchesIn(title: string): Camera[] {
     const chosen = this.choice()[title];
     if (!chosen?.brand) return [];
 
-    const mine = this.itemsIn(title).filter((item) => item.brand === chosen.brand);
+    // The type is part of the question, not an optional refinement: resolving on
+    // the brand alone committed a line before the reader had said which form
+    // factor they wanted.
+    if (!chosen.type && this.typesIn(title).length) return [];
 
-    // A brand holding one item needs no second question.
+    const mine = this.narrow(title, chosen.brand, chosen.type);
+
+    // Brand and type holding one item between them need no third question.
     if (mine.length === 1) return mine;
 
     // Otherwise nothing resolves until the model step has been answered — that
@@ -529,10 +568,21 @@ export class BoqEditorComponent implements OnInit {
     const brand = (event.target as HTMLSelectElement).value;
     // Model and description belong to the old brand — clearing them stops a
     // stale pair being submitted.
-    this.choice.update((current) => ({ ...current, [title]: { brand, model: '' } }));
+    this.choice.update((current) => ({ ...current, [title]: { brand, type: '', model: '' } }));
 
     // A brand whose items carry no model number is already unambiguous, so
     // there is nothing left to ask.
+    this.commitIfResolved(title);
+  }
+
+  protected setType(title: string, event: Event): void {
+    const type = (event.target as HTMLSelectElement).value;
+    // The model belonged to the old type, so it goes with it.
+    this.choice.update((current) => ({
+      ...current,
+      [title]: { brand: current[title]?.brand ?? '', type, model: '' },
+    }));
+
     this.commitIfResolved(title);
   }
 
@@ -540,7 +590,11 @@ export class BoqEditorComponent implements OnInit {
     const model = (event.target as HTMLSelectElement).value;
     this.choice.update((current) => ({
       ...current,
-      [title]: { brand: current[title]?.brand ?? '', model },
+      [title]: {
+        brand: current[title]?.brand ?? '',
+        type: current[title]?.type ?? '',
+        model,
+      },
     }));
 
     this.commitIfResolved(title);
@@ -562,11 +616,10 @@ export class BoqEditorComponent implements OnInit {
     const matches = this.matchesIn(title);
     if (matches.length !== 1) return;
 
-    const section = title === this.unsortedGroup.title ? this.unsortedSection() : title;
-    if (!section) return;
+    const section = title;
 
     this.addToSection(section, matches[0], 1);
-    this.choice.update((current) => ({ ...current, [title]: { brand: '', model: '' } }));
+    this.choice.update((current) => ({ ...current, [title]: { brand: '', type: '', model: '' } }));
   }
 
   /**
@@ -581,13 +634,12 @@ export class BoqEditorComponent implements OnInit {
     const matches = this.matchesIn(title);
     if (matches.length !== 1) return;
 
-    const section = title === this.unsortedGroup.title ? this.unsortedSection() : title;
-    if (!section) return;
+    const section = title;
 
     this.addToSection(section, matches[0], this.qtyFor(title));
 
     // Back to an empty entry row, ready for the next item.
-    this.choice.update((current) => ({ ...current, [title]: { brand: '', model: '' } }));
+    this.choice.update((current) => ({ ...current, [title]: { brand: '', type: '', model: '' } }));
     this.newQty.update((current) => ({ ...current, [title]: 1 }));
   }
 
@@ -599,13 +651,12 @@ export class BoqEditorComponent implements OnInit {
 
     if (!item) return;
 
-    const section = title === this.unsortedGroup.title ? this.unsortedSection() : title;
-    if (!section) return;
+    const section = title;
 
     this.addToSection(section, item, this.qtyFor(title));
     // Reset so the next item starts from the brand, rather than looking as
     // though the one just added is still pending.
-    this.choice.update((current) => ({ ...current, [title]: { brand: '', model: '' } }));
+    this.choice.update((current) => ({ ...current, [title]: { brand: '', type: '', model: '' } }));
     this.newQty.update((current) => ({ ...current, [title]: 1 }));
   }
 
@@ -625,9 +676,6 @@ export class BoqEditorComponent implements OnInit {
     return this.itemsIn(title).filter((item) => chosen.has(item.id)).length;
   }
 
-  protected setUnsortedSection(event: Event): void {
-    this.unsortedSection.set((event.target as HTMLSelectElement).value);
-  }
 
   /**
    * Adds an item into the section the group stands for, creating that section
@@ -729,6 +777,7 @@ export class BoqEditorComponent implements OnInit {
                   itemName: item.itemName,
                   modelNo: item.modelNo || null,
                   brand: item.brand,
+                  type: item.type || null,
                   uom: item.uom,
                   quantity,
                   unitRate: item.rate ?? 0,

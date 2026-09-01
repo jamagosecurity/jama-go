@@ -50,7 +50,7 @@ export class CameraService {
       .pipe(map(unwrapApiResult));
   }
 
-  /** Stock counts per camera type — drives the public catalogue's sections. */
+  /** Stock counts per type — drives the public catalogue's sections. */
   typeCounts(): Observable<CameraTypeCount[]> {
     return this.http
       .get<ApiResult<CameraTypeCount[]>>(`${this.baseUrl}/types`)

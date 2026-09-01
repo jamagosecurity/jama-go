@@ -1,4 +1,4 @@
-import { Option, UnitOfMeasurement } from './camera.model';
+import { CameraResolution, Option, UnitOfMeasurement } from './camera.model';
 
 /** Mirrors Jama.Domain.Enums.BoqStatus — the server sends the enum NAME. */
 export type BoqStatus = 'Draft' | 'Submitted' | 'Approved' | 'Rejected';
@@ -34,8 +34,20 @@ export interface BoqLine {
   itemName: string;
   modelNo: string | null;
   brand: string | null;
+  /** Form factor as the catalogue held it when the line was written. */
+  type: string | null;
   uom: UnitOfMeasurement;
   quantity: number;
+  /**
+   * The recording profile frozen onto this line when it was written — what
+   * storage sizing reads, so a bill sizes the same today as when it was quoted.
+   * Not the catalogue's current value, and deliberately so.
+   *
+   * Unspecified/null on everything that is not a camera, and on a camera whose
+   * profile nobody had filled in at the time.
+   */
+  resolution: CameraResolution;
+  bitrateMbps: number | null;
   /** Comes from the catalogue. Staff cannot change it. */
   unitRate: number;
   lineTotal: number;

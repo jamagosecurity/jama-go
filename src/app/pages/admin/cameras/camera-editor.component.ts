@@ -6,7 +6,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import {
   CAMERA_BRANDS,
-  CAMERA_TYPES,
   Camera,
   CameraBrand,
   CameraImage,
@@ -35,6 +34,7 @@ import { CAMERAS_BASE_PATH } from './cameras-base-path';
 const ITEM_NAME_MAX_LENGTH = 200;
 const BRAND_MAX_LENGTH = 120;
 const MODEL_NO_MAX_LENGTH = 120;
+const TYPE_MAX_LENGTH = 60;
 const SEARCH_KEY_MAX_LENGTH = 300;
 const DESCRIPTION_MAX_LENGTH = 500;
 const NOTES_MAX_LENGTH = 1000;
@@ -68,7 +68,7 @@ export class CameraEditorComponent implements OnInit {
   /** Portal this screen is mounted under — see CAMERAS_BASE_PATH. */
   protected readonly base = inject(CAMERAS_BASE_PATH);
 
-  protected readonly cameraTypes = CAMERA_TYPES;
+  protected readonly typeMaxLength = TYPE_MAX_LENGTH;
   protected readonly categories = PRODUCT_CATEGORIES;
   protected readonly units = UNITS_OF_MEASUREMENT;
   protected readonly itemTypes = ITEM_TYPES;
@@ -119,7 +119,7 @@ export class CameraEditorComponent implements OnInit {
     itemName: ['', [Validators.required, Validators.maxLength(ITEM_NAME_MAX_LENGTH)]],
     modelNo: ['', [Validators.maxLength(MODEL_NO_MAX_LENGTH)]],
     brand: ['', [Validators.required, Validators.maxLength(BRAND_MAX_LENGTH)]],
-    type: this.formBuilder.nonNullable.control<CameraType>('Dome', Validators.required),
+    type: ['', [Validators.required, Validators.maxLength(TYPE_MAX_LENGTH)]],
     category: this.formBuilder.nonNullable.control<ProductCategory>('Cctv', Validators.required),
     searchKey: ['', [Validators.maxLength(SEARCH_KEY_MAX_LENGTH)]],
     descriptionEn: ['', [Validators.maxLength(DESCRIPTION_MAX_LENGTH)]],

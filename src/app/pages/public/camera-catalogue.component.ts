@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
-  CAMERA_TYPES,
   Camera,
   CameraType,
   CameraTypeCount,
@@ -29,7 +28,7 @@ import { getApiErrorMessage } from '../../utils/api-error.util';
  * API agrees — its write routes require camera.manage, so a visitor could not
  * edit a price even by calling it directly.
  *
- * Laid out one section per camera type: open Bullet to see every bullet camera,
+ * Laid out one section per type: open Bullet to see every bullet camera,
  * open ANPR to see the ANPR ones. Each section loads its own items the first
  * time it is opened rather than the page fetching the whole catalogue up front.
  */
@@ -62,14 +61,16 @@ export class CameraCatalogueComponent implements OnInit {
 
   /** Only types that actually have stock get a section — an empty "Fisheye"
    *  heading is a dead end for someone browsing. */
-  protected readonly sections = computed(() => {
-    const counts = this.counts();
-    return CAMERA_TYPES.map((option) => ({
-      type: option.value,
-      label: option.label,
-      count: counts.find((c) => c.type === option.value),
-    })).filter((section) => (section.count?.itemCount ?? 0) > 0);
-  });
+  protected readonly sections = computed(() =>
+    // Straight from the counts, which the API builds from the data. Type is free
+    // text now, so there is no fixed list to walk — and the endpoint already
+    // returns only types something is filed under, so nothing needs filtering.
+    this.counts().map((count) => ({
+      type: count.type,
+      label: count.type,
+      count,
+    })),
+  );
 
   protected readonly totalItems = computed(() =>
     this.counts().reduce((sum, c) => sum + c.itemCount, 0),

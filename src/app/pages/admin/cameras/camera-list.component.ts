@@ -14,7 +14,6 @@ import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { PaginatedData } from '../../../models/api-result.model';
 import {
-  CAMERA_TYPES,
   Camera,
   CameraSummary,
   CameraType,
@@ -49,7 +48,9 @@ export class CameraListComponent implements OnInit {
   /** Portal this screen is mounted under — see CAMERAS_BASE_PATH. */
   protected readonly base = inject(CAMERAS_BASE_PATH);
 
-  protected readonly cameraTypes = CAMERA_TYPES;
+  /** Filter options from the data, since type is free text and has no fixed
+   *  list to offer. Loaded alongside the summary. */
+  protected readonly cameraTypes = signal<string[]>([]);
   protected readonly categories = PRODUCT_CATEGORIES;
   protected readonly brandLogo = matchCameraBrand;
   protected readonly brandInitials = brandInitials;
@@ -119,6 +120,16 @@ export class CameraListComponent implements OnInit {
     this.readSaveResult();
     this.load();
     this.loadSummary();
+
+    // Silent on failure: the filter simply offers nothing rather than the page
+    // reporting an error for a convenience.
+    this.service
+      .typeCounts()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (counts) => this.cameraTypes.set(counts.map((c) => c.type).filter(Boolean)),
+        error: () => this.cameraTypes.set([]),
+      });
 
     // Debounced so a name typed letter by letter is one request, not eight.
     this.searchControl.valueChanges

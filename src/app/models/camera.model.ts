@@ -3,38 +3,41 @@
  *
  * The server stores and sends the enum NAME, so these strings are the wire
  * values and must match the C# member names exactly. Display copy lives in
- * CAMERA_TYPES below — "Ptz" is the value, "PTZ" is what a person reads.
+ * Free text since the fixed form-factor list was dropped.
  */
-export type CameraType = 'Bullet' | 'Dome' | 'Ptz' | 'Fisheye' | 'Thermal' | 'Anpr' | 'Box';
+/**
+ * Camera form factor, as free text — "Dome", "Bullet PTZ", "Thermal ANPR".
+ *
+ * Was a fixed union mirroring an enum on the API. The list could never cover
+ * what suppliers ship, so an item that fitted none of the seven had to be filed
+ * under the wrong one. It reaches the BOQ exactly as typed.
+ */
+export type CameraType = string;
 
 export interface CameraTypeOption {
   value: CameraType;
   label: string;
 }
 
-export const CAMERA_TYPES: readonly CameraTypeOption[] = [
-  { value: 'Bullet', label: 'Bullet' },
-  { value: 'Dome', label: 'Dome' },
-  { value: 'Ptz', label: 'PTZ' },
-  { value: 'Fisheye', label: 'Fisheye' },
-  { value: 'Thermal', label: 'Thermal' },
-  { value: 'Anpr', label: 'ANPR' },
-  { value: 'Box', label: 'Box' },
-];
 
-const CAMERA_TYPE_LABELS = new Map<CameraType, string>(
-  CAMERA_TYPES.map((option) => [option.value, option.label]),
-);
 
 /** Falls back to the raw value so a type added on the API still renders. */
+/** Shown as typed. Kept as a function so callers need no change. */
 export function cameraTypeLabel(type: CameraType): string {
-  return CAMERA_TYPE_LABELS.get(type) ?? type;
+  return (type ?? '').trim();
 }
 
 /** Mirrors Jama.Domain.Enums. The server sends and accepts the enum NAME. */
 export type ProductCategory =
-  | 'Cctv' | 'AccessControl' | 'Alarm' | 'Network'
-  | 'Cable' | 'Storage' | 'Monitor' | 'PowerSupply' | 'Accessory' | 'Other';
+  | 'Cctv'
+  | 'Accessory'
+  | 'Storage'
+  | 'Monitor'
+  | 'Network'
+  | 'PowerSupply'
+  | 'Kpoi'
+  | 'Cable'
+  | 'AccessControl';
 
 export type UnitOfMeasurement = 'Piece' | 'Box' | 'Set' | 'Metre' | 'Roll' | 'Pack' | 'Pair';
 
@@ -47,17 +50,26 @@ export interface Option<T> {
   label: string;
 }
 
+/**
+ * Stock categories, named for the bill-of-quantities section each one prints in.
+ *
+ * The two lists are the same list: an item's category is what decides its
+ * section, and naming them differently meant staff had to hold a translation in
+ * their head — "Power supply" goes in "Rack & UPS" — and the BOQ editor had to
+ * keep a mapping that could drift.
+ *
+ * Order matches BOQ_SECTION_TITLES so the dropdown reads in document order.
+ */
 export const PRODUCT_CATEGORIES: readonly Option<ProductCategory>[] = [
-  { value: 'Cctv', label: 'CCTV' },
-  { value: 'AccessControl', label: 'Access control' },
-  { value: 'Alarm', label: 'Alarm' },
-  { value: 'Network', label: 'Network' },
-  { value: 'Cable', label: 'Cable' },
-  { value: 'Storage', label: 'Storage' },
-  { value: 'Monitor', label: 'Monitor / workstation' },
-  { value: 'PowerSupply', label: 'Power supply' },
-  { value: 'Accessory', label: 'Accessory' },
-  { value: 'Other', label: 'Other' },
+  { value: 'Cctv', label: 'Main CCTV System' },
+  { value: 'Accessory', label: 'Camera Accessories' },
+  { value: 'Storage', label: 'NVR & Storage' },
+  { value: 'Monitor', label: 'Monitors and Work Stations' },
+  { value: 'Network', label: 'Switch & Components' },
+  { value: 'PowerSupply', label: 'Rack & UPS' },
+  { value: 'Kpoi', label: 'Key Point of Interest Camera (KPOI)' },
+  { value: 'Cable', label: 'Passive Components & Cables' },
+  { value: 'AccessControl', label: 'Access Control System' },
 ];
 
 export const UNITS_OF_MEASUREMENT: readonly Option<UnitOfMeasurement>[] = [

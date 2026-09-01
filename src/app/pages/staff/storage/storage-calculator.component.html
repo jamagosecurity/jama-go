@@ -47,46 +47,118 @@
     </div>
   </div>
 
-  <!-- ===== 2. Recording plan ===== -->
+  <!-- ===== 2. Settings =====
+       Two questions, because two is all an installer actually decides: how long
+       the footage has to survive, and what disk is being bought. The other seven
+       inputs are engineering constants with defaults that are right almost
+       always — they were on the page purely because they exist, and having ten
+       fields on screen is what made this unreadable. -->
   <div class="admin-panel storage-panel">
     <div class="storage-step">
       <span class="storage-step-no" aria-hidden="true">2</span>
       <div class="storage-step-copy">
-        <h2>Recording plan</h2>
-        <p>Retention drives every figure below. In the old workbook it was buried in each formula.</p>
+        <h2>Settings</h2>
+        <p>How long to keep the footage. Everything else has a sensible default.</p>
       </div>
     </div>
 
     <form [formGroup]="form" class="storage-settings">
       <label class="boq-field">
-        <span>Retention <em>days</em></span>
+        <span>Keep footage for <em>days</em></span>
         <input type="number" formControlName="retentionDays" min="1" max="3650" />
       </label>
       <label class="boq-field">
-        <span>RAID level</span>
-        <select formControlName="raidLevel">
-          @for (option of raidLevels; track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
+        <span>Recording disk</span>
+        <select formControlName="recommendDiskTerabytes">
+          <option value="">Choose the best for me</option>
+          @for (size of diskSizes; track size) {
+            <option [value]="size">{{ size }} TB</option>
           }
         </select>
       </label>
-      <label class="boq-field">
-        <span>Video redundancy</span>
-        <input type="number" formControlName="redundancy" min="1" max="3" step="0.01" />
-      </label>
-      <label class="boq-field">
-        <span>Filesystem factor</span>
-        <input type="number" formControlName="filesystemFactor" min="0.5" max="1" step="0.01" />
-      </label>
-      <label class="boq-field">
-        <span>Failover cameras</span>
-        <input type="number" formControlName="failoverCameras" min="0" />
-      </label>
-      <label class="boq-field">
-        <span>Failover retention <em>days</em></span>
-        <input type="number" formControlName="failoverDays" min="0" max="3650" />
-      </label>
+      <!-- Only when the quotation has number-plate cameras — otherwise it is a
+           choice about an array that will not be built. -->
+      @if (anprRows().length) {
+        <label class="boq-field">
+          <span>ANPR disk</span>
+          <select formControlName="anprDiskTerabytes">
+            <option value="">Choose the best for me</option>
+            @for (size of diskSizes; track size) {
+              <option [value]="size">{{ size }} TB</option>
+            }
+          </select>
+        </label>
+      }
     </form>
+
+    <details class="storage-details storage-advanced">
+      <summary>Advanced settings — you rarely need these</summary>
+      <form [formGroup]="form" class="storage-settings">
+        <label class="boq-field">
+          <span>RAID level</span>
+          <select formControlName="raidLevel">
+            <option value="">Choose the best for me</option>
+            @for (option of raidLevels; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="boq-field">
+          <span>Bays per enclosure</span>
+          <select formControlName="baysPerGroup">
+            @for (bays of bayOptions; track bays) {
+              <option [value]="bays">{{ bays }} bays</option>
+            }
+          </select>
+        </label>
+        <label class="boq-field">
+          <span>Hot spare disks <em>shared</em></span>
+          <input type="number" min="0" max="8" step="1" formControlName="hotSpareDisks" />
+        </label>
+        <label class="boq-field">
+          <span>Enclosure price <em>each</em></span>
+          <input type="number" min="0" step="50"
+            [attr.placeholder]="suggestedEnclosure()
+              ? (suggestedEnclosure()!.price | number: '1.0-0') + ' from stock'
+              : 'no recorder in stock'"
+            formControlName="enclosurePrice" />
+        </label>
+        <!-- Stated on the MOI sheet. Codec and FPS explain how the bitrate was
+             arrived at; motion scales the footage, so 50 halves the storage. -->
+        <label class="boq-field">
+          <span>Recording codec</span>
+          <input type="text" formControlName="recordingCodec" />
+        </label>
+        <label class="boq-field">
+          <span>FPS</span>
+          <input type="number" min="1" max="60" step="1" formControlName="fps" />
+        </label>
+        <label class="boq-field">
+          <span>Motion <em>%</em></span>
+          <input type="number" min="1" max="100" step="1" formControlName="motionPercent" />
+        </label>
+        <label class="boq-field">
+          <span>Type of HDD</span>
+          <input type="text" formControlName="hddType" />
+        </label>
+        <label class="boq-field">
+          <span>Video redundancy</span>
+          <input type="number" formControlName="redundancy" min="1" max="3" step="0.01" />
+        </label>
+        <label class="boq-field">
+          <span>Filesystem factor</span>
+          <input type="number" formControlName="filesystemFactor" min="0.5" max="1" step="0.01" />
+        </label>
+        <label class="boq-field">
+          <span>Failover cameras</span>
+          <input type="number" formControlName="failoverCameras" min="0" />
+        </label>
+        <label class="boq-field">
+          <span>Failover retention <em>days</em></span>
+          <input type="number" formControlName="failoverDays" min="0" max="3650" />
+        </label>
+      </form>
+    </details>
   </div>
 
   <!-- ===== 3. Cameras ===== -->
@@ -102,24 +174,26 @@
       }
     </div>
 
-    @if (skipped().length) {
-      <p class="storage-skipped">
-        <span class="storage-skipped-tag">Cameras only</span>
-        {{ skipped().length }}
-        {{ skipped().length === 1 ? 'line was' : 'lines were' }} left out —
-        {{ skipped().join(', ') }} —
-        {{ skipped().length === 1 ? 'it records' : 'they record' }} nothing.
-      </p>
-    }
 
     @if (cameraRows().length) {
+      @if (assumedRows().length) {
+        <p class="storage-warn" role="status">
+          <span class="storage-warn-tag">Assumed bitrate</span>
+          {{ assumedRows().length }}
+          {{ assumedRows().length === 1 ? 'item has' : 'items have' }}
+          none on the stock record, so
+          {{ assumedRows().length === 1 ? 'it is' : 'they are' }} sized at
+          {{ defaultBitrate }} Mbps. Change it below for this quotation, or set it on
+          the item so every future quotation sizes itself.
+        </p>
+      }
+
       @if (unpricedRows().length) {
         <p class="storage-warn" role="status">
           <span class="storage-warn-tag">Bitrate needed</span>
           {{ unpricedRows().length }}
-          {{ unpricedRows().length === 1 ? 'item has' : 'items have' }}
-          none on the stock record. Enter one below, or set it on the item so every
-          future quotation sizes itself.
+          {{ unpricedRows().length === 1 ? 'row has' : 'rows have' }}
+          no bitrate. Enter one to size the array.
         </p>
       }
 
@@ -135,10 +209,14 @@
           </thead>
           <tbody>
             @for (row of cameraRows(); track row.key; let i = $index) {
-              <tr [class.is-missing]="!row.bitrateMbps">
+              <tr [class.is-missing]="!row.bitrateMbps || row.needsBitrate">
                 <td class="storage-item">
                   {{ row.label }}
-                  @if (!row.bitrateMbps) { <span class="storage-flag">no bitrate</span> }
+                  @if (!row.bitrateMbps) {
+                    <span class="storage-flag">no bitrate</span>
+                  } @else if (row.needsBitrate) {
+                    <span class="storage-flag">assumed</span>
+                  }
                 </td>
                 <td class="num">
                   <input type="number" class="storage-input" min="1" [value]="row.count"
@@ -173,133 +251,82 @@
     }
   </div>
 
-  <!-- ===== 4. ANPR ===== -->
-  <div class="admin-panel storage-panel">
-    <div class="storage-step">
-      <span class="storage-step-no" aria-hidden="true">4</span>
-      <div class="storage-step-copy">
-        <h2>ANPR snapshots</h2>
-        <p>Number-plate capture stores stills, not video, so it is sized on its own terms.</p>
+  <!-- ===== 4. ANPR =====
+       Hidden unless the quotation has number-plate cameras. Most jobs have
+       none, and an empty panel saying "None" is a section the reader has to
+       understand before they can dismiss it. -->
+  @if (anprRows().length) {
+    <div class="admin-panel storage-panel">
+      <div class="storage-step">
+        <span class="storage-step-no" aria-hidden="true">4</span>
+        <div class="storage-step-copy">
+          <h2>ANPR snapshots</h2>
+          <p>Number-plate capture stores stills, not video, so it is sized on its own terms.</p>
+        </div>
+        @if (anprRows().length) {
+          <span class="storage-count">
+            {{ anprRows().length }} {{ anprRows().length === 1 ? 'group' : 'groups' }}
+          </span>
+        }
       </div>
+
       @if (anprRows().length) {
-        <span class="storage-count">
-          {{ anprRows().length }} {{ anprRows().length === 1 ? 'group' : 'groups' }}
-        </span>
-      }
-    </div>
-
-    @if (anprRows().length) {
-      <div class="storage-table-wrap">
-        <table class="storage-table">
-          <thead>
-            <tr>
-              <th scope="col">Label</th>
-              <th scope="col" class="num">Cameras</th>
-              <th scope="col" class="num">KB <em>/ image</em></th>
-              <th scope="col" class="num">Images <em>/ event</em></th>
-              <th scope="col" class="num">Events <em>/ day</em></th>
-              <th scope="col" class="shrink"><span class="visually-hidden">Remove</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of anprRows(); track row.key; let i = $index) {
+        <div class="storage-table-wrap">
+          <table class="storage-table">
+            <thead>
               <tr>
-                <td>
-                  <input class="storage-input storage-input--text" [value]="row.label"
-                    aria-label="ANPR group label" (change)="setAnpr(i, 'label', $event)" />
-                </td>
-                <td class="num">
-                  <input type="number" class="storage-input" min="1" [value]="row.count"
-                    aria-label="ANPR camera count" (change)="setAnpr(i, 'count', $event)" />
-                </td>
-                <td class="num">
-                  <input type="number" class="storage-input" min="1" [value]="row.kilobytesPerImage"
-                    aria-label="Kilobytes per image" (change)="setAnpr(i, 'kilobytesPerImage', $event)" />
-                </td>
-                <td class="num">
-                  <input type="number" class="storage-input" min="1" [value]="row.imagesPerEvent"
-                    aria-label="Images per event" (change)="setAnpr(i, 'imagesPerEvent', $event)" />
-                </td>
-                <td class="num">
-                  <input type="number" class="storage-input" min="1" [value]="row.eventsPerDay"
-                    aria-label="Events per day" (change)="setAnpr(i, 'eventsPerDay', $event)" />
-                </td>
-                <td class="shrink">
-                  <button type="button" class="row-btn row-btn--delete"
-                    (click)="removeAnprRow(i)" aria-label="Remove ANPR group">Remove</button>
-                </td>
+                <th scope="col">Label</th>
+                <th scope="col" class="num">Cameras</th>
+                <th scope="col" class="num">KB <em>/ image</em></th>
+                <th scope="col" class="num">Images <em>/ event</em></th>
+                <th scope="col" class="num">Events <em>/ day</em></th>
+                <th scope="col" class="shrink"><span class="visually-hidden">Remove</span></th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    } @else {
-      <div class="storage-empty storage-empty--quiet">
-        <p>None. ANPR cameras on the quotation land here automatically.</p>
-      </div>
-    }
+            </thead>
+            <tbody>
+              @for (row of anprRows(); track row.key; let i = $index) {
+                <tr>
+                  <td>
+                    <input class="storage-input storage-input--text" [value]="row.label"
+                      aria-label="ANPR group label" (change)="setAnpr(i, 'label', $event)" />
+                  </td>
+                  <td class="num">
+                    <input type="number" class="storage-input" min="1" [value]="row.count"
+                      aria-label="ANPR camera count" (change)="setAnpr(i, 'count', $event)" />
+                  </td>
+                  <td class="num">
+                    <input type="number" class="storage-input" min="1" [value]="row.kilobytesPerImage"
+                      aria-label="Kilobytes per image" (change)="setAnpr(i, 'kilobytesPerImage', $event)" />
+                  </td>
+                  <td class="num">
+                    <input type="number" class="storage-input" min="1" [value]="row.imagesPerEvent"
+                      aria-label="Images per event" (change)="setAnpr(i, 'imagesPerEvent', $event)" />
+                  </td>
+                  <td class="num">
+                    <input type="number" class="storage-input" min="1" [value]="row.eventsPerDay"
+                      aria-label="Events per day" (change)="setAnpr(i, 'eventsPerDay', $event)" />
+                  </td>
+                  <td class="shrink">
+                    <button type="button" class="row-btn row-btn--delete"
+                      (click)="removeAnprRow(i)" aria-label="Remove ANPR group">Remove</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="storage-empty storage-empty--quiet">
+          <p>None. ANPR cameras on the quotation land here automatically.</p>
+        </div>
+      }
 
-    <button type="button" class="btn-admin btn-admin-ghost storage-add" (click)="addAnprRow()">
-      + Add ANPR group
-    </button>
-  </div>
-
-  <!-- ===== 5. Array ===== -->
-  <div class="admin-panel storage-panel">
-    <div class="storage-step">
-      <span class="storage-step-no" aria-hidden="true">5</span>
-      <div class="storage-step-copy">
-        <h2>Disk array</h2>
-        <p>Parity is subtracted before the filesystem factor — in every group, including ANPR.</p>
-      </div>
-      <span class="storage-count">RAID-{{ raidLevelValue() }}</span>
+      <button type="button" class="btn-admin btn-admin-ghost storage-add" (click)="addAnprRow()">
+        + Add ANPR group
+      </button>
     </div>
 
-    <div class="storage-table-wrap">
-      <table class="storage-table">
-        <thead>
-          <tr>
-            <th scope="col">Group</th>
-            <th scope="col" class="num">Disks</th>
-            <th scope="col" class="num">Disk size</th>
-            <th scope="col" class="shrink"><span class="visually-hidden">Remove</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of groupRows(); track row.key; let i = $index) {
-            <tr>
-              <td>
-                <input class="storage-input storage-input--text" [value]="row.label"
-                  aria-label="Group label" (change)="setGroup(i, 'label', $event)" />
-              </td>
-              <td class="num">
-                <input type="number" class="storage-input" min="2" max="96" [value]="row.totalDisks"
-                  aria-label="Total disks" (change)="setGroup(i, 'totalDisks', $event)" />
-              </td>
-              <td class="num">
-                <select class="storage-input" [value]="row.diskTerabytes"
-                  aria-label="Disk size" (change)="setGroup(i, 'diskTerabytes', $event)">
-                  @for (size of diskSizes; track size) {
-                    <option [value]="size" [selected]="size === row.diskTerabytes">{{ size }} TB</option>
-                  }
-                </select>
-              </td>
-              <td class="shrink">
-                @if (groupRows().length > 1) {
-                  <button type="button" class="row-btn row-btn--delete"
-                    (click)="removeGroupRow(i)" aria-label="Remove group">Remove</button>
-                }
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <button type="button" class="btn-admin btn-admin-ghost storage-add" (click)="addGroupRow()">
-      + Add group
-    </button>
-  </div>
+  }
 
   <!-- ===== Calculate ===== -->
   <div class="storage-cta">
@@ -308,9 +335,11 @@
         Choose a quotation to size.
       } @else if (unpricedRows().length) {
         Fill in the missing bitrates to continue.
+      } @else if (assumedRows().length) {
+        {{ cameraCount() }} cameras over {{ retentionValue() }} days —
+        {{ assumedRows().length }} at the assumed {{ defaultBitrate }} Mbps.
       } @else {
-        {{ cameraCount() }} cameras over {{ retentionValue() }} days, across
-        {{ groupRows().length }} {{ groupRows().length === 1 ? 'group' : 'groups' }}.
+        {{ cameraCount() }} cameras over {{ retentionValue() }} days.
       }
     </p>
     <button type="button" class="btn-admin btn-admin-primary storage-cta-btn"
@@ -330,146 +359,598 @@
         </div>
       </div>
 
-      <div class="storage-verdict" [class.is-short]="!result.covered">
-        <div class="storage-verdict-head">
-          <span class="storage-verdict-badge">{{ result.covered ? 'Covered' : 'Short' }}</span>
-          <span class="storage-verdict-pct">{{ result.coveragePercent | number: '1.0-1' }}%</span>
-        </div>
-
-        <!-- Clamped, so 400% coverage does not try to paint four bars wide. -->
-        <div class="storage-bar" role="img"
-          [attr.aria-label]="'Coverage ' + (result.coveragePercent | number: '1.0-1') + ' percent'">
-          <span class="storage-bar-fill" [style.width.%]="coverageWidth(result.coveragePercent)"></span>
-        </div>
-
-        <p class="storage-verdict-figure">
-          <strong>{{ result.availableTerabytes | number: '1.2-2' }} TB</strong> available of
-          <strong>{{ result.requiredTerabytes | number: '1.2-2' }} TB</strong> needed
-          @if (result.covered) {
-            — {{ result.surplusTerabytes | number: '1.2-2' }} TB spare
-          } @else {
-            — {{ -result.surplusTerabytes | number: '1.2-2' }} TB short
-          }
+      <!-- The answer, ahead of everything else: what to buy. The coverage
+           check below only grades an array someone already guessed at. -->
+      <!-- The whole answer, in the words the person buying and racking the
+           disks actually uses. Everything technical is folded away below: an
+           installer needs a shopping list and a wiring instruction, not a
+           storage architect's worksheet. -->
+      <div class="storage-buy">
+        <p class="storage-buy-label">Recording — buy</p>
+        <p class="storage-buy-figure">
+          <strong>{{ result.recommended.totalDisks }}</strong>
+          hard {{ result.recommended.totalDisks === 1 ? 'disk' : 'disks' }}
+          <span class="storage-buy-size">{{ result.recommended.diskTerabytes | number: '1.0-0' }} TB each</span>
         </p>
-      </div>
 
-      <div class="storage-stats">
-        <div class="storage-stat">
-          <span class="storage-stat-label">Video</span>
-          <strong>{{ result.videoTerabytes | number: '1.2-2' }} <em>TB</em></strong>
-          <small>{{ result.videoTerabytesRaw | number: '1.2-2' }} TB × {{ result.redundancy }} redundancy</small>
-        </div>
-        <div class="storage-stat">
-          <span class="storage-stat-label">Bandwidth</span>
-          <strong>{{ result.bandwidthMbps | number: '1.1-1' }} <em>Mbps</em></strong>
-          <small>Aggregate at the recorder</small>
-        </div>
-        @if (result.anprTerabytes > 0) {
-          <div class="storage-stat">
-            <span class="storage-stat-label">ANPR</span>
-            <strong>{{ result.anprTerabytes | number: '1.2-2' }} <em>TB</em></strong>
-            <small>Snapshots, not video</small>
-          </div>
-        }
-        @if (result.failoverTerabytes > 0) {
-          <div class="storage-stat">
-            <span class="storage-stat-label">Failover</span>
-            <strong>{{ result.failoverTerabytes | number: '1.2-2' }} <em>TB</em></strong>
-            <small>Shorter copy of some cameras</small>
-          </div>
-        }
-        <div class="storage-stat storage-stat--total">
-          <span class="storage-stat-label">Required</span>
-          <strong>{{ result.requiredTerabytes | number: '1.2-2' }} <em>TB</em></strong>
-          <small>Video + ANPR + failover</small>
-        </div>
-      </div>
-
-      <h3 class="storage-subhead">Per camera</h3>
-      <div class="storage-table-wrap">
-        <table class="storage-table storage-table--read">
-          <thead>
-            <tr>
-              <th scope="col">Item</th>
-              <th scope="col" class="num">Qty</th>
-              <th scope="col" class="num">Mbps</th>
-              <th scope="col" class="num">TB each</th>
-              <th scope="col" class="num">TB total</th>
-              <th scope="col" class="num">Bandwidth</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (line of result.cameras; track line.label) {
-              <tr>
-                <td class="storage-item">{{ line.label }}</td>
-                <td class="num">{{ line.count }}</td>
-                <td class="num">{{ line.bitrateMbps | number: '1.1-2' }}</td>
-                <td class="num storage-dim">{{ line.perCameraTerabytes | number: '1.4-4' }}</td>
-                <td class="num"><strong>{{ line.terabytesRaw | number: '1.2-2' }}</strong></td>
-                <td class="num storage-dim">{{ line.bandwidthMbps | number: '1.1-1' }} Mbps</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      @if (result.anpr.length) {
-        <h3 class="storage-subhead">ANPR</h3>
+        <!-- Same shape as the quotation tables: header, a row per thing, and
+             the count at the foot. Read by the same people. -->
+        <!-- Turned on its side: the disk types run across the head and the
+             measures down the side, so "how many of each" reads as one row
+             instead of a column the eye has to walk down. -->
         <div class="storage-table-wrap">
-          <table class="storage-table storage-table--read">
+          <table class="storage-disks">
             <thead>
               <tr>
-                <th scope="col">Group</th>
-                <th scope="col" class="num">Cameras</th>
-                <th scope="col" class="num">TB each</th>
-                <th scope="col" class="num">TB total</th>
-                <th scope="col" class="num">Disks</th>
+                <th scope="col"><span class="visually-hidden">Measure</span></th>
+                <th scope="col" class="num">Data</th>
+                <th scope="col" class="num">Parity</th>
+                @if (result.recommended.hotSpareDisks) {
+                  <th scope="col" class="num">Hot spare</th>
+                }
+                <th scope="col" class="num storage-col-total">Total</th>
               </tr>
             </thead>
             <tbody>
-              @for (line of result.anpr; track line.label) {
+              <tr>
+                <th scope="row">Qty</th>
+                <td class="num"><strong>{{ result.recommended.dataDisks }}</strong></td>
+                <td class="num"><strong>{{ result.recommended.parityDisks }}</strong></td>
+                @if (result.recommended.hotSpareDisks) {
+                  <td class="num"><strong>{{ result.recommended.hotSpareDisks }}</strong></td>
+                }
+                <td class="num storage-col-total"><strong>{{ result.recommended.totalDisks }}</strong></td>
+              </tr>
+              <tr>
+                <th scope="row">Size</th>
+                <td class="num">{{ result.recommended.diskTerabytes | number: '1.0-0' }} TB</td>
+                <td class="num">{{ result.recommended.diskTerabytes | number: '1.0-0' }} TB</td>
+                @if (result.recommended.hotSpareDisks) {
+                  <td class="num">{{ result.recommended.diskTerabytes | number: '1.0-0' }} TB</td>
+                }
+                <td class="num storage-col-total">{{ result.recommended.diskTerabytes | number: '1.0-0' }} TB</td>
+              </tr>
+              <tr>
+                <th scope="row">Capacity</th>
+                <td class="num">{{ result.recommended.usableTerabytes | number: '1.2-2' }} TB</td>
+                <td class="num storage-dim">—</td>
+                @if (result.recommended.hotSpareDisks) {
+                  <td class="num storage-dim">—</td>
+                }
+                <td class="num storage-col-total">{{ result.recommended.rawTerabytes | number: '1.2-2' }} TB</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="storage-setup"><strong>Set up as</strong> <span class="storage-setup-raid">RAID-{{ result.recommended.raidLevel }}</span></p>
+        <ul class="storage-groups">
+          @for (g of result.recommended.layout; track g.number) {
+            <li>
+              <span class="storage-group-no">Group {{ g.number }}</span>
+              <span class="storage-group-make">
+                {{ g.dataDisks }} data + {{ g.parityDisks }} parity
+              </span>
+              <span class="storage-group-total">{{ g.totalDisks }} disks</span>
+            </li>
+          }
+          @if (result.recommended.hotSpareDisks) {
+            <li class="storage-group-spare">
+              <span class="storage-group-no">Hot spare</span>
+              <span class="storage-group-make">shared across all groups</span>
+              <span class="storage-group-total">
+                {{ result.recommended.hotSpareDisks }} {{ result.recommended.hotSpareDisks === 1 ? 'disk' : 'disks' }}
+              </span>
+            </li>
+          }
+        </ul>
+
+        <p class="storage-outcome">
+          Records <strong>{{ result.cameraCount }} cameras</strong> for
+          <strong>{{ result.recommended.retentionDaysAchieved }} days</strong>
+          — {{ result.retentionDays }} were needed.
+        </p>
+      </div>
+
+      <!-- The specification, as a submission has to state it. One table so the
+           figures quoted are the figures calculated, not retyped per document. -->
+      <!-- Number-plate stills get their own disks. They are written and read on
+           different terms to continuous video, and an ANPR volume filling up
+           must not start eating the footage the retention period promises. -->
+      @if (result.recommendedAnpr.totalDisks) {
+        <div class="storage-buy">
+          <p class="storage-buy-label">ANPR — buy</p>
+          <p class="storage-buy-figure">
+            <strong>{{ result.recommendedAnpr.totalDisks }}</strong>
+            hard {{ result.recommendedAnpr.totalDisks === 1 ? 'disk' : 'disks' }}
+            <span class="storage-buy-size">{{ result.recommendedAnpr.diskTerabytes | number: '1.0-0' }} TB each</span>
+          </p>
+
+          <!-- Same shape as the quotation tables: header, a row per thing, and
+               the count at the foot. Read by the same people. -->
+          <!-- Turned on its side: the disk types run across the head and the
+               measures down the side, so "how many of each" reads as one row
+               instead of a column the eye has to walk down. -->
+          <div class="storage-table-wrap">
+            <table class="storage-disks">
+              <thead>
                 <tr>
-                  <td class="storage-item">{{ line.label }}</td>
-                  <td class="num">{{ line.count }}</td>
-                  <td class="num storage-dim">{{ line.perCameraTerabytes | number: '1.4-4' }}</td>
-                  <td class="num"><strong>{{ line.terabytes | number: '1.2-2' }}</strong></td>
-                  <td class="num">{{ line.disksNeeded }}</td>
+                  <th scope="col"><span class="visually-hidden">Measure</span></th>
+                  <th scope="col" class="num">Data</th>
+                  <th scope="col" class="num">Parity</th>
+                  @if (result.recommendedAnpr.hotSpareDisks) {
+                    <th scope="col" class="num">Hot spare</th>
+                  }
+                  <th scope="col" class="num storage-col-total">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Qty</th>
+                  <td class="num"><strong>{{ result.recommendedAnpr.dataDisks }}</strong></td>
+                  <td class="num"><strong>{{ result.recommendedAnpr.parityDisks }}</strong></td>
+                  @if (result.recommendedAnpr.hotSpareDisks) {
+                    <td class="num"><strong>{{ result.recommendedAnpr.hotSpareDisks }}</strong></td>
+                  }
+                  <td class="num storage-col-total"><strong>{{ result.recommendedAnpr.totalDisks }}</strong></td>
+                </tr>
+                <tr>
+                  <th scope="row">Size</th>
+                  <td class="num">{{ result.recommendedAnpr.diskTerabytes | number: '1.0-0' }} TB</td>
+                  <td class="num">{{ result.recommendedAnpr.diskTerabytes | number: '1.0-0' }} TB</td>
+                  @if (result.recommendedAnpr.hotSpareDisks) {
+                    <td class="num">{{ result.recommendedAnpr.diskTerabytes | number: '1.0-0' }} TB</td>
+                  }
+                  <td class="num storage-col-total">{{ result.recommendedAnpr.diskTerabytes | number: '1.0-0' }} TB</td>
+                </tr>
+                <tr>
+                  <th scope="row">Capacity</th>
+                  <td class="num">{{ result.recommendedAnpr.usableTerabytes | number: '1.2-2' }} TB</td>
+                  <td class="num storage-dim">—</td>
+                  @if (result.recommendedAnpr.hotSpareDisks) {
+                    <td class="num storage-dim">—</td>
+                  }
+                  <td class="num storage-col-total">{{ result.recommendedAnpr.rawTerabytes | number: '1.2-2' }} TB</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        <p class="storage-setup"><strong>Set up as</strong> <span class="storage-setup-raid">RAID-{{ result.recommendedAnpr.raidLevel }}</span></p>
+        <ul class="storage-groups">
+          @for (g of result.recommendedAnpr.layout; track g.number) {
+            <li>
+              <span class="storage-group-no">Group {{ g.number }}</span>
+              <span class="storage-group-make">
+                {{ g.dataDisks }} data + {{ g.parityDisks }} parity
+              </span>
+              <span class="storage-group-total">{{ g.totalDisks }} disks</span>
+            </li>
+          }
+          @if (result.recommendedAnpr.hotSpareDisks) {
+            <li class="storage-group-spare">
+              <span class="storage-group-no">Hot spare</span>
+              <span class="storage-group-make">shared across all groups</span>
+              <span class="storage-group-total">
+                {{ result.recommendedAnpr.hotSpareDisks }} {{ result.recommendedAnpr.hotSpareDisks === 1 ? 'disk' : 'disks' }}
+              </span>
+            </li>
+          }
+        </ul>
+
+          <p class="storage-outcome">
+            Keeps the number-plate stills for
+            <strong>{{ result.recommendedAnpr.retentionDaysAchieved }} days</strong>
+            — {{ result.retentionDays }} were needed.
+          </p>
+        </div>
+
+        <!-- The specification, as a submission has to state it. One table so the
+             figures quoted are the figures calculated, not retyped per document. -->
+      }
+
+      <!-- Separating ANPR costs the RAID minimum twice. On a real job that is
+           worth paying; on a small one it doubles the hardware for nothing, so
+           the cheaper alternative is put in front of the reader to choose. -->
+      @if (result.sharedAlternative; as shared) {
+        <p class="storage-warn" role="status">
+          <span class="storage-warn-tag">Cheaper together</span>
+          Recording and ANPR are on separate arrays, which buys the RAID minimum
+          twice. One shared array of
+          <strong>{{ shared.totalDisks }} × {{ shared.diskTerabytes | number: '1.0-0' }} TB</strong>
+          holds both ({{ shared.usableTerabytes | number: '1.2-2' }} TB) and saves
+          <strong>{{ shared.disksSaved }} {{ shared.disksSaved === 1 ? 'disk' : 'disks' }}</strong>@if (shared.costSaved !== null) {,
+            <strong>{{ shared.costSaved | number: '1.0-0' }} ﷼</strong>}.
+          Keep them separate if a full ANPR volume must never eat into the footage.
+        </p>
+      }
+
+      <!-- Why this disk and not another. Shown rather than asserted: the same
+           28.80 TB usable costs 48 TB of disk at 8 TB and 64 TB at 16 TB, and
+           nobody would order the second having seen the first beside it. -->
+      @if (result.diskOptions.length > 1) {
+        <details class="storage-details storage-why">
+          <summary>Why this disk size?</summary>
+          <div class="storage-table-wrap">
+            <table class="storage-table storage-table--read">
+              <thead>
+                <tr>
+                  <th scope="col">Disk</th>
+                  <th scope="col" class="num">Disks</th>
+                  <th scope="col" class="num">Groups</th>
+                  <th scope="col" class="num">Usable</th>
+                  <th scope="col" class="num">Bought</th>
+                  <th scope="col" class="num">Spare capacity</th>
+                  <th scope="col" class="num">Disks ﷼</th>
+                  <th scope="col" class="num">Chassis ﷼</th>
+                  <th scope="col" class="num">Total ﷼</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (o of result.diskOptions; track o.diskTerabytes) {
+                  <tr [class.is-chosen]="o.chosen">
+                    <td>
+                      <strong>{{ o.diskTerabytes | number: '1.0-0' }} TB</strong>
+                      @if (o.chosen) { <span class="storage-flag storage-flag--pick">chosen</span> }
+                    </td>
+                    <td class="num">{{ o.totalDisks }}</td>
+                    <td class="num">{{ o.groups }}</td>
+                    <td class="num">{{ o.usableTerabytes | number: '1.2-2' }} TB</td>
+                    <td class="num">{{ o.rawTerabytes | number: '1.2-2' }} TB</td>
+                    <td class="num storage-dim">{{ o.overBuyTerabytes | number: '1.2-2' }} TB</td>
+                    <td class="num storage-dim">
+                      @if (o.diskCost !== null) { {{ o.diskCost | number: '1.0-0' }} } @else { — }
+                    </td>
+                    <td class="num storage-dim">
+                      @if (o.enclosureCost !== null) { {{ o.enclosureCost | number: '1.0-0' }} } @else { — }
+                    </td>
+                    <td class="num">
+                      @if (o.totalCost !== null) {
+                        <strong>{{ o.totalCost | number: '1.0-0' }}</strong>
+                      } @else {
+                        <span class="storage-dim">—</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (effectiveEnclosurePrice() === null) {
+            <p class="storage-warn storage-why-warn" role="status">
+              <span class="storage-warn-tag">Chassis not counted</span>
+              No recorder in stock covers {{ result.cameraCount }} cameras, so
+              enclosure cost is missing from these totals. That favours many small
+              disks — {{ result.diskOptions[0].groups }} groups needs
+              {{ result.diskOptions[0].groups }} enclosures. Put a price in Advanced
+              settings to rank this properly.
+            </p>
+          }
+
+          <p class="storage-note storage-why-note">
+            @if (!form.controls.enclosurePrice.value && suggestedEnclosure(); as box) {
+              Chassis priced at {{ box.price | number: '1.0-0' }} ﷼ each — the cheapest
+              way to cover {{ result.cameraCount }} cameras is
+              {{ box.count }} × {{ box.channels }}-channel
+              {{ box.count === 1 ? 'recorder' : 'recorders' }}
+              ({{ box.lineUpCost | number: '1.0-0' }} ﷼). Override in Advanced settings.
+            }
+            Ranked on total cost — disks plus one enclosure per group. Group count
+            moves with disk size, so leaving the chassis out favours many small
+            disks and picks the wrong one. Without prices it takes the fewest disks
+            that are not wasteful.
+          </p>
+        </details>
+      }
+
+      <!-- ===== MOI submission sheet =====
+           Laid out column for column as the Ministry's storage calculation
+           sheet, so a submission is a print of this rather than a spreadsheet
+           somebody retypes the figures into. Every number is the server's. -->
+      <details class="storage-details storage-moi" open>
+        <summary>MOI submission sheet</summary>
+
+        <table class="moi-head">
+          <tbody>
+            <tr><th scope="row">Project Name</th><td>{{ loadedQuotation()?.projectName || '—' }}</td></tr>
+            <tr><th scope="row">Revision No.</th><td>REV.00</td></tr>
+            <tr><th scope="row">Date:</th><td>{{ today }}</td></tr>
+          </tbody>
+        </table>
+
+
+        @if (result.redundancy > 1) {
+          <p class="storage-warn" role="status">
+            <span class="storage-warn-tag">Will not reconcile</span>
+            Video redundancy is set to &times; {{ result.redundancy }} and the MOI
+            sheet applies none — its per-camera figure is bitrate &times; time and
+            nothing else. Every figure below is
+            {{ ((result.redundancy - 1) * 100) | number: '1.0-0' }}% above what a
+            reviewer gets checking it by hand. Set it back to 1 in Advanced
+            settings before submitting.
+          </p>
+        }
+
+        @if (!sheetRecorder()) {
+          <p class="storage-warn" role="status">
+            <span class="storage-warn-tag">No recorder</span>
+            The quotation prices no NVR, so the sheet cannot state one. Add the
+            recorder to the quotation and it fills in here.
+          </p>
+        } @else if (recorderShortfall()) {
+          <p class="storage-warn" role="status">
+            <span class="storage-warn-tag">Channels short</span>
+            The quoted recorders take {{ sheetRecorder()!.channels }} cameras and the
+            quotation has {{ cameraCount() }} — {{ recorderShortfall() }} with nowhere
+            to record. Fix the quotation before submitting this.
+          </p>
+        }
+
+
+        <p class="moi-download">
+          <button type="button" class="btn-admin btn-admin-primary"
+            [disabled]="downloading()" (click)="downloadSheet()">
+            {{ downloading() ? 'Building…' : 'Download MOI sheet (PDF)' }}
+          </button>
+        </p>
+
+        <p class="moi-title">CCTV SYSTEM STORAGE CALCULATION</p>
+        <p class="moi-sub">PRIMARY STORAGE: {{ result.retentionDays }} DAYS</p>
+
+        <div class="storage-table-wrap">
+          <table class="storage-table storage-table--read moi-table">
+            <thead>
+              <tr>
+                <th scope="col">NVR / Storage server</th>
+                <th scope="col" class="num">No. of Channels</th>
+                <th scope="col" class="num">No. of HDD Bays</th>
+                <th scope="col">Type of HDD</th>
+                <th scope="col" class="num">Size of HDD (TB)</th>
+                <th scope="col">Disk Pool / Array</th>
+                <th scope="col" class="num"># of HDD for Each Array</th>
+                <th scope="col" class="num">HDD for RAID</th>
+                <th scope="col" class="num">Hot Spare HDD</th>
+                <th scope="col" class="num">Total #HDD</th>
+                <th scope="col" class="num">No. of Cameras</th>
+                <th scope="col">Recording resolution</th>
+                <th scope="col">Recording Codec</th>
+                <th scope="col" class="num">FPS</th>
+                <th scope="col" class="num">Bitrate (Mbps)</th>
+                <th scope="col" class="num">Motion (%)</th>
+                <th scope="col" class="num">Recording days</th>
+                <th scope="col" class="num">Required storage for 1 camera (TB)</th>
+                <th scope="col" class="num">Total storage required (TB)</th>
+                <th scope="col" class="num">Available storage (TB)</th>
+                <th scope="col" class="num">Proposed Storage (TB)</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (g of result.recommended.layout; track g.number) {
+                <tr>
+                  @if ($first) {
+                    <td [attr.rowspan]="result.recommended.layout.length">
+                      @if (sheetRecorder(); as rec) {
+                        {{ rec.label }}
+                        @if (rec.units > 1) {
+                          <span class="storage-dim">× {{ rec.units }}</span>
+                        }
+                      } @else {
+                        <span class="storage-dim">Not on the quotation</span>
+                      }
+                    </td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">
+                      {{ sheetRecorder()?.channels || '—' }}
+                    </td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ result.recommended.baysPerGroup }}</td>
+                    <td [attr.rowspan]="result.recommended.layout.length">{{ result.hddType }}</td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ result.recommended.diskTerabytes | number: '1.0-0' }}</td>
+                  }
+                  <td>{{ arrayLetter(g.number) }}</td>
+                  <td class="num">{{ g.dataDisks }}</td>
+                  <td class="num">{{ g.parityDisks }}</td>
+                  @if ($first) {
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ result.recommended.hotSpareDisks }}</td>
+                    <td class="num storage-col-total" [attr.rowspan]="result.recommended.layout.length">{{ result.recommended.totalDisks }}</td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ result.cameraCount }}</td>
+                    <td [attr.rowspan]="result.recommended.layout.length">{{ sheetResolution() }}</td>
+                    <td [attr.rowspan]="result.recommended.layout.length">{{ result.recordingCodec }}</td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ result.fps }}</td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ sheetBitrate() | number: '1.2-2' }}</td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ result.motionPercent }}</td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ result.retentionDays }}</td>
+                    <td class="num" [attr.rowspan]="result.recommended.layout.length">{{ perCameraTerabytes() | number: '1.2-2' }}</td>
+                    <td class="num moi-req" [attr.rowspan]="result.recommended.layout.length">{{ result.videoRequiredTerabytes | number: '1.2-2' }}</td>
+                  }
+                  <td class="num moi-req">{{ g.availableTerabytes | number: '1.2-2' }}</td>
+                  <td class="num moi-prop">{{ g.proposedTerabytes | number: '1.2-2' }}</td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
-      }
 
-      <h3 class="storage-subhead">Disk groups</h3>
+        <p class="moi-summary-title">Summary (Primary Storage)</p>
+        <div class="storage-table-wrap">
+          <table class="storage-table storage-table--read storage-spec">
+            <tbody>
+              <tr><th scope="row">Number of Storage Server</th><td>1</td></tr>
+              <tr><th scope="row">Number of HDD</th><td>{{ result.recommended.totalDisks }}</td></tr>
+              <tr><th scope="row">Size of HDD</th><td>{{ result.recommended.diskTerabytes | number: '1.0-0' }} TB</td></tr>
+              <tr><th scope="row">RAID Type</th><td>{{ result.recommended.raidLevel }}</td></tr>
+              <tr><th scope="row">Number of Cameras</th><td>{{ result.cameraCount }}</td></tr>
+              <tr><th scope="row">Video redundancy applied</th><td>&times; {{ result.redundancy }}</td></tr>
+              <tr class="storage-spec-rule"><th scope="row">Total Required Storage</th><td class="moi-req">{{ result.videoRequiredTerabytes | number: '1.2-2' }} TB</td></tr>
+              <tr><th scope="row">Total Available Storage</th><td class="moi-req">{{ result.recommended.usableTerabytes | number: '1.2-2' }} TB</td></tr>
+              <tr><th scope="row">Total Proposed storage</th><td class="moi-prop">{{ proposedDataTerabytes() | number: '1.2-2' }} TB</td></tr>
+              <tr><th scope="row">Total Proposed storage Including Raid + Hotspare</th><td class="moi-prop">{{ result.recommended.rawTerabytes | number: '1.2-2' }} TB</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        @if (result.recommendedAnpr.totalDisks) {
+          <p class="moi-title moi-title--second">ANPR SYSTEM STORAGE CALCULATION</p>
+          <p class="moi-sub">ANPR STORAGE: {{ result.retentionDays }} DAYS</p>
+
+          <p class="moi-summary-title">ANPR snapshot storage for {{ result.retentionDays }} days</p>
+          <div class="storage-table-wrap">
+            <table class="storage-table storage-table--read storage-spec">
+              <tbody>
+                <tr><th scope="row">One camera snapshots per day (approx)</th><td>{{ anprSnapshotsPerDay() }}</td></tr>
+                <tr><th scope="row">One snapshot size (Kb)</th><td>{{ anprSnapshotKb() }}</td></tr>
+                <tr><th scope="row">Recording days</th><td>{{ result.retentionDays }}</td></tr>
+                <tr><th scope="row">Per camera snapshots storage (TB)</th><td>{{ anprPerCamera() | number: '1.2-2' }}</td></tr>
+                <tr><th scope="row">No. of Cameras</th><td>{{ anprCameraCount() }}</td></tr>
+                <tr><th scope="row">Size of HDD</th><td>{{ result.recommendedAnpr.diskTerabytes | number: '1.0-0' }} TB</td></tr>
+                <tr><th scope="row">Total Required Storage (TB)</th><td class="moi-req">{{ result.anprRequiredTerabytes | number: '1.2-2' }}</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="moi-summary-title">Summary (ANPR Storage)</p>
+          <div class="storage-table-wrap">
+            <table class="storage-table storage-table--read storage-spec">
+              <tbody>
+                <tr><th scope="row">Number of Storage Server</th><td>1</td></tr>
+                <tr><th scope="row">Number of HDD</th><td>{{ result.recommendedAnpr.totalDisks }}</td></tr>
+                <tr><th scope="row">Size of HDD</th><td>{{ result.recommendedAnpr.diskTerabytes | number: '1.0-0' }} TB</td></tr>
+                <tr><th scope="row">RAID Type</th><td>{{ result.recommendedAnpr.raidLevel }}</td></tr>
+                <tr><th scope="row">Number of Cameras</th><td>{{ anprCameraCount() }}</td></tr>
+                <tr class="storage-spec-rule"><th scope="row">Total Required Storage</th><td class="moi-req">{{ result.anprRequiredTerabytes | number: '1.2-2' }} TB</td></tr>
+                <tr><th scope="row">Total Available Storage</th><td class="moi-req">{{ result.recommendedAnpr.usableTerabytes | number: '1.2-2' }} TB</td></tr>
+                <!-- Data disks only, matching the primary summary above. The
+                     reference sheet states this two different ways on its two
+                     pages; the primary page's reading is the one that reconciles
+                     with its own "including RAID + Hotspare" line, so both of our
+                     summaries follow it. -->
+                <tr><th scope="row">Total Proposed storage</th><td class="moi-prop">{{ proposedAnprDataTerabytes() | number: '1.2-2' }} TB</td></tr>
+                <tr><th scope="row">Total Proposed storage Including Raid + Hotspare</th><td class="moi-prop">{{ result.recommendedAnpr.rawTerabytes | number: '1.2-2' }} TB</td></tr>
+              </tbody>
+            </table>
+          </div>
+        }
+      </details>
+
+      <details class="storage-details">
+        <summary>Technical details</summary>
       <div class="storage-table-wrap">
-        <table class="storage-table storage-table--read">
-          <thead>
-            <tr>
-              <th scope="col">Group</th>
-              <th scope="col" class="num">Disks</th>
-              <th scope="col" class="num">Parity</th>
-              <th scope="col" class="num">Data</th>
-              <th scope="col" class="num">Disk TB</th>
-              <th scope="col" class="num">Usable TB</th>
-              <th scope="col" class="num">Camera ceiling</th>
-            </tr>
-          </thead>
+        <table class="storage-table storage-table--read storage-spec">
           <tbody>
-            @for (group of result.groups; track group.label) {
-              <tr>
-                <td class="storage-item">{{ group.label }}</td>
-                <td class="num">{{ group.totalDisks }}</td>
-                <td class="num storage-dim">{{ group.parityDisks }}</td>
-                <td class="num storage-dim">{{ group.dataDisks }}</td>
-                <td class="num storage-dim">{{ group.diskTerabytes }}</td>
-                <td class="num"><strong>{{ group.availableTerabytes | number: '1.2-2' }}</strong></td>
-                <td class="num">{{ group.cameraCeiling }}</td>
-              </tr>
+            <tr><th scope="row">Retention required</th><td>{{ result.retentionDays }} days</td></tr>
+            <tr><th scope="row">Retention achieved</th><td>{{ result.recommended.retentionDaysAchieved }} days</td></tr>
+            <tr><th scope="row">Cameras</th><td>{{ result.cameraCount }}</td></tr>
+            <tr><th scope="row">Aggregate bandwidth</th><td>{{ result.bandwidthMbps | number: '1.1-1' }} Mbps</td></tr>
+            <tr class="storage-spec-rule"><th scope="row">RAID level</th><td>RAID-{{ result.recommended.raidLevel }}</td></tr>
+            <tr><th scope="row">RAID groups</th><td>{{ result.recommended.groups }}</td></tr>
+            <tr><th scope="row">Disks per group</th><td>{{ result.recommended.disksPerGroup }} <span class="storage-dim">(max {{ result.recommended.baysPerGroup }} bays)</span></td></tr>
+            <tr><th scope="row">Data disks</th><td>{{ result.recommended.dataDisks }}</td></tr>
+            <tr><th scope="row">Parity disks</th><td>{{ result.recommended.parityDisks }}</td></tr>
+            <tr><th scope="row">Hot spare disks</th><td>{{ result.recommended.hotSpareDisks }}</td></tr>
+            <tr><th scope="row">Total disks</th><td>{{ result.recommended.totalDisks }} × {{ result.recommended.diskTerabytes | number: '1.0-0' }} TB</td></tr>
+            <tr class="storage-spec-rule"><th scope="row">Raw capacity</th><td>{{ result.recommended.rawTerabytes | number: '1.2-2' }} TB</td></tr>
+            <tr><th scope="row">Usable capacity</th><td>{{ result.recommended.usableTerabytes | number: '1.2-2' }} TB <span class="storage-dim">(after parity &amp; {{ result.filesystemFactor }} filesystem factor)</span></td></tr>
+            <tr><th scope="row">Required capacity</th><td>{{ result.videoRequiredTerabytes | number: '1.2-2' }} TB</td></tr>
+            <tr><th scope="row">Spare capacity</th><td>{{ result.recommended.spareTerabytes | number: '1.2-2' }} TB</td></tr>
+            <tr class="storage-spec-rule"><th scope="row">Video redundancy</th><td>× {{ result.redundancy }}</td></tr>
+            @if (result.anprTerabytes) {
+              <tr><th scope="row">ANPR snapshots</th><td>{{ result.anprTerabytes | number: '1.2-2' }} TB</td></tr>
+            }
+            @if (result.failoverTerabytes) {
+              <tr><th scope="row">Failover copy</th><td>{{ result.failoverTerabytes | number: '1.2-2' }} TB</td></tr>
             }
           </tbody>
         </table>
       </div>
+        <div class="storage-stats">
+          <div class="storage-stat">
+            <span class="storage-stat-label">Video</span>
+            <strong>{{ result.videoTerabytes | number: '1.2-2' }} <em>TB</em></strong>
+            <small>{{ result.videoTerabytesRaw | number: '1.2-2' }} TB × {{ result.redundancy }} redundancy</small>
+          </div>
+          <div class="storage-stat">
+            <span class="storage-stat-label">Bandwidth</span>
+            <strong>{{ result.bandwidthMbps | number: '1.1-1' }} <em>Mbps</em></strong>
+            <small>Aggregate at the recorder</small>
+          </div>
+          @if (result.anprTerabytes > 0) {
+            <div class="storage-stat">
+              <span class="storage-stat-label">ANPR</span>
+              <strong>{{ result.anprTerabytes | number: '1.2-2' }} <em>TB</em></strong>
+              <small>Snapshots, not video</small>
+            </div>
+          }
+          @if (result.failoverTerabytes > 0) {
+            <div class="storage-stat">
+              <span class="storage-stat-label">Failover</span>
+              <strong>{{ result.failoverTerabytes | number: '1.2-2' }} <em>TB</em></strong>
+              <small>Shorter copy of some cameras</small>
+            </div>
+          }
+          <div class="storage-stat storage-stat--total">
+            <span class="storage-stat-label">Required</span>
+            <strong>{{ result.requiredTerabytes | number: '1.2-2' }} <em>TB</em></strong>
+            <small>Video + ANPR + failover</small>
+          </div>
+        </div>
+
+        <h3 class="storage-subhead">Per camera</h3>
+        <div class="storage-table-wrap">
+          <table class="storage-table storage-table--read">
+            <thead>
+              <tr>
+                <th scope="col">Item</th>
+                <th scope="col" class="num">Qty</th>
+                <th scope="col" class="num">Mbps</th>
+                <th scope="col" class="num">TB each</th>
+                <th scope="col" class="num">TB total</th>
+                <th scope="col" class="num">Bandwidth</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (line of result.cameras; track line.label) {
+                <tr>
+                  <td class="storage-item">{{ line.label }}</td>
+                  <td class="num">{{ line.count }}</td>
+                  <td class="num">{{ line.bitrateMbps | number: '1.1-2' }}</td>
+                  <td class="num storage-dim">{{ line.perCameraTerabytes | number: '1.4-4' }}</td>
+                  <td class="num"><strong>{{ line.terabytesRaw | number: '1.2-2' }}</strong></td>
+                  <td class="num storage-dim">{{ line.bandwidthMbps | number: '1.1-1' }} Mbps</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (result.anpr.length) {
+          <h3 class="storage-subhead">ANPR</h3>
+          <div class="storage-table-wrap">
+            <table class="storage-table storage-table--read">
+              <thead>
+                <tr>
+                  <th scope="col">Group</th>
+                  <th scope="col" class="num">Cameras</th>
+                  <th scope="col" class="num">TB each</th>
+                  <th scope="col" class="num">TB total</th>
+                  <th scope="col" class="num">Disks</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of result.anpr; track line.label) {
+                  <tr>
+                    <td class="storage-item">{{ line.label }}</td>
+                    <td class="num">{{ line.count }}</td>
+                    <td class="num storage-dim">{{ line.perCameraTerabytes | number: '1.4-4' }}</td>
+                    <td class="num"><strong>{{ line.terabytes | number: '1.2-2' }}</strong></td>
+                    <td class="num">{{ line.disksNeeded }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+      </details>
+
+
     </div>
   }
 </section>

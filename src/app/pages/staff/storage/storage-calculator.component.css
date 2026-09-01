@@ -190,8 +190,7 @@
 
 /* ===== Notices ===== */
 
-.storage-warn,
-.storage-skipped {
+.storage-warn {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -210,15 +209,7 @@
   color: #7d4406;
 }
 
-/* Neutral: an excluded line is a decision the page made, not a problem. */
-.storage-skipped {
-  border: 1px solid rgba(15, 40, 70, 0.12);
-  background: rgba(15, 40, 70, 0.035);
-  color: var(--admin-muted);
-}
-
-.storage-warn-tag,
-.storage-skipped-tag {
+.storage-warn-tag {
   padding: 3px 9px;
   border-radius: 999px;
   font-size: 0.68rem;
@@ -229,7 +220,6 @@
 }
 
 .storage-warn-tag { color: #fff; background: #c2660f; }
-.storage-skipped-tag { color: #fff; background: #64748b; }
 
 /* ===== Empty states ===== */
 
@@ -585,3 +575,448 @@
 @media (prefers-reduced-motion: reduce) {
   .storage-bar-fill { transition: none; }
 }
+
+/* ===== What to buy =====
+   The array sized from the requirement. Leads the result because "how many
+   disks do I buy" is the question being asked; the coverage bar below only
+   grades an array someone already had in mind. */
+
+.storage-buy {
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: 1px solid rgba(37, 148, 210, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(120deg, rgba(37, 148, 210, 0.09), rgba(246, 153, 61, 0.08));
+}
+
+.storage-buy-label {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.storage-buy-figure {
+  margin: 4px 0 0;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  letter-spacing: -0.02em;
+  color: var(--admin-blue-ink, #0f2846);
+}
+
+.storage-buy-figure strong { font-weight: 800; }
+
+.storage-buy-sub {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--admin-muted);
+}
+
+/* ===== Array specification =====
+   Label/value rows rather than a column layout: a submission reads these one
+   line at a time, and every value is a different shape. */
+
+.storage-spec th[scope="row"] {
+  width: 44%;
+  padding: 9px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--admin-muted);
+  white-space: nowrap;
+}
+
+.storage-spec td {
+  padding: 9px 12px;
+  font-weight: 700;
+  color: var(--admin-ink, #0f2846);
+}
+
+/* Rules group the table into requirement / array / capacity, so the reader is
+   not scanning eighteen undifferentiated rows. */
+.storage-spec .storage-spec-rule th,
+.storage-spec .storage-spec-rule td {
+  border-top: 1px solid rgba(15, 40, 70, 0.12);
+}
+
+.storage-spec .storage-spec-total th,
+.storage-spec .storage-spec-total td {
+  background: rgba(37, 148, 210, 0.07);
+  font-size: 1.02rem;
+}
+
+.storage-spec .storage-dim { font-weight: 500; }
+
+/* ===== Plain-language result =====
+   Read by installers, not storage engineers: a count, what each disk is for,
+   and how to wire it. Everything else is folded into the details below. */
+
+.storage-buy-size {
+  display: block;
+  margin-top: 2px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--admin-muted);
+  letter-spacing: 0;
+}
+
+.storage-setup,
+.storage-outcome {
+  margin: 14px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--admin-ink, #0f2846);
+}
+
+.storage-setup strong,
+.storage-outcome strong { font-weight: 800; }
+.storage-outcome { color: var(--admin-muted); }
+
+/* Shut by default. The submission needs these figures; the person racking the
+   disks does not, and leaving them open is what made the page unreadable. */
+.storage-details {
+  margin-top: 18px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 13px;
+  overflow: hidden;
+}
+
+.storage-details > summary {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--admin-muted);
+  background: rgba(15, 40, 70, 0.03);
+  user-select: none;
+}
+
+.storage-details > summary:hover { color: var(--admin-ink, #0f2846); }
+.storage-details[open] > summary { border-bottom: 1px solid rgba(15, 40, 70, 0.1); }
+
+/* ===== Disk table =====
+   Deliberately the quotation table's shape — same header band, same total row
+   at the foot. The people reading this already read those all day, so it is
+   one layout to learn rather than two. */
+
+.storage-disks {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.92rem;
+}
+
+.storage-disks th,
+.storage-disks td {
+  padding: 11px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(15, 40, 70, 0.07);
+  vertical-align: middle;
+}
+
+.storage-disks thead th {
+  background: linear-gradient(135deg, #1b357c 0%, #12548f 55%, #0d6fae 100%);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: none;
+}
+
+.storage-disks thead th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+.storage-disks thead th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+.storage-disks .num { text-align: right; font-variant-numeric: tabular-nums; }
+.storage-disks tbody tr:hover { background: rgba(37, 148, 210, 0.04); }
+.storage-disks tbody td strong { font-weight: 750; }
+
+/* The total is a column now, so it is set apart down the right rather than
+   along the bottom. Same emphasis a section total gets on a quotation. */
+.storage-disks .storage-col-total {
+  background: rgba(37, 148, 210, 0.08);
+  font-weight: 800;
+  border-left: 2px solid rgba(37, 148, 210, 0.3);
+}
+
+.storage-disks thead th.storage-col-total {
+  background: linear-gradient(135deg, #12548f 0%, #0d6fae 100%);
+  border-left: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+/* Row labels: the measure names down the left edge. */
+.storage-disks tbody th[scope="row"] {
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+  white-space: nowrap;
+}
+
+.storage-disks tbody tr:last-child td,
+.storage-disks tbody tr:last-child th { border-bottom: none; }
+.storage-disks .storage-dim { color: var(--admin-muted); font-weight: 500; }
+
+/* ===== The two questions =====
+   Wider fields than the advanced grid, because these two are the decisions and
+   should not look like six settings that happen to be first. */
+
+.storage-settings--wide {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 620px;
+}
+
+@media (max-width: 560px) {
+  .storage-settings--wide { grid-template-columns: 1fr; }
+}
+
+.storage-settings--wide .boq-field input,
+.storage-settings--wide .boq-field select {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* Advanced block sits quietly under them — present for whoever needs it,
+   invisible to whoever does not. */
+.storage-advanced { margin-top: 18px; }
+.storage-advanced .storage-settings { margin: 0; padding: 16px; }
+
+/* ===== Group breakdown =====
+   The split, group by group. "1 RAID-5 group of 8 disks" was a sentence the
+   reader had to unpack; a row per group is the thing they will actually build. */
+
+.storage-groups {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.storage-groups li {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 40, 70, 0.09);
+  font-size: 0.9rem;
+}
+
+.storage-group-no {
+  font-weight: 800;
+  color: var(--admin-blue-ink, #0f2846);
+}
+
+.storage-group-make { color: var(--admin-muted); }
+
+.storage-group-total {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-ink, #0f2846);
+}
+
+/* The spare belongs to no group, so it is set apart rather than numbered. */
+.storage-groups .storage-group-spare {
+  background: rgba(37, 148, 210, 0.07);
+  border-style: dashed;
+}
+
+@media (max-width: 560px) {
+  .storage-groups li { grid-template-columns: 1fr auto; }
+  .storage-groups .storage-group-make { grid-column: 1 / -1; }
+}
+
+/* ===== Why this disk size ===== */
+
+.storage-why { margin-top: 14px; }
+.storage-why .storage-table-wrap { margin: 0; }
+
+.storage-disks .is-chosen,
+.storage-table .is-chosen {
+  background: rgba(37, 148, 210, 0.09);
+}
+
+.storage-table .is-chosen td { font-weight: 700; }
+
+.storage-flag--pick {
+  color: #fff;
+  background: #1a7bb5;
+}
+
+.storage-why-note {
+  margin: 10px 14px 12px;
+  font-size: 0.82rem;
+  color: var(--admin-muted);
+}
+
+/* The comparison is incomplete without a chassis price, and an incomplete
+   ranking picks the wrong disk — so say so where the ranking is shown. */
+.storage-why-warn { margin: 12px 14px 0; }
+
+/* The level each array is actually built at. Stated per array because the two
+   are weighed separately and routinely land on different ones. */
+.storage-setup-raid {
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(37, 148, 210, 0.12);
+  color: var(--admin-blue-ink, #0f2846);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+/* ===== MOI submission sheet =====
+
+   Palette and layout taken from the Ministry's own sheet, not approximated:
+   #8A1538 is Qatar's maroon and carries the banners and the header block's
+   label cells; #0E233D the summary titles; the data table itself is white with
+   black rules, which is why the header row is NOT maroon.
+
+   The red/green on the figures is the sheet's own coding and carries meaning:
+   red is what the job REQUIRES and what the array makes AVAILABLE — the two
+   numbers a reviewer checks against each other — and green is what is being
+   PROPOSED to buy. Getting these the wrong way round would invert the reading.
+
+   Desktop only, by decision: this is a submission that gets printed, so it keeps
+   its true column widths and scrolls sideways rather than reflowing into
+   something that no longer matches the sheet it reproduces. */
+
+.storage-moi {
+  --moi-maroon: #8a1538;
+  --moi-navy: #0e233d;
+  --moi-shade: #f2f2f2;
+  --moi-rule: #000000;
+  --moi-req: #c00000;
+  --moi-prop: #00b050;
+}
+
+/* Header block: label and value stacked in rows, labels reversed out on maroon. */
+.storage-moi .moi-head {
+  width: 100%;
+  margin: 14px 0 16px;
+  border-collapse: collapse;
+}
+
+.storage-moi .moi-head th,
+.storage-moi .moi-head td {
+  border: 1px solid var(--moi-rule);
+  padding: 5px 12px;
+  font-size: 0.8rem;
+}
+
+.storage-moi .moi-head th {
+  width: 190px;
+  background: var(--moi-maroon);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
+
+.storage-moi .moi-head td { background: #fff; color: var(--moi-navy); font-weight: 700; }
+
+/* Both banners are maroon on the sheet. */
+.storage-moi .moi-title,
+.storage-moi .moi-sub {
+  margin: 0;
+  padding: 5px 12px;
+  background: var(--moi-maroon);
+  color: #fff;
+  text-align: center;
+  border: 1px solid var(--moi-rule);
+  border-bottom: 0;
+}
+
+.storage-moi .moi-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.storage-moi .moi-title--second { margin-top: 34px; }
+.storage-moi .moi-sub { font-size: 0.78rem; font-weight: 700; margin-bottom: 0; }
+
+/* Summary banners are navy. */
+.storage-moi .moi-summary-title {
+  margin: 22px 0 0;
+  padding: 6px 12px;
+  background: var(--moi-navy);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  border: 1px solid var(--moi-rule);
+  border-bottom: 0;
+}
+
+/* The 21-column sheet: white ground, every cell ruled. */
+.storage-moi .moi-table {
+  min-width: 1600px;
+  font-size: 0.72rem;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.storage-moi .moi-table th,
+.storage-moi .moi-table td {
+  border: 1px solid var(--moi-rule);
+  padding: 5px 6px;
+  text-align: center;
+}
+
+.storage-moi .moi-table thead th {
+  background: #fff;
+  color: #000;
+  font-weight: 700;
+  font-size: 0.67rem;
+  line-height: 1.2;
+  vertical-align: middle;
+}
+
+.storage-moi .moi-table td { vertical-align: middle; }
+
+/* Summary tables, ruled to match. */
+.storage-moi .storage-spec { width: 100%; border-collapse: collapse; background: #fff; }
+
+.storage-moi .storage-spec th,
+.storage-moi .storage-spec td {
+  border: 1px solid var(--moi-rule);
+  padding: 5px 12px;
+  font-size: 0.8rem;
+}
+
+.storage-moi .storage-spec th {
+  width: 52%;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.storage-moi .storage-spec td { text-align: center; font-weight: 700; color: var(--moi-navy); }
+
+/* The sheet's own coding: red for required and available, green for proposed.
+   Qualified with td because `.storage-moi .storage-spec td` sets a colour and
+   outranks a bare class — unqualified, these rules lost and every figure came
+   out navy. */
+.storage-moi td.moi-req,
+.storage-moi .storage-spec td.moi-req,
+.storage-moi .moi-table td.moi-req { color: var(--moi-req); font-weight: 800; }
+
+.storage-moi td.moi-prop,
+.storage-moi .storage-spec td.moi-prop,
+.storage-moi .moi-table td.moi-prop { color: var(--moi-prop); font-weight: 800; }
+
+/* The sheet is a submission document, so downloading it is the point of the
+   section rather than an afterthought at the bottom. */
+.storage-moi .moi-download { margin: 0 0 14px; text-align: right; }

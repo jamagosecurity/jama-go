@@ -3,7 +3,11 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResult, unwrapApiResult } from '../models/api-result.model';
-import { CalculateStorageRequest, StorageDesign } from '../models/storage-design.model';
+import {
+  CalculateStorageRequest,
+  StorageDesign,
+  StorageSheetPdfRequest,
+} from '../models/storage-design.model';
 
 /**
  * CCTV storage sizing. One stateless route, gated on boq.manage.
@@ -20,5 +24,16 @@ export class StorageDesignService {
     return this.http
       .post<ApiResult<StorageDesign>>(`${this.baseUrl}/calculate`, request)
       .pipe(map(unwrapApiResult));
+  }
+
+  /**
+   * The MOI submission sheet as a PDF.
+   *
+   * The server recalculates from the same inputs rather than being handed the
+   * figures on screen, so a downloaded sheet cannot disagree with the page that
+   * offered it.
+   */
+  downloadSheet(request: StorageSheetPdfRequest): Observable<Blob> {
+    return this.http.post(`${this.baseUrl}/pdf`, request, { responseType: 'blob' });
   }
 }

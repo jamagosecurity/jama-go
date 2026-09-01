@@ -84,16 +84,6 @@
               </div>
 
               <label class="camera-field">
-                <span>Model no</span>
-                <input formControlName="modelNo" [maxlength]="modelNoMaxLength"
-                  placeholder="e.g. DS-2CD2143G0-I" autocomplete="off"
-                  [class.is-invalid]="showError('modelNo')" />
-                @if (showError('modelNo')) {
-                  <small class="field-error">{{ errorFor('modelNo', 'Model no') }}</small>
-                }
-              </label>
-
-              <label class="camera-field">
                 <span>Product category <i aria-hidden="true">*</i></span>
                 <select formControlName="category">
                   @for (option of categories; track option.value) {
@@ -103,12 +93,22 @@
               </label>
 
               <label class="camera-field">
-                <span>Camera type <i aria-hidden="true">*</i></span>
-                <select formControlName="type">
-                  @for (option of cameraTypes; track option.value) {
-                    <option [value]="option.value">{{ option.label }}</option>
-                  }
-                </select>
+                <span>Type <i aria-hidden="true">*</i></span>
+                <!-- Plain text box. It carried a datalist of the types already
+                     in stock, which browsers render with a dropdown arrow — so a
+                     field meant to be typed still looked like one to pick from. -->
+                <input formControlName="type"
+                  [maxlength]="typeMaxLength" placeholder="Dome, Bullet, ANPR…" />
+              </label>
+
+              <label class="camera-field">
+                <span>Model no</span>
+                <input formControlName="modelNo" [maxlength]="modelNoMaxLength"
+                  placeholder="e.g. DS-2CD2143G0-I" autocomplete="off"
+                  [class.is-invalid]="showError('modelNo')" />
+                @if (showError('modelNo')) {
+                  <small class="field-error">{{ errorFor('modelNo', 'Model no') }}</small>
+                }
               </label>
 
               <label class="camera-field camera-field--wide">

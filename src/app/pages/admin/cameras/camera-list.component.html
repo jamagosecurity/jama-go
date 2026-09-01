@@ -99,11 +99,11 @@
     </label>
 
     <label class="camera-field">
-      <span>Camera type</span>
+      <span>Type</span>
       <select [formControl]="typeFilterControl">
         <option value="">All types</option>
-        @for (option of cameraTypes; track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
+        @for (option of cameraTypes(); track option) {
+          <option [value]="option">{{ option }}</option>
         }
       </select>
     </label>

@@ -99,6 +99,7 @@
                       <th scope="col">S.No</th>
                       <th scope="col">Brand</th>
                       <th scope="col" class="col-img">Image</th>
+                      <th scope="col">Type</th>
                       <th scope="col">Model</th>
                       <th scope="col">Description</th>
                       <th scope="col">Unit</th>
@@ -128,6 +129,7 @@
                             <span class="boq-thumb boq-thumb--none" aria-hidden="true">—</span>
                           }
                         </td>
+                        <td data-label="Type" class="boq-model">{{ line.type || '—' }}</td>
                         <td data-label="Model" class="boq-model">{{ line.modelNo || '—' }}</td>
                         <td data-label="Description">
                           <span class="boq-linetext">
@@ -187,14 +189,40 @@
                           <span class="boq-thumb boq-thumb--none" aria-hidden="true">—</span>
                         </td>
 
+                        <td data-label="Type">
+                          <select class="boq-cell-select" [value]="choice()[section.title]?.type || ''"
+                            [disabled]="!choice()[section.title]?.brand || !typesIn(section.title).length"
+                            [attr.aria-label]="'Type for the next line in ' + section.title"
+                            (change)="setType(section.title, $event)">
+                            <option value="">
+                              @if (!choice()[section.title]?.brand) {
+                                Brand first
+                              } @else if (!typesIn(section.title).length) {
+                                No type
+                              } @else {
+                                Type…
+                              }
+                            </option>
+                            @for (type of typesIn(section.title); track type) {
+                              <option [value]="type" [selected]="type === choice()[section.title]?.type">
+                                {{ type }}
+                              </option>
+                            }
+                          </select>
+                        </td>
+
                         <td data-label="Model">
                           <select class="boq-cell-select" [value]="choice()[section.title]?.model || ''"
-                            [disabled]="!choice()[section.title]?.brand || !modelsIn(section.title).length"
+                            [disabled]="!choice()[section.title]?.brand
+                              || (!choice()[section.title]?.type && typesIn(section.title).length > 0)
+                              || !modelsIn(section.title).length"
                             [attr.aria-label]="'Model for the next line in ' + section.title"
                             (change)="setModel(section.title, $event)">
                             <option value="">
                               @if (!choice()[section.title]?.brand) {
                                 Brand first
+                              } @else if (!choice()[section.title]?.type && typesIn(section.title).length) {
+                                Type first
                               } @else if (!modelsIn(section.title).length) {
                                 No model no.
                               } @else {
@@ -241,7 +269,7 @@
                          than beside the heading. -->
                     @if (section.lines.length) {
                       <tr class="boq-subtotal">
-                        <td colspan="8" class="num">Section total</td>
+                        <td colspan="9" class="num">Section total</td>
                         <td class="num">
                           <strong>{{ sectionTotal(section) | number: '1.2-2' }} ﷼</strong>
                         </td>
@@ -265,61 +293,6 @@
             </div>
           }
 
-          <!-- Stock filed under no section. Quotable, but only once told where
-               it belongs, so each row carries its own chooser. -->
-          @if (itemsIn(unsortedGroup.title).length) {
-            <div class="admin-panel boq-section boq-section--unsorted">
-              <div class="boq-section-head">
-                <span class="boq-section-lead">
-                  <span class="boq-section-no boq-section-no--muted" aria-hidden="true">?</span>
-                  <h3 class="boq-section-title">Other stock</h3>
-                </span>
-                <span class="boq-section-meta"></span>
-              </div>
-
-              <div class="boq-cascade">
-                <label class="boq-field">
-                  <span>Section</span>
-                  <select [value]="unsortedSection()" (change)="setUnsortedSection($event)">
-                    <option value="">Choose a section…</option>
-                    @for (title of sectionTitles; track title) {
-                      <option [value]="title" [selected]="title === unsortedSection()">{{ title }}</option>
-                    }
-                  </select>
-                </label>
-
-                <label class="boq-field">
-                  <span>Brand</span>
-                  <select [value]="choice()[unsortedGroup.title]?.brand || ''"
-                    (change)="setBrand(unsortedGroup.title, $event)">
-                    <option value="">Choose a brand…</option>
-                    @for (brand of brandsIn(unsortedGroup.title); track brand) {
-                      <option [value]="brand">{{ brand }}</option>
-                    }
-                  </select>
-                </label>
-
-                <label class="boq-field boq-field--grow">
-                  <span>Description</span>
-                  <select [disabled]="!unsortedSection() || !matchesIn(unsortedGroup.title).length"
-                    (change)="pickItem(unsortedGroup.title, $event)">
-                    <option value="">
-                      @if (!unsortedSection()) {
-                        Choose a section first
-                      } @else if (!matchesIn(unsortedGroup.title).length) {
-                        Choose a brand first
-                      } @else {
-                        Choose to add…
-                      }
-                    </option>
-                    @for (item of matchesIn(unsortedGroup.title); track item.id) {
-                      <option [value]="item.id">{{ item.descriptionEn || item.itemName }}</option>
-                    }
-                  </select>
-                </label>
-              </div>
-            </div>
-          }
         </div>
 
       <!-- Total sits at the end, where a reader arrives after the last line —
