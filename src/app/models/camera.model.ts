@@ -36,6 +36,7 @@ export type ProductCategory =
   | 'Network'
   | 'PowerSupply'
   | 'Kpoi'
+  | 'Anpr'
   | 'Cable'
   | 'AccessControl';
 
@@ -68,6 +69,7 @@ export const PRODUCT_CATEGORIES: readonly Option<ProductCategory>[] = [
   { value: 'Network', label: 'Switch & Components' },
   { value: 'PowerSupply', label: 'Rack & UPS' },
   { value: 'Kpoi', label: 'Key Point of Interest Camera (KPOI)' },
+  { value: 'Anpr', label: 'Automatic Number Plate Recognition (ANPR)' },
   { value: 'Cable', label: 'Passive Components & Cables' },
   { value: 'AccessControl', label: 'Access Control System' },
 ];

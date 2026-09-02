@@ -110,10 +110,11 @@ export class BoqEditorComponent implements OnInit {
    * differently. They are the same list now, so the mapping is one to one and
    * there is nothing left to drift.
    *
-   * KPOI is its own category rather than a filter over Cctv. The two are not the
-   * same thing: a submission counts KPOI separately from the main system, while
-   * number-plate cameras are sized on a page of their own. ANPR cameras stay
-   * under Main CCTV, which is where they are quoted.
+   * KPOI and ANPR are their own categories rather than filters over Cctv. A
+   * submission counts each separately from the main system, and number-plate
+   * cameras are sized on a page of their own. ANPR used to sit under Main CCTV
+   * and be told apart by its free-text type — which held only for as long as
+   * everyone spelled that type the same way.
    */
   protected readonly pickerGroups: readonly PickerGroup[] = [
     { title: 'Main CCTV System', categories: ['Cctv'] },
@@ -123,6 +124,7 @@ export class BoqEditorComponent implements OnInit {
     { title: 'Switch & Components', categories: ['Network'] },
     { title: 'Rack & UPS', categories: ['PowerSupply'] },
     { title: 'Key Point of Interest Camera (KPOI)', categories: ['Kpoi'] },
+    { title: 'Automatic Number Plate Recognition (ANPR)', categories: ['Anpr'] },
     { title: 'Passive Components & Cables', categories: ['Cable'] },
     { title: 'Access Control System', categories: ['AccessControl'] },
   ];

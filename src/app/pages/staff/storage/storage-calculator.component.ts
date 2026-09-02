@@ -539,14 +539,25 @@ export class StorageCalculatorComponent implements OnInit {
 
             // KPOI cameras record like any other, so they size like any other.
             // Filtering on Cctv alone dropped them silently and undersized the
-            // array — the one failure mode this screen must not have.
-            if (!item || (item.category !== 'Cctv' && item.category !== 'Kpoi')) return;
+            // array — the one failure mode this screen must not have. Anpr is
+            // in this list for the same reason: it is excluded from the video
+            // sum below, but it has to get past here to be counted as stills at
+            // all. Leaving it out drops number-plate cameras from BOTH totals.
+            if (
+              !item
+              || (item.category !== 'Cctv' && item.category !== 'Kpoi' && item.category !== 'Anpr')
+            ) {
+              return;
+            }
 
-            // Matched loosely because the type is free text now. An exact
-            // 'Anpr' test silently failed on "ANPR" or "ANPR Camera", and the
-            // camera was then sized as continuous video — 3.09 TB against the
-            // 0.78 TB it actually needs, which quietly overstates the array.
-            if (/anpr|number\s*plate|lpr/i.test(item.type ?? '')) {
+            // The category is the reliable half of this test and the type is
+            // the fallback. Matched loosely because the type is free text: an
+            // exact 'Anpr' test silently failed on "ANPR" or "ANPR Camera", and
+            // the camera was then sized as continuous video — 3.09 TB against
+            // the 0.78 TB it actually needs, which quietly overstates the array.
+            // Items filed under the ANPR category are counted however the type
+            // happens to read, including not at all.
+            if (item.category === 'Anpr' || /anpr|number\s*plate|lpr/i.test(item.type ?? '')) {
               anpr.push({
                 key: `anpr-${index}-${id}`,
                 label: line.label,

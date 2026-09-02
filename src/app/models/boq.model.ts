@@ -22,6 +22,7 @@ export const BOQ_SECTION_TITLES: readonly string[] = [
   'Switch & Components',
   'Rack & UPS',
   'Key Point of Interest Camera (KPOI)',
+  'Automatic Number Plate Recognition (ANPR)',
   'Passive Components & Cables',
   'Access Control System',
 ];
