@@ -111,12 +111,30 @@ export class AuthService {
 
   /** Clears an invalid/expired session and returns to the shared secure login. */
   handleUnauthorized(): void {
+    this.clearSession();
+
+    // A 401 raised while a navigation is already running came from a route
+    // guard checking the session — that is the only thing making requests
+    // before a route activates. The guard redirects to the login itself when
+    // the check fails, so navigating from here too starts a second navigation
+    // that cancels the guard's. Both end cancelled, no route ever activates,
+    // and the router leaves an empty <app-root> — a blank white page rather
+    // than the login form.
+    //
+    // The symptom only appears with an EXPIRED session, which is why it hid:
+    // a signed-out visitor never reaches this (the guard redirects without a
+    // request) and a valid session never 401s. Only a stale token does both.
+    if (this.router.getCurrentNavigation()) {
+      return;
+    }
+
+    // No navigation in flight: this 401 came from a screen already on display,
+    // so nothing else is going to move the user and this has to.
     const onPortal =
       this.router.url.startsWith('/admin')
       || this.router.url.startsWith('/staff')
       || this.router.url.startsWith('/technician')
       || this.router.url.startsWith('/client');
-    this.clearSession();
 
     if (onPortal && !this.router.url.startsWith('/admin/login')) {
       void this.router.navigate(['/admin/login']);
