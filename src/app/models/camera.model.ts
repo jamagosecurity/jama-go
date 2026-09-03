@@ -38,7 +38,8 @@ export type ProductCategory =
   | 'Kpoi'
   | 'Anpr'
   | 'Cable'
-  | 'AccessControl';
+  | 'AccessControl'
+  | 'Service';
 
 export type UnitOfMeasurement = 'Piece' | 'Box' | 'Set' | 'Metre' | 'Roll' | 'Location';
 
@@ -72,6 +73,7 @@ export const PRODUCT_CATEGORIES: readonly Option<ProductCategory>[] = [
   { value: 'Anpr', label: 'Automatic Number Plate Recognition (ANPR)' },
   { value: 'Cable', label: 'Passive Components & Cables' },
   { value: 'AccessControl', label: 'Access Control System' },
+  { value: 'Service', label: 'Service' },
 ];
 
 /**

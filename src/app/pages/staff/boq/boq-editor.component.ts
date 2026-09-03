@@ -127,6 +127,7 @@ export class BoqEditorComponent implements OnInit {
     { title: 'Automatic Number Plate Recognition (ANPR)', categories: ['Anpr'] },
     { title: 'Passive Components & Cables', categories: ['Cable'] },
     { title: 'Access Control System', categories: ['AccessControl'] },
+    { title: 'Service', categories: ['Service'] },
   ];
 
   /**

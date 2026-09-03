@@ -25,6 +25,7 @@ export const BOQ_SECTION_TITLES: readonly string[] = [
   'Automatic Number Plate Recognition (ANPR)',
   'Passive Components & Cables',
   'Access Control System',
+  'Service',
 ];
 
 export interface BoqLine {
