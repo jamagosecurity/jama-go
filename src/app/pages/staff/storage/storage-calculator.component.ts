@@ -219,6 +219,11 @@ export class StorageCalculatorComponent implements OnInit {
   });
 
   protected readonly raidLevelValue = computed(() => this.raidLevelSignal());
+
+  /** The chosen scheme, or undefined when the server is to weigh them all. */
+  protected readonly raidScheme = computed(() =>
+    RAID_LEVELS.find((x) => x.value === this.raidLevelSignal()),
+  );
   protected readonly retentionValue = computed(() => this.retentionSignal());
 
   // ===== MOI submission sheet =====
@@ -683,7 +688,10 @@ export class StorageCalculatorComponent implements OnInit {
       retentionDays: raw.retentionDays,
       redundancy: raw.redundancy,
       filesystemFactor: raw.filesystemFactor,
-      raidLevel: raw.raidLevel ? Number(raw.raidLevel) : null,
+      // The control holds the scheme's key, not a level — '5x2' is RAID-5 with two
+      // parity disks. Unpicked sends both as null, which lets the server weigh them.
+      raidLevel: this.raidScheme()?.level ?? null,
+      raidParityDisks: this.raidScheme()?.parityDisks ?? null,
       failoverDays: raw.failoverDays,
       failoverCameras: raw.failoverCameras,
       recordingCodec: raw.recordingCodec,

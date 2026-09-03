@@ -29,8 +29,11 @@ export interface CalculateStorageRequest {
   retentionDays: number;
   redundancy: number;
   filesystemFactor: number;
-  /** 1, 5 or 6 — or null to weigh all three and take the cheapest per array. */
+  /** 1 or 5 — or null to weigh every scheme and take the cheapest per array. */
   raidLevel: number | null;
+  /** Parity disks per group, 1 or 2. Pairs with raidLevel: RAID-5 at 2 parity is
+   *  what other tools call RAID-6. Null lets the server weigh both. */
+  raidParityDisks: number | null;
   failoverDays: number;
   failoverCameras: number;
   /** Pin the RECORDING disk, or null to let the server pick the best. */
@@ -224,12 +227,25 @@ export interface StorageDesign {
   covered: boolean;
 }
 
-export const RAID_LEVELS: readonly { value: number; label: string }[] = [
+/**
+ * The RAID schemes on offer.
+ *
+ * `value` is the form's own key, not a RAID level — the level and the parity
+ * count are sent to the server as two fields, because dual parity is quoted here
+ * as RAID-5 with two parity disks rather than as RAID-6, and one number cannot
+ * carry both.
+ */
+export const RAID_LEVELS: readonly {
+  value: string;
+  level: number;
+  parityDisks: number;
+  label: string;
+}[] = [
   // RAID-1 first: on a small job it is the right answer and the other two force
   // a 3- or 4-disk minimum on a requirement that fits a single disk.
-  { value: 1, label: 'RAID-1 — mirrored pair' },
-  { value: 5, label: 'RAID-5 — 1 parity disk per group' },
-  { value: 6, label: 'RAID-6 — 2 parity disks per group' },
+  { value: '1', level: 1, parityDisks: 1, label: 'RAID-1 — mirrored pair' },
+  { value: '5', level: 5, parityDisks: 1, label: 'RAID-5 — 1 parity disk per group' },
+  { value: '5x2', level: 5, parityDisks: 2, label: 'RAID-5 — 2 parity disks per group' },
 ];
 
 /** Disk sizes actually stocked, so a group is sized from something buyable. */
