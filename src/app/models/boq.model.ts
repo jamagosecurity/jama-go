@@ -18,6 +18,7 @@ export const BOQ_SECTION_TITLES: readonly string[] = [
   'Main CCTV System',
   'Camera Accessories',
   'NVR & Storage',
+  'VMS & Server',
   'Monitors and Work Stations',
   'Switch & Components',
   'Rack & UPS',

@@ -120,6 +120,7 @@ export class BoqEditorComponent implements OnInit {
     { title: 'Main CCTV System', categories: ['Cctv'] },
     { title: 'Camera Accessories', categories: ['Accessory'] },
     { title: 'NVR & Storage', categories: ['Storage'] },
+    { title: 'VMS & Server', categories: ['VmsServer'] },
     { title: 'Monitors and Work Stations', categories: ['Monitor'] },
     { title: 'Switch & Components', categories: ['Network'] },
     { title: 'Rack & UPS', categories: ['PowerSupply'] },

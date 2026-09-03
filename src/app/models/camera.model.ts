@@ -32,6 +32,7 @@ export type ProductCategory =
   | 'Cctv'
   | 'Accessory'
   | 'Storage'
+  | 'VmsServer'
   | 'Monitor'
   | 'Network'
   | 'PowerSupply'
@@ -66,6 +67,7 @@ export const PRODUCT_CATEGORIES: readonly Option<ProductCategory>[] = [
   { value: 'Cctv', label: 'Main CCTV System' },
   { value: 'Accessory', label: 'Camera Accessories' },
   { value: 'Storage', label: 'NVR & Storage' },
+  { value: 'VmsServer', label: 'VMS & Server' },
   { value: 'Monitor', label: 'Monitors and Work Stations' },
   { value: 'Network', label: 'Switch & Components' },
   { value: 'PowerSupply', label: 'Rack & UPS' },
