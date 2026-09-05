@@ -15,6 +15,10 @@ export const PERMISSIONS = {
   vipManage: 'vip.manage',
   cameraManage: 'camera.manage',
   boqManage: 'boq.manage',
+  /** Lets an account type a rate over the catalogue price on a quotation line.
+   *  Separate from boqManage: quantity is a fact about the site, a rate is a
+   *  commercial decision. */
+  boqPrice: 'boq.price',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

@@ -500,8 +500,37 @@
   box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
 }
 
-/* Read-only by design — the catalogue owns the rate. */
+/* Read-only without the rate override grant — the catalogue owns the rate. */
 .boq-rate { color: var(--admin-muted); font-variant-numeric: tabular-nums; cursor: help; }
+
+/* A repriced line is marked on the field itself, not with a badge off to one
+   side. Somebody scanning a long quotation for "what did we change?" is looking
+   at the prices, and that is where the answer has to be. */
+.boq-rate-input.is-repriced {
+  border-color: rgba(246, 153, 61, 0.75);
+  background: rgba(246, 153, 61, 0.08);
+  font-weight: 600;
+}
+
+.boq-rate-reset {
+  display: block;
+  margin: 4px 0 0 auto;
+  padding: 1px 6px;
+  border: 1px solid rgba(246, 153, 61, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: #9a5b12;
+  font: inherit;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.boq-rate-reset:hover { background: rgba(246, 153, 61, 0.14); }
+.boq-rate-reset:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.18);
+}
 
 .boq-line-remove { text-align: right; }
 .boq-line-remove button {

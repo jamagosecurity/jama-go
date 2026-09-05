@@ -51,8 +51,13 @@ export interface BoqLine {
    */
   resolution: CameraResolution;
   bitrateMbps: number | null;
-  /** Comes from the catalogue. Staff cannot change it. */
+  /** What this line is charged at — the catalogue rate unless someone with the
+   *  rate override grant typed a different one. */
   unitRate: number;
+  /** What the catalogue held when the line was written. Equal to unitRate on an
+   *  ordinary line; different means a discount, and the pair is what makes that
+   *  discount visible instead of lost. */
+  catalogueRate: number;
   lineTotal: number;
   sortOrder: number;
 }
@@ -109,14 +114,23 @@ export interface BoqListQuery {
 }
 
 /**
- * What the client may send for a line: which item, and how many.
+ * What the client may send for a line: which item, how many, and — from an
+ * account holding the rate override grant — at what rate.
  *
- * Deliberately no rate — the server reads that from the catalogue. Sending one
- * would be ignored, so the type does not pretend otherwise.
+ * Still no name, model or unit: those describe the item and the server reads
+ * them from the catalogue.
  */
 export interface SaveBoqLine {
   cameraId: string;
   quantity: number;
+  /**
+   * A rate to use instead of the catalogue's, or null to take the catalogue's.
+   *
+   * The server refuses a value that differs from the catalogue when the account
+   * lacks the grant, rather than dropping it quietly — so this is never sent
+   * hopefully. The editor only sets it where it is allowed to.
+   */
+  unitRate: number | null;
 }
 
 export interface SaveBoqSection {

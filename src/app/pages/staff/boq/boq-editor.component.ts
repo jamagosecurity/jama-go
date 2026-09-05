@@ -17,13 +17,15 @@ import {
   matchCameraBrand,
   unitLabel,
 } from '../../../models/camera.model';
+import { PERMISSIONS } from '../../../models/auth.model';
+import { AuthService } from '../../../services/auth.service';
 import { BoqService } from '../../../services/boq.service';
 import { CameraService } from '../../../services/camera.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { downloadBlob } from '../../../utils/download.util';
 import { fieldErrorMessage, shouldShowError } from '../../../utils/form-validators.util';
 
-/** A line while it is being built. The rate is shown but never sent. */
+/** A line while it is being built. */
 interface DraftLine {
   key: string;
   cameraId: string;
@@ -35,8 +37,12 @@ interface DraftLine {
   type: string | null;
   uom: string;
   quantity: number;
-  /** Catalogue price, for the running total only — the server sets the real one. */
+  /** The rate this line is priced at. Starts as the catalogue rate and is only
+   *  editable for an account holding the rate override grant. */
   unitRate: number;
+  /** The catalogue rate, kept beside it so the list price is still on screen
+   *  after someone types over it — and so "reset" has something to reset to. */
+  catalogueRate: number;
   /**
    * Thumbnail and blurb, so the table on screen shows the same nine columns the
    * client's PDF does. Neither is sent on save and neither is copied onto the
@@ -93,6 +99,14 @@ interface DraftSection {
 export class BoqEditorComponent implements OnInit {
   private readonly service = inject(BoqService);
   private readonly cameras = inject(CameraService);
+  private readonly auth = inject(AuthService);
+
+  /**
+   * Whether the rate boxes are editable. The API enforces the same grant and
+   * refuses a changed rate without it, so this only decides whether to offer
+   * something that would be rejected — it is not the control itself.
+   */
+  protected readonly canPrice = computed(() => this.auth.can(PERMISSIONS.boqPrice));
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -335,6 +349,7 @@ export class BoqEditorComponent implements OnInit {
                   uom: line.uom,
                   quantity: line.quantity,
                   unitRate: line.unitRate,
+                  catalogueRate: line.catalogueRate,
                   // Filled in once the catalogue arrives — see attachCatalogueDetail.
                   imageUrl: null,
                   description: null,
@@ -786,7 +801,11 @@ export class BoqEditorComponent implements OnInit {
                   type: item.type || null,
                   uom: item.uom,
                   quantity,
+                  // A new line starts at the catalogue price. Both fields hold
+                  // it, so the line reads as "no discount" until somebody makes
+                  // one — rather than as a discount down from nothing.
                   unitRate: item.rate ?? 0,
+                  catalogueRate: item.rate ?? 0,
                   imageUrl: item.images[0]?.url ?? null,
                   description: item.descriptionEn,
                   descriptionAr: item.descriptionAr,
@@ -816,6 +835,49 @@ export class BoqEditorComponent implements OnInit {
 
   protected onQuantityInput(sectionIndex: number, lineIndex: number, event: Event): void {
     this.setQuantity(sectionIndex, lineIndex, Number((event.target as HTMLInputElement).value));
+  }
+
+  /**
+   * Whether this line goes out at anything other than the catalogue price.
+   *
+   * Compared in fils rather than on the raw numbers: 57 and 57.000000001 are the
+   * same price to everyone except a floating-point comparison, and treating that
+   * as a discount would mark untouched lines and post a pointless override.
+   */
+  protected isRepriced(line: DraftLine): boolean {
+    return Math.round(line.unitRate * 100) !== Math.round(line.catalogueRate * 100);
+  }
+
+  /**
+   * Zero is a legitimate price — an item included at no charge — so it is kept
+   * rather than bounced back to the catalogue rate. Only a cleared or nonsense
+   * box falls back, and negatives are refused: a line that subtracts from the
+   * total is a discount pretending to be equipment.
+   */
+  protected setRate(sectionIndex: number, lineIndex: number, value: number): void {
+    const unitRate = Number.isFinite(value) && value >= 0 ? Math.round(value * 100) / 100 : 0;
+    this.sections.update((current) =>
+      current.map((section, i) =>
+        i !== sectionIndex
+          ? section
+          : {
+              ...section,
+              lines: section.lines.map((line, j) =>
+                j === lineIndex ? { ...line, unitRate } : line,
+              ),
+            },
+      ),
+    );
+  }
+
+  protected onRateInput(sectionIndex: number, lineIndex: number, event: Event): void {
+    this.setRate(sectionIndex, lineIndex, Number((event.target as HTMLInputElement).value));
+  }
+
+  /** Puts a repriced line back on the catalogue price. */
+  protected resetRate(sectionIndex: number, lineIndex: number): void {
+    const line = this.sections()[sectionIndex]?.lines[lineIndex];
+    if (line) this.setRate(sectionIndex, lineIndex, line.catalogueRate);
   }
 
   protected removeLine(sectionIndex: number, lineIndex: number): void {
@@ -862,10 +924,18 @@ export class BoqEditorComponent implements OnInit {
       issueDate: raw.issueDate,
       status: raw.status,
       notes: raw.notes.trim() || null,
-      // Item and quantity only. The rate is the server's to decide.
       sections: filled.map((section) => ({
         title: section.title.trim(),
-        lines: section.lines.map((line) => ({ cameraId: line.cameraId, quantity: line.quantity })),
+        lines: section.lines.map((line) => ({
+          cameraId: line.cameraId,
+          quantity: line.quantity,
+          // Null unless this line was actually repriced. Sending the catalogue
+          // rate back as an "override" would pin today's price onto the line
+          // forever: re-saving an untouched quotation after an admin corrected
+          // the catalogue would silently keep the old figure, and it would look
+          // like somebody had chosen it.
+          unitRate: this.isRepriced(line) ? line.unitRate : null,
+        })),
       })),
     };
 
