@@ -17,9 +17,8 @@ import {
   matchCameraBrand,
   unitLabel,
 } from '../../../models/camera.model';
-import { PERMISSIONS } from '../../../models/auth.model';
-import { AuthService } from '../../../services/auth.service';
 import { BoqService } from '../../../services/boq.service';
+import { BOQ_BASE_PATH, BOQ_STORAGE_PATH } from './boq-base-path';
 import { CameraService } from '../../../services/camera.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { downloadBlob } from '../../../utils/download.util';
@@ -37,8 +36,8 @@ interface DraftLine {
   type: string | null;
   uom: string;
   quantity: number;
-  /** The rate this line is priced at. Starts as the catalogue rate and is only
-   *  editable for an account holding the rate override grant. */
+  /** The rate this line is priced at. Starts at the catalogue rate and can be
+   *  typed over — the total follows it. */
   unitRate: number;
   /** The catalogue rate, kept beside it so the list price is still on screen
    *  after someone types over it — and so "reset" has something to reset to. */
@@ -84,9 +83,10 @@ interface DraftSection {
 /**
  * Builds a bill of quantities from the stock catalogue.
  *
- * Staff choose items and quantities. Rates are shown so the total means
- * something, but they are read-only here and are not part of what gets sent —
- * the server prices every line from the catalogue. See BoqWriter on the API.
+ * Staff choose items, quantities and rates. A rate starts at the catalogue
+ * price and may be typed over for a negotiated job; the catalogue figure is
+ * kept beside it, so a discount stays visible instead of vanishing into the
+ * agreed number. See BoqWriter on the API.
  */
 @Component({
   selector: 'app-boq-editor',
@@ -99,18 +99,16 @@ interface DraftSection {
 export class BoqEditorComponent implements OnInit {
   private readonly service = inject(BoqService);
   private readonly cameras = inject(CameraService);
-  private readonly auth = inject(AuthService);
-
-  /**
-   * Whether the rate boxes are editable. The API enforces the same grant and
-   * refuses a changed rate without it, so this only decides whether to offer
-   * something that would be rejected — it is not the control itself.
-   */
-  protected readonly canPrice = computed(() => this.auth.can(PERMISSIONS.boqPrice));
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Whichever portal mounted these routes — see BOQ_BASE_PATH. Every internal
+   *  link is built from these two rather than written out, so the same screens
+   *  keep an administrator in /admin and a staff member in /staff. */
+  protected readonly basePath = inject(BOQ_BASE_PATH);
+  protected readonly storagePath = inject(BOQ_STORAGE_PATH);
 
   protected readonly statuses = BOQ_STATUSES;
   protected readonly sectionTitles = BOQ_SECTION_TITLES;
@@ -952,7 +950,7 @@ export class BoqEditorComponent implements OnInit {
           this.boq.set(saved);
           // A new BOQ has just been given its number and id, so move the URL onto
           // it — a refresh must not land back on /new.
-          if (!existing) void this.router.navigate(['/staff/boq', saved.id]);
+          if (!existing) void this.router.navigate([this.basePath, saved.id]);
         },
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to save the quotation.')),

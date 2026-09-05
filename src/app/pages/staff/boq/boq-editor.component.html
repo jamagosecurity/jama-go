@@ -7,12 +7,12 @@
         <span class="boq-status" [attr.data-status]="saved.status">{{ saved.status }}</span>
         <!-- Only once it is saved: the calculator reads the quotation back from
              the server, so an unsaved draft has nothing for it to read. -->
-        <a class="btn-admin btn-admin-ghost" [routerLink]="['/staff/storage']"
+        <a class="btn-admin btn-admin-ghost" [routerLink]="[storagePath]"
           [queryParams]="{ quotation: saved.id }">Calculate storage</a>
         <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"
           (click)="download()">{{ downloading() ? 'Preparing…' : 'Download PDF' }}</button>
       }
-      <a class="btn-admin btn-admin-ghost boq-back" routerLink="/staff/boq">← All quotations</a>
+      <a class="btn-admin btn-admin-ghost boq-back" [routerLink]="basePath">← All quotations</a>
     </div>
   </header>
 
@@ -149,31 +149,22 @@
                             (input)="onQuantityInput(s, i, $event)" />
                         </td>
                         <td data-label="Unit price (﷼)" class="num">
-                          @if (canPrice()) {
-                            <input class="boq-qty boq-rate-input" type="number" min="0" step="0.01"
-                              [class.is-repriced]="isRepriced(line)"
-                              [value]="line.unitRate"
-                              [attr.aria-label]="'Unit price for ' + line.itemName"
-                              (input)="onRateInput(s, i, $event)" />
+                          <input class="boq-qty boq-rate-input" type="number" min="0" step="0.01"
+                            [class.is-repriced]="isRepriced(line)"
+                            [value]="line.unitRate"
+                            [attr.aria-label]="'Unit price for ' + line.itemName"
+                            (input)="onRateInput(s, i, $event)" />
 
-                            <!-- Only once it differs. Printing "list 57.00" against
-                                 an unchanged 57.00 is noise on every line of the
-                                 document, and buries the one line that did change. -->
-                            @if (isRepriced(line)) {
-                              <button type="button" class="boq-rate-reset"
-                                (click)="resetRate(s, i)"
-                                [attr.aria-label]="'Restore catalogue price for ' + line.itemName"
-                                [title]="'Catalogue price ' + (line.catalogueRate | number: '1.2-2') + ' — click to restore'">
-                                was {{ line.catalogueRate | number: '1.2-2' }} ↺
-                              </button>
-                            }
-                          } @else {
-                            <!-- Read-only without the rate override grant. The API
-                                 refuses a changed rate from this account anyway, so
-                                 an editable box would only invite a rejected save. -->
-                            <span class="boq-rate" title="Set by your administrator">
-                              {{ line.unitRate | number: '1.2-2' }}
-                            </span>
+                          <!-- Only once it differs. Printing "was 57.00" against
+                               an unchanged 57.00 is noise on every line of the
+                               document, and buries the one line that did change. -->
+                          @if (isRepriced(line)) {
+                            <button type="button" class="boq-rate-reset"
+                              (click)="resetRate(s, i)"
+                              [attr.aria-label]="'Restore catalogue price for ' + line.itemName"
+                              [title]="'Catalogue price ' + (line.catalogueRate | number: '1.2-2') + ' — click to restore'">
+                              was {{ line.catalogueRate | number: '1.2-2' }} ↺
+                            </button>
                           }
                         </td>
                         <td data-label="Total amount" class="num">
@@ -338,7 +329,7 @@
         <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
           {{ saving() ? 'Saving…' : isEditing() ? 'Save changes' : 'Create quotation' }}
         </button>
-        <a class="btn-admin btn-admin-ghost" routerLink="/staff/boq">Cancel</a>
+        <a class="btn-admin btn-admin-ghost" [routerLink]="basePath">Cancel</a>
       </div>
     </form>
   }

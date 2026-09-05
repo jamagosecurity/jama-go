@@ -3,6 +3,7 @@ import { permissionGuard } from '../../guards/admin.guard';
 import { PERMISSIONS } from '../../models/auth.model';
 import { createCameraRoutes } from '../admin/cameras/cameras.routes';
 import { createDiaRoutes } from '../admin/dia/dia.routes';
+import { createBoqRoutes } from './boq/boq.routes';
 
 export const STAFF_ROUTES: Routes = [
   {
@@ -34,30 +35,14 @@ export const STAFF_ROUTES: Routes = [
       {
         // Quotations, as staff call them. The route, API and entity keep the
         // "boq" name — renaming those would rewrite a document reference that
-        // may already be circulating. Gated on boq.manage, so only staff an admin has
-        // granted it ever see the screens.
+        // may already be circulating. Gated on boq.manage, so only staff an
+        // admin has granted it ever see the screens.
+        //
+        // Mounted from the shared factory, the same way the stock inventory is:
+        // admins mount the identical screens under /admin/boq.
         path: 'boq',
         canActivate: [permissionGuard(PERMISSIONS.boqManage)],
-        children: [
-          {
-            path: 'new',
-            title: 'New Quotation — Jama Go Staff',
-            loadComponent: () =>
-              import('./boq/boq-editor.component').then((m) => m.BoqEditorComponent),
-          },
-          {
-            path: ':id',
-            title: 'Quotation — Jama Go Staff',
-            loadComponent: () =>
-              import('./boq/boq-editor.component').then((m) => m.BoqEditorComponent),
-          },
-          {
-            path: '',
-            title: 'Quotations — Jama Go Staff',
-            loadComponent: () =>
-              import('./boq/boq-list.component').then((m) => m.BoqListComponent),
-          },
-        ],
+        children: createBoqRoutes('/staff/boq', '/staff/storage'),
       },
       {
         // Sizes the array for a quotation, so it rides the same permission:

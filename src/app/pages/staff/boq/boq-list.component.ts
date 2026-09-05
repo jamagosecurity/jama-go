@@ -11,6 +11,7 @@ import { BOQ_STATUSES, BoqListItem, BoqStatus } from '../../../models/boq.model'
 import { BoqService } from '../../../services/boq.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { downloadBlob } from '../../../utils/download.util';
+import { BOQ_BASE_PATH } from './boq-base-path';
 
 const PAGE_SIZE = 20;
 
@@ -25,6 +26,9 @@ const PAGE_SIZE = 20;
 export class BoqListComponent implements OnInit {
   private readonly service = inject(BoqService);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** The portal these screens are mounted under — see BOQ_BASE_PATH. */
+  protected readonly basePath = inject(BOQ_BASE_PATH);
 
   protected readonly statuses = BOQ_STATUSES;
   protected readonly result = signal<PaginatedData<BoqListItem> | null>(null);

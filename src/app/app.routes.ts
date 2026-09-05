@@ -9,6 +9,7 @@ import {
   technicianGuard,
 } from './guards/admin.guard';
 import { createCameraRoutes } from './pages/admin/cameras/cameras.routes';
+import { createBoqRoutes } from './pages/staff/boq/boq.routes';
 import { PERMISSIONS } from './models/auth.model';
 
 /**
@@ -132,6 +133,18 @@ export const routes: Routes = [
               import('./pages/admin/storage/storage-plan.component').then(
                 (m) => m.StoragePlanComponent,
               ),
+          },
+          {
+            // The same quotation screens staff use, mounted for admins too.
+            // An administrator implicitly holds boq.manage, so the guard here is
+            // about the shape of the tree rather than about keeping anyone out.
+            //
+            // The calculator sits at a different path in each portal — /staff/storage
+            // for staff, /admin/storage/calculator for admins, whose /admin/storage
+            // is the sizing reference page — so it is passed in rather than derived.
+            path: 'boq',
+            canActivate: [permissionGuard(PERMISSIONS.boqManage)],
+            children: createBoqRoutes('/admin/boq', '/admin/storage/calculator'),
           },
           {
             path: 'cameras',

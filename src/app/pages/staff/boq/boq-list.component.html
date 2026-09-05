@@ -3,7 +3,7 @@
     <div>
       <h1>Quotations</h1>
     </div>
-    <a class="btn-admin btn-admin-primary" routerLink="/staff/boq/new">New quotation</a>
+    <a class="btn-admin btn-admin-primary" [routerLink]="[basePath, 'new']">New quotation</a>
   </header>
 
   <div class="boq-filters">
@@ -62,7 +62,7 @@
               @for (boq of page.items; track boq.id) {
                 <tr>
                   <td data-label="Number">
-                    <a class="boq-number" [routerLink]="['/staff/boq', boq.id]">{{ boq.boqNumber }}</a>
+                    <a class="boq-number" [routerLink]="[basePath, boq.id]">{{ boq.boqNumber }}</a>
                   </td>
                   <td data-label="Project">
                     <span class="boq-projectcell">
@@ -90,7 +90,7 @@
                       <button type="button" class="row-btn" [disabled]="busyId() === boq.id"
                         (click)="cancelDelete()">Keep</button>
                     } @else {
-                      <a class="row-btn row-btn--edit" [routerLink]="['/staff/boq', boq.id]">Open</a>
+                      <a class="row-btn row-btn--edit" [routerLink]="[basePath, boq.id]">Open</a>
                       <button type="button" class="row-btn" [disabled]="busyId() === boq.id"
                         (click)="download(boq)">
                         {{ busyId() === boq.id ? '…' : 'PDF' }}
@@ -120,7 +120,7 @@
           <strong>{{ hasFilters() ? 'Nothing matches those filters' : 'No quotations yet' }}</strong>
           <p>{{ hasFilters() ? 'Try a different search.' : 'Build the first one from the catalogue.' }}</p>
           @if (!hasFilters()) {
-            <a class="btn-admin btn-admin-primary" routerLink="/staff/boq/new">New quotation</a>
+            <a class="btn-admin btn-admin-primary" [routerLink]="[basePath, 'new']">New quotation</a>
           }
         </div>
       }
