@@ -78,8 +78,15 @@
                     <span class="boq-status" [attr.data-status]="boq.status">{{ boq.status }}</span>
                   </td>
                   <td data-label="Lines" class="num">{{ boq.lineCount }}</td>
+                  <!-- What the job is worth, which is the discounted figure. The
+                       total it came down from is shown struck through beside it,
+                       so a discounted quotation is recognisable in the list
+                       rather than only once it is opened. -->
                   <td data-label="Total (﷼)" class="num">
-                    <strong>{{ boq.total | number: '1.2-2' }}</strong>
+                    <strong>{{ boq.grandTotal | number: '1.2-2' }}</strong>
+                    @if (boq.specialDiscount > 0) {
+                      <span class="boq-was">{{ boq.total | number: '1.2-2' }}</span>
+                    }
                   </td>
                   <td class="boq-row-actions">
                     @if (pendingDeleteId() === boq.id) {

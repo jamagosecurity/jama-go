@@ -84,7 +84,12 @@ export interface Boq {
   notes: string | null;
   preparedById: string;
   preparedByName: string | null;
+  /** Sum of the lines, before any discount. */
   total: number;
+  /** A lump sum agreed off the total, in QAR. Zero when none was given. */
+  specialDiscount: number;
+  /** What is payable: the lines less the discount. */
+  grandTotal: number;
   sections: BoqSection[];
   createdAt: string;
   updatedAt: string | null;
@@ -99,6 +104,8 @@ export interface BoqListItem {
   issueDate: string;
   status: BoqStatus;
   total: number;
+  specialDiscount: number;
+  grandTotal: number;
   sectionCount: number;
   lineCount: number;
   preparedByName: string | null;
@@ -121,7 +128,14 @@ export interface BoqListQuery {
  * them from the catalogue.
  */
 export interface SaveBoqLine {
-  cameraId: string;
+  /**
+   * The line's own id, for a line already on this BOQ. It is what keeps a line
+   * whose stock item has since been deleted — that line has no cameraId left,
+   * so the id is the only way to say which line is being kept.
+   */
+  id: string | null;
+  /** Null once the stock item behind the line has been deleted. */
+  cameraId: string | null;
   quantity: number;
   /**
    * A rate to use instead of the catalogue's, or null to take the catalogue's.
@@ -146,5 +160,12 @@ export interface SaveBoqRequest {
   issueDate: string;
   status: BoqStatus;
   notes: string | null;
+  /**
+   * A lump sum off the finished quotation, in QAR. Zero for no discount.
+   *
+   * Only the amount is sent — the server works out what is payable from the
+   * lines it priced, so a client cannot state its own final figure.
+   */
+  specialDiscount: number;
   sections: SaveBoqSection[];
 }

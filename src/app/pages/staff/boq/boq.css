@@ -590,6 +590,72 @@
 .boq-total-figure span { font-size: 0.8rem; color: var(--admin-muted); }
 .boq-total-note { margin: 0; color: var(--admin-muted); font-size: 0.76rem; }
 
+/* The three money rows, in the order the document prints them. One card rather
+   than three, so the discount reads as part of the arithmetic rather than as a
+   field that happens to sit nearby. */
+.boq-money {
+  display: grid;
+  gap: 2px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+  min-width: 300px;
+}
+
+.boq-money-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 6px 0;
+}
+
+.boq-money-row + .boq-money-row { border-top: 1px solid rgba(15, 40, 70, 0.07); }
+
+.boq-money-label {
+  display: grid;
+  gap: 1px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+/* Arabic carries no case, so the letter-spacing and uppercasing above only
+   distort it. Reset rather than inherited. */
+.boq-money-ar {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--admin-muted);
+}
+
+.boq-money-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--admin-muted);
+}
+
+.boq-money-minus { font-size: 1rem; font-weight: 700; color: #c2660f; }
+.boq-money-riyal { font-size: 0.8rem; }
+.boq-discount-input { width: 116px; text-align: right; }
+
+/* The line that matters, given the weight the printed document gives it. */
+.boq-money-final { padding-top: 8px; }
+.boq-money-final .boq-money-label { color: var(--admin-ink); }
+.boq-money-final .boq-total-figure { font-size: 1.3rem; }
+
+.boq-total-warn {
+  margin: 0;
+  color: #9f1239;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
 /* Actions sit under the total, right-aligned to follow it rather than stretch. */
 .boq-save {
   display: flex;
@@ -955,4 +1021,15 @@
   color: var(--admin-ink);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+/* The pre-discount total on a list row: present for checking, never competing
+   with the figure that is actually payable. */
+.boq-was {
+  display: block;
+  margin-top: 1px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--admin-muted);
+  text-decoration: line-through;
 }

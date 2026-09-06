@@ -312,10 +312,56 @@
            not in a rail beside them. Compact: it is a confirmation of what the
            lines already say, not the headline of the page. -->
       <div class="boq-foot">
-        <div class="boq-total">
-          <span class="boq-total-label">Total</span>
-          <span class="boq-total-figure">{{ total() | number: '1.2-2' }} <span>﷼</span></span>
+        <!-- Laid out the way the printed document ends: what the lines came to,
+             what was taken off, and what is left to pay. The Arabic sits under
+             each label because that is how it prints, so what is agreed here is
+             recognisably what the client receives. -->
+        <div class="boq-money">
+          <div class="boq-money-row">
+            <span class="boq-money-label">
+              Total
+              <span class="boq-money-ar" dir="rtl">الإجمالي</span>
+            </span>
+            <span class="boq-total-figure">{{ total() | number: '1.2-2' }} <span>﷼</span></span>
+          </div>
+
+          <div class="boq-money-row">
+            <label class="boq-money-label" for="boq-discount">
+              Discount
+              <span class="boq-money-ar" dir="rtl">الخصم</span>
+            </label>
+            <span class="boq-money-entry">
+              <span class="boq-money-minus" aria-hidden="true">−</span>
+              <input
+                id="boq-discount"
+                class="boq-qty boq-discount-input"
+                type="number"
+                min="0"
+                step="0.01"
+                [value]="discount()"
+                (input)="onDiscountInput($event)"
+              />
+              <span class="boq-money-riyal">﷼</span>
+            </span>
+          </div>
+
+          <div class="boq-money-row boq-money-final">
+            <span class="boq-money-label">
+              {{ discountApplied() > 0 ? 'Final amount' : 'Amount payable' }}
+              <span class="boq-money-ar" dir="rtl">
+                {{ discountApplied() > 0 ? 'المبلغ النهائي' : 'المبلغ المستحق' }}
+              </span>
+            </span>
+            <span class="boq-total-figure">{{ grandTotal() | number: '1.2-2' }} <span>﷼</span></span>
+          </div>
         </div>
+
+        @if (discountTooLarge()) {
+          <p class="boq-total-warn" role="alert">
+            A discount of {{ discount() | number: '1.2-2' }} ﷼ is more than the quotation total.
+          </p>
+        }
+
         <p class="boq-total-note">
           Rates come from the stock catalogue. The server recalculates on save.
         </p>
@@ -323,6 +369,10 @@
 
       @if (formError()) {
         <p class="admin-error" role="alert">{{ formError() }}</p>
+      }
+
+      @if (savedNotice()) {
+        <p class="admin-success" role="status">{{ savedNotice() }}</p>
       }
 
       <div class="boq-save">

@@ -27,7 +27,13 @@ import { fieldErrorMessage, shouldShowError } from '../../../utils/form-validato
 /** A line while it is being built. */
 interface DraftLine {
   key: string;
-  cameraId: string;
+  /** The saved line's id, or null for one added in this sitting. Sent back so a
+   *  line whose stock item has been deleted can still be kept — it has no
+   *  cameraId left to name it by. */
+  id: string | null;
+  /** Null once the stock item behind the line has been deleted; the copied name,
+   *  rate and unit below are then all that describes it. */
+  cameraId: string | null;
   itemName: string;
   modelNo: string | null;
   brand: string | null;
@@ -191,6 +197,17 @@ export class BoqEditorComponent implements OnInit {
   protected readonly downloading = signal(false);
   protected readonly formError = signal('');
 
+  /**
+   * What the last save actually did, named — "Saved" alone leaves the reader
+   * checking the figures to see whether anything happened.
+   *
+   * A save used to finish in silence: the button went back to reading "Save
+   * changes" and nothing else moved, which is indistinguishable from a save that
+   * never happened.
+   */
+  protected readonly savedNotice = signal('');
+  private savedNoticeTimer: ReturnType<typeof setTimeout> | null = null;
+
   protected readonly sections = signal<DraftSection[]>(
     BOQ_SECTION_TITLES.map((title, index) => ({
       key: `section-${index}`,
@@ -261,6 +278,34 @@ export class BoqEditorComponent implements OnInit {
   );
 
   /**
+   * The lump sum agreed off the quotation, as typed.
+   *
+   * A signal rather than a form control because the figures below it are
+   * computed, and the total has to move under the discount as lines are added.
+   */
+  protected readonly discount = signal(0);
+
+  /** Never below zero and never more than the lines it comes off — the server
+   *  refuses both, and the footer should not show a figure it will reject. */
+  protected readonly discountApplied = computed(() =>
+    Math.min(Math.max(this.discount(), 0), this.total()),
+  );
+
+  /** What the customer pays, which is what the document ends on. */
+  protected readonly grandTotal = computed(() => this.total() - this.discountApplied());
+
+  /** Typing 5,000 off a 500 quotation is a mistake worth saying out loud rather
+   *  than silently clamping — the saved figure would not be the one on screen. */
+  protected readonly discountTooLarge = computed(
+    () => this.discount() > this.total() && this.total() > 0,
+  );
+
+  protected onDiscountInput(event: Event): void {
+    const value = Number((event.target as HTMLInputElement).value);
+    this.discount.set(Number.isFinite(value) ? value : 0);
+  }
+
+  /**
    * How a unit is written on screen. The stored enum name stays put, so only
    * the printed form changes; the mapping lives with the dropdown it has to
    * agree with rather than being spelled out a second time here.
@@ -279,6 +324,10 @@ export class BoqEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCatalogue();
+
+    this.destroyRef.onDestroy(() => {
+      if (this.savedNoticeTimer) clearTimeout(this.savedNoticeTimer);
+    });
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') this.loadBoq(id);
@@ -326,42 +375,61 @@ export class BoqEditorComponent implements OnInit {
             status: boq.status,
             notes: boq.notes ?? '',
           });
-          // Merged into the nine, not swapped for them: a saved quotation
-          // holds only the sections it uses, and the editor shows all of them.
-          const saved = new Map(boq.sections.map((section) => [section.title, section]));
-
-          this.sections.set(
-            BOQ_SECTION_TITLES.map((title, index) => {
-              const section = saved.get(title);
-
-              return {
-                key: `section-${index}`,
-                title,
-                lines: (section?.lines ?? []).map((line, lineIndex) => ({
-                  key: `saved-line-${line.id}-${lineIndex}`,
-                  cameraId: line.cameraId ?? '',
-                  itemName: line.itemName,
-                  modelNo: line.modelNo,
-                  brand: line.brand,
-                  type: line.type,
-                  uom: line.uom,
-                  quantity: line.quantity,
-                  unitRate: line.unitRate,
-                  catalogueRate: line.catalogueRate,
-                  // Filled in once the catalogue arrives — see attachCatalogueDetail.
-                  imageUrl: null,
-                  description: null,
-                  descriptionAr: null,
-                })),
-              };
-            }),
-          );
-
-          this.attachCatalogueDetail();
+          this.seedSections(boq);
         },
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to load the quotation.')),
       });
+  }
+
+  /**
+   * Puts the rows on screen in step with a saved document — on load, and again
+   * after every save.
+   *
+   * Re-seeding after a save is not cosmetic. The server rewrites a BOQ by
+   * replacing its lines, so each save mints fresh line ids; rows still holding
+   * the previous ones are refused the next time round with "a line is no longer
+   * on this BOQ", which is true but unhelpful when nothing has actually moved.
+   */
+  private seedSections(boq: Boq): void {
+    this.discount.set(boq.specialDiscount);
+
+    // Merged into the nine, not swapped for them: a saved quotation
+    // holds only the sections it uses, and the editor shows all of them.
+    const saved = new Map(boq.sections.map((section) => [section.title, section]));
+
+    this.sections.set(
+      BOQ_SECTION_TITLES.map((title, index) => {
+        const section = saved.get(title);
+
+        return {
+          key: `section-${index}`,
+          title,
+          lines: (section?.lines ?? []).map((line, lineIndex) => ({
+            key: `saved-line-${line.id}-${lineIndex}`,
+            id: line.id,
+            // Kept as null, not blanked to '': an empty string is not a
+            // guid, and posting one back made the whole document
+            // unsaveable with a 500 from the JSON reader.
+            cameraId: line.cameraId,
+            itemName: line.itemName,
+            modelNo: line.modelNo,
+            brand: line.brand,
+            type: line.type,
+            uom: line.uom,
+            quantity: line.quantity,
+            unitRate: line.unitRate,
+            catalogueRate: line.catalogueRate,
+            // Filled in once the catalogue arrives — see attachCatalogueDetail.
+            imageUrl: null,
+            description: null,
+            descriptionAr: null,
+          })),
+        };
+      }),
+    );
+
+    this.attachCatalogueDetail();
   }
 
   /**
@@ -387,7 +455,7 @@ export class BoqEditorComponent implements OnInit {
             current.map((section) => ({
               ...section,
               lines: section.lines.map((line) => {
-                const item = catalogue.get(line.cameraId);
+                const item = line.cameraId ? catalogue.get(line.cameraId) : undefined;
                 if (!item) return line;
 
                 return {
@@ -792,6 +860,7 @@ export class BoqEditorComponent implements OnInit {
                 ...section.lines,
                 {
                   key: `line-${item.id}-${Date.now()}`,
+                  id: null,
                   cameraId: item.id,
                   itemName: item.itemName,
                   modelNo: item.modelNo || null,
@@ -912,6 +981,10 @@ export class BoqEditorComponent implements OnInit {
       this.formError.set('Every line needs a quantity greater than zero.');
       return;
     }
+    if (this.discountTooLarge()) {
+      this.formError.set('The discount cannot be more than the quotation total.');
+      return;
+    }
 
     const raw = this.form.getRawValue();
     const request: SaveBoqRequest = {
@@ -922,9 +995,11 @@ export class BoqEditorComponent implements OnInit {
       issueDate: raw.issueDate,
       status: raw.status,
       notes: raw.notes.trim() || null,
+      specialDiscount: this.discountApplied(),
       sections: filled.map((section) => ({
         title: section.title.trim(),
         lines: section.lines.map((line) => ({
+          id: line.id,
           cameraId: line.cameraId,
           quantity: line.quantity,
           // Null unless this line was actually repriced. Sending the catalogue
@@ -942,12 +1017,24 @@ export class BoqEditorComponent implements OnInit {
 
     this.saving.set(true);
     this.formError.set('');
+    this.savedNotice.set('');
 
     save$
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false)))
       .subscribe({
         next: (saved) => {
           this.boq.set(saved);
+          // Back in step with what the server actually wrote — the rates it
+          // recalculated, and the line ids it minted, which the next save has
+          // to quote.
+          this.seedSections(saved);
+          // The payable figure, not the pre-discount one: that is what the
+          // document ends on and what the reader is checking against.
+          this.noteSaved(
+            existing
+              ? `Saved. ${saved.boqNumber} now comes to ${this.money(saved.grandTotal)} ﷼.`
+              : `Saved as ${saved.boqNumber}, coming to ${this.money(saved.grandTotal)} ﷼.`,
+          );
           // A new BOQ has just been given its number and id, so move the URL onto
           // it — a refresh must not land back on /new.
           if (!existing) void this.router.navigate([this.basePath, saved.id]);
@@ -955,6 +1042,21 @@ export class BoqEditorComponent implements OnInit {
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to save the quotation.')),
       });
+  }
+
+  private money(value: number): string {
+    return value.toLocaleString('en-QA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  /**
+   * Shows what the save did, then takes it away again — a confirmation left
+   * standing beside figures the reader has since changed reads as though those
+   * changes were saved too.
+   */
+  private noteSaved(message: string): void {
+    if (this.savedNoticeTimer) clearTimeout(this.savedNoticeTimer);
+    this.savedNotice.set(message);
+    this.savedNoticeTimer = setTimeout(() => this.savedNotice.set(''), 6000);
   }
 
   protected download(): void {
