@@ -44,8 +44,14 @@ export interface Quotation {
   notes: string | null;
   terms: string | null;
   subtotal: number;
+  /** What the per-line discount percentages come to. */
   discountTotal: number;
   taxTotal: number;
+  /** The lines, less their own discounts, plus tax — before the discount below. */
+  totalBeforeDiscount: number;
+  /** A lump sum off the finished quote, in QAR. */
+  specialDiscount: number;
+  /** What the customer pays, after the discount. */
   grandTotal: number;
   lines: QuotationLine[];
   createdAt: string;
@@ -106,6 +112,7 @@ export interface SaveQuotationRequest {
   status: QuotationStatus;
   notes: string | null;
   terms: string | null;
+  specialDiscount: number;
   lines: SaveQuotationLine[];
 }
 
@@ -126,7 +133,7 @@ export function lineTotalOf(line: {
   return net + round2((net * line.taxPercent) / 100);
 }
 
-export function quotationTotalsOf(lines: SaveQuotationLine[]) {
+export function quotationTotalsOf(lines: SaveQuotationLine[], specialDiscount = 0) {
   let subtotal = 0;
   let discountTotal = 0;
   let taxTotal = 0;
@@ -140,11 +147,20 @@ export function quotationTotalsOf(lines: SaveQuotationLine[]) {
     taxTotal += round2((net * line.taxPercent) / 100);
   }
 
+  const totalBeforeDiscount = subtotal - discountTotal + taxTotal;
+
+  // Clamped the way the server clamps it, so the figure on screen is the figure
+  // that will be stored — a discount larger than the quote never shows a
+  // negative amount payable here either.
+  const applied = Math.min(Math.max(round2(specialDiscount), 0), totalBeforeDiscount);
+
   return {
     subtotal,
     discountTotal,
     taxTotal,
-    grandTotal: subtotal - discountTotal + taxTotal,
+    totalBeforeDiscount,
+    specialDiscount: applied,
+    grandTotal: totalBeforeDiscount - applied,
   };
 }
 

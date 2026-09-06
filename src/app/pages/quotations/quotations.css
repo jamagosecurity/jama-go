@@ -341,6 +341,34 @@
   color: var(--admin-ink);
 }
 
+/* The figure the discount comes off, set apart from the rows it sums so the
+   subtraction below it reads as one step rather than another line item. */
+.quote-totals .is-total dt,
+.quote-totals .is-total dd {
+  color: var(--admin-ink);
+}
+
+.quote-totals .is-discount dd {
+  color: var(--admin-orange-deep);
+}
+
+.quote-discount {
+  margin-top: 14px;
+}
+
+.quote-discount-input {
+  font-variant-numeric: tabular-nums;
+}
+
+/* .camera-field sets a 750 weight for its label, which the hint underneath the
+   box inherits and must not keep — it is an aside, not a second label. */
+.quote-discount-hint {
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
 .quote-totals .is-grand {
   margin-top: 6px;
   padding: 11px 12px;

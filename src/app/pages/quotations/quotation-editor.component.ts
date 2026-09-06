@@ -61,6 +61,10 @@ export class QuotationEditorComponent implements OnInit {
 
   protected readonly lines = signal<EditableLine[]>([]);
 
+  /** The lump sum given off the finished quote, in QAR. Kept as a signal rather
+   *  than a form control so the totals recompute as it is typed. */
+  protected readonly specialDiscount = signal(0);
+
   /** Catalogue search for the item picker. */
   protected readonly pickerControl = new FormControl('', { nonNullable: true });
   protected readonly pickerResults = signal<Camera[]>([]);
@@ -83,8 +87,16 @@ export class QuotationEditorComponent implements OnInit {
 
   /** Mirrors the server's arithmetic so the figures move as the user types. The
    *  server recomputes on save and its answer is what gets stored. */
-  protected readonly totals = computed(() => quotationTotalsOf(this.lines()));
+  protected readonly totals = computed(() =>
+    quotationTotalsOf(this.lines(), this.specialDiscount()),
+  );
   protected readonly lineTotal = lineTotalOf;
+
+  /** A discount bigger than the quote is a mistyped figure, not an offer — the
+   *  server rejects it, so the editor says so before the save is attempted. */
+  protected readonly discountTooLarge = computed(
+    () => this.specialDiscount() > this.totals().totalBeforeDiscount,
+  );
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -122,6 +134,7 @@ export class QuotationEditorComponent implements OnInit {
             notes: quote.notes ?? '',
             terms: quote.terms ?? '',
           });
+          this.specialDiscount.set(quote.specialDiscount);
           this.lines.set(
             quote.lines.map((line, index) => ({
               key: `saved-${line.id}-${index}`,
@@ -246,6 +259,13 @@ export class QuotationEditorComponent implements OnInit {
     this.updateLine(index, field, input.value);
   }
 
+  /** The discount box. A cleared or nonsense value reads as no discount rather
+   *  than NaN, which would wipe out the total below it. */
+  protected onDiscountInput(event: Event): void {
+    const parsed = Number((event.target as HTMLInputElement).value);
+    this.specialDiscount.set(Number.isFinite(parsed) && parsed > 0 ? parsed : 0);
+  }
+
   // ===== Save =====
 
   protected save(event: Event): void {
@@ -266,6 +286,11 @@ export class QuotationEditorComponent implements OnInit {
       return;
     }
 
+    if (this.discountTooLarge()) {
+      this.formError.set('Discount cannot be more than the quotation total.');
+      return;
+    }
+
     const raw = this.form.getRawValue();
     const request: SaveQuotationRequest = {
       customerName: raw.customerName.trim(),
@@ -278,6 +303,7 @@ export class QuotationEditorComponent implements OnInit {
       status: raw.status,
       notes: raw.notes.trim() || null,
       terms: raw.terms.trim() || null,
+      specialDiscount: this.specialDiscount(),
       lines: this.lines().map(({ key, ...line }) => ({ ...line, itemName: line.itemName.trim() })),
     };
 
@@ -297,6 +323,9 @@ export class QuotationEditorComponent implements OnInit {
       .subscribe({
         next: (saved) => {
           this.quotation.set(saved);
+          // Taken back from the response, not left as typed: the server has the
+          // last word on the discount it stored.
+          this.specialDiscount.set(saved.specialDiscount);
           // A new quote has just been given its number and id, so move the URL
           // onto it — a refresh or a back button must not land on /new again.
           if (!existing) void this.router.navigate(['/quotations', saved.id]);

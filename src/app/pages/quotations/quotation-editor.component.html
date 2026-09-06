@@ -234,10 +234,39 @@
             <div class="admin-panel-title"><h2>Totals</h2></div>
             <dl>
               <div><dt>Subtotal</dt><dd>{{ totals().subtotal | number: '1.2-2' }}</dd></div>
-              <div><dt>Discount</dt><dd>−{{ totals().discountTotal | number: '1.2-2' }}</dd></div>
+              <div><dt>Line discount</dt><dd>−{{ totals().discountTotal | number: '1.2-2' }}</dd></div>
               <div><dt>Tax</dt><dd>{{ totals().taxTotal | number: '1.2-2' }}</dd></div>
+              <div class="is-total">
+                <dt>Total</dt>
+                <dd>{{ totals().totalBeforeDiscount | number: '1.2-2' }}</dd>
+              </div>
+            </dl>
+
+            <label class="camera-field quote-discount">
+              <span>Discount off the total (﷼)</span>
+              <input class="quote-discount-input" type="number" min="0" step="0.01"
+                [value]="specialDiscount()" (input)="onDiscountInput($event)"
+                [class.is-invalid]="discountTooLarge()" placeholder="0.00" />
+              @if (discountTooLarge()) {
+                <small class="field-error">
+                  More than the total of {{ totals().totalBeforeDiscount | number: '1.2-2' }} ﷼.
+                </small>
+              } @else {
+                <small class="quote-discount-hint">
+                  A lump sum agreed on the finished quote. Shows on the PDF in English and Arabic.
+                </small>
+              }
+            </label>
+
+            <dl>
+              @if (totals().specialDiscount > 0) {
+                <div class="is-discount">
+                  <dt>Discount</dt>
+                  <dd>−{{ totals().specialDiscount | number: '1.2-2' }}</dd>
+                </div>
+              }
               <div class="is-grand">
-                <dt>Total (﷼)</dt>
+                <dt>{{ totals().specialDiscount > 0 ? 'Final amount (﷼)' : 'Total (﷼)' }}</dt>
                 <dd>{{ totals().grandTotal | number: '1.2-2' }}</dd>
               </div>
             </dl>
