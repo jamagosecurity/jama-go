@@ -13,6 +13,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { PaginatedData } from '../../../models/api-result.model';
+import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 import {
   Camera,
@@ -49,11 +50,13 @@ export class CameraListComponent implements OnInit {
   /**
    * Whether this account may change the catalogue.
    *
-   * Only the super administrator can: everything the business quotes is priced
-   * from these rows. Everyone else reads them. The API refuses the write either
-   * way — this only keeps a button from being offered that would 403.
+   * camera.manage, granted per account by the super administrator — everything
+   * the business quotes is priced from these rows, so it is given deliberately
+   * rather than held by anyone who can reach the screens. The API refuses the
+   * write either way; this only keeps a button from being offered that would
+   * come back 403.
    */
-  protected readonly canEditStock = computed(() => this.auth.isSuperAdmin());
+  protected readonly canEditStock = computed(() => this.auth.can(PERMISSIONS.cameraManage));
   private readonly destroyRef = inject(DestroyRef);
 
   /** Portal this screen is mounted under — see CAMERAS_BASE_PATH. */
