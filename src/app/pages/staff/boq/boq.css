@@ -1238,3 +1238,16 @@
 
 /* An amendment in the trail sits with the decisions, not beside them. */
 .boq-history-step[data-action="Amended"]::before { background: #f6993d; }
+
+/* Waiting on somebody, but still yours to correct. Informational, not a lock —
+   the locked style below is for an approval, which is a different thing. */
+.boq-approval-note {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(37, 148, 210, 0.07);
+  border: 1px solid rgba(37, 148, 210, 0.2);
+  color: var(--admin-blue-ink);
+  font-size: 0.86rem;
+  font-weight: 600;
+}

@@ -477,11 +477,16 @@
             </p>
           }
 
-          @if (!isEditable()) {
+          <!-- Only an approval closes it. A quotation still in the queue is
+               being written, and its author may keep correcting it. -->
+          @if (saved.status === 'Submitted') {
+            <p class="boq-approval-note">
+              Waiting for an approver. You can still make changes until it is approved —
+              they will see the quotation as it stands when they open it.
+            </p>
+          } @else if (!isEditable()) {
             <p class="boq-approval-locked">
-              {{ saved.status === 'Submitted'
-                  ? 'This quotation is with an approver and cannot be changed. It has to be rejected before it can be edited again.'
-                  : 'This quotation has been approved. Its lines and figures are fixed.' }}
+              This quotation has been approved. Its lines and figures are fixed.
             </p>
           }
 
