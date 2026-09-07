@@ -466,6 +466,17 @@
             </p>
           }
 
+          <!-- The super administrator editing a decided document. Said plainly,
+               because the approval shown above was given for the lines as they
+               were, and saving will record that they moved. -->
+          @if (isAmending()) {
+            <p class="boq-amending" role="status">
+              You are editing a quotation that has already been decided. Your changes
+              are allowed because you are the super administrator, and they will be
+              recorded in the history below.
+            </p>
+          }
+
           @if (!isEditable()) {
             <p class="boq-approval-locked">
               {{ saved.status === 'Submitted'

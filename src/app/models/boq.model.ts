@@ -143,7 +143,13 @@ export interface BoqListItem {
 }
 
 /** Mirrors Jama.Domain.Enums.BoqApprovalAction. */
-export type BoqApprovalAction = 'Created' | 'Submitted' | 'Approved' | 'Rejected';
+export type BoqApprovalAction =
+  | 'Created'
+  | 'Submitted'
+  | 'Approved'
+  | 'Rejected'
+  /** Changed after a decision — super administrator only. */
+  | 'Amended';
 
 /**
  * One step in a quotation's approval history.

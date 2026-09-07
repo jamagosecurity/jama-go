@@ -1222,3 +1222,19 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/* The super administrator amending a decided quotation. Amber rather than red:
+   it is allowed, and it is worth knowing. */
+.boq-amending {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(246, 153, 61, 0.1);
+  border: 1px solid rgba(246, 153, 61, 0.3);
+  color: #92400e;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* An amendment in the trail sits with the decisions, not beside them. */
+.boq-history-step[data-action="Amended"]::before { background: #f6993d; }

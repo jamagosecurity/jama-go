@@ -237,8 +237,20 @@ export class BoqEditorComponent implements OnInit {
    * Whether the lines may still be changed, as the SERVER says — an approved or
    * submitted quotation is read-only, and the editor asks rather than working it
    * out, so the two cannot disagree about it.
+   *
+   * The super administrator is the exception, and the server agrees: somebody
+   * has to be able to correct a signed-off document, and the alternative is
+   * deleting and rebuilding it, which loses the number and the trail with it.
    */
-  protected readonly isEditable = computed(() => this.boq()?.isEditable ?? true);
+  protected readonly isEditable = computed(
+    () => (this.boq()?.isEditable ?? true) || this.auth.isSuperAdmin(),
+  );
+
+  /** Editing something already decided. Worth saying out loud — the approval on
+   *  screen was given for the lines as they were, not as they are becoming. */
+  protected readonly isAmending = computed(
+    () => this.isEditing() && !(this.boq()?.isEditable ?? true) && this.auth.isSuperAdmin(),
+  );
 
   protected readonly canSubmit = computed(() =>
     this.isEditing() && this.isEditable() && !this.saving() && !this.deciding());
@@ -1196,6 +1208,7 @@ export class BoqEditorComponent implements OnInit {
       case 'Submitted': return 'Submitted for approval';
       case 'Approved': return 'Approved';
       case 'Rejected': return 'Rejected';
+      case 'Amended': return 'Amended after the decision';
       default: return action;
     }
   }
