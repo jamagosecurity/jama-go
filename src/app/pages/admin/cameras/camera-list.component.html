@@ -24,7 +24,9 @@
     </div>
 
     <div class="camera-head-actions">
-      <a class="btn-admin btn-admin-primary" [routerLink]="[base, 'new']">Add item</a>
+      @if (canEditStock()) {
+        <a class="btn-admin btn-admin-primary" [routerLink]="[base, 'new']">Add item</a>
+      }
     </div>
 
     @if (summary(); as totals) {
@@ -218,7 +220,11 @@
                     }
                   </td>
                   <td class="camera-row-actions col-actions">
-                    @if (pendingDeleteId() === camera.id) {
+                    <!-- Read-only for everybody but the super administrator, who
+                         is the only account the API will accept a write from. -->
+                    @if (!canEditStock()) {
+                      <span class="camera-readonly">View only</span>
+                    } @else if (pendingDeleteId() === camera.id) {
                       <button type="button" class="row-btn row-btn--danger"
                         [disabled]="deletingId() === camera.id" (click)="confirmDelete(camera)">
                         {{ deletingId() === camera.id ? 'Deleting…' : 'Delete' }}

@@ -1755,3 +1755,10 @@
   cursor: pointer;
 }
 .camera-linkbtn:hover { text-decoration: none; }
+
+/* Stock is the super administrator's to change; everyone else reads it. */
+.camera-readonly {
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+}

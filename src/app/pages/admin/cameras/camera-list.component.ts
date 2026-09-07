@@ -13,6 +13,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { PaginatedData } from '../../../models/api-result.model';
+import { AuthService } from '../../../services/auth.service';
 import {
   Camera,
   CameraSummary,
@@ -43,6 +44,16 @@ const PAGE_SIZE = 20;
 })
 export class CameraListComponent implements OnInit {
   private readonly service = inject(CameraService);
+  private readonly auth = inject(AuthService);
+
+  /**
+   * Whether this account may change the catalogue.
+   *
+   * Only the super administrator can: everything the business quotes is priced
+   * from these rows. Everyone else reads them. The API refuses the write either
+   * way — this only keeps a button from being offered that would 403.
+   */
+  protected readonly canEditStock = computed(() => this.auth.isSuperAdmin());
   private readonly destroyRef = inject(DestroyRef);
 
   /** Portal this screen is mounted under — see CAMERAS_BASE_PATH. */
