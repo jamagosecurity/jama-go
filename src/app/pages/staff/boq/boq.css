@@ -1033,3 +1033,148 @@
   color: var(--admin-muted);
   text-decoration: line-through;
 }
+
+/* ===== Approval ===== */
+
+/* Sits under the figures: a decision is taken after reading them. */
+.boq-approval { margin-top: 18px; }
+
+.boq-approval-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.boq-approval-state { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.boq-approval-when { color: var(--admin-muted); font-size: 0.84rem; font-weight: 600; }
+
+.boq-approval-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Approving is the affirmative action on this panel, so it carries the colour
+   rather than the brand blue the save button uses. */
+.boq-approve-btn {
+  background: #0f766e;
+  border-color: #0f766e;
+}
+.boq-approve-btn:hover:not(:disabled) { background: #0b5f59; border-color: #0b5f59; }
+
+/* The reason a rework starts from — in front of the person doing it, not filed
+   away in the trail below. */
+.boq-reject-reason {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(225, 29, 72, 0.07);
+  border: 1px solid rgba(225, 29, 72, 0.16);
+  color: #9f1239;
+  font-size: 0.9rem;
+}
+
+.boq-approval-locked {
+  margin: 14px 0 0;
+  color: var(--admin-muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+/* ===== History ===== */
+
+.boq-history {
+  margin: 16px 0 0;
+  padding: 0 0 0 18px;
+  list-style: none;
+  border-left: 2px solid var(--admin-line);
+  display: grid;
+  gap: 12px;
+}
+
+.boq-history-step { display: grid; gap: 2px; position: relative; }
+
+.boq-history-step::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--admin-muted);
+}
+.boq-history-step[data-action="Approved"]::before { background: #0f766e; }
+.boq-history-step[data-action="Rejected"]::before { background: #e11d48; }
+.boq-history-step[data-action="Submitted"]::before { background: var(--admin-blue-deep); }
+
+.boq-history-what { font-weight: 750; color: var(--admin-ink); font-size: 0.9rem; }
+.boq-history-who { color: var(--admin-muted); font-size: 0.8rem; }
+.boq-history-reason { color: #9f1239; font-size: 0.86rem; font-style: italic; }
+
+/* ===== Reject modal ===== */
+
+.boq-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 40, 70, 0.45);
+  z-index: 40;
+}
+
+.boq-modal {
+  position: fixed;
+  z-index: 41;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(520px, calc(100vw - 32px));
+  padding: 22px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 40, 70, 0.28);
+}
+
+.boq-modal-title { margin: 0 0 6px; font-size: 1.15rem; }
+.boq-modal-note { margin: 0 0 16px; color: var(--admin-muted); font-size: 0.88rem; }
+.boq-modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+
+/* Reasons run long; the column wraps rather than pushing the table wider. */
+.boq-reason-cell {
+  max-width: 320px;
+  white-space: normal;
+  color: #9f1239;
+  font-size: 0.86rem;
+}
+
+/* ===== Approvals tabs ===== */
+
+/* Segmented rather than underlined: there are two of them and they are a
+   choice between lists, not navigation within one. */
+.boq-tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 4px;
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: var(--admin-panel);
+}
+
+.boq-tab {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--admin-muted);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.boq-tab:hover:not(.is-active) { color: var(--admin-ink); }
+
+.boq-tab.is-active {
+  background: #fff;
+  color: var(--admin-blue-ink);
+  box-shadow: 0 1px 3px rgba(15, 40, 70, 0.12);
+}

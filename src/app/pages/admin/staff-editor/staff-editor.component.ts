@@ -71,6 +71,8 @@ export class StaffEditorComponent {
     'vip.manage': ['M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
     'camera.manage': ['M3 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z', 'm16 11 5-3v8l-5-3z', 'M6 20h5'],
     'boq.manage': ['M9 3h6l1 2h3v16H5V5h3z', 'M9 11h6M9 15h6M9 19h3'],
+    // A tick on a document: approving somebody else's work, not writing it.
+    'boq.approve': ['M9 3h6l1 2h3v16H5V5h3z', 'm9 13 2 2 4-4'],
   };
 
   readonly permissionCatalogue = signal<PermissionDefinition[]>([]);

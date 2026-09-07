@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import {
   adminGuard,
+  anyPermissionGuard,
   clientGuard,
   guestGuard,
   permissionGuard,
@@ -119,7 +120,7 @@ export const routes: Routes = [
           },
           {
             path: 'storage/calculator',
-            canActivate: [permissionGuard(PERMISSIONS.boqManage)],
+            canActivate: [anyPermissionGuard(PERMISSIONS.boqManage, PERMISSIONS.boqApprove)],
             title: 'Storage Calculator — Jama Go Admin',
             loadComponent: () =>
               import('./pages/staff/storage/storage-calculator.component').then(
@@ -143,7 +144,7 @@ export const routes: Routes = [
             // for staff, /admin/storage/calculator for admins, whose /admin/storage
             // is the sizing reference page — so it is passed in rather than derived.
             path: 'boq',
-            canActivate: [permissionGuard(PERMISSIONS.boqManage)],
+            canActivate: [anyPermissionGuard(PERMISSIONS.boqManage, PERMISSIONS.boqApprove)],
             children: createBoqRoutes('/admin/boq', '/admin/storage/calculator'),
           },
           {

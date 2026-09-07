@@ -15,6 +15,9 @@ export const PERMISSIONS = {
   vipManage: 'vip.manage',
   cameraManage: 'camera.manage',
   boqManage: 'boq.manage',
+  /** Deciding on a quotation somebody else built. Separate from boqManage on
+   *  purpose — see Jama.Application.Common.Permissions. */
+  boqApprove: 'boq.approve',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

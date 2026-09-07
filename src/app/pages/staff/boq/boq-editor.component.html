@@ -52,14 +52,6 @@
             <span>Date <i aria-hidden="true">*</i></span>
             <input type="date" formControlName="issueDate" />
           </label>
-          <label class="boq-field">
-            <span>Status</span>
-            <select formControlName="status">
-              @for (option of statuses; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </label>
           <label class="boq-field boq-field--wide">
             <span>Notes</span>
             <textarea formControlName="notes" rows="2" maxlength="2000"
@@ -367,6 +359,84 @@
         </p>
       </div>
 
+      <!-- Where the quotation stands, what may be done to it next, and how it
+           got here. Below the figures because a decision is taken after reading
+           them, not before. -->
+      @if (boq(); as saved) {
+        <div class="admin-panel boq-approval">
+          <div class="boq-approval-head">
+            <div class="boq-approval-state">
+              <span class="boq-status" [attr.data-status]="saved.status">{{ saved.status }}</span>
+              @if (saved.status === 'Submitted' && saved.submittedAt) {
+                <span class="boq-approval-when">Waiting since {{ saved.submittedAt | date: 'medium' }}</span>
+              }
+              @if (saved.status === 'Approved' && saved.approvedAt) {
+                <span class="boq-approval-when">
+                  Approved by {{ saved.approvedByName || 'an approver' }}
+                  on {{ saved.approvedAt | date: 'medium' }}
+                </span>
+              }
+              @if (saved.status === 'Rejected' && saved.rejectedAt) {
+                <span class="boq-approval-when">
+                  Rejected by {{ saved.rejectedByName || 'an approver' }}
+                  on {{ saved.rejectedAt | date: 'medium' }}
+                </span>
+              }
+            </div>
+
+            <div class="boq-approval-actions">
+              @if (canSubmit()) {
+                <button type="button" class="btn-admin btn-admin-primary"
+                  [disabled]="deciding()" (click)="submitForApproval()">
+                  {{ saved.status === 'Rejected' ? 'Re-submit for approval' : 'Submit for approval' }}
+                </button>
+              }
+              <!-- Only for an account holding boq.approve, and only while there
+                   is something to answer. The API refuses either action without
+                   the grant regardless of what is drawn here. -->
+              @if (canDecide()) {
+                <button type="button" class="btn-admin btn-admin-primary boq-approve-btn"
+                  [disabled]="deciding()" (click)="approve()">Approve</button>
+                <button type="button" class="btn-admin btn-admin-danger"
+                  [disabled]="deciding()" (click)="openReject()">Reject</button>
+              }
+            </div>
+          </div>
+
+          <!-- The reason the rework starts from, kept in front of whoever has to
+               do it rather than filed in the history below. -->
+          @if (saved.status === 'Rejected' && saved.rejectionReason) {
+            <p class="boq-reject-reason">
+              <strong>Reason for rejection:</strong> {{ saved.rejectionReason }}
+            </p>
+          }
+
+          @if (!isEditable()) {
+            <p class="boq-approval-locked">
+              {{ saved.status === 'Submitted'
+                  ? 'This quotation is with an approver and cannot be changed. It has to be rejected before it can be edited again.'
+                  : 'This quotation has been approved. Its lines and figures are fixed.' }}
+            </p>
+          }
+
+          @if (saved.history.length) {
+            <ol class="boq-history">
+              @for (step of saved.history; track step.id) {
+                <li class="boq-history-step" [attr.data-action]="step.action">
+                  <span class="boq-history-what">{{ stepLabel(step.action) }}</span>
+                  <span class="boq-history-who">
+                    {{ step.actorName || 'Unknown' }} · {{ step.at | date: 'medium' }}
+                  </span>
+                  @if (step.reason) {
+                    <span class="boq-history-reason">“{{ step.reason }}”</span>
+                  }
+                </li>
+              }
+            </ol>
+          }
+        </div>
+      }
+
       @if (formError()) {
         <p class="admin-error" role="alert">{{ formError() }}</p>
       }
@@ -384,3 +454,36 @@
     </form>
   }
 </section>
+
+<!-- Asked for in a modal rather than inline: rejecting is the one action here
+     that cannot be undone by clicking again, and it should take a deliberate
+     second step. -->
+@if (rejecting()) {
+  <div class="boq-modal-backdrop" (click)="closeReject()"></div>
+  <div class="boq-modal" role="dialog" aria-modal="true" aria-labelledby="boq-reject-title">
+    <h2 id="boq-reject-title" class="boq-modal-title">Reject this quotation</h2>
+    <p class="boq-modal-note">
+      Say what needs changing. Whoever built it sees this, and reworks from it.
+    </p>
+
+    <label class="boq-field">
+      <span>Reason <i aria-hidden="true">*</i></span>
+      <textarea rows="4" maxlength="1000" [value]="rejectReason()"
+        (input)="onRejectReasonInput($event)"
+        placeholder="e.g. Switch is undersized for 24 cameras — quote a 24-port PoE."></textarea>
+    </label>
+
+    @if (rejectError()) {
+      <p class="admin-error" role="alert">{{ rejectError() }}</p>
+    }
+
+    <div class="boq-modal-actions">
+      <button type="button" class="btn-admin btn-admin-danger"
+        [disabled]="deciding()" (click)="confirmReject()">
+        {{ deciding() ? 'Rejecting…' : 'Reject quotation' }}
+      </button>
+      <button type="button" class="btn-admin btn-admin-ghost"
+        [disabled]="deciding()" (click)="closeReject()">Cancel</button>
+    </div>
+  </div>
+}

@@ -52,6 +52,23 @@ export const permissionGuard = (permission: string): CanActivateFn => () => {
   return auth.can(permission) ? true : router.createUrlTree([auth.landingRoute()]);
 };
 
+/**
+ * The same, for a screen more than one grant opens.
+ *
+ * The quotation screens are the case it exists for: building one and deciding on
+ * one are separate permissions, and an approver holding only the second still
+ * has to reach the document to read it. Mirrors AuthorizationPolicies.BoqRead on
+ * the API, which is the check that actually decides.
+ */
+export const anyPermissionGuard = (...permissions: string[]): CanActivateFn => () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return permissions.some((permission) => auth.can(permission))
+    ? true
+    : router.createUrlTree([auth.landingRoute()]);
+};
+
 export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);

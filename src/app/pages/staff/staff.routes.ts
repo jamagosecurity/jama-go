@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { permissionGuard } from '../../guards/admin.guard';
+import { anyPermissionGuard, permissionGuard } from '../../guards/admin.guard';
 import { PERMISSIONS } from '../../models/auth.model';
 import { createCameraRoutes } from '../admin/cameras/cameras.routes';
 import { createDiaRoutes } from '../admin/dia/dia.routes';
@@ -41,14 +41,14 @@ export const STAFF_ROUTES: Routes = [
         // Mounted from the shared factory, the same way the stock inventory is:
         // admins mount the identical screens under /admin/boq.
         path: 'boq',
-        canActivate: [permissionGuard(PERMISSIONS.boqManage)],
+        canActivate: [anyPermissionGuard(PERMISSIONS.boqManage, PERMISSIONS.boqApprove)],
         children: createBoqRoutes('/staff/boq', '/staff/storage'),
       },
       {
         // Sizes the array for a quotation, so it rides the same permission:
         // anyone who can build one can size its storage.
         path: 'storage',
-        canActivate: [permissionGuard(PERMISSIONS.boqManage)],
+        canActivate: [anyPermissionGuard(PERMISSIONS.boqManage, PERMISSIONS.boqApprove)],
         title: 'Storage Calculator — Jama Go Staff',
         loadComponent: () =>
           import('./storage/storage-calculator.component').then(

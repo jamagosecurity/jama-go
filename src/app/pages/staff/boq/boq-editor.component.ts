@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal,
 } from '@angular/core';
@@ -6,7 +6,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
-import { BOQ_SECTION_TITLES, BOQ_STATUSES, Boq, BoqStatus, SaveBoqRequest } from '../../../models/boq.model';
+import { BOQ_SECTION_TITLES, Boq, SaveBoqRequest } from '../../../models/boq.model';
 import {
   Camera,
   CameraBrandCount,
@@ -17,6 +17,8 @@ import {
   matchCameraBrand,
   unitLabel,
 } from '../../../models/camera.model';
+import { PERMISSIONS } from '../../../models/auth.model';
+import { AuthService } from '../../../services/auth.service';
 import { BoqService } from '../../../services/boq.service';
 import { BOQ_BASE_PATH, BOQ_STORAGE_PATH } from './boq-base-path';
 import { CameraService } from '../../../services/camera.service';
@@ -97,7 +99,7 @@ interface DraftSection {
 @Component({
   selector: 'app-boq-editor',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './boq-editor.component.html',
   styleUrl: './boq.css',
@@ -109,6 +111,7 @@ export class BoqEditorComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
 
   /** Whichever portal mounted these routes — see BOQ_BASE_PATH. Every internal
    *  link is built from these two rather than written out, so the same screens
@@ -116,7 +119,6 @@ export class BoqEditorComponent implements OnInit {
   protected readonly basePath = inject(BOQ_BASE_PATH);
   protected readonly storagePath = inject(BOQ_STORAGE_PATH);
 
-  protected readonly statuses = BOQ_STATUSES;
   protected readonly sectionTitles = BOQ_SECTION_TITLES;
 
   /** In the order the document prints them, so browsing follows the quotation. */
@@ -208,6 +210,40 @@ export class BoqEditorComponent implements OnInit {
   protected readonly savedNotice = signal('');
   private savedNoticeTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // ===== Approval =====
+
+  /**
+   * Whether this account may decide on a quotation.
+   *
+   * Drives which buttons are drawn and nothing else. The API refuses an approve
+   * or reject from an account without the grant whatever the screen was showing
+   * — see AuthorizationPolicies and the Boqs endpoints — so this is about not
+   * offering an action that would fail, never about keeping anybody out.
+   */
+  protected readonly canApprove = computed(() => this.auth.can(PERMISSIONS.boqApprove));
+
+  /** Where the saved document stands. A quotation not yet saved is a draft. */
+  protected readonly status = computed(() => this.boq()?.status ?? 'Draft');
+
+  /**
+   * Whether the lines may still be changed, as the SERVER says — an approved or
+   * submitted quotation is read-only, and the editor asks rather than working it
+   * out, so the two cannot disagree about it.
+   */
+  protected readonly isEditable = computed(() => this.boq()?.isEditable ?? true);
+
+  protected readonly canSubmit = computed(() =>
+    this.isEditing() && this.isEditable() && !this.saving() && !this.deciding());
+
+  /** Only a quotation actually waiting on somebody can be answered. */
+  protected readonly canDecide = computed(() =>
+    this.canApprove() && this.status() === 'Submitted' && !this.deciding());
+
+  protected readonly deciding = signal(false);
+  protected readonly rejecting = signal(false);
+  protected readonly rejectReason = signal('');
+  protected readonly rejectError = signal('');
+
   protected readonly sections = signal<DraftSection[]>(
     BOQ_SECTION_TITLES.map((title, index) => ({
       key: `section-${index}`,
@@ -262,7 +298,6 @@ export class BoqEditorComponent implements OnInit {
     clientName: ['', [Validators.maxLength(200)]],
     contactNumber: ['', [Validators.maxLength(40)]],
     issueDate: [new Date().toISOString().slice(0, 10), Validators.required],
-    status: this.formBuilder.nonNullable.control<BoqStatus>('Draft', Validators.required),
     notes: ['', [Validators.maxLength(2000)]],
   });
 
@@ -372,7 +407,6 @@ export class BoqEditorComponent implements OnInit {
             clientName: boq.clientName ?? '',
             contactNumber: boq.contactNumber ?? '',
             issueDate: boq.issueDate,
-            status: boq.status,
             notes: boq.notes ?? '',
           });
           this.seedSections(boq);
@@ -993,7 +1027,6 @@ export class BoqEditorComponent implements OnInit {
       clientName: raw.clientName.trim() || null,
       contactNumber: raw.contactNumber.trim() || null,
       issueDate: raw.issueDate,
-      status: raw.status,
       notes: raw.notes.trim() || null,
       specialDiscount: this.discountApplied(),
       sections: filled.map((section) => ({
@@ -1042,6 +1075,115 @@ export class BoqEditorComponent implements OnInit {
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to save the quotation.')),
       });
+  }
+
+  // ===== Approval actions =====
+
+  /**
+   * Hands the quotation to an approver.
+   *
+   * Saved first when there is anything unsaved: submitting shows somebody the
+   * stored document, and sending them a version that differs from what is on
+   * screen is how a decision gets taken on the wrong figures.
+   */
+  protected submitForApproval(): void {
+    const existing = this.boq();
+    if (!existing || !this.canSubmit()) return;
+
+    this.formError.set('');
+    this.deciding.set(true);
+
+    this.service
+      .submit(existing.id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.deciding.set(false)))
+      .subscribe({
+        next: (saved) => this.applyDecision(saved, 'Sent for approval.'),
+        error: (err: unknown) =>
+          this.formError.set(getApiErrorMessage(err, 'Unable to submit this quotation.')),
+      });
+  }
+
+  protected approve(): void {
+    const existing = this.boq();
+    if (!existing || !this.canDecide()) return;
+
+    this.formError.set('');
+    this.deciding.set(true);
+
+    this.service
+      .approve(existing.id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.deciding.set(false)))
+      .subscribe({
+        next: (saved) => this.applyDecision(saved, `Approved. ${saved.boqNumber} is now agreed.`),
+        error: (err: unknown) =>
+          this.formError.set(getApiErrorMessage(err, 'Unable to approve this quotation.')),
+      });
+  }
+
+  protected openReject(): void {
+    this.rejectReason.set('');
+    this.rejectError.set('');
+    this.rejecting.set(true);
+  }
+
+  protected closeReject(): void {
+    this.rejecting.set(false);
+  }
+
+  protected onRejectReasonInput(event: Event): void {
+    this.rejectReason.set((event.target as HTMLTextAreaElement).value);
+    if (this.rejectError()) this.rejectError.set('');
+  }
+
+  /**
+   * Rejects with the reason given.
+   *
+   * The reason is checked here so the approver is told before the round trip,
+   * and again by the server, which is the check that counts — a rejection
+   * nobody explained leaves the person reworking it guessing.
+   */
+  protected confirmReject(): void {
+    const existing = this.boq();
+    if (!existing) return;
+
+    const reason = this.rejectReason().trim();
+    if (reason.length < 5) {
+      this.rejectError.set('Say what needs changing — at least a few words.');
+      return;
+    }
+
+    this.rejectError.set('');
+    this.deciding.set(true);
+
+    this.service
+      .reject(existing.id, reason)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.deciding.set(false)))
+      .subscribe({
+        next: (saved) => {
+          this.rejecting.set(false);
+          this.applyDecision(saved, `Rejected. ${saved.boqNumber} has gone back for changes.`);
+        },
+        error: (err: unknown) =>
+          this.rejectError.set(getApiErrorMessage(err, 'Unable to reject this quotation.')),
+      });
+  }
+
+  /** Everything a decision changes: the document, the rows, and what to say. */
+  private applyDecision(saved: Boq, message: string): void {
+    this.boq.set(saved);
+    this.seedSections(saved);
+    this.noteSaved(message);
+  }
+
+  /** How a step reads in the history. */
+  protected stepLabel(action: string): string {
+    switch (action) {
+      case 'Created': return 'Created';
+      case 'Submitted': return 'Submitted for approval';
+      case 'Approved': return 'Approved';
+      case 'Rejected': return 'Rejected';
+      default: return action;
+    }
   }
 
   private money(value: number): string {

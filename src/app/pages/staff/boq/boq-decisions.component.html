@@ -1,0 +1,110 @@
+<section class="admin-page boq-page">
+  <header class="admin-page-header">
+    <div>
+      <h1>Approvals</h1>
+      <p class="admin-page-note">{{ blurb() }}</p>
+    </div>
+    <a class="btn-admin btn-admin-ghost" [routerLink]="basePath">← All quotations</a>
+  </header>
+
+  <!-- The two lists as tabs, not two sidebar rows: same question, two answers. -->
+  <div class="boq-tabs" role="tablist" aria-label="Decided quotations">
+    <button type="button" class="boq-tab" role="tab"
+      [class.is-active]="!rejected()" [attr.aria-selected]="!rejected()"
+      (click)="showTab('Approved')">
+      Approved
+    </button>
+    <button type="button" class="boq-tab" role="tab"
+      [class.is-active]="rejected()" [attr.aria-selected]="rejected()"
+      (click)="showTab('Rejected')">
+      Rejected
+    </button>
+  </div>
+
+  @if (listError()) {
+    <p class="admin-error" role="alert">{{ listError() }}</p>
+  }
+
+  <div class="admin-panel">
+    @if (loading()) {
+      <p>Loading…</p>
+    } @else if (!result()?.items?.length) {
+      <p class="boq-blank">
+        {{ rejected() ? 'Nothing has been rejected.' : 'Nothing has been approved yet.' }}
+      </p>
+    } @else {
+      <div class="boq-table-wrap">
+        <table class="boq-table">
+          <caption class="visually-hidden">{{ heading() }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Quotation</th>
+              <th scope="col">Customer</th>
+              <th scope="col" class="num">Amount (﷼)</th>
+              <th scope="col">Created by</th>
+              <th scope="col">{{ rejected() ? 'Rejected by' : 'Approved by' }}</th>
+              <th scope="col">{{ rejected() ? 'Rejected' : 'Approved' }}</th>
+              @if (rejected()) {
+                <th scope="col">Reason</th>
+              }
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (boq of result()!.items; track boq.id) {
+              <tr>
+                <td data-label="Quotation">
+                  <a class="boq-number" [routerLink]="[basePath, boq.id]">{{ boq.boqNumber }}</a>
+                  <span class="boq-projectcell"><small>{{ boq.projectName }}</small></span>
+                </td>
+                <td data-label="Customer">
+                  {{ boq.clientName || '—' }}
+                </td>
+                <td data-label="Amount (﷼)" class="num">
+                  <strong>{{ boq.grandTotal | number: '1.2-2' }}</strong>
+                  @if (boq.specialDiscount > 0) {
+                    <span class="boq-was">{{ boq.total | number: '1.2-2' }}</span>
+                  }
+                </td>
+                <td data-label="Created by">{{ boq.preparedByName || '—' }}</td>
+                <td [attr.data-label]="rejected() ? 'Rejected by' : 'Approved by'">
+                  {{ (rejected() ? boq.rejectedByName : boq.approvedByName) || '—' }}
+                </td>
+                <td [attr.data-label]="rejected() ? 'Rejected' : 'Approved'">
+                  @if (rejected() ? boq.rejectedAt : boq.approvedAt; as at) {
+                    {{ at | date: 'medium' }}
+                  } @else {
+                    <span class="boq-blank">Not recorded</span>
+                  }
+                </td>
+                @if (rejected()) {
+                  <td data-label="Reason" class="boq-reason-cell">
+                    {{ boq.rejectionReason || '—' }}
+                  </td>
+                }
+                <td data-label="Status">
+                  <span class="boq-status" [attr.data-status]="boq.status">{{ boq.status }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (result()!.totalPages > 1) {
+        <div class="boq-pager">
+          <button type="button" class="btn-admin btn-admin-ghost"
+            [disabled]="result()!.pageNumber <= 1" (click)="goToPage(result()!.pageNumber - 1)">
+            Previous
+          </button>
+          <span>Page {{ result()!.pageNumber }} of {{ result()!.totalPages }}</span>
+          <button type="button" class="btn-admin btn-admin-ghost"
+            [disabled]="result()!.pageNumber >= result()!.totalPages"
+            (click)="goToPage(result()!.pageNumber + 1)">
+            Next
+          </button>
+        </div>
+      }
+    }
+  </div>
+</section>

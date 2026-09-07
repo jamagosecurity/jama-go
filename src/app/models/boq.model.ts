@@ -90,6 +90,28 @@ export interface Boq {
   specialDiscount: number;
   /** What is payable: the lines less the discount. */
   grandTotal: number;
+
+  // ===== Approval =====
+  submittedAt: string | null;
+  approvedByName: string | null;
+  approvedAt: string | null;
+  rejectedByName: string | null;
+  rejectedAt: string | null;
+  /** Why the current rejection was given — what a rework starts from. */
+  rejectionReason: string | null;
+  /**
+   * Whether the lines may still be changed. Comes from the server rather than
+   * being worked out from the status here, so the editor cannot believe
+   * something the API will refuse.
+   */
+  isEditable: boolean;
+  /** How many times it has been sent back, and how many times submitted — so
+   *  "approved at the third attempt" needs no counting by hand. */
+  rejectionCount: number;
+  submissionCount: number;
+  /** Every step, oldest first. Append-only. */
+  history: BoqApprovalEvent[];
+
   sections: BoqSection[];
   createdAt: string;
   updatedAt: string | null;
@@ -106,10 +128,37 @@ export interface BoqListItem {
   total: number;
   specialDiscount: number;
   grandTotal: number;
+  submittedAt: string | null;
+  approvedByName: string | null;
+  approvedAt: string | null;
+  rejectedByName: string | null;
+  rejectedAt: string | null;
+  rejectionReason: string | null;
+  rejectionCount: number;
+  submissionCount: number;
   sectionCount: number;
   lineCount: number;
   preparedByName: string | null;
   createdAt: string;
+}
+
+/** Mirrors Jama.Domain.Enums.BoqApprovalAction. */
+export type BoqApprovalAction = 'Created' | 'Submitted' | 'Approved' | 'Rejected';
+
+/**
+ * One step in a quotation's approval history.
+ *
+ * The actor's name is the one recorded at the time, not the account's name
+ * today — a trail that rewrites itself is no trail.
+ */
+export interface BoqApprovalEvent {
+  id: string;
+  action: BoqApprovalAction;
+  actorId: string;
+  actorName: string | null;
+  /** Given on a rejection, and only there. */
+  reason: string | null;
+  at: string;
 }
 
 export interface BoqListQuery {
@@ -158,7 +207,6 @@ export interface SaveBoqRequest {
   clientName: string | null;
   contactNumber: string | null;
   issueDate: string;
-  status: BoqStatus;
   notes: string | null;
   /**
    * A lump sum off the finished quotation, in QAR. Zero for no discount.
@@ -168,4 +216,40 @@ export interface SaveBoqRequest {
    */
   specialDiscount: number;
   sections: SaveBoqSection[];
+}
+
+/**
+ * One decision an administrator is told about: what was decided, on whose
+ * quotation, by whom, and — for a rejection — why.
+ *
+ * Read off the approval trail rather than a notifications table, so it can never
+ * disagree with the history on the quotation itself.
+ */
+export interface BoqNotification {
+  id: string;
+  boqId: string;
+  boqNumber: string;
+  projectName: string;
+  clientName: string | null;
+  amount: number;
+  action: BoqApprovalAction;
+  /** Who decided. */
+  actorName: string | null;
+  /** Whose quotation was answered. */
+  preparedByName: string | null;
+  reason: string | null;
+  at: string;
+  isUnread: boolean;
+  /** Which submission this decision answered — 3 means approved at the third
+   *  time of asking. */
+  attempt: number;
+  /** How many times this quotation has been sent back, all told. */
+  rejectionCount: number;
+  /** Whether the signed-in account built it, which changes only the wording. */
+  isMine: boolean;
+}
+
+export interface BoqNotifications {
+  items: BoqNotification[];
+  unreadCount: number;
 }
