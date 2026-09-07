@@ -42,7 +42,7 @@ export type ProductCategory =
   | 'AccessControl'
   | 'Service';
 
-export type UnitOfMeasurement = 'Piece' | 'Box' | 'Set' | 'Metre' | 'Roll' | 'Location';
+export type UnitOfMeasurement = 'Piece' | 'Box' | 'Set' | 'Metre' | 'Roll' | 'Lot';
 
 export type ItemType = 'Product' | 'Service';
 
@@ -91,7 +91,7 @@ export const UNITS_OF_MEASUREMENT: readonly Option<UnitOfMeasurement>[] = [
   { value: 'Set', label: 'Set' },
   { value: 'Metre', label: 'Mtr' },
   { value: 'Roll', label: 'Roll' },
-  { value: 'Location', label: 'Loc' },
+  { value: 'Lot', label: 'Lot' },
 ];
 
 /**
@@ -183,8 +183,11 @@ export interface CameraBrand {
  * text, and anything not here simply renders as its name.
  */
 export const CAMERA_BRANDS: readonly CameraBrand[] = [
-  // The four cameras are quoted from most often, so they lead. Everything after
-  // is alphabetical.
+  // The house brand first — service lines and anything Jama Go supplies itself.
+  { name: 'Jama Go', logo: '/brands/jamago.webp', aliases: ['jama go', 'jamago', 'jama-go'] },
+
+  // Then the four cameras quoted from most often. Everything after is
+  // alphabetical.
   { name: 'Hikvision', logo: '/brands/hikvision.webp', aliases: ['hikvision', 'hik'] },
   { name: 'Dahua', logo: '/brands/dahua.webp', aliases: ['dahua', 'dahua technology'] },
   { name: 'Uniview', logo: '/brands/uniview.webp', aliases: ['uniview', 'unv'] },
