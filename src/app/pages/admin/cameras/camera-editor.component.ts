@@ -4,6 +4,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
+import { PERMISSIONS } from '../../../models/auth.model';
 import {
   CAMERA_BRANDS,
   Camera,
@@ -25,6 +26,7 @@ import {
   WarrantyUnit,
   matchCameraBrand,
 } from '../../../models/camera.model';
+import { AuthService } from '../../../services/auth.service';
 import { CameraService } from '../../../services/camera.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { fieldErrorMessage, shouldShowError } from '../../../utils/form-validators.util';
@@ -64,6 +66,16 @@ export class CameraEditorComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
+
+  /**
+   * Whether this account may see and set what stock costs.
+   *
+   * Its own grant: managing the catalogue and knowing the buying price are
+   * different jobs. Without it the API sends the figures blank and refuses to
+   * write them, so the two fields are not drawn at all.
+   */
+  protected readonly canSeeCost = computed(() => this.auth.can(PERMISSIONS.cameraCost));
 
   /** Portal this screen is mounted under — see CAMERAS_BASE_PATH. */
   protected readonly base = inject(CAMERAS_BASE_PATH);

@@ -14,6 +14,9 @@ export const PERMISSIONS = {
   panelsManage: 'panels.manage',
   vipManage: 'vip.manage',
   cameraManage: 'camera.manage',
+  /** Seeing what stock costs and the margin on it. Granted to nobody by
+   *  default — see Jama.Application.Common.Permissions. */
+  cameraCost: 'camera.cost',
   boqManage: 'boq.manage',
   /** Deciding on a quotation somebody else built. Separate from boqManage on
    *  purpose — see Jama.Application.Common.Permissions. */

@@ -57,6 +57,14 @@ interface DraftLine {
    * which is fixed at the moment of quoting.
    */
   imageUrl: string | null;
+  /**
+   * What the business pays for the item, per unit.
+   *
+   * Null for an account not entitled to see it — the API blanks it on the way
+   * out rather than sending it and trusting the screen to hide it. Also null on
+   * a line whose stock item has been deleted, and on stock nobody has costed.
+   */
+  supplierCost: number | null;
   description: string | null;
   /** Kept apart from the English rather than concatenated: it has to be rendered
    *  right-to-left, and joining them would make that impossible. */
@@ -362,6 +370,7 @@ export class BoqEditorComponent implements OnInit {
 
     this.destroyRef.onDestroy(() => {
       if (this.savedNoticeTimer) clearTimeout(this.savedNoticeTimer);
+      this.clearCostTimer();
     });
 
     const id = this.route.snapshot.paramMap.get('id');
@@ -456,6 +465,7 @@ export class BoqEditorComponent implements OnInit {
             catalogueRate: line.catalogueRate,
             // Filled in once the catalogue arrives — see attachCatalogueDetail.
             imageUrl: null,
+            supplierCost: null,
             description: null,
             descriptionAr: null,
           })),
@@ -495,6 +505,9 @@ export class BoqEditorComponent implements OnInit {
                 return {
                   ...line,
                   imageUrl: item.images[0]?.url ?? null,
+                  // Null unless this account may see it — the API decides, not
+                  // this screen.
+                  supplierCost: item.supplierCost,
                   description: item.descriptionEn,
                   descriptionAr: item.descriptionAr,
                 };
@@ -907,6 +920,7 @@ export class BoqEditorComponent implements OnInit {
                   // one — rather than as a discount down from nothing.
                   unitRate: item.rate ?? 0,
                   catalogueRate: item.rate ?? 0,
+                  supplierCost: item.supplierCost,
                   imageUrl: item.images[0]?.url ?? null,
                   description: item.descriptionEn,
                   descriptionAr: item.descriptionAr,
@@ -1184,6 +1198,85 @@ export class BoqEditorComponent implements OnInit {
       case 'Rejected': return 'Rejected';
       default: return action;
     }
+  }
+
+  // ===== Supplier cost =====
+
+  /**
+   * Whether this account may see what stock costs.
+   *
+   * Its own grant, held by nobody until an administrator gives it — managing the
+   * catalogue and knowing the buying price are different jobs. It only decides
+   * whether the button is drawn: the API blanks the figures for anyone else, so
+   * a screen that showed the column anyway would show a column of dashes.
+   */
+  protected readonly canSeeCost = computed(() => this.auth.can(PERMISSIONS.cameraCost));
+
+  /**
+   * Revealed on request and taken away again.
+   *
+   * A quotation is built in front of customers and on shared screens, so cost
+   * is off by default and does not stay up: it closes itself after
+   * COST_VISIBLE_MS, which is what makes it safe to use in a meeting rather than
+   * something to remember to hide.
+   */
+  protected readonly costVisible = signal(false);
+  protected readonly costSecondsLeft = signal(0);
+  private costTimer: ReturnType<typeof setInterval> | null = null;
+
+  /** Long enough to read a column of figures, short enough to be gone before
+   *  the laptop is turned round. */
+  private static readonly COST_VISIBLE_MS = 30_000;
+
+  protected toggleCost(): void {
+    if (this.costVisible()) {
+      this.hideCost();
+      return;
+    }
+
+    this.costVisible.set(true);
+    this.costSecondsLeft.set(BoqEditorComponent.COST_VISIBLE_MS / 1000);
+
+    this.clearCostTimer();
+    this.costTimer = setInterval(() => {
+      const left = this.costSecondsLeft() - 1;
+      if (left <= 0) {
+        this.hideCost();
+        return;
+      }
+      this.costSecondsLeft.set(left);
+    }, 1000);
+  }
+
+  protected hideCost(): void {
+    this.costVisible.set(false);
+    this.costSecondsLeft.set(0);
+    this.clearCostTimer();
+  }
+
+  private clearCostTimer(): void {
+    if (this.costTimer) clearInterval(this.costTimer);
+    this.costTimer = null;
+  }
+
+  /** What a whole section costs the business. Lines nobody has costed count as
+   *  zero, so this reads as "at least this much" rather than refusing to add up. */
+  protected sectionCost(section: DraftSection): number {
+    return section.lines.reduce((sum, line) => sum + (this.lineCost(line) ?? 0), 0);
+  }
+
+  /** What the line costs the business, against what it is being sold for. */
+  protected lineCost(line: DraftLine): number | null {
+    return line.supplierCost === null ? null : line.supplierCost * line.quantity;
+  }
+
+  /** Margin on the line as a percentage of the selling price, or null when
+   *  either half is unknown — a made-up margin is worse than none. */
+  protected lineMargin(line: DraftLine): number | null {
+    const cost = this.lineCost(line);
+    const sell = this.lineTotal(line);
+    if (cost === null || sell <= 0) return null;
+    return ((sell - cost) / sell) * 100;
   }
 
   private money(value: number): string {

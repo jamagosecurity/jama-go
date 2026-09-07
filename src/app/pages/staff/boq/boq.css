@@ -1178,3 +1178,47 @@
   color: var(--admin-blue-ink);
   box-shadow: 0 1px 3px rgba(15, 40, 70, 0.12);
 }
+
+/* ===== Supplier cost ===== */
+
+/* Amber, and only ever on screen: this column is the one thing in the editor
+   that must not reach the printed document or a customer's eye. */
+.boq-costcol {
+  background: rgba(246, 153, 61, 0.07);
+  border-left: 1px solid rgba(246, 153, 61, 0.25);
+  border-right: 1px solid rgba(246, 153, 61, 0.25);
+  color: #92400e;
+}
+
+.boq-table thead th.boq-costcol {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+  color: #fff;
+}
+
+.boq-costline {
+  display: block;
+  margin-top: 1px;
+  color: #b45309;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Reads as armed while the column is open, and counts itself down so nobody has
+   to wonder how long it has been up. */
+.boq-costtoggle { display: inline-flex; align-items: center; gap: 7px; }
+
+.boq-costtoggle.is-on {
+  border-color: rgba(180, 83, 9, 0.5);
+  background: rgba(246, 153, 61, 0.12);
+  color: #92400e;
+}
+
+.boq-eye svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

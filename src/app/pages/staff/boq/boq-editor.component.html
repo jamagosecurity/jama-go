@@ -12,6 +12,31 @@
         <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"
           (click)="download()">{{ downloading() ? 'Preparing…' : 'Download PDF' }}</button>
       }
+
+      <!-- Cost is off by default and closes itself: a quotation gets built in
+           front of customers and on shared screens. Only drawn for an account
+           the API would send the figures to. -->
+      @if (canSeeCost()) {
+        <button type="button" class="btn-admin btn-admin-ghost boq-costtoggle"
+          [class.is-on]="costVisible()" (click)="toggleCost()"
+          [attr.aria-pressed]="costVisible()">
+          <span class="boq-eye" aria-hidden="true">
+            @if (costVisible()) {
+              <svg viewBox="0 0 24 24">
+                <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" />
+                <circle cx="12" cy="12" r="2.8" />
+                <path d="m3 3 18 18" />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24">
+                <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" />
+                <circle cx="12" cy="12" r="2.8" />
+              </svg>
+            }
+          </span>
+          {{ costVisible() ? 'Hide cost · ' + costSecondsLeft() + 's' : 'Show cost' }}
+        </button>
+      }
       <a class="btn-admin btn-admin-ghost boq-back" [routerLink]="basePath">← All quotations</a>
     </div>
   </header>
@@ -97,6 +122,9 @@
                       <th scope="col">Unit</th>
                       <th scope="col" class="num">Qty</th>
                       <th scope="col" class="num">Unit price (﷼)</th>
+                      @if (costVisible()) {
+                        <th scope="col" class="num boq-costcol">Supplier cost (﷼)</th>
+                      }
                       <th scope="col" class="num">Total amount</th>
                       <th scope="col"><span class="visually-hidden">Remove</span></th>
                     </tr>
@@ -159,6 +187,24 @@
                             </button>
                           }
                         </td>
+                        @if (costVisible()) {
+                          <!-- Unit cost, with what the line costs against what it
+                               sells for underneath. A dash where nobody has costed
+                               the item, rather than a zero that reads as free. -->
+                          <td data-label="Supplier cost (﷼)" class="num boq-costcol">
+                            @if (line.supplierCost !== null) {
+                              <strong>{{ line.supplierCost | number: '1.2-2' }}</strong>
+                              <small class="boq-costline">
+                                {{ lineCost(line) | number: '1.2-2' }} total
+                                @if (lineMargin(line) !== null) {
+                                  · {{ lineMargin(line) | number: '1.0-0' }}% margin
+                                }
+                              </small>
+                            } @else {
+                              <span class="boq-blank">—</span>
+                            }
+                          </td>
+                        }
                         <td data-label="Total amount" class="num">
                           <strong>{{ lineTotal(line) | number: '1.2-2' }}</strong>
                         </td>
@@ -264,6 +310,9 @@
                         <td data-label="Qty" class="num boq-newrow-blank">—</td>
 
                         <td data-label="Unit price (﷼)" class="num boq-newrow-blank">—</td>
+                        @if (costVisible()) {
+                          <td class="num boq-newrow-blank boq-costcol">—</td>
+                        }
                         <td data-label="Total amount" class="num boq-newrow-blank">—</td>
                         <td class="boq-line-remove"></td>
                       </tr>
@@ -275,6 +324,12 @@
                     @if (section.lines.length) {
                       <tr class="boq-subtotal">
                         <td colspan="9" class="num">Section total</td>
+                        @if (costVisible()) {
+                          <!-- What the section costs, beside what it sells for. -->
+                          <td class="num boq-costcol">
+                            <strong>{{ sectionCost(section) | number: '1.2-2' }} ﷼</strong>
+                          </td>
+                        }
                         <td class="num">
                           <strong>{{ sectionTotal(section) | number: '1.2-2' }} ﷼</strong>
                         </td>

@@ -153,26 +153,33 @@
           </header>
 
             <div class="camera-form">
-              <label class="camera-field">
-                <span>Supplier cost <small class="camera-cur">﷼</small></span>
-                <input type="number" formControlName="supplierCost" min="0" step="0.01"
-                  inputmode="decimal" placeholder="0.00"
-                  [class.is-invalid]="showError('supplierCost')" />
-                @if (showError('supplierCost')) {
-                  <small class="field-error">{{ errorFor('supplierCost', 'Supplier cost') }}</small>
-                }
-              </label>
+              <!-- Only for an account granted the cost figures. Without the
+                   grant the API sends them blank, so showing the boxes would
+                   invite somebody to save an empty cost over a real one — which
+                   the server now refuses to write, but an empty box that
+                   silently does nothing is its own kind of wrong. -->
+              @if (canSeeCost()) {
+                <label class="camera-field">
+                  <span>Supplier cost <small class="camera-cur">﷼</small></span>
+                  <input type="number" formControlName="supplierCost" min="0" step="0.01"
+                    inputmode="decimal" placeholder="0.00"
+                    [class.is-invalid]="showError('supplierCost')" />
+                  @if (showError('supplierCost')) {
+                    <small class="field-error">{{ errorFor('supplierCost', 'Supplier cost') }}</small>
+                  }
+                </label>
 
-              <label class="camera-field">
-                <span>Margin (%)</span>
-                <input type="number" formControlName="margin" min="0" step="0.01" inputmode="decimal"
-                  placeholder="0" (change)="applyMargin()"
-                  [class.is-invalid]="showError('margin')" />
-                <small class="field-hint">Fills the rate from cost + margin.</small>
-                @if (showError('margin')) {
-                  <small class="field-error">{{ errorFor('margin', 'Margin') }}</small>
-                }
-              </label>
+                <label class="camera-field">
+                  <span>Margin (%)</span>
+                  <input type="number" formControlName="margin" min="0" step="0.01" inputmode="decimal"
+                    placeholder="0" (change)="applyMargin()"
+                    [class.is-invalid]="showError('margin')" />
+                  <small class="field-hint">Fills the rate from cost + margin.</small>
+                  @if (showError('margin')) {
+                    <small class="field-error">{{ errorFor('margin', 'Margin') }}</small>
+                  }
+                </label>
+              }
 
               <label class="camera-field">
                 <span>Rate <small class="camera-cur">﷼</small></span>
