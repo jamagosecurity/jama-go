@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ApprovalBellComponent } from '../../../components/approval-bell/approval-bell.component';
 import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [ApprovalBellComponent, RouterOutlet, RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.css',

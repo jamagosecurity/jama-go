@@ -1,0 +1,167 @@
+/* The component is the anchor the panel hangs from, now that the bar it sits in
+   belongs to the layout. */
+:host {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The bell and its panel. Styles live with the component rather than with each
+   layout, so the two portals cannot drift apart.
+
+   Written for a light background: this sits on the content ground, never on the
+   navy sidebar. */
+
+/* Light styling: this sits on the content ground, not on the navy sidebar. */
+.admin-bell {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 14px;
+  border: 1px solid rgba(15, 40, 70, 0.14);
+  border-radius: 999px;
+  background: #fff;
+  color: #0f2846;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 40, 70, 0.06);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.admin-bell:hover,
+.admin-bell.is-open {
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 4px 14px -6px rgba(15, 40, 70, 0.35);
+}
+
+.admin-bell-icon svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Orange, not red: something happened worth seeing, not something went wrong. */
+.admin-bell-count {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #f6993d;
+  color: #08192b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.admin-panel-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+}
+
+/* Hangs from the bell, right-aligned to it. */
+.admin-notifs {
+  position: absolute;
+  z-index: 31;
+  top: calc(100% + 8px);
+  right: 28px;
+  width: min(400px, calc(100vw - 40px));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 26px 60px rgba(4, 16, 30, 0.24);
+}
+
+.admin-notifs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px 8px;
+  color: #0f2846;
+  font-size: 0.88rem;
+}
+.admin-notifs-head a {
+  color: #12548f;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.admin-notifs-head a:hover { text-decoration: underline; }
+
+.admin-notifs-empty {
+  margin: 0;
+  padding: 16px 12px;
+  color: #7c93a6;
+  font-size: 0.86rem;
+}
+
+.admin-notifs-list { margin: 0; padding: 0; list-style: none; }
+
+.admin-notif {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #0f2846;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-notif:hover { background: rgba(37, 148, 210, 0.08); }
+
+/* The colours the status badges use, so panel and table agree. */
+.admin-notif[data-action="Approved"] { border-left-color: #0f766e; }
+.admin-notif[data-action="Rejected"] { border-left-color: #e11d48; }
+
+/* Unread sits on a tint rather than carrying a dot: the whole row is the news. */
+.admin-notif.is-unread { background: rgba(246, 153, 61, 0.1); }
+.admin-notif.is-unread:hover { background: rgba(246, 153, 61, 0.16); }
+
+.admin-notif-line { display: flex; align-items: baseline; gap: 8px; }
+
+.admin-notif-what { font-weight: 800; font-size: 0.86rem; }
+.admin-notif[data-action="Approved"] .admin-notif-what { color: #0f766e; }
+.admin-notif[data-action="Rejected"] .admin-notif-what { color: #9f1239; }
+
+.admin-notif-no {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.admin-notif-amount {
+  margin-left: auto;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-notif-project { font-size: 0.84rem; font-weight: 600; }
+.admin-notif-who { color: #5b7288; font-size: 0.78rem; }
+.admin-notif-reason { color: #9f1239; font-size: 0.79rem; font-style: italic; }
+.admin-notif-when { color: #93a7b8; font-size: 0.73rem; }
+
+@media (max-width: 620px) {
+  .admin-topbar { padding: 14px 16px 0; }
+  .admin-notifs { right: 16px; }
+}
+
+/* How many times round this one has been. */
+.admin-notif-attempts {
+  color: #b45309;
+  font-size: 0.76rem;
+  font-weight: 700;
+}

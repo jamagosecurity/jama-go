@@ -227,8 +227,9 @@
 }
 
 .staff-content {
-  /* Was spaced by the top bar above it, which is gone. */
-  padding: 28px 28px 36px;
+  /* The bar above carries the top spacing again for accounts that get it; the
+     rest keeps enough on its own. */
+  padding: 20px 28px 36px;
   min-width: 0;
 }
 
@@ -253,3 +254,75 @@
   }
 
   }
+
+/* ===== Nested nav ===== */
+
+/* Kept together, so the gap between nav rows does not open up between a heading
+   and the views listed under it. */
+.nav-group { display: grid; gap: 2px; }
+
+/* Indented to the parent's label rather than its icon: 42px tile + 12px gap +
+   12px row padding. */
+.nav-subs {
+  display: grid;
+  gap: 1px;
+  margin: 2px 0 4px 32px;
+  padding-left: 22px;
+  border-left: 1px solid rgba(215, 231, 244, 0.16);
+}
+
+/* Deliberately not the tile-and-two-line treatment the parent rows get. These
+   are views of the row above, not areas of their own. */
+.staff-nav .nav-subs a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 10px;
+  color: rgba(215, 231, 244, 0.72);
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.staff-nav .nav-subs a:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.07);
+  color: #eaf4ff;
+}
+
+/* Quieter than an active parent: a child says where you are, the parent says
+   which section you are in, and two full-strength highlights compete. */
+.staff-nav .nav-subs a.active {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: transparent;
+  color: #ffffff;
+  font-weight: 750;
+}
+
+/* The colours the status badges already use, so the sidebar and the table agree. */
+.nav-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.nav-dot--ok { background: #57c2b0; }
+.nav-dot--no { background: #f2708d; }
+
+/* ===== Top bar ===== */
+
+/* Console chrome — notifications follow you across every screen, so they cannot
+   live inside any one page's header. Thin, so it does not compete with them. */
+.staff-topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 28px 0;
+}
+
+@media (max-width: 620px) {
+  .staff-topbar { padding: 14px 16px 0; }
+}

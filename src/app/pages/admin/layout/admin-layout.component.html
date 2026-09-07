@@ -33,20 +33,6 @@
           </span>
         </a>
 
-        <a routerLink="/admin/storage" routerLinkActive="active" class="nav-storage">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <rect x="3" y="4" width="18" height="6" rx="2" />
-              <rect x="3" y="14" width="18" height="6" rx="2" />
-              <path d="M7 7h.01M7 17h.01" />
-            </svg>
-          </span>
-          <span>
-            <strong>Storage Sizing</strong>
-            <small>CCTV capacity &amp; RAID</small>
-          </span>
-        </a>
-
         <a routerLink="/admin/dia" routerLinkActive="active" class="nav-dia">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
@@ -88,18 +74,45 @@
           </span>
         </a>
 
-        <a routerLink="/admin/boq" routerLinkActive="active" class="nav-boq">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-              <path d="M9 8h6M9 12h6M9 16h3" />
-            </svg>
-          </span>
-          <span>
-            <strong>Quotation</strong>
-            <small>Priced from stock</small>
-          </span>
-        </a>
+        <!-- Quotation and what has been decided on one, as a parent and its
+             children. They were three competing pills before, which made
+             "Approved" read as its own area of the system rather than as a view
+             of the quotations already in the row above it. -->
+        <div class="nav-group">
+          <a routerLink="/admin/boq" routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }" class="nav-boq">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+                <path d="M9 8h6M9 12h6M9 16h3" />
+              </svg>
+            </span>
+            <span>
+              <strong>Quotation</strong>
+              <small>Priced from stock</small>
+            </span>
+          </a>
+
+          <!-- Always on screen rather than revealed on hover or once the parent
+               is open: an approver should be able to see where the decided work
+               lives without first guessing to click into it. -->
+          <div class="nav-subs">
+            <!-- Both carry the status, so the highlight follows the tab. The
+                 page defaults to approved when the parameter is missing. -->
+            <a routerLink="/admin/boq/decisions" [queryParams]="{ status: 'Approved' }"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'exact', fragment: 'ignored', matrixParams: 'ignored' }">
+              <span class="nav-dot nav-dot--ok" aria-hidden="true"></span>
+              Approved
+            </a>
+            <a routerLink="/admin/boq/decisions" [queryParams]="{ status: 'Rejected' }"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'exact', fragment: 'ignored', matrixParams: 'ignored' }">
+              <span class="nav-dot nav-dot--no" aria-hidden="true"></span>
+              Rejected
+            </a>
+          </div>
+        </div>
 
         <a routerLink="/" class="admin-nav-muted nav-site">
           <span class="nav-icon" aria-hidden="true">
@@ -127,6 +140,14 @@
   </aside>
 
   <div class="admin-main">
+    <!-- Console chrome, not page chrome: notifications follow you across every
+         screen, so they cannot live inside any one page's header. Kept to a thin
+         strip — the heavy top bar this replaces was removed because it competed
+         with those headers. -->
+    <header class="admin-topbar">
+      <app-approval-bell basePath="/admin/boq" />
+    </header>
+
     <div class="admin-content">
       <router-outlet />
     </div>

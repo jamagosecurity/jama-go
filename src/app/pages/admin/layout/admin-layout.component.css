@@ -367,3 +367,88 @@
     transform: none;
   }
 }
+
+/* ===== Nested nav ===== */
+
+/* A parent row and its children, kept together so the gap the nav puts between
+   pills does not open up between a heading and the things under it. */
+.nav-group { display: grid; gap: 2px; }
+
+/* Indented to the parent's label, not its icon: the children line up with the
+   word "Quotation" rather than floating under the tile. 42px tile + 12px gap +
+   12px row padding. */
+.nav-subs {
+  display: grid;
+  gap: 1px;
+  margin: 2px 0 4px 32px;
+  padding-left: 22px;
+  border-left: 1px solid rgba(226, 240, 255, 0.16);
+}
+
+/* Deliberately not pills. These are views of the row above, and giving them the
+   same tile-and-two-line treatment made them read as separate areas of the
+   system — which is what was wrong with them as top-level entries. */
+.admin-nav .nav-subs a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 10px;
+  color: rgba(226, 240, 255, 0.72);
+  font-size: 0.86rem;
+  font-weight: 650;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+/* The parent's left colour tab would otherwise be inherited and land on each
+   child, drawing a second stack of marks beside the connecting rule. */
+.admin-nav .nav-subs a::before { content: none; }
+
+.admin-nav .nav-subs a:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #eaf4ff;
+}
+
+/* Quiet compared with an active parent — a child row is where you are, not what
+   section you are in, and two full-strength highlights at once compete. */
+.admin-nav .nav-subs a.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  box-shadow: none;
+  font-weight: 750;
+}
+
+/* The status colours the badges already use, so a glance at the sidebar and a
+   glance at a row in the table agree with each other. */
+.nav-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.nav-dot--ok { background: #57c2b0; }
+.nav-dot--no { background: #f2708d; }
+
+
+/* ===== Top bar ===== */
+
+/* Console chrome: it follows you across every screen, so it cannot live inside
+   any one page's header. Thin and transparent on purpose — the heavy bar that
+   used to sit here was removed because it competed with those headers. */
+.admin-topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 28px 0;
+}
+
+/* The page's own top spacing now comes after the bar. */
+.admin-main .admin-content { padding-top: 16px; }
+
+@media (max-width: 620px) {
+  .admin-topbar { padding: 14px 16px 0; }
+}

@@ -69,19 +69,39 @@
         </a>
       }
 
-      @if (canBuildBoq()) {
-        <a routerLink="/staff/boq" routerLinkActive="active">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M9 3h6l1 2h3v16H5V5h3z" />
-              <path d="M9 11h6M9 15h6M9 19h3" />
-            </svg>
-          </span>
-          <span>
-            <strong>Quotation</strong>
-            <small>Priced from stock</small>
-          </span>
-        </a>
+      @if (canSeeBoq()) {
+        <!-- Parent and children, so "Approved" reads as a view of the
+             quotations above it rather than as its own area. -->
+        <div class="nav-group">
+          <a routerLink="/staff/boq" routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 3h6l1 2h3v16H5V5h3z" />
+                <path d="M9 11h6M9 15h6M9 19h3" />
+              </svg>
+            </span>
+            <span>
+              <strong>Quotation</strong>
+              <small>Priced from stock</small>
+            </span>
+          </a>
+
+          <div class="nav-subs">
+            <a routerLink="/staff/boq/decisions" [queryParams]="{ status: 'Approved' }"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'exact', fragment: 'ignored', matrixParams: 'ignored' }">
+              <span class="nav-dot nav-dot--ok" aria-hidden="true"></span>
+              Approved
+            </a>
+            <a routerLink="/staff/boq/decisions" [queryParams]="{ status: 'Rejected' }"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'exact', fragment: 'ignored', matrixParams: 'ignored' }">
+              <span class="nav-dot nav-dot--no" aria-hidden="true"></span>
+              Rejected
+            </a>
+          </div>
+        </div>
       }
     </nav>
 
@@ -98,6 +118,15 @@
   </aside>
 
   <div class="staff-main">
+    <!-- The same bar the admin console has. A staff member needs telling that
+         their quotation was approved or sent back at least as much as an
+         administrator does — more, since they are the one who has to act on it. -->
+    @if (canSeeBoq()) {
+      <header class="staff-topbar">
+        <app-approval-bell basePath="/staff/boq" />
+      </header>
+    }
+
     <div class="staff-content">
       <router-outlet />
     </div>

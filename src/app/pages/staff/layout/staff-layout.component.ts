@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ApprovalBellComponent } from '../../../components/approval-bell/approval-bell.component';
 import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-staff-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [ApprovalBellComponent, RouterOutlet, RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './staff-layout.component.html',
   styleUrl: './staff-layout.component.css',
@@ -18,8 +19,22 @@ export class StaffLayoutComponent {
    *  removes the link on the next session refresh without a reload. */
   readonly canUploadDia = computed(() => this.auth.can(PERMISSIONS.diaUpload));
 
-  /** Same for the BOQ screens. Hiding the link is a courtesy — the route guard
-   *  and every endpoint check boq.manage themselves. */
+  /**
+   * Same for the BOQ screens. Hiding the link is a courtesy — the route guard
+   * and every endpoint check the grant themselves.
+   *
+   * Either grant opens them: an approver has to reach a quotation to decide on
+   * it, and gating the only link on the BUILD permission left an approve-only
+   * account with a portal that led nowhere near the thing it was granted for.
+   */
+  readonly canSeeBoq = computed(
+    () => this.auth.can(PERMISSIONS.boqManage) || this.auth.can(PERMISSIONS.boqApprove),
+  );
+
+  /**
+   * Building specifically, which is what the storage calculator belongs to —
+   * sizing an array is part of quoting for it, not part of deciding on one.
+   */
   readonly canBuildBoq = computed(() => this.auth.can(PERMISSIONS.boqManage));
 
   /** And for the stock inventory. Without this the permission was grantable but
