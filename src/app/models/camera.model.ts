@@ -183,10 +183,49 @@ export interface CameraBrand {
  * text, and anything not here simply renders as its name.
  */
 export const CAMERA_BRANDS: readonly CameraBrand[] = [
+  // The four cameras are quoted from most often, so they lead. Everything after
+  // is alphabetical.
   { name: 'Hikvision', logo: '/brands/hikvision.png', aliases: ['hikvision', 'hik'] },
   { name: 'Dahua', logo: '/brands/dahua.png', aliases: ['dahua', 'dahua technology'] },
   { name: 'Uniview', logo: '/brands/uniview.png', aliases: ['uniview', 'unv'] },
   { name: 'Tiandy', logo: '/brands/tiandy.png', aliases: ['tiandy'] },
+
+  { name: 'ABB', logo: '/brands/abb.png', aliases: ['abb'] },
+  { name: 'APSYS', logo: '/brands/apsys.png', aliases: ['apsys', 'apsys networks'] },
+  { name: 'Aqara', logo: '/brands/aqara.png', aliases: ['aqara'] },
+  { name: 'Aruba', logo: '/brands/aruba.png', aliases: ['aruba', 'aruba networks', 'hpe aruba'] },
+  { name: 'ATNT', logo: '/brands/atnt.png', aliases: ['atnt'] },
+  { name: 'Axis', logo: '/brands/axis.png', aliases: ['axis', 'axis communications'] },
+  { name: 'Bolein', logo: '/brands/bolein.png', aliases: ['bolein'] },
+  { name: 'Bosch', logo: '/brands/bosch.png', aliases: ['bosch'] },
+  { name: 'Bose', logo: '/brands/bose.png', aliases: ['bose'] },
+  { name: 'Cisco', logo: '/brands/cisco.png', aliases: ['cisco'] },
+  { name: 'Dell', logo: '/brands/dell.png', aliases: ['dell'] },
+  { name: 'DSPPA', logo: '/brands/dsppa.png', aliases: ['dsppa'] },
+  { name: 'Huawei', logo: '/brands/huawei.png', aliases: ['huawei'] },
+  { name: 'ITC', logo: '/brands/itc.png', aliases: ['itc'] },
+  { name: 'KSTAR', logo: '/brands/kstar.png', aliases: ['kstar', 'k-star', 'k star'] },
+  { name: 'LifeSmart', logo: '/brands/lifesmart.png', aliases: ['lifesmart', 'life smart'] },
+  { name: 'Loxone', logo: '/brands/loxone.png', aliases: ['loxone'] },
+  { name: 'Lutron', logo: '/brands/lutron.png', aliases: ['lutron'] },
+  { name: 'NETCON', logo: '/brands/netcon.png', aliases: ['netcon', 'net con'] },
+  { name: 'Norden', logo: '/brands/norden.png', aliases: ['norden'] },
+  // "Orivibo" is how the artwork arrived and how it is often typed; both resolve.
+  { name: 'ORVIBO', logo: '/brands/orvibo.png', aliases: ['orvibo', 'orivibo'] },
+  { name: 'Panduit', logo: '/brands/panduit.png', aliases: ['panduit'] },
+  { name: 'Pelco', logo: '/brands/pelco.png', aliases: ['pelco'] },
+  { name: 'Reolink', logo: '/brands/reolink.png', aliases: ['reolink'] },
+  { name: 'Seagate', logo: '/brands/seagate.png', aliases: ['seagate', 'seagete'] },
+  { name: 'Sonos', logo: '/brands/sonos.png', aliases: ['sonos'] },
+  { name: 'Televes', logo: '/brands/televes.png', aliases: ['televes', 'televés'] },
+  { name: 'Toshiba', logo: '/brands/toshiba.png', aliases: ['toshiba'] },
+  { name: 'TP-Link', logo: '/brands/tp-link.png', aliases: ['tp-link', 'tplink', 'tp link'] },
+  // The mark reads "WD / Western Digital", and a store room writes either.
+  { name: 'Western Digital', logo: '/brands/wd.png', aliases: ['wd', 'western digital'] },
+  { name: 'Wi-Tek', logo: '/brands/wi-tek.png', aliases: ['wi-tek', 'witek', 'wi tek'] },
+  { name: 'Wisenet', logo: '/brands/wisenet.png', aliases: ['wisenet', 'hanwha', 'hanwha vision'] },
+  // Filed as GIMI in the artwork, printed XGIMI on the product.
+  { name: 'XGIMI', logo: '/brands/xgimi.png', aliases: ['xgimi', 'gimi'] },
 ];
 
 const BRAND_BY_ALIAS = new Map<string, CameraBrand>(
