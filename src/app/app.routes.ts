@@ -11,6 +11,7 @@ import {
 } from './guards/admin.guard';
 import { createCameraRoutes } from './pages/admin/cameras/cameras.routes';
 import { createBoqRoutes } from './pages/staff/boq/boq.routes';
+import { createDrawingRoutes } from './pages/staff/drawings/drawing.routes';
 import { PERMISSIONS } from './models/auth.model';
 
 /**
@@ -146,6 +147,15 @@ export const routes: Routes = [
             path: 'boq',
             canActivate: [anyPermissionGuard(PERMISSIONS.boqManage, PERMISSIONS.boqApprove)],
             children: createBoqRoutes('/admin/boq', '/admin/storage/calculator'),
+          },
+          {
+            // CAD drawings, on the same terms as quotations: either grant opens
+            // the tree, the components decide what each account may do inside
+            // it. A standalone module — not nested under boq, and no relation
+            // to quotations at all.
+            path: 'drawings',
+            canActivate: [anyPermissionGuard(PERMISSIONS.drawingManage, PERMISSIONS.drawingApprove)],
+            children: createDrawingRoutes('/admin/drawings'),
           },
           {
             path: 'cameras',

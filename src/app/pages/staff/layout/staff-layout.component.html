@@ -103,6 +103,41 @@
           </div>
         </div>
       }
+
+      @if (canSeeDrawings()) {
+        <!-- Same parent-plus-decisions shape as Quotation, and a standalone
+             module — no relation to quotations at all. -->
+        <div class="nav-group">
+          <a routerLink="/staff/drawings" routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M3 3h18v18H3z" />
+                <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+              </svg>
+            </span>
+            <span>
+              <strong>Drawings</strong>
+              <small>CAD submissions</small>
+            </span>
+          </a>
+
+          <div class="nav-subs">
+            <a routerLink="/staff/drawings/decisions" [queryParams]="{ status: 'Approved' }"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'exact', fragment: 'ignored', matrixParams: 'ignored' }">
+              <span class="nav-dot nav-dot--ok" aria-hidden="true"></span>
+              Approved
+            </a>
+            <a routerLink="/staff/drawings/decisions" [queryParams]="{ status: 'Rejected' }"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'exact', fragment: 'ignored', matrixParams: 'ignored' }">
+              <span class="nav-dot nav-dot--no" aria-hidden="true"></span>
+              Rejected
+            </a>
+          </div>
+        </div>
+      }
     </nav>
 
     <div class="staff-sidebar-foot">

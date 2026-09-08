@@ -41,6 +41,12 @@ export class StaffLayoutComponent {
    *  invisible: nothing in the staff portal led to the screens it unlocks. */
   readonly canManageCameras = computed(() => this.auth.can(PERMISSIONS.cameraManage));
 
+  /** Same shape as canSeeBoq, for the drawings module — either grant reaches
+   *  it, since an approver has to open a drawing to decide on it too. */
+  readonly canSeeDrawings = computed(
+    () => this.auth.can(PERMISSIONS.drawingManage) || this.auth.can(PERMISSIONS.drawingApprove),
+  );
+
   readonly initials = computed(() => {
     const name = this.auth.currentUser()?.fullName?.trim() || 'Staff';
     const parts = name.split(/\s+/).filter(Boolean);

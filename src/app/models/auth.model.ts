@@ -21,6 +21,12 @@ export const PERMISSIONS = {
   /** Deciding on a quotation somebody else built. Separate from boqManage on
    *  purpose — see Jama.Application.Common.Permissions. */
   boqApprove: 'boq.approve',
+  /** Drafting and submitting CAD drawings. Its own module, independent of
+   *  quotations — see Jama.Application.Common.Permissions. */
+  drawingManage: 'drawing.manage',
+  /** Deciding on a drawing somebody else drafted. Separate from
+   *  drawingManage on the same terms as boqApprove is from boqManage. */
+  drawingApprove: 'drawing.approve',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

@@ -234,6 +234,22 @@ export class BoqEditorComponent implements OnInit {
   protected readonly status = computed(() => this.boq()?.status ?? 'Draft');
 
   /**
+   * Whether the finished PDF can be produced at all yet.
+   *
+   * Mirrors BoqVisibility.CanDownload on the server exactly: even the
+   * document's own author gets nothing before Approved, because that
+   * download is the one file that could go straight to a client and skip
+   * the approval step entirely — the whole reason this check exists. The
+   * API enforces the real boundary regardless of what this screen offers;
+   * this is only about not drawing a button that would come back refused.
+   */
+  protected readonly canDownload = computed(() => this.status() === 'Approved' || this.canApprove());
+
+  /** Sending an approved document out is a decision above even an
+   *  approver's grant — only the super administrator sees this. */
+  protected readonly canShare = computed(() => this.status() === 'Approved' && this.auth.isSuperAdmin());
+
+  /**
    * Whether the lines may still be changed, as the SERVER says — an approved or
    * submitted quotation is read-only, and the editor asks rather than working it
    * out, so the two cannot disagree about it.
@@ -1320,6 +1336,53 @@ export class BoqEditorComponent implements OnInit {
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to download the PDF.')),
       });
+  }
+
+  // ===== Share (super admin, approved only) =====
+
+  /**
+   * Neither wa.me nor mailto: can attach a file on the sender's behalf — that
+   * is not something either can do from a web page — so this triggers the
+   * same clean download the button above does, and the message says the file
+   * is waiting to be attached rather than implying it already is.
+   */
+  private shareMessage(boq: Boq): string {
+    return [
+      `Hello${boq.clientName ? ' ' + boq.clientName : ''},`,
+      '',
+      `Please find attached quotation ${boq.boqNumber}${boq.projectName ? ' for ' + boq.projectName : ''}.`,
+      '(The PDF has just been downloaded to your computer — attach it here before sending.)',
+      '',
+      'Kind regards,',
+      'Jama Go Security Equipment',
+    ].join('\n');
+  }
+
+  protected shareWhatsApp(): void {
+    const boq = this.boq();
+    if (!boq || !this.canShare()) return;
+
+    this.download();
+
+    const digits = (boq.contactNumber ?? '').replace(/[^0-9]/g, '');
+    const text = encodeURIComponent(this.shareMessage(boq));
+    const url = digits
+      ? `https://wa.me/${digits}?text=${text}`
+      : `https://api.whatsapp.com/send?text=${text}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  protected shareEmail(): void {
+    const boq = this.boq();
+    if (!boq || !this.canShare()) return;
+
+    this.download();
+
+    const subject = encodeURIComponent(
+      `Quotation ${boq.boqNumber}${boq.projectName ? ' — ' + boq.projectName : ''}`,
+    );
+    const body = encodeURIComponent(this.shareMessage(boq));
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   }
 
   protected showError(field: string): boolean {

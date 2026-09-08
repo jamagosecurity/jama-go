@@ -1,0 +1,244 @@
+<section class="admin-page boq-page">
+  <header class="admin-page-header boq-page-header">
+    <div class="boq-head-actions">
+      @if (drawing(); as saved) {
+        <span class="boq-status" [attr.data-status]="saved.status">{{ saved.status }}</span>
+        @if (canShare()) {
+          <button type="button" class="btn-admin btn-admin-ghost" (click)="shareWhatsApp()">Share · WhatsApp</button>
+          <button type="button" class="btn-admin btn-admin-ghost" (click)="shareEmail()">Share · Email</button>
+        }
+      }
+      <a class="btn-admin btn-admin-ghost boq-back" [routerLink]="basePath">← All drawings</a>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading drawing…</p></div>
+  } @else {
+    <form [formGroup]="form" (submit)="save($event)">
+      <div class="admin-panel boq-project">
+        <div class="admin-panel-title"><h2>Project</h2></div>
+        <div class="boq-project-form">
+          <label class="boq-field">
+            <span>Project name <i aria-hidden="true">*</i></span>
+            <input formControlName="projectName" maxlength="200" autocomplete="off"
+              [class.is-invalid]="showError('projectName')" />
+            @if (showError('projectName')) {
+              <small class="field-error">{{ errorFor('projectName', 'Project name') }}</small>
+            }
+          </label>
+          <label class="boq-field">
+            <span>Client</span>
+            <input formControlName="clientName" maxlength="200" autocomplete="off" />
+          </label>
+          <label class="boq-field">
+            <span>Contact number</span>
+            <input formControlName="contactNumber" maxlength="40" autocomplete="off"
+              inputmode="tel" placeholder="e.g. +974 3312 3456" />
+          </label>
+          <label class="boq-field">
+            <span>Site / location</span>
+            <input formControlName="siteLocation" maxlength="200" autocomplete="off"
+              placeholder="e.g. Al Waab, Doha" />
+          </label>
+          <label class="boq-field boq-field--wide">
+            <span>Notes</span>
+            <textarea formControlName="notes" rows="2" maxlength="2000"
+              placeholder="Anything that should appear alongside the drawing"></textarea>
+          </label>
+        </div>
+      </div>
+
+      <!-- Files are a drawing's content — there is nothing to save here until
+           the drawing itself exists, so this only appears once it does. -->
+      @if (drawing(); as saved) {
+        <div class="admin-panel boq-project">
+          <div class="admin-panel-title">
+            <h2>Files</h2>
+            <p class="admin-page-note">
+              A DWG or DXF alone cannot be reviewed — neither opens in a browser. Attach the
+              plotted PDF too; that is what an approver actually looks at.
+            </p>
+          </div>
+
+          @if (isEditable()) {
+            <label class="btn-admin btn-admin-ghost boq-upload-btn">
+              {{ uploading() ? 'Uploading…' : 'Add a file' }}
+              <input type="file" accept=".dwg,.dxf,.pdf,.zip" [disabled]="uploading()"
+                (change)="onFileSelected($event)" hidden />
+            </label>
+          }
+
+          @if (uploadError()) {
+            <p class="admin-error" role="alert">{{ uploadError() }}</p>
+          }
+
+          @if (saved.files.length) {
+            <ul class="boq-filelist">
+              @for (file of saved.files; track file.id) {
+                <li class="boq-filelist-row">
+                  <span class="boq-filelist-name">
+                    <strong>{{ file.fileName }}</strong>
+                    <small>
+                      {{ fileSize(file.sizeBytes) }}
+                      @if (file.uploadedByName) { · {{ file.uploadedByName }} }
+                    </small>
+                  </span>
+                  <span class="boq-filelist-actions">
+                    @if (canDownloadFile(file)) {
+                      <button type="button" class="row-btn" (click)="downloadFile(file)">Download</button>
+                    } @else {
+                      <span class="boq-download-locked" [title]="downloadBlockedReason(file)">
+                        {{ downloadBlockedReason(file) }}
+                      </span>
+                    }
+                    @if (isEditable()) {
+                      <button type="button" class="row-btn row-btn--delete"
+                        [disabled]="removingFileId() === file.id"
+                        (click)="removeFile(file)">
+                        {{ removingFileId() === file.id ? '…' : 'Remove' }}
+                      </button>
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="boq-blank">No files yet.</p>
+          }
+        </div>
+      }
+
+      <!-- Where the drawing stands, what may be done to it next, and how it got
+           here. Mirrors BoqEditorComponent's approval bar exactly. -->
+      @if (drawing(); as saved) {
+        <div class="admin-panel boq-approval">
+          <div class="boq-approval-head">
+            <div class="boq-approval-state">
+              <span class="boq-status" [attr.data-status]="saved.status">{{ saved.status }}</span>
+              @if (saved.status === 'Submitted' && saved.submittedAt) {
+                <span class="boq-approval-when">Waiting since {{ saved.submittedAt | date: 'medium' }}</span>
+              }
+              @if (saved.status === 'Approved' && saved.approvedAt) {
+                <span class="boq-approval-when">
+                  Approved by {{ saved.approvedByName || 'an approver' }}
+                  on {{ saved.approvedAt | date: 'medium' }}
+                </span>
+              }
+              @if (saved.status === 'Rejected' && saved.rejectedAt) {
+                <span class="boq-approval-when">
+                  Rejected by {{ saved.rejectedByName || 'an approver' }}
+                  on {{ saved.rejectedAt | date: 'medium' }}
+                </span>
+              }
+            </div>
+
+            <div class="boq-approval-actions">
+              @if (canSubmit()) {
+                <button type="button" class="btn-admin btn-admin-primary"
+                  [disabled]="deciding()" (click)="submitForApproval()">
+                  {{ saved.status === 'Rejected' ? 'Re-submit for approval' : 'Submit for approval' }}
+                </button>
+              }
+              <!-- Only for an account holding drawing.approve, and only while
+                   there is something to answer. The API refuses either action
+                   without the grant regardless of what is drawn here. -->
+              @if (canDecide()) {
+                <button type="button" class="btn-admin btn-admin-primary boq-approve-btn"
+                  [disabled]="deciding()" (click)="approve()">Approve</button>
+                <button type="button" class="btn-admin btn-admin-danger"
+                  [disabled]="deciding()" (click)="openReject()">Reject</button>
+              }
+            </div>
+          </div>
+
+          @if (saved.status === 'Rejected' && saved.rejectionReason) {
+            <p class="boq-reject-reason">
+              <strong>Reason for rejection:</strong> {{ saved.rejectionReason }}
+            </p>
+          }
+
+          @if (isAmending()) {
+            <p class="boq-amending" role="status">
+              You are editing a drawing that has already been decided. Your changes are
+              allowed because you are the super administrator, and they will be recorded
+              in the history below.
+            </p>
+          }
+
+          @if (saved.status === 'Submitted') {
+            <p class="boq-approval-note">
+              Waiting for an approver. You can still make changes until it is approved —
+              they will see the drawing as it stands when they open it.
+            </p>
+          } @else if (!isEditable()) {
+            <p class="boq-approval-locked">
+              This drawing has been approved. Its files and details are fixed.
+            </p>
+          }
+
+          @if (saved.history.length) {
+            <ol class="boq-history">
+              @for (step of saved.history; track step.id) {
+                <li class="boq-history-step" [attr.data-action]="step.action">
+                  <span class="boq-history-what">{{ stepLabel(step.action) }}</span>
+                  <span class="boq-history-who">
+                    {{ step.actorName || 'Unknown' }} · {{ step.at | date: 'medium' }}
+                  </span>
+                  @if (step.reason) {
+                    <span class="boq-history-reason">“{{ step.reason }}”</span>
+                  }
+                </li>
+              }
+            </ol>
+          }
+        </div>
+      }
+
+      @if (formError()) {
+        <p class="admin-error" role="alert">{{ formError() }}</p>
+      }
+
+      @if (savedNotice()) {
+        <p class="admin-success" role="status">{{ savedNotice() }}</p>
+      }
+
+      <div class="boq-save">
+        <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : isEditing() ? 'Save changes' : 'Create drawing' }}
+        </button>
+        <a class="btn-admin btn-admin-ghost" [routerLink]="basePath">Cancel</a>
+      </div>
+    </form>
+  }
+</section>
+
+@if (rejecting()) {
+  <div class="boq-modal-backdrop" (click)="closeReject()"></div>
+  <div class="boq-modal" role="dialog" aria-modal="true" aria-labelledby="drw-reject-title">
+    <h2 id="drw-reject-title" class="boq-modal-title">Reject this drawing</h2>
+    <p class="boq-modal-note">
+      Say what needs changing. Whoever drafted it sees this, and reworks from it.
+    </p>
+
+    <label class="boq-field">
+      <span>Reason <i aria-hidden="true">*</i></span>
+      <textarea rows="4" maxlength="1000" [value]="rejectReason()"
+        (input)="onRejectReasonInput($event)"
+        placeholder="e.g. North elevation dimensions don't match the site survey."></textarea>
+    </label>
+
+    @if (rejectError()) {
+      <p class="admin-error" role="alert">{{ rejectError() }}</p>
+    }
+
+    <div class="boq-modal-actions">
+      <button type="button" class="btn-admin btn-admin-danger"
+        [disabled]="deciding()" (click)="confirmReject()">
+        {{ deciding() ? 'Rejecting…' : 'Reject drawing' }}
+      </button>
+      <button type="button" class="btn-admin btn-admin-ghost"
+        [disabled]="deciding()" (click)="closeReject()">Cancel</button>
+    </div>
+  </div>
+}

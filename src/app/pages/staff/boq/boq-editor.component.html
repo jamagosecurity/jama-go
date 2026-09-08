@@ -9,8 +9,18 @@
              the server, so an unsaved draft has nothing for it to read. -->
         <a class="btn-admin btn-admin-ghost" [routerLink]="[storagePath]"
           [queryParams]="{ quotation: saved.id }">Calculate storage</a>
-        <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"
-          (click)="download()">{{ downloading() ? 'Preparing…' : 'Download PDF' }}</button>
+        @if (canDownload()) {
+          <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"
+            (click)="download()">{{ downloading() ? 'Preparing…' : 'Download PDF' }}</button>
+        } @else {
+          <span class="boq-download-locked" title="Only an approver can preview it before then.">
+            Available once approved.
+          </span>
+        }
+        @if (canShare()) {
+          <button type="button" class="btn-admin btn-admin-ghost" (click)="shareWhatsApp()">Share · WhatsApp</button>
+          <button type="button" class="btn-admin btn-admin-ghost" (click)="shareEmail()">Share · Email</button>
+        }
       }
 
       <!-- Cost is off by default and closes itself: a quotation gets built in

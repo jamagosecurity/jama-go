@@ -138,6 +138,13 @@
 .boq-status[data-status="Approved"]  { background: rgba(28,133,119,.15); color: var(--admin-teal-ink, #0f766e); }
 .boq-status[data-status="Rejected"]  { background: rgba(225,29,72,.12); color: var(--jama-rose-ink, #9f1239); }
 
+/* Stands in for the Download button before approval — same slot, no action. */
+.boq-download-locked {
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
 /* ===== Tables ===== */
 
 .boq-table-wrap { overflow-x: auto; }
@@ -1250,4 +1257,47 @@
   color: var(--admin-blue-ink);
   font-size: 0.86rem;
   font-weight: 600;
+}
+
+/* ===== Drawing files ===== */
+/* Used only by the drawing editor, but lives here alongside the rest of the
+   approval-bar styles it shares — one stylesheet for both modules' documents. */
+
+.boq-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.boq-filelist {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.boq-filelist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.boq-filelist-name {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.boq-filelist-name small { color: var(--admin-muted); font-size: 0.79rem; }
+
+.boq-filelist-actions {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
 }

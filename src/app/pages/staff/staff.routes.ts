@@ -4,6 +4,7 @@ import { PERMISSIONS } from '../../models/auth.model';
 import { createCameraRoutes } from '../admin/cameras/cameras.routes';
 import { createDiaRoutes } from '../admin/dia/dia.routes';
 import { createBoqRoutes } from './boq/boq.routes';
+import { createDrawingRoutes } from './drawings/drawing.routes';
 
 export const STAFF_ROUTES: Routes = [
   {
@@ -43,6 +44,13 @@ export const STAFF_ROUTES: Routes = [
         path: 'boq',
         canActivate: [anyPermissionGuard(PERMISSIONS.boqManage, PERMISSIONS.boqApprove)],
         children: createBoqRoutes('/staff/boq', '/staff/storage'),
+      },
+      {
+        // CAD drawings — a standalone module, independent of quotations. Either
+        // grant opens the tree; the components decide what each account may do.
+        path: 'drawings',
+        canActivate: [anyPermissionGuard(PERMISSIONS.drawingManage, PERMISSIONS.drawingApprove)],
+        children: createDrawingRoutes('/staff/drawings'),
       },
       {
         // Sizes the array for a quotation, so it rides the same permission:
