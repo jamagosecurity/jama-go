@@ -56,9 +56,11 @@ export class BoqService {
       .pipe(map(unwrapApiResult));
   }
 
-  approve(id: string): Observable<Boq> {
+  /** Unlike a rejection's reason, the note is never required — the server
+   *  accepts an empty one, so the popup that asks for it must never block. */
+  approve(id: string, note?: string): Observable<Boq> {
     return this.http
-      .post<ApiResult<Boq>>(`${this.baseUrl}/${id}/approve`, {})
+      .post<ApiResult<Boq>>(`${this.baseUrl}/${id}/approve`, { note })
       .pipe(map(unwrapApiResult));
   }
 

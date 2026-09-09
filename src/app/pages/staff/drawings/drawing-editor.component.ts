@@ -13,6 +13,7 @@ import { DrawingService } from '../../../services/drawing.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { downloadBlob } from '../../../utils/download.util';
 import { fieldErrorMessage, shouldShowError } from '../../../utils/form-validators.util';
+import { drawingShareMessage, mailtoShareUrl, whatsAppShareUrl } from '../../../utils/share.util';
 import { DRAWING_BASE_PATH } from './drawing-base-path';
 
 /**
@@ -201,24 +202,23 @@ export class DrawingEditorComponent implements OnInit {
   }
 
   /**
-   * Whether this file can be downloaded at all yet — mirrors
-   * DrawingVisibility.CanDownload plus the server's file-type rule: a native
-   * CAD file (DWG/DXF/ZIP) cannot be watermarked, so it stays blocked pre-
-   * approval even for an approver, who reviews the plotted PDF to decide
-   * instead. The API enforces this regardless; this only keeps the button
-   * from offering something that would come back refused.
+   * Whether this file can be downloaded at all yet.
+   *
+   * Anyone who can open this drawing may download any file once Approved,
+   * or the plotted PDF (watermarked) before then. A native CAD file
+   * (DWG/DXF/ZIP) can never carry that watermark, so it stays blocked pre-
+   * approval regardless of who is asking — see DrawingVisibility.Watermark
+   * on the server. The API enforces this regardless of what this screen
+   * offers; this only keeps the button from offering something that would
+   * come back refused.
    */
   protected canDownloadFile(file: DrawingFile): boolean {
-    if (this.status() === 'Approved') return true;
-    if (!this.canApprove()) return false;
-    return this.isPdf(file);
+    return this.status() === 'Approved' || this.isPdf(file);
   }
 
   /** Why a blocked file's button is replaced with a message instead. */
-  protected downloadBlockedReason(file: DrawingFile): string {
-    return this.canApprove() && !this.isPdf(file)
-      ? 'Only the plotted PDF can be previewed before approval.'
-      : 'Available once approved.';
+  protected downloadBlockedReason(): string {
+    return 'Only the plotted PDF can be previewed before approval.';
   }
 
   private isPdf(file: DrawingFile): boolean {
@@ -245,39 +245,25 @@ export class DrawingEditorComponent implements OnInit {
    * this does not guess which file to download. It only opens the prefilled
    * message; the file list below is where the actual files live.
    */
-  private shareMessage(drawing: Drawing): string {
-    return [
-      `Hello${drawing.clientName ? ' ' + drawing.clientName : ''},`,
-      '',
-      `Please find attached drawing ${drawing.drawingNumber}${drawing.projectName ? ' for ' + drawing.projectName : ''}.`,
-      '(Attach the approved file(s) from the drawing before sending.)',
-      '',
-      'Kind regards,',
-      'Jama Go Security Equipment',
-    ].join('\n');
-  }
-
   protected shareWhatsApp(): void {
     const drawing = this.drawing();
     if (!drawing || !this.canShare()) return;
 
-    const digits = (drawing.contactNumber ?? '').replace(/[^0-9]/g, '');
-    const text = encodeURIComponent(this.shareMessage(drawing));
-    const url = digits
-      ? `https://wa.me/${digits}?text=${text}`
-      : `https://api.whatsapp.com/send?text=${text}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(
+      whatsAppShareUrl(drawing.contactNumber, drawingShareMessage(drawing)),
+      '_blank',
+      'noopener,noreferrer',
+    );
   }
 
   protected shareEmail(): void {
     const drawing = this.drawing();
     if (!drawing || !this.canShare()) return;
 
-    const subject = encodeURIComponent(
+    window.location.href = mailtoShareUrl(
       `Drawing ${drawing.drawingNumber}${drawing.projectName ? ' — ' + drawing.projectName : ''}`,
+      drawingShareMessage(drawing),
     );
-    const body = encodeURIComponent(this.shareMessage(drawing));
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   }
 
   protected removeFile(file: DrawingFile): void {

@@ -123,6 +123,7 @@ export interface BoqListItem {
   projectName: string;
   siteLocation: string | null;
   clientName: string | null;
+  contactNumber: string | null;
   issueDate: string;
   status: BoqStatus;
   total: number;

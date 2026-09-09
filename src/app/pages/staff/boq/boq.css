@@ -182,6 +182,110 @@
 
 .boq-row-actions { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
 
+/* Every row action shares this base — Open, PDF, Delete, and the two Share
+   buttons — so the row reads as one family of controls rather than a plain
+   unstyled <button> next to a styled one. Variants below only swap the three
+   custom properties, mirroring the pattern already used for camera rows. */
+.row-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 1px solid var(--btn-line, var(--admin-line));
+  border-radius: 10px;
+  background: var(--btn-bg, #fff);
+  color: var(--btn-ink, var(--admin-ink-soft));
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.row-btn svg { width: 14px; height: 14px; flex: none; }
+.row-btn--whatsapp svg { fill: currentColor; }
+.row-btn--email svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.row-btn:hover { transform: translateY(-1px); }
+.row-btn:focus-visible { outline: 2px solid var(--admin-blue-deep); outline-offset: 2px; }
+.row-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
+
+.row-btn--edit {
+  --btn-bg: rgba(37, 148, 210, 0.1);
+  --btn-line: rgba(37, 148, 210, 0.28);
+  --btn-ink: #14547d;
+}
+.row-btn--edit:hover {
+  --btn-bg: var(--admin-blue-deep, #1a7bb5);
+  --btn-line: var(--admin-blue-deep, #1a7bb5);
+  --btn-ink: #fff;
+}
+
+.row-btn--delete {
+  --btn-bg: #fff;
+  --btn-line: var(--admin-line);
+  --btn-ink: var(--admin-muted);
+}
+.row-btn--delete:hover {
+  --btn-bg: rgba(225, 29, 72, 0.1);
+  --btn-line: rgba(225, 29, 72, 0.4);
+  --btn-ink: var(--jama-rose-ink, #9f1239);
+}
+
+.row-btn--danger {
+  --btn-bg: linear-gradient(135deg, #f2557a, #d92352);
+  --btn-line: #c81d48;
+  --btn-ink: #fff;
+  box-shadow: 0 4px 12px -4px rgba(217, 35, 82, 0.6);
+}
+.row-btn--danger:hover { --btn-bg: linear-gradient(135deg, #e8446b, #c01c46); }
+
+/* WhatsApp's own green — recognisable at a glance is the whole point of an
+   icon button, so this borrows the brand colour rather than the app's blue. */
+.row-btn--whatsapp {
+  --btn-bg: rgba(37, 211, 102, 0.12);
+  --btn-line: rgba(37, 211, 102, 0.35);
+  --btn-ink: #1a8c48;
+  padding: 7px 9px;
+}
+.row-btn--whatsapp:hover {
+  --btn-bg: #25d366;
+  --btn-line: #25d366;
+  --btn-ink: #fff;
+}
+
+.row-btn--email {
+  --btn-bg: rgba(194, 102, 15, 0.1);
+  --btn-line: rgba(194, 102, 15, 0.3);
+  --btn-ink: #8a4a0b;
+  padding: 7px 9px;
+}
+.row-btn--email:hover {
+  --btn-bg: var(--admin-accent, #c2660f);
+  --btn-line: var(--admin-accent, #c2660f);
+  --btn-ink: #fff;
+}
+
+/* The header's Share pair — same icons as the row buttons, sized for a
+   .btn-admin-ghost rather than a table cell. */
+.btn-share--whatsapp svg { fill: currentColor; stroke: none; }
+.btn-share--whatsapp:hover { color: #fff; background: #25d366; border-color: #25d366; }
+.btn-share--email:hover {
+  color: #fff;
+  background: var(--admin-accent, #c2660f);
+  border-color: var(--admin-accent, #c2660f);
+}
+
 .boq-blank { color: var(--admin-muted); font-style: italic; opacity: 0.75; }
 
 .boq-pager {

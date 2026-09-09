@@ -8,9 +8,11 @@ import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { PaginatedData } from '../../../models/api-result.model';
 import { BOQ_STATUSES, BoqListItem, BoqStatus } from '../../../models/boq.model';
+import { AuthService } from '../../../services/auth.service';
 import { BoqService } from '../../../services/boq.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { downloadBlob } from '../../../utils/download.util';
+import { boqShareMessage, mailtoShareUrl, whatsAppShareUrl } from '../../../utils/share.util';
 import { BOQ_BASE_PATH } from './boq-base-path';
 
 const PAGE_SIZE = 20;
@@ -26,6 +28,7 @@ const PAGE_SIZE = 20;
 export class BoqListComponent implements OnInit {
   private readonly service = inject(BoqService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
 
   /** The portal these screens are mounted under — see BOQ_BASE_PATH. */
   protected readonly basePath = inject(BOQ_BASE_PATH);
@@ -131,6 +134,35 @@ export class BoqListComponent implements OnInit {
         error: (err: unknown) =>
           this.listError.set(getApiErrorMessage(err, 'Unable to download the PDF.')),
       });
+  }
+
+  // ===== Share (super admin, approved only) =====
+
+  /** Sending an approved document out is a decision above even an
+   *  approver's grant — only the super administrator sees this. */
+  protected canShare(boq: BoqListItem): boolean {
+    return boq.status === 'Approved' && this.auth.isSuperAdmin();
+  }
+
+  protected shareWhatsApp(boq: BoqListItem): void {
+    if (!this.canShare(boq)) return;
+
+    this.download(boq);
+    window.open(
+      whatsAppShareUrl(boq.contactNumber, boqShareMessage(boq)),
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
+
+  protected shareEmail(boq: BoqListItem): void {
+    if (!this.canShare(boq)) return;
+
+    this.download(boq);
+    window.location.href = mailtoShareUrl(
+      `Quotation ${boq.boqNumber}${boq.projectName ? ' — ' + boq.projectName : ''}`,
+      boqShareMessage(boq),
+    );
   }
 
   protected askDelete(boq: BoqListItem): void {

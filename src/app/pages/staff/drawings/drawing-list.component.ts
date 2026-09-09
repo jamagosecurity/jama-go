@@ -8,8 +8,10 @@ import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { PaginatedData } from '../../../models/api-result.model';
 import { DRAWING_STATUSES, DrawingListItem, DrawingStatus } from '../../../models/drawing.model';
+import { AuthService } from '../../../services/auth.service';
 import { DrawingService } from '../../../services/drawing.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
+import { drawingShareMessage, mailtoShareUrl, whatsAppShareUrl } from '../../../utils/share.util';
 import { DRAWING_BASE_PATH } from './drawing-base-path';
 
 const PAGE_SIZE = 20;
@@ -26,6 +28,7 @@ const PAGE_SIZE = 20;
 export class DrawingListComponent implements OnInit {
   private readonly service = inject(DrawingService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
 
   protected readonly basePath = inject(DRAWING_BASE_PATH);
   protected readonly statuses = DRAWING_STATUSES;
@@ -134,5 +137,35 @@ export class DrawingListComponent implements OnInit {
         this.listError.set(getApiErrorMessage(err, 'Unable to delete the drawing.'));
       },
     });
+  }
+
+  // ===== Share (super admin, approved only) =====
+
+  /** Sending an approved document out is a decision above even an
+   *  approver's grant — only the super administrator sees this. */
+  protected canShare(drawing: DrawingListItem): boolean {
+    return drawing.status === 'Approved' && this.auth.isSuperAdmin();
+  }
+
+  /** No single file to download-then-share here, unlike the quotation list —
+   *  a drawing carries several files (native CAD plus a plotted PDF). This
+   *  only opens the prefilled message; the files live in the editor. */
+  protected shareWhatsApp(drawing: DrawingListItem): void {
+    if (!this.canShare(drawing)) return;
+
+    window.open(
+      whatsAppShareUrl(drawing.contactNumber, drawingShareMessage(drawing)),
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
+
+  protected shareEmail(drawing: DrawingListItem): void {
+    if (!this.canShare(drawing)) return;
+
+    window.location.href = mailtoShareUrl(
+      `Drawing ${drawing.drawingNumber}${drawing.projectName ? ' — ' + drawing.projectName : ''}`,
+      drawingShareMessage(drawing),
+    );
   }
 }

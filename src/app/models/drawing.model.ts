@@ -89,6 +89,7 @@ export interface DrawingListItem {
   drawingNumber: string;
   projectName: string;
   clientName: string | null;
+  contactNumber: string | null;
   status: DrawingStatus;
   preparedByName: string | null;
   submittedAt: string | null;
