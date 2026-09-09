@@ -1217,6 +1217,7 @@
 .boq-history-step[data-action="Approved"]::before { background: #0f766e; }
 .boq-history-step[data-action="Rejected"]::before { background: #e11d48; }
 .boq-history-step[data-action="Submitted"]::before { background: var(--admin-blue-deep); }
+.boq-history-step[data-action="Revised"]::before { background: #7c3aed; }
 
 .boq-history-what { font-weight: 750; color: var(--admin-ink); font-size: 0.9rem; }
 .boq-history-who { color: var(--admin-muted); font-size: 0.8rem; }

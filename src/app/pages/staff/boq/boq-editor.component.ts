@@ -1239,6 +1239,7 @@ export class BoqEditorComponent implements OnInit {
       case 'Submitted': return 'Submitted for approval';
       case 'Approved': return 'Approved';
       case 'Rejected': return 'Rejected';
+      case 'Revised': return 'Revised after rejection';
       case 'Amended': return 'Amended after the decision';
       default: return action;
     }

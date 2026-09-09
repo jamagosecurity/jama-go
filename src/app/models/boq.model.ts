@@ -149,6 +149,8 @@ export type BoqApprovalAction =
   | 'Submitted'
   | 'Approved'
   | 'Rejected'
+  /** Saved while sitting Rejected — the ordinary author reworking it. */
+  | 'Revised'
   /** Changed after a decision — super administrator only. */
   | 'Amended';
 
