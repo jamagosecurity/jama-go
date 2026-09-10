@@ -71,8 +71,8 @@
 
           @if (isEditable()) {
             <label class="btn-admin btn-admin-ghost boq-upload-btn">
-              {{ uploading() ? 'Uploading…' : 'Add a file' }}
-              <input type="file" accept=".dwg,.dxf,.pdf,.zip" [disabled]="uploading()"
+              {{ uploading() ? 'Uploading…' : 'Add files' }}
+              <input type="file" accept=".dwg,.dxf,.pdf,.zip" multiple [disabled]="uploading()"
                 (change)="onFileSelected($event)" hidden />
             </label>
           }

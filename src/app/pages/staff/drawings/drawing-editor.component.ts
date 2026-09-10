@@ -5,7 +5,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { catchError, concatMap, EMPTY, finalize, from } from 'rxjs';
 import { PERMISSIONS } from '../../../models/auth.model';
 import { Drawing, DrawingFile } from '../../../models/drawing.model';
 import { AuthService } from '../../../services/auth.service';
@@ -179,11 +179,20 @@ export class DrawingEditorComponent implements OnInit {
 
   // ===== Files =====
 
+  /**
+   * Uploads every file picked, one at a time.
+   *
+   * Sequential (concatMap) rather than all at once: the server writes each
+   * file's row individually, and firing them in parallel risked two uploads
+   * racing to reload the drawing mid-write. A file that fails is reported
+   * but does not stop the rest — reload happens once, after the whole batch,
+   * so the list does not flicker file-by-file.
+   */
   protected onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+    const files = input.files ? Array.from(input.files) : [];
     input.value = '';
-    if (!file) return;
+    if (!files.length) return;
 
     const existing = this.drawing();
     if (!existing) return;
@@ -191,14 +200,25 @@ export class DrawingEditorComponent implements OnInit {
     this.uploading.set(true);
     this.uploadError.set('');
 
-    this.service
-      .uploadFile(existing.id, file)
-      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.uploading.set(false)))
-      .subscribe({
-        next: () => this.loadDrawing(existing.id),
-        error: (err: unknown) =>
-          this.uploadError.set(getApiErrorMessage(err, 'Unable to upload that file.')),
-      });
+    from(files)
+      .pipe(
+        concatMap((file) =>
+          this.service.uploadFile(existing.id, file).pipe(
+            catchError((err: unknown) => {
+              this.uploadError.set(
+                getApiErrorMessage(err, `Unable to upload ${file.name}.`),
+              );
+              return EMPTY;
+            }),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.uploading.set(false);
+          this.loadDrawing(existing.id);
+        }),
+      )
+      .subscribe();
   }
 
   /**
