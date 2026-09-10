@@ -15,6 +15,24 @@ const TOKEN_KEY = 'jamago_admin_token';
 const USER_KEY = 'jamago_admin_user';
 const EXPIRES_KEY = 'jamago_admin_expires';
 
+/**
+ * A session that dies exactly 60 minutes after login — active or not — reads
+ * as a sudden, unexplained logout to whoever is mid-task when the clock runs
+ * out. These turn that hard cutoff into a sliding one: real activity keeps
+ * quietly renewing the token before it expires, and only IDLE_LIMIT_MS of
+ * silence lets it actually run out.
+ */
+const IDLE_LIMIT_MS = 60 * 60 * 1000;
+/** How often the idle clock is checked, and — while active — how often the
+ *  token gets renewed. Well under IDLE_LIMIT_MS, so a renewal is never missed
+ *  by more than this margin. */
+const IDLE_CHECK_INTERVAL_MS = 60 * 1000;
+/** Activity events fire in bursts (mousemove alone can fire dozens of times a
+ *  second) — this is the floor between two events counting as separate
+ *  activity, so the browser isn't doing that bookkeeping on every pixel of
+ *  mouse movement. */
+const ACTIVITY_THROTTLE_MS = 10 * 1000;
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -22,8 +40,11 @@ export class AuthService {
 
   readonly currentUser = signal<UserSummary | null>(null);
 
+  private lastActivityAt = Date.now();
+
   constructor() {
     this.restoreSession();
+    this.startIdleWatch();
   }
 
   getToken(): string | null {
@@ -83,6 +104,57 @@ export class AuthService {
         map((result) => unwrapApiResult(result)),
         tap((response) => this.persistSession(response)),
       );
+  }
+
+  /**
+   * Reissues the current token with a fresh 60-minute expiry. Requires the
+   * existing token to still be valid — the server refuses an already-expired
+   * one — which is what keeps this a sliding window rather than an
+   * indefinite one. Re-persisting the response also refreshes currentUser's
+   * permissions, since the server recomputes them from the database rather
+   * than copying the old token's claims forward.
+   */
+  private refreshToken(): Observable<LoginResponse> {
+    return this.http
+      .post<ApiResult<LoginResponse>>(`${environment.apiUrl}/auth/refresh`, {})
+      .pipe(
+        map((result) => unwrapApiResult(result)),
+        tap((response) => this.persistSession(response)),
+      );
+  }
+
+  /**
+   * Real activity keeps the session alive indefinitely; IDLE_LIMIT_MS of
+   * silence logs it out. Checked on a timer rather than a per-event countdown
+   * so a laptop put to sleep mid-session is handled correctly too — on wake,
+   * the elapsed wall-clock time since the last real activity is what counts,
+   * not how many timer ticks fired while it was asleep.
+   */
+  private startIdleWatch(): void {
+    const markActive = () => {
+      const now = Date.now();
+      if (now - this.lastActivityAt > ACTIVITY_THROTTLE_MS) {
+        this.lastActivityAt = now;
+      }
+    };
+
+    for (const event of ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart']) {
+      window.addEventListener(event, markActive, { passive: true });
+    }
+
+    setInterval(() => {
+      if (!this.isLoggedIn()) return;
+
+      if (Date.now() - this.lastActivityAt >= IDLE_LIMIT_MS) {
+        this.logout();
+        return;
+      }
+
+      // Best-effort: a failed renewal (e.g. a network blip) just means the
+      // existing token's own expiry — or the next request's 401 — takes
+      // over, not a thrown error nobody is listening for.
+      this.refreshToken().subscribe({ error: () => {} });
+    }, IDLE_CHECK_INTERVAL_MS);
   }
 
   /** Self-service password change for the signed-in user, any role. */
