@@ -14,6 +14,16 @@ import {
 const TOKEN_KEY = 'jamago_admin_token';
 const USER_KEY = 'jamago_admin_user';
 const EXPIRES_KEY = 'jamago_admin_expires';
+/**
+ * The idle clock lives in localStorage, not in a field, because the session it
+ * guards does too. Activity events only reach the focused tab, so a per-tab
+ * field made a second tab left in the background believe the whole account had
+ * gone idle — and its logout() cleared the shared localStorage out from under
+ * the tab the user was actively working in. Keeping one clock per origin means
+ * activity anywhere counts everywhere, and only a genuinely idle account times
+ * out.
+ */
+const ACTIVITY_KEY = 'jamago_admin_last_activity';
 
 /**
  * A session that dies exactly 60 minutes after login — active or not — reads
@@ -40,7 +50,9 @@ export class AuthService {
 
   readonly currentUser = signal<UserSummary | null>(null);
 
-  private lastActivityAt = Date.now();
+  /** Mirrors the last value this tab wrote to ACTIVITY_KEY, so throttling a
+   *  burst of mousemoves costs a comparison rather than a localStorage read. */
+  private lastActivityWriteAt = 0;
 
   constructor() {
     this.restoreSession();
@@ -133,8 +145,9 @@ export class AuthService {
   private startIdleWatch(): void {
     const markActive = () => {
       const now = Date.now();
-      if (now - this.lastActivityAt > ACTIVITY_THROTTLE_MS) {
-        this.lastActivityAt = now;
+      if (now - this.lastActivityWriteAt > ACTIVITY_THROTTLE_MS) {
+        this.lastActivityWriteAt = now;
+        localStorage.setItem(ACTIVITY_KEY, String(now));
       }
     };
 
@@ -142,19 +155,37 @@ export class AuthService {
       window.addEventListener(event, markActive, { passive: true });
     }
 
+    // Another tab logging out — or logging in as somebody else — has to be
+    // reflected here rather than left to whatever this tab last read, or this
+    // tab goes on rendering a signed-in shell over a session that is gone.
+    window.addEventListener('storage', (event) => {
+      if (event.key !== TOKEN_KEY && event.key !== USER_KEY) return;
+
+      const user = this.readStoredUser();
+      this.currentUser.set(localStorage.getItem(TOKEN_KEY) && user ? user : null);
+    });
+
     setInterval(() => {
       if (!this.isLoggedIn()) return;
 
-      if (Date.now() - this.lastActivityAt >= IDLE_LIMIT_MS) {
+      if (Date.now() - this.readLastActivity() >= IDLE_LIMIT_MS) {
         this.logout();
         return;
       }
 
-      // Best-effort: a failed renewal (e.g. a network blip) just means the
-      // existing token's own expiry — or the next request's 401 — takes
-      // over, not a thrown error nobody is listening for.
+      // Best-effort: a failed renewal leaves the existing token in place to
+      // carry the session until the next attempt a minute later. The
+      // interceptor deliberately ignores a 401 from this call for the same
+      // reason — a renewal that fails is not proof the session has ended.
       this.refreshToken().subscribe({ error: () => {} });
     }, IDLE_CHECK_INTERVAL_MS);
+  }
+
+  /** Falls back to "active right now" for a session that predates the shared
+   *  clock, so an upgrade in a tab already open doesn't read as an hour idle. */
+  private readLastActivity(): number {
+    const stored = Number(localStorage.getItem(ACTIVITY_KEY));
+    return Number.isFinite(stored) && stored > 0 ? stored : Date.now();
   }
 
   /** Self-service password change for the signed-in user, any role. */
@@ -236,6 +267,12 @@ export class AuthService {
     localStorage.setItem(TOKEN_KEY, response.accessToken);
     localStorage.setItem(USER_KEY, JSON.stringify(response.user));
 
+    // Signing in is itself activity. Without this a fresh login inherits the
+    // timestamp left by the previous session, and an account signing back in
+    // after a long break would be timed out on the idle watch's next tick.
+    this.lastActivityWriteAt = Date.now();
+    localStorage.setItem(ACTIVITY_KEY, String(this.lastActivityWriteAt));
+
     if (response.expiresAtUtc) {
       localStorage.setItem(EXPIRES_KEY, response.expiresAtUtc);
     } else {
@@ -249,6 +286,7 @@ export class AuthService {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(EXPIRES_KEY);
+    localStorage.removeItem(ACTIVITY_KEY);
     this.currentUser.set(null);
   }
 
