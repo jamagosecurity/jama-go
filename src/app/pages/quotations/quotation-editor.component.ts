@@ -27,6 +27,7 @@ import { QuotationService } from '../../services/quotation.service';
 import { getApiErrorMessage } from '../../utils/api-error.util';
 import { downloadBlob } from '../../utils/download.util';
 import { fieldErrorMessage, shouldShowError } from '../../utils/form-validators.util';
+import { quotationShareMessage, whatsAppShareUrl } from '../../utils/share.util';
 
 /** A quote line while it is being edited. */
 interface EditableLine extends SaveQuotationLine {
@@ -353,6 +354,20 @@ export class QuotationEditorComponent implements OnInit {
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to download the PDF.')),
       });
+  }
+
+  /** Downloads the PDF, then opens WhatsApp with the covering message ready —
+   *  wa.me cannot carry a file, so the sender attaches the download by hand. */
+  protected shareWhatsApp(): void {
+    const quote = this.quotation();
+    if (!quote) return;
+
+    this.download();
+    window.open(
+      whatsAppShareUrl(quote.customerPhone, quotationShareMessage(quote)),
+      '_blank',
+      'noopener,noreferrer',
+    );
   }
 
   // ===== Helpers =====

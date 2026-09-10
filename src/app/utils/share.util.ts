@@ -41,6 +41,23 @@ export function boqShareMessage(boq: {
   ].join('\n');
 }
 
+/** Mirrors boqShareMessage for a quotation — see there for why the wording is
+ *  what it is. */
+export function quotationShareMessage(quotation: {
+  quoteNumber: string;
+  customerName: string;
+}): string {
+  return [
+    `Hello${quotation.customerName ? ' ' + quotation.customerName : ''},`,
+    '',
+    `Please find attached quotation ${quotation.quoteNumber}.`,
+    '(The PDF has just been downloaded to your computer — attach it here before sending.)',
+    '',
+    'Kind regards,',
+    'Jama Go Security Equipment',
+  ].join('\n');
+}
+
 /** Mirrors boqShareMessage for a drawing — see there for why the wording is
  *  what it is. */
 export function drawingShareMessage(drawing: {
