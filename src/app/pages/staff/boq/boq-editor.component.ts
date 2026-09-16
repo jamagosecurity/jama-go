@@ -1,3 +1,4 @@
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal,
@@ -108,7 +109,7 @@ interface DraftSection {
 @Component({
   selector: 'app-boq-editor',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, DragDropModule, ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './boq-editor.component.html',
   styleUrl: './boq.css',
@@ -1022,6 +1023,30 @@ export class BoqEditorComponent implements OnInit {
           ? section
           : { ...section, lines: section.lines.filter((_, j) => j !== lineIndex) },
       ),
+    );
+  }
+
+  /**
+   * Drag-and-drop reordering, one section at a time — a line dropped here
+   * only ever moves within the section it started in, never into another,
+   * since each section renders its own drop list.
+   *
+   * Nothing is sent to the server just for this: the printed S.No already
+   * follows array position, and the next save writes lines back in whatever
+   * order they sit in here — see BoqWriter, which assigns SortOrder from
+   * array position rather than reading it off the request.
+   */
+  protected onLineDrop(sectionIndex: number, event: CdkDragDrop<DraftLine[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+
+    this.sections.update((current) =>
+      current.map((section, i) => {
+        if (i !== sectionIndex) return section;
+
+        const lines = [...section.lines];
+        moveItemInArray(lines, event.previousIndex, event.currentIndex);
+        return { ...section, lines };
+      }),
     );
   }
 

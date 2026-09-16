@@ -125,6 +125,7 @@
                   <caption class="visually-hidden">Lines in {{ section.title }}</caption>
                   <thead>
                     <tr>
+                      <th scope="col"><span class="visually-hidden">Reorder</span></th>
                       <th scope="col">S.No</th>
                       <th scope="col">Brand</th>
                       <th scope="col" class="col-img">Image</th>
@@ -141,9 +142,17 @@
                       <th scope="col"><span class="visually-hidden">Remove</span></th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody cdkDropList [cdkDropListData]="section.lines"
+                    (cdkDropListDropped)="onLineDrop(s, $event)">
                     @for (line of section.lines; track line.key; let i = $index) {
-                      <tr>
+                      <tr cdkDrag [cdkDragData]="line">
+                        <td class="boq-line-drag" cdkDragHandle [attr.aria-label]="'Reorder ' + line.itemName">
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" />
+                            <circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" />
+                            <circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" />
+                          </svg>
+                        </td>
                         <td data-label="S.No">{{ s + 1 }}.{{ i + 1 }}</td>
                         <td data-label="Brand">
                           @if (brandLogo(line.brand || ''); as known) {
@@ -233,6 +242,7 @@
                          next line rather than as a form beside the table. -->
                     @if (itemsIn(section.title).length) {
                       <tr class="boq-newrow">
+                        <td></td>
                         <td data-label="S.No">{{ s + 1 }}.{{ section.lines.length + 1 }}</td>
 
                         <td data-label="Brand">
@@ -335,7 +345,7 @@
                          than beside the heading. -->
                     @if (section.lines.length) {
                       <tr class="boq-subtotal">
-                        <td colspan="9" class="num">Section total</td>
+                        <td colspan="10" class="num">Section total</td>
                         @if (costVisible()) {
                           <!-- What the section costs, beside what it sells for. -->
                           <td class="num boq-costcol">

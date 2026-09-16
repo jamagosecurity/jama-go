@@ -658,6 +658,42 @@
   color: var(--jama-rose-ink, #9f1239);
 }
 
+/* ===== Line reordering ===== */
+
+.boq-line-drag {
+  width: 28px;
+  padding-left: 4px !important;
+  padding-right: 0 !important;
+  color: var(--admin-muted);
+  cursor: grab;
+  touch-action: none;
+}
+.boq-line-drag svg { width: 16px; height: 16px; fill: currentColor; display: block; }
+.boq-line-drag:hover { color: var(--admin-blue-deep); }
+
+/* A <tr> dragged in isolation is not inside a <table> any more — HTML will
+   not let one nest inside another, which rules out a custom preview/
+   placeholder template, so this styles CDK's own clone instead. CDK copies
+   the row's measured size onto it, which is what keeps the columns lined up
+   while it floats. */
+.boq-lines tr.cdk-drag-preview {
+  display: table;
+  background: #fff;
+  box-shadow: 0 12px 24px -8px rgba(8, 25, 43, 0.35);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* The row left behind in the list mid-drag — dimmed and outlined rather than
+   showing its real content twice while a copy of it floats under the cursor. */
+.boq-lines tr.cdk-drag-placeholder {
+  opacity: 0.35;
+  outline: 1px dashed var(--admin-blue-deep);
+  outline-offset: -1px;
+}
+
+.boq-lines tbody tr.cdk-drag-animating { transition: transform 200ms cubic-bezier(0, 0, 0.2, 1); }
+
 .boq-addsection { width: fit-content; }
 
 /* ===== Total ===== */
