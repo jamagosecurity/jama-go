@@ -7,7 +7,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
-import { BOQ_SECTION_TITLES, Boq, SaveBoqRequest } from '../../../models/boq.model';
+import { BOQ_SECTION_TITLES, Boq, BoqLine, SaveBoqRequest } from '../../../models/boq.model';
 import {
   Camera,
   CameraBrandCount,
@@ -458,18 +458,32 @@ export class BoqEditorComponent implements OnInit {
   private seedSections(boq: Boq): void {
     this.discount.set(boq.specialDiscount);
 
-    // Merged into the nine, not swapped for them: a saved quotation
-    // holds only the sections it uses, and the editor shows all of them.
-    const saved = new Map(boq.sections.map((section) => [section.title, section]));
+    // The sections actually on the document come first, in the order the
+    // SERVER holds them — which is the order last saved, drag-reordered or
+    // not. Rebuilding from the fixed canonical list here was the bug: every
+    // save (and every reload) silently snapped a reordered document straight
+    // back to alphabetical, which read as "the reorder isn't saving" even
+    // though the server had it right.
+    //
+    // Any heading nobody has used yet is appended after, in canonical order
+    // — merged in rather than swapping the used ones out, since a saved
+    // quotation holds only the sections it uses, and the picker still needs
+    // every heading listed somewhere to file a first item under.
+    const used = new Set(boq.sections.map((section) => section.title));
+    const ordered: { title: string; lines: BoqLine[] }[] = [
+      ...boq.sections,
+      ...BOQ_SECTION_TITLES.filter((title) => !used.has(title)).map((title) => ({
+        title,
+        lines: [] as BoqLine[],
+      })),
+    ];
 
     this.sections.set(
-      BOQ_SECTION_TITLES.map((title, index) => {
-        const section = saved.get(title);
-
+      ordered.map((section, index) => {
         return {
           key: `section-${index}`,
-          title,
-          lines: (section?.lines ?? []).map((line, lineIndex) => ({
+          title: section.title,
+          lines: section.lines.map((line, lineIndex) => ({
             key: `saved-line-${line.id}-${lineIndex}`,
             id: line.id,
             // Kept as null, not blanked to '': an empty string is not a

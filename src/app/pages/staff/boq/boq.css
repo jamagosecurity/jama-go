@@ -563,22 +563,12 @@
   color: #fff;
   font-size: 0.85rem;
   font-weight: 800;
-}
-
-.boq-section-drag {
-  display: grid;
-  place-items: center;
-  width: 26px; height: 26px;
-  flex: none;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--admin-muted);
+  /* Doubles as the section's drag handle — no separate icon needed, so
+     nothing new sits to the left of it. */
   cursor: grab;
   touch-action: none;
 }
-.boq-section-drag svg { width: 16px; height: 16px; fill: currentColor; }
-.boq-section-drag:hover { background: rgba(15, 40, 70, 0.06); color: var(--admin-blue-deep); }
+.boq-section-no:hover { box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.25); }
 
 /* A whole section — unlike a line's plain <tr> — can carry a real custom
    template, so dragging it shows this small chip rather than a clone of the
@@ -705,16 +695,13 @@
 
 /* ===== Line reordering ===== */
 
-.boq-line-drag {
-  width: 28px;
-  padding-left: 4px !important;
-  padding-right: 0 !important;
-  color: var(--admin-muted);
+/* The row number doubles as its own drag handle — no extra column needed. */
+.boq-line-num {
   cursor: grab;
   touch-action: none;
+  border-radius: 6px;
 }
-.boq-line-drag svg { width: 16px; height: 16px; fill: currentColor; display: block; }
-.boq-line-drag:hover { color: var(--admin-blue-deep); }
+.boq-line-num:hover { background: rgba(37, 148, 210, 0.1); color: var(--admin-blue-deep); }
 
 /* A <tr> dragged in isolation is not inside a <table> any more — HTML will
    not let one nest inside another, which rules out a custom preview/

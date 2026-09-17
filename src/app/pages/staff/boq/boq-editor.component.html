@@ -107,20 +107,15 @@
 >
               <div class="boq-section-head">
                 <span class="boq-section-lead">
-                  <!-- Its own handle, separate from a line's — dragging a
-                       section moves the section object whole, via a
-                       different cdkDrag on this outer element than the one
-                       on each <tr> below, so a line can never end up
-                       reassigned to another section by this gesture. -->
-                  <button type="button" class="boq-section-drag" cdkDragHandle
-                    [attr.aria-label]="'Reorder ' + section.title">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" />
-                      <circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" />
-                      <circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" />
-                    </svg>
-                  </button>
-                  <span class="boq-section-no">{{ s + 1 }}</span>
+                  <!-- The number badge doubles as its own drag handle — no
+                       extra icon needed. Dragging a section moves the section
+                       object whole, via a separate cdkDrag on this outer
+                       element than the one on each <tr> below, so a line can
+                       never end up reassigned to another section this way. -->
+                  <span class="boq-section-no" cdkDragHandle
+                    [attr.aria-label]="'Reorder ' + section.title" [title]="'Drag to reorder'">
+                    {{ s + 1 }}
+                  </span>
                   <h3 class="boq-section-title">{{ section.title }}</h3>
                 </span>
                 <span class="boq-section-meta">
@@ -140,7 +135,6 @@
                   <caption class="visually-hidden">Lines in {{ section.title }}</caption>
                   <thead>
                     <tr>
-                      <th scope="col"><span class="visually-hidden">Reorder</span></th>
                       <th scope="col">S.No</th>
                       <th scope="col">Brand</th>
                       <th scope="col" class="col-img">Image</th>
@@ -161,14 +155,13 @@
                     (cdkDropListDropped)="onLineDrop(s, $event)">
                     @for (line of section.lines; track line.key; let i = $index) {
                       <tr cdkDrag [cdkDragData]="line">
-                        <td class="boq-line-drag" cdkDragHandle [attr.aria-label]="'Reorder ' + line.itemName">
-                          <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" />
-                            <circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" />
-                            <circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" />
-                          </svg>
+                        <!-- The row number doubles as its own drag handle —
+                             no extra column needed, and it is already the one
+                             cell on the row that isn't an editable field. -->
+                        <td class="boq-line-num" data-label="S.No" cdkDragHandle
+                          [attr.aria-label]="'Reorder ' + line.itemName" [title]="'Drag to reorder'">
+                          {{ s + 1 }}.{{ i + 1 }}
                         </td>
-                        <td data-label="S.No">{{ s + 1 }}.{{ i + 1 }}</td>
                         <td data-label="Brand">
                           @if (brandLogo(line.brand || ''); as known) {
                             <img class="boq-brandmark" [src]="known.logo"
@@ -257,7 +250,6 @@
                          next line rather than as a form beside the table. -->
                     @if (itemsIn(section.title).length) {
                       <tr class="boq-newrow">
-                        <td></td>
                         <td data-label="S.No">{{ s + 1 }}.{{ section.lines.length + 1 }}</td>
 
                         <td data-label="Brand">
@@ -360,7 +352,7 @@
                          than beside the heading. -->
                     @if (section.lines.length) {
                       <tr class="boq-subtotal">
-                        <td colspan="10" class="num">Section total</td>
+                        <td colspan="9" class="num">Section total</td>
                         @if (costVisible()) {
                           <!-- What the section costs, beside what it sells for. -->
                           <td class="num boq-costcol">
