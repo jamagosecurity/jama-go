@@ -97,14 +97,29 @@
         </div>
       </div>
 
-      <div class="boq-main">
+      <div class="boq-main" cdkDropList [cdkDropListData]="sections()"
+        (cdkDropListDropped)="onSectionDrop($event)">
 
           @for (section of sections(); track section.key; let s = $index) {
             <div class="admin-panel boq-section"
               [class.is-filled]="section.lines.length > 0"
+              cdkDrag [cdkDragData]="section"
 >
               <div class="boq-section-head">
                 <span class="boq-section-lead">
+                  <!-- Its own handle, separate from a line's — dragging a
+                       section moves the section object whole, via a
+                       different cdkDrag on this outer element than the one
+                       on each <tr> below, so a line can never end up
+                       reassigned to another section by this gesture. -->
+                  <button type="button" class="boq-section-drag" cdkDragHandle
+                    [attr.aria-label]="'Reorder ' + section.title">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" />
+                      <circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" />
+                      <circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" />
+                    </svg>
+                  </button>
                   <span class="boq-section-no">{{ s + 1 }}</span>
                   <h3 class="boq-section-title">{{ section.title }}</h3>
                 </span>
@@ -372,6 +387,18 @@
                   }
                 </p>
               }
+
+              <!-- A whole section's own panel is a lot to drag as-is — its
+                   table can run well past a screen tall — so unlike a line
+                   (a plain <tr>, which can't carry a custom template at all),
+                   this gets a small floating chip instead of a giant clone. -->
+              <div *cdkDragPreview class="boq-section-drag-preview">
+                Section {{ s + 1 }}: {{ section.title }}
+                @if (section.lines.length) {
+                  · {{ section.lines.length }} {{ section.lines.length === 1 ? 'item' : 'items' }}
+                }
+              </div>
+              <div *cdkDragPlaceholder class="boq-section-drag-placeholder"></div>
             </div>
           }
 

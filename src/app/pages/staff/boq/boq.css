@@ -565,6 +565,51 @@
   font-weight: 800;
 }
 
+.boq-section-drag {
+  display: grid;
+  place-items: center;
+  width: 26px; height: 26px;
+  flex: none;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--admin-muted);
+  cursor: grab;
+  touch-action: none;
+}
+.boq-section-drag svg { width: 16px; height: 16px; fill: currentColor; }
+.boq-section-drag:hover { background: rgba(15, 40, 70, 0.06); color: var(--admin-blue-deep); }
+
+/* A whole section — unlike a line's plain <tr> — can carry a real custom
+   template, so dragging it shows this small chip rather than a clone of the
+   entire panel (which could be a full table tall). */
+.boq-section-drag-preview {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--admin-ink);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  box-shadow: 0 16px 32px -10px rgba(8, 25, 43, 0.5);
+  white-space: nowrap;
+}
+
+/* What the panel's own slot in the list looks like mid-drag — a flat outline
+   the same rough height as a section header, not the section's full,
+   now-empty-looking table. */
+.boq-section-drag-placeholder {
+  height: 64px;
+  border: 1px dashed var(--admin-blue-deep);
+  border-radius: 14px;
+  background: rgba(37, 148, 210, 0.06);
+}
+
+.boq-main.cdk-drop-list-dragging .boq-section:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
 .boq-section-title {
   flex: 1 1 auto;
   min-width: 0;

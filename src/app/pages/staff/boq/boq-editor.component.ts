@@ -1050,6 +1050,23 @@ export class BoqEditorComponent implements OnInit {
     );
   }
 
+  /**
+   * Reorders whole sections. Moves the DraftSection objects themselves —
+   * each one carries its own lines array along with it untouched — so this
+   * can never reassign a line to a different section the way dragging it
+   * out of its own section's drop list might. That guarantee comes from
+   * operating one level up, not from anything checked at drop time.
+   */
+  protected onSectionDrop(event: CdkDragDrop<DraftSection[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+
+    this.sections.update((current) => {
+      const next = [...current];
+      moveItemInArray(next, event.previousIndex, event.currentIndex);
+      return next;
+    });
+  }
+
   // ===== Save =====
 
   protected save(event: Event): void {
