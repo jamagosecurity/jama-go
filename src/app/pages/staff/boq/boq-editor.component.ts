@@ -19,10 +19,12 @@ import {
   unitLabel,
 } from '../../../models/camera.model';
 import { PERMISSIONS } from '../../../models/auth.model';
+import { StaffMember } from '../../../models/staff.model';
 import { AuthService } from '../../../services/auth.service';
 import { BoqService } from '../../../services/boq.service';
 import { BOQ_BASE_PATH, BOQ_STORAGE_PATH } from './boq-base-path';
 import { CameraService } from '../../../services/camera.service';
+import { StaffService } from '../../../services/staff.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { downloadBlob } from '../../../utils/download.util';
 import { fieldErrorMessage, shouldShowError } from '../../../utils/form-validators.util';
@@ -117,6 +119,7 @@ interface DraftSection {
 export class BoqEditorComponent implements OnInit {
   private readonly service = inject(BoqService);
   private readonly cameras = inject(CameraService);
+  private readonly staff = inject(StaffService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -280,6 +283,13 @@ export class BoqEditorComponent implements OnInit {
   protected readonly confirmingAmend = signal(false);
   protected readonly amendNote = signal('');
   protected readonly amendError = signal('');
+
+  /** Who asked for the change, if anyone in particular did — entirely
+   *  optional, unlike the reason itself. Loaded lazily, once, the first time
+   *  the amend modal actually opens, since a plain edit never needs it. */
+  protected readonly amendRequestedBy = signal('');
+  protected readonly staffOptions = signal<StaffMember[]>([]);
+  private staffOptionsLoaded = false;
 
   protected readonly sections = signal<DraftSection[]>(
     BOQ_SECTION_TITLES.map((title, index) => ({
@@ -1150,8 +1160,10 @@ export class BoqEditorComponent implements OnInit {
     if (this.boq() && this.isAmending()) {
       this.pendingAmendRequest = request;
       this.amendNote.set('');
+      this.amendRequestedBy.set('');
       this.amendError.set('');
       this.confirmingAmend.set(true);
+      this.loadStaffOptionsOnce();
       return;
     }
 
@@ -1168,6 +1180,32 @@ export class BoqEditorComponent implements OnInit {
     if (this.amendError()) this.amendError.set('');
   }
 
+  protected onAmendRequestedByChange(event: Event): void {
+    this.amendRequestedBy.set((event.target as HTMLSelectElement).value);
+  }
+
+  /** Best-effort — the dropdown just goes empty (still fully optional) if
+   *  this fails, rather than blocking the modal on it.
+   *
+   *  getAll(), not getActive(): the latter is the public "Our Team" marketing
+   *  listing, which can hold generic placeholder entries (a job title with no
+   *  login and nobody real behind it) alongside actual staff. Filtered to
+   *  hasLoginAccount so only someone who could plausibly have asked for this
+   *  shows up — an active-but-no-login placeholder wouldn't make sense here. */
+  private loadStaffOptionsOnce(): void {
+    if (this.staffOptionsLoaded) return;
+    this.staffOptionsLoaded = true;
+
+    this.staff
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (members) =>
+          this.staffOptions.set(members.filter((m) => m.isActive && m.hasLoginAccount)),
+        error: () => this.staffOptions.set([]),
+      });
+  }
+
   /** Checked client-side too, same as a rejection's reason — the server's
    *  own check is what actually counts, but there is no reason to make a
    *  round trip just to learn the box was left empty. */
@@ -1181,9 +1219,15 @@ export class BoqEditorComponent implements OnInit {
       return;
     }
 
+    // Entirely optional, so it only goes in front of the reason when someone
+    // was actually picked — never a blank "Requested by :" prefix.
+    const requestedById = this.amendRequestedBy();
+    const requestedByName = this.staffOptions().find((m) => m.id === requestedById)?.fullName;
+    const combinedNote = requestedByName ? `Requested by ${requestedByName}: ${note}` : note;
+
     this.confirmingAmend.set(false);
     this.pendingAmendRequest = null;
-    this.performSave({ ...pending, amendmentNote: note });
+    this.performSave({ ...pending, amendmentNote: combinedNote });
   }
 
   private performSave(request: SaveBoqRequest): void {

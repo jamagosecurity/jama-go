@@ -645,6 +645,16 @@
     </p>
 
     <label class="boq-field">
+      <span>Who asked for this? <small>(optional)</small></span>
+      <select [value]="amendRequestedBy()" (change)="onAmendRequestedByChange($event)">
+        <option value="">— Not specified —</option>
+        @for (member of staffOptions(); track member.id) {
+          <option [value]="member.id">{{ member.fullName }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="boq-field">
       <span>Reason <i aria-hidden="true">*</i></span>
       <textarea rows="4" maxlength="1000" [value]="amendNote()"
         (input)="onAmendNoteInput($event)"
