@@ -273,6 +273,14 @@ export class BoqEditorComponent implements OnInit {
   protected readonly rejectReason = signal('');
   protected readonly rejectError = signal('');
 
+  /** Set while save() is waiting on the amend-reason modal, so it knows what
+   *  to actually send once confirmAmend() supplies the reason. Null the rest
+   *  of the time, including for every ordinary save. */
+  private pendingAmendRequest: SaveBoqRequest | null = null;
+  protected readonly confirmingAmend = signal(false);
+  protected readonly amendNote = signal('');
+  protected readonly amendError = signal('');
+
   protected readonly sections = signal<DraftSection[]>(
     BOQ_SECTION_TITLES.map((title, index) => ({
       key: `section-${index}`,
@@ -1135,6 +1143,50 @@ export class BoqEditorComponent implements OnInit {
       })),
     };
 
+    // Amending an approved quotation needs a reason on the record before
+    // anything is sent — the server refuses it without one regardless, but
+    // asking here means the admin explains themselves once, up front,
+    // instead of typing the whole form again after a refusal.
+    if (this.boq() && this.isAmending()) {
+      this.pendingAmendRequest = request;
+      this.amendNote.set('');
+      this.amendError.set('');
+      this.confirmingAmend.set(true);
+      return;
+    }
+
+    this.performSave(request);
+  }
+
+  protected closeAmendConfirm(): void {
+    this.confirmingAmend.set(false);
+    this.pendingAmendRequest = null;
+  }
+
+  protected onAmendNoteInput(event: Event): void {
+    this.amendNote.set((event.target as HTMLTextAreaElement).value);
+    if (this.amendError()) this.amendError.set('');
+  }
+
+  /** Checked client-side too, same as a rejection's reason — the server's
+   *  own check is what actually counts, but there is no reason to make a
+   *  round trip just to learn the box was left empty. */
+  protected confirmAmend(): void {
+    const pending = this.pendingAmendRequest;
+    if (!pending) return;
+
+    const note = this.amendNote().trim();
+    if (note.length < 5) {
+      this.amendError.set('Say why this approved quotation is being changed — at least a few words.');
+      return;
+    }
+
+    this.confirmingAmend.set(false);
+    this.pendingAmendRequest = null;
+    this.performSave({ ...pending, amendmentNote: note });
+  }
+
+  private performSave(request: SaveBoqRequest): void {
     const existing = this.boq();
     const save$ = existing ? this.service.update(existing.id, request) : this.service.create(request);
 

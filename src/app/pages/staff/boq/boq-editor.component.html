@@ -631,3 +631,37 @@
     </div>
   </div>
 }
+
+<!-- Asked for before the save goes anywhere: touching a quotation everyone
+     already signed off on needs a reason on the record every time, not just
+     when someone remembers to explain it in a comment elsewhere. -->
+@if (confirmingAmend()) {
+  <div class="boq-modal-backdrop" (click)="closeAmendConfirm()"></div>
+  <div class="boq-modal" role="dialog" aria-modal="true" aria-labelledby="boq-amend-title">
+    <h2 id="boq-amend-title" class="boq-modal-title">Changing an approved quotation</h2>
+    <p class="boq-modal-note">
+      This quotation was already approved. Say why it's being changed — this is
+      recorded in the history below, visible to everyone who opens it.
+    </p>
+
+    <label class="boq-field">
+      <span>Reason <i aria-hidden="true">*</i></span>
+      <textarea rows="4" maxlength="1000" [value]="amendNote()"
+        (input)="onAmendNoteInput($event)"
+        placeholder="e.g. Client asked for the site address to be corrected after sign-off."></textarea>
+    </label>
+
+    @if (amendError()) {
+      <p class="admin-error" role="alert">{{ amendError() }}</p>
+    }
+
+    <div class="boq-modal-actions">
+      <button type="button" class="btn-admin btn-admin-primary"
+        [disabled]="saving()" (click)="confirmAmend()">
+        {{ saving() ? 'Saving…' : 'Save the change' }}
+      </button>
+      <button type="button" class="btn-admin btn-admin-ghost"
+        [disabled]="saving()" (click)="closeAmendConfirm()">Cancel</button>
+    </div>
+  </div>
+}

@@ -225,6 +225,10 @@ export interface SaveBoqRequest {
    */
   specialDiscount: number;
   sections: SaveBoqSection[];
+  /** Why an already-approved quotation is being changed. Required by the
+   *  server only when it actually is one — see BoqEditorComponent's amend
+   *  confirmation modal, which is the only path that ever sets this. */
+  amendmentNote?: string | null;
 }
 
 /**
