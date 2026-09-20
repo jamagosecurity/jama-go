@@ -56,17 +56,23 @@ export interface Option<T> {
 /**
  * Stock categories, named for the bill-of-quantities section each one prints in.
  *
- * The two lists are the same list: an item's category is what decides its
- * section, and naming them differently meant staff had to hold a translation in
- * their head — "Power supply" goes in "Rack & UPS" — and the BOQ editor had to
- * keep a mapping that could drift.
+ * The two lists are almost the same list: an item's category is what decides
+ * its section, and naming them differently meant staff had to hold a
+ * translation in their head — "Power supply" goes in "Rack & UPS" — and the
+ * BOQ editor had to keep a mapping that could drift.
+ *
+ * "Almost", not exactly: Primary Storage and Failover storage are two BOQ
+ * sections but one catalogue category — a failover NVR is still stock of the
+ * same kind, not a different one — so this list stays one entry shorter than
+ * BOQ_SECTION_TITLES. Labelled plainly rather than after either section,
+ * since it feeds both.
  *
  * Order matches BOQ_SECTION_TITLES so the dropdown reads in document order.
  */
 export const PRODUCT_CATEGORIES: readonly Option<ProductCategory>[] = [
   { value: 'Cctv', label: 'Main CCTV System' },
   { value: 'Accessory', label: 'Camera Accessories' },
-  { value: 'Storage', label: 'NVR & Storage' },
+  { value: 'Storage', label: 'Storage' },
   { value: 'VmsServer', label: 'VMS & Server' },
   { value: 'Monitor', label: 'Monitors and Work Stations' },
   { value: 'Network', label: 'Switch & Components' },

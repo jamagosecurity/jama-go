@@ -78,10 +78,11 @@ interface DraftLine {
 /**
  * One expandable group in the picker, and the catalogue it draws from.
  *
- * The groups ARE the quotation's sections: opening "NVR Storage" and clicking an
- * item puts that item in the NVR Storage section, creating it if the quotation
- * does not have one yet. That is the whole point — staff browse by section and
- * select, rather than filtering a flat list and then remembering where it goes.
+ * The groups ARE the quotation's sections: opening "Primary Storage" and
+ * clicking an item puts that item in the Primary Storage section, creating it
+ * if the quotation does not have one yet. That is the whole point — staff
+ * browse by section and select, rather than filtering a flat list and then
+ * remembering where it goes.
  *
  * Membership is derived from the stock item's product category. Deriving it
  * means an item can never be filed in two places, and adding stock needs no
@@ -152,7 +153,11 @@ export class BoqEditorComponent implements OnInit {
   protected readonly pickerGroups: readonly PickerGroup[] = [
     { title: 'Main CCTV System', categories: ['Cctv'] },
     { title: 'Camera Accessories', categories: ['Accessory'] },
-    { title: 'NVR & Storage', categories: ['Storage'] },
+    { title: 'Primary Storage', categories: ['Storage'] },
+    // A second, separate recording path — its own NVR/server, not a spare
+    // disk in the primary one — so it draws from the same Storage stock as
+    // Primary Storage rather than needing a catalogue category of its own.
+    { title: 'Failover storage', categories: ['Storage'] },
     { title: 'VMS & Server', categories: ['VmsServer'] },
     { title: 'Monitors and Work Stations', categories: ['Monitor'] },
     { title: 'Switch & Components', categories: ['Network'] },

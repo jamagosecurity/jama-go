@@ -17,7 +17,8 @@ export const BOQ_STATUSES: readonly Option<BoqStatus>[] = [
 export const BOQ_SECTION_TITLES: readonly string[] = [
   'Main CCTV System',
   'Camera Accessories',
-  'NVR & Storage',
+  'Primary Storage',
+  'Failover storage',
   'VMS & Server',
   'Monitors and Work Stations',
   'Switch & Components',
