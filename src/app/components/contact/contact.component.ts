@@ -76,6 +76,7 @@ export class ContactComponent {
 
   readonly phones = [
     { display: '+974 3064 4006', tel: '+97430644006' },
+    { display: '+974 3139 2007', tel: '+97431392007' },
     { display: '+974 3139 5879', tel: '+97431395879' },
     { display: '+974 4001 3599', tel: '+97440013599' },
   ];
@@ -128,7 +129,7 @@ export class ContactComponent {
       label: 'Call Us',
       value: this.primaryPhone.display,
       href: `tel:${this.primaryPhone.tel}`,
-      note: `${this.phones[1].display} · ${this.phones[2].display}`,
+      note: `${this.phones[1].display} · ${this.phones[2].display} · ${this.phones[3].display}`,
       tone: 'blue',
     },
     {
