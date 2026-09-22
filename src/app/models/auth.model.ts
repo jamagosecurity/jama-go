@@ -21,6 +21,10 @@ export const PERMISSIONS = {
   /** Deciding on a quotation somebody else built. Separate from boqManage on
    *  purpose — see Jama.Application.Common.Permissions. */
   boqApprove: 'boq.approve',
+  /** Changing a quotation that is already Approved — price, discount, or its
+   *  items. Previously the super administrator alone; grantable now — see
+   *  Jama.Application.Common.Permissions. */
+  boqAmend: 'boq.amend',
   /** Drafting and submitting CAD drawings. Its own module, independent of
    *  quotations — see Jama.Application.Common.Permissions. */
   drawingManage: 'drawing.manage',

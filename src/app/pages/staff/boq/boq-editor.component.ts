@@ -252,18 +252,23 @@ export class BoqEditorComponent implements OnInit {
    * submitted quotation is read-only, and the editor asks rather than working it
    * out, so the two cannot disagree about it.
    *
-   * The super administrator is the exception, and the server agrees: somebody
-   * has to be able to correct a signed-off document, and the alternative is
-   * deleting and rebuilding it, which loses the number and the trail with it.
+   * The super administrator, and anyone granted boq.amend, are the exception,
+   * and the server agrees: somebody has to be able to correct a signed-off
+   * document, and the alternative is deleting and rebuilding it, which loses
+   * the number and the trail with it.
    */
+  protected readonly canAmend = computed(
+    () => this.auth.isSuperAdmin() || this.auth.can(PERMISSIONS.boqAmend),
+  );
+
   protected readonly isEditable = computed(
-    () => (this.boq()?.isEditable ?? true) || this.auth.isSuperAdmin(),
+    () => (this.boq()?.isEditable ?? true) || this.canAmend(),
   );
 
   /** Editing something already decided. Worth saying out loud — the approval on
    *  screen was given for the lines as they were, not as they are becoming. */
   protected readonly isAmending = computed(
-    () => this.isEditing() && !(this.boq()?.isEditable ?? true) && this.auth.isSuperAdmin(),
+    () => this.isEditing() && !(this.boq()?.isEditable ?? true) && this.canAmend(),
   );
 
   protected readonly canSubmit = computed(() =>
