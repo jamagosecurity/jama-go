@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResult, unwrapApiResult } from '../models/api-result.model';
+import { SUPPRESS_FORBIDDEN_REDIRECT } from '../interceptors/auth.interceptor';
 import {
   AdminStaffMember,
   CreateStaffRequest,
@@ -24,10 +25,21 @@ export class StaffService {
       .pipe(map((result) => unwrapApiResult(result)));
   }
 
-  /** Admin: all staff including inactive. Requires Bearer token. */
-  getAll(): Observable<AdminStaffMember[]> {
+  /**
+   * Admin: all staff including inactive. Requires Bearer token.
+   *
+   * A boq.amend holder without the Admin role calls this too, for the amend
+   * modal's optional "who asked for this" picker — pass `optional: true`
+   * there so a 403 degrades to an empty dropdown instead of the global
+   * interceptor bouncing them off the page they were amending.
+   */
+  getAll(options?: { optional?: boolean }): Observable<AdminStaffMember[]> {
     return this.http
-      .get<ApiResult<AdminStaffMember[]>>(`${this.baseUrl}/all`)
+      .get<ApiResult<AdminStaffMember[]>>(`${this.baseUrl}/all`, {
+        context: options?.optional
+          ? new HttpContext().set(SUPPRESS_FORBIDDEN_REDIRECT, true)
+          : undefined,
+      })
       .pipe(map((result) => unwrapApiResult(result)));
   }
 

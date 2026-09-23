@@ -1,7 +1,21 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+
+/**
+ * Opts a single request out of the global "403 sends you back to your
+ * landing page" behaviour below.
+ *
+ * That behaviour is right for a 403 on something the user directly asked
+ * for — the page they meant to reach has already failed and there is
+ * nothing to stay on. It is wrong for a background call a component already
+ * treats as best-effort (its own `error` handler quietly degrades), where a
+ * caller lacking one specific grant should not be yanked off whatever they
+ * were doing to fetch a nicety. Set true on a request's HttpContext to mark
+ * it as one of those.
+ */
+export const SUPPRESS_FORBIDDEN_REDIRECT = new HttpContextToken<boolean>(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
@@ -31,7 +45,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       } else if (
         error instanceof HttpErrorResponse &&
         error.status === 403 &&
-        !isLoginRequest
+        !isLoginRequest &&
+        !req.context.get(SUPPRESS_FORBIDDEN_REDIRECT)
       ) {
         auth.handleForbidden();
       }

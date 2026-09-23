@@ -1207,7 +1207,7 @@ export class BoqEditorComponent implements OnInit {
     this.staffOptionsLoaded = true;
 
     this.staff
-      .getAll()
+      .getAll({ optional: true })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (members) =>
