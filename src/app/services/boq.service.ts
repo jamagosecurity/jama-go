@@ -96,4 +96,10 @@ export class BoqService {
   downloadPdf(id: string): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/${id}/pdf`, { responseType: 'blob' });
   }
+
+  /** Only exists once Approved — the server refuses anything earlier since a
+   *  contract represents an agreement, not a draft. */
+  downloadContract(id: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${id}/contract`, { responseType: 'blob' });
+  }
 }

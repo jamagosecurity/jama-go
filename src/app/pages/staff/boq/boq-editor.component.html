@@ -11,6 +11,12 @@
           [queryParams]="{ quotation: saved.id }">Calculate storage</a>
         <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"
           (click)="download()">{{ downloading() ? 'Preparing…' : 'Download PDF' }}</button>
+        @if (saved.status === 'Approved') {
+          <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloadingContract()"
+            (click)="downloadContract()">
+            {{ downloadingContract() ? 'Preparing…' : 'Download Contract' }}
+          </button>
+        }
         @if (canShare()) {
           <button type="button" class="btn-admin btn-admin-ghost btn-share btn-share--whatsapp"
             (click)="shareWhatsApp()">

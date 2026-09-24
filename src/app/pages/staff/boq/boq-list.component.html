@@ -102,6 +102,12 @@
                         (click)="download(boq)">
                         {{ busyId() === boq.id ? '…' : 'PDF' }}
                       </button>
+                      @if (canDownloadContract(boq)) {
+                        <button type="button" class="row-btn" [disabled]="busyId() === boq.id"
+                          (click)="downloadContract(boq)">
+                          {{ busyId() === boq.id ? '…' : 'Contract' }}
+                        </button>
+                      }
                       @if (canShare(boq)) {
                         <button type="button" class="row-btn row-btn--whatsapp" title="Share via WhatsApp"
                           (click)="shareWhatsApp(boq)">
