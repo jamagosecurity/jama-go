@@ -212,6 +212,7 @@ export const CAMERA_BRANDS: readonly CameraBrand[] = [
   { name: 'Dell', logo: '/brands/dell.webp', aliases: ['dell'] },
   { name: 'DSPPA', logo: '/brands/dsppa.webp', aliases: ['dsppa'] },
   { name: 'Huawei', logo: '/brands/huawei.webp', aliases: ['huawei'] },
+  { name: 'Hubnetix', logo: '/brands/hubnetix.webp', aliases: ['hubnetix'] },
   { name: 'ITC', logo: '/brands/itc.webp', aliases: ['itc'] },
   { name: 'KSTAR', logo: '/brands/kstar.webp', aliases: ['kstar', 'k-star', 'k star'] },
   { name: 'LifeSmart', logo: '/brands/lifesmart.webp', aliases: ['lifesmart', 'life smart'] },
