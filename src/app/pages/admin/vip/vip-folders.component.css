@@ -122,6 +122,13 @@
   padding: 0 10px 10px;
   display: grid;
   gap: 6px;
+  /* A folder with 30+ files used to stretch the card to match, towering over
+     its siblings in the same row and pushing the rest of the page down. A
+     capped, internally-scrolling list keeps every card a predictable height
+     regardless of how many files are in it. */
+  max-height: 440px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .vip-file {
