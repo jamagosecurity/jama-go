@@ -74,4 +74,20 @@ export class VipClientService {
       responseType: 'blob',
     });
   }
+
+  /** Every file in the folder, zipped server-side. */
+  downloadFolder(folderId: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/folders/${folderId}/download-all`, {
+      responseType: 'blob',
+    });
+  }
+
+  /** Only the picked files, zipped server-side. */
+  downloadFolderSelected(folderId: string, documentIds: string[]): Observable<Blob> {
+    return this.http.post(
+      `${this.baseUrl}/folders/${folderId}/download-selected`,
+      { documentIds },
+      { responseType: 'blob' },
+    );
+  }
 }
