@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
@@ -18,7 +18,7 @@ import { getApiErrorMessage } from '../../../utils/api-error.util';
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-login.component.html',
   styleUrl: './admin-login.component.css',

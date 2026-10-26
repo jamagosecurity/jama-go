@@ -76,6 +76,15 @@ export const routes: Routes = [
       import('./pages/sifeddine/sifeddine-landing.component').then((m) => m.SifeddineLandingComponent),
   },
   {
+    path: 'register',
+    canActivate: [guestGuard],
+    title: 'Client Registration — Jama Go',
+    loadComponent: () =>
+      import('./pages/client/register/client-register.component').then(
+        (m) => m.ClientRegisterComponent,
+      ),
+  },
+  {
     path: 'admin',
     children: [
       {
@@ -161,6 +170,14 @@ export const routes: Routes = [
             path: 'cameras',
             canActivate: [permissionGuard(PERMISSIONS.cameraManage)],
             children: createCameraRoutes('/admin/cameras'),
+          },
+          {
+            path: 'client-registrations',
+            title: 'Client Registrations — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/admin/client-registrations/client-registrations.component').then(
+                (m) => m.ClientRegistrationsComponent,
+              ),
           },
           {
             path: 'contacts',

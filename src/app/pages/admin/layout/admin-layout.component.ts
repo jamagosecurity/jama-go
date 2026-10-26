@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy, computed, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ApprovalBellComponent } from '../../../components/approval-bell/approval-bell.component';
 import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
+import { ClientRegistrationService } from '../../../services/client-registration.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -12,8 +13,14 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.css',
 })
-export class AdminLayoutComponent {
+export class AdminLayoutComponent implements OnInit {
   readonly auth = inject(AuthService);
+  /** Drives the waiting-count badge on the Client Registrations row. */
+  readonly registrations = inject(ClientRegistrationService);
+
+  ngOnInit(): void {
+    this.registrations.refreshPendingCount();
+  }
 
   /** VIP nav is permission-gated; admins hold vip.manage implicitly. */
   readonly canManageVip = computed(() => this.auth.can(PERMISSIONS.vipManage));

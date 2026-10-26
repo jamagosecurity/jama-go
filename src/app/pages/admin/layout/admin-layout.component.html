@@ -33,6 +33,21 @@
           </span>
         </a>
 
+        <a routerLink="/admin/client-registrations" routerLinkActive="active" class="nav-clients">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+          </span>
+          <span>
+            <strong>Client Registrations</strong>
+            <small>Sign-ups to review</small>
+          </span>
+          @if (registrations.pendingCount() > 0) {
+            <span class="nav-count" [attr.aria-label]="registrations.pendingCount() + ' waiting for review'">
+              {{ registrations.pendingCount() }}
+            </span>
+          }
+        </a>
+
         <a routerLink="/admin/dia" routerLinkActive="active" class="nav-dia">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">

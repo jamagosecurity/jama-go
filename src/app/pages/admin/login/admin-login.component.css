@@ -1011,12 +1011,31 @@
   85%, 100% { transform: translateX(130%); }
 }
 
+/* Clients sign in through this same page once approved, so the way to become
+   one sits right under the button rather than somewhere on the public site. */
+.register-cta {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.register-cta a {
+  color: var(--accent-ink);
+  font-weight: 800;
+}
+
+.register-cta a:hover {
+  text-decoration: underline;
+}
+
 .trust {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-top: 30px;
+  margin-top: 22px;
   padding-top: 16px;
   border-top: 1px solid rgba(15, 40, 70, 0.12);
   color: var(--muted);

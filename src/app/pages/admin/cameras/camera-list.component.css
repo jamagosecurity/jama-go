@@ -1440,6 +1440,15 @@
   width: 190px;
 }
 
+/* Category, Type, Low stock and Clear move as one block when the row runs
+   out of room next to Search, rather than each wrapping to its own line. */
+.camera-filters-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 /* ===== Stat tiles, in full colour =====
    Overrides the washed-out version above. Each figure now sits on a saturated
    gradient in its own hue, which is what makes the four readable as four

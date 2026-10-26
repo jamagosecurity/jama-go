@@ -90,36 +90,41 @@
       }
     </label>
 
-    <label class="camera-field">
-      <span>Category</span>
-      <select [formControl]="categoryFilterControl">
-        <option value="">All categories</option>
-        @for (option of categories; track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </select>
-    </label>
+    <!-- One unit, not four: Category, Type, Low stock and Clear used to wrap
+         independently, so a narrower window could split them onto ragged
+         lines. Grouped so they move to a second line together instead. -->
+    <div class="camera-filters-group">
+      <label class="camera-field">
+        <span>Category</span>
+        <select [formControl]="categoryFilterControl">
+          <option value="">All categories</option>
+          @for (option of categories; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
 
-    <label class="camera-field">
-      <span>Type</span>
-      <select [formControl]="typeFilterControl">
-        <option value="">All types</option>
-        @for (option of cameraTypes(); track option) {
-          <option [value]="option">{{ option }}</option>
-        }
-      </select>
-    </label>
+      <label class="camera-field">
+        <span>Type</span>
+        <select [formControl]="typeFilterControl">
+          <option value="">All types</option>
+          @for (option of cameraTypes(); track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </label>
 
-    <label class="camera-check">
-      <input type="checkbox" [formControl]="lowStockFilterControl" />
-      <span>Low stock only</span>
-    </label>
+      <label class="camera-check">
+        <input type="checkbox" [formControl]="lowStockFilterControl" />
+        <span>Low stock only</span>
+      </label>
 
-    @if (hasFilters()) {
-      <button type="button" class="btn-admin btn-admin-ghost" (click)="clearFilters()">
-        Clear filters
-      </button>
-    }
+      @if (hasFilters()) {
+        <button type="button" class="btn-admin btn-admin-ghost" (click)="clearFilters()">
+          Clear filters
+        </button>
+      }
+    </div>
   </div>
 
   <div class="admin-panel">

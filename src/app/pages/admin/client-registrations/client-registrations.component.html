@@ -1,0 +1,262 @@
+<section class="admin-page">
+  <header class="admin-page-header">
+    <div>
+      <span class="admin-kicker">Clients</span>
+      <h1>Client registrations</h1>
+      <p>
+        People who signed up on the website. Accept each one as MOI or Non-MOI and allot their
+        team — MOI clients get their DIA inspection created automatically.
+      </p>
+    </div>
+  </header>
+
+  <!-- The three counts ARE the tabs: one glance says how much is waiting, one
+       click shows it. -->
+  <div class="creg-tabs" role="tablist" aria-label="Registration status">
+    <button type="button" role="tab" class="admin-stat admin-stat--orange creg-tab"
+      [class.is-current]="status() === 'Pending'" [attr.aria-selected]="status() === 'Pending'"
+      (click)="setStatus('Pending')">
+      <strong>{{ counts().pending }}</strong>
+      <span>Waiting for review</span>
+    </button>
+    <button type="button" role="tab" class="admin-stat admin-stat--teal creg-tab"
+      [class.is-current]="status() === 'Approved'" [attr.aria-selected]="status() === 'Approved'"
+      (click)="setStatus('Approved')">
+      <strong>{{ counts().approved }}</strong>
+      <span>Accepted</span>
+    </button>
+    <button type="button" role="tab" class="admin-stat admin-stat--rose creg-tab"
+      [class.is-current]="status() === 'Rejected'" [attr.aria-selected]="status() === 'Rejected'"
+      (click)="setStatus('Rejected')">
+      <strong>{{ counts().rejected }}</strong>
+      <span>Rejected</span>
+    </button>
+  </div>
+
+  <div class="admin-toolbar">
+    <label class="admin-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+      <input type="search" placeholder="Search name, email, mobile or site" aria-label="Search registrations"
+        (input)="onSearch($event)" />
+    </label>
+  </div>
+
+  @if (notice()) {
+    <p class="admin-success" role="status">{{ notice() }}</p>
+  }
+
+  @if (loading() && !items().length) {
+    <div class="admin-panel"><p>Loading registrations…</p></div>
+  } @else if (error()) {
+    <div class="admin-panel">
+      <p class="admin-error">{{ error() }}</p>
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="load()">Try again</button>
+    </div>
+  } @else if (!items().length) {
+    <div class="admin-panel">
+      <div class="admin-empty">
+        <strong>Nothing here</strong>
+        <p>{{ emptyMessage() }}</p>
+      </div>
+    </div>
+  } @else {
+    <div class="creg-grid" [class.is-refreshing]="loading()">
+      @for (item of items(); track item.id) {
+        <article class="creg-card surface-card surface-card--raised"
+          [class.creg-card--pending]="item.status === 'Pending'"
+          [class.creg-card--approved]="item.status === 'Approved'"
+          [class.creg-card--rejected]="item.status === 'Rejected'">
+          <header class="creg-card-head">
+            <div class="creg-avatar" aria-hidden="true">{{ item.fullName.charAt(0).toUpperCase() }}</div>
+            <div class="creg-card-title">
+              <h2>{{ item.fullName }}</h2>
+              <p>Registered {{ item.createdAt | date: 'd MMM y, h:mm a' }}</p>
+            </div>
+            @switch (item.status) {
+              @case ('Pending') { <span class="admin-badge admin-badge--new admin-badge--dot">Waiting</span> }
+              @case ('Approved') { <span class="admin-badge admin-badge--active admin-badge--dot">Accepted</span> }
+              @default { <span class="admin-badge admin-badge--hidden admin-badge--dot">Rejected</span> }
+            }
+          </header>
+
+          <dl class="creg-details">
+            <div>
+              <dt>Email</dt>
+              <dd><a [href]="'mailto:' + item.email">{{ item.email }}</a></dd>
+            </div>
+            <div>
+              <dt>Mobile</dt>
+              <dd><a [href]="'tel:' + item.mobile">{{ item.mobile }}</a></dd>
+            </div>
+            <div class="creg-details-wide">
+              <dt>Site location</dt>
+              <dd>{{ item.siteLocation }}</dd>
+            </div>
+          </dl>
+
+          @if (item.status === 'Approved') {
+            <div class="creg-outcome">
+              <div class="creg-outcome-row">
+                <span class="creg-category" [class.creg-category--moi]="item.category === 'Moi'">
+                  {{ item.category ? categoryLabels[item.category] : '' }}
+                </span>
+                @for (team of item.teams; track team.key) {
+                  <span class="creg-team">{{ team.name }}</span>
+                }
+              </div>
+              @if (item.diaInspectionId) {
+                <a class="creg-dia-link" [routerLink]="['/admin/dia', item.diaInspectionId]">
+                  DIA inspection {{ item.diaNumber }}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+              } @else if (item.category === 'Moi') {
+                <p class="creg-muted">The DIA record for this client has since been deleted.</p>
+              }
+              <p class="creg-muted">
+                Accepted {{ item.reviewedAt | date: 'd MMM y' }}@if (reviewer(item.reviewedByName)) { by {{ reviewer(item.reviewedByName) }}}
+              </p>
+            </div>
+          }
+
+          @if (item.status === 'Rejected') {
+            <div class="creg-reason">
+              <strong>Why it was rejected</strong>
+              <p>{{ item.rejectionReason }}</p>
+              <span class="creg-muted">
+                {{ item.reviewedAt | date: 'd MMM y' }}@if (reviewer(item.reviewedByName)) { · {{ reviewer(item.reviewedByName) }}}
+              </span>
+            </div>
+          }
+
+          @if (item.status !== 'Approved') {
+            <footer class="creg-actions">
+              @if (item.status === 'Pending') {
+                <button type="button" class="btn-admin btn-admin-ghost creg-reject" (click)="openReject(item)">
+                  Reject
+                </button>
+              }
+              <button type="button" class="btn-admin btn-admin-primary" (click)="openAccept(item)">
+                {{ item.status === 'Rejected' ? 'Accept anyway' : 'Accept' }}
+              </button>
+            </footer>
+          }
+        </article>
+      }
+    </div>
+  }
+</section>
+
+<!-- ===== Accept ===== -->
+@if (accepting(); as item) {
+  <div class="creg-backdrop" (click)="closeAccept()"></div>
+  <div class="creg-modal" role="dialog" aria-modal="true" aria-labelledby="creg-accept-title">
+    <h2 id="creg-accept-title" class="creg-modal-title">Accept {{ item.fullName }}</h2>
+    <p class="creg-modal-note">Their login is switched on as soon as you accept.</p>
+
+    <div class="creg-step">
+      <span class="creg-step-label">1 · Type of client</span>
+      <div class="creg-segment" role="radiogroup" aria-label="Type of client">
+        <button type="button" role="radio" class="creg-segment-option"
+          [class.is-selected]="acceptCategory() === 'Moi'" [attr.aria-checked]="acceptCategory() === 'Moi'"
+          (click)="chooseCategory('Moi')">
+          <strong>MOI</strong>
+          <small>Goes straight to DIA inspection</small>
+        </button>
+        <button type="button" role="radio" class="creg-segment-option"
+          [class.is-selected]="acceptCategory() === 'NonMoi'" [attr.aria-checked]="acceptCategory() === 'NonMoi'"
+          (click)="chooseCategory('NonMoi')">
+          <strong>Non-MOI</strong>
+          <small>Team allotted, no DIA record</small>
+        </button>
+      </div>
+    </div>
+
+    @if (acceptCategory(); as category) {
+      <div class="creg-step">
+        <span class="creg-step-label">2 · Allot teams</span>
+        <div class="creg-team-picker">
+          @for (team of teams(); track team.key) {
+            <label class="creg-team-option" [class.is-selected]="isTeamSelected(team.key)">
+              <input type="checkbox" [checked]="isTeamSelected(team.key)" (change)="toggleTeam(team.key)" />
+              <span class="creg-check" aria-hidden="true">
+                <svg viewBox="0 0 12 10"><path d="m1 5 3 3 7-7" /></svg>
+              </span>
+              {{ team.name }}
+            </label>
+          }
+        </div>
+      </div>
+
+      @if (category === 'Moi') {
+        <div class="creg-step creg-dia">
+          <span class="creg-step-label">3 · DIA inspection record</span>
+          <p class="creg-modal-note creg-dia-note">
+            Created the moment you accept, in DIA Inspection — inactive until the DIA team activates it.
+          </p>
+          <label class="creg-field">
+            <span>DIA number <i aria-hidden="true">*</i></span>
+            <input [value]="diaNumber()" (input)="onInput('diaNumber', $event)" maxlength="100"
+              placeholder="e.g. DIA-2026-0457" autocomplete="off" />
+          </label>
+          <div class="creg-field-row">
+            <label class="creg-field">
+              <span>Client number</span>
+              <input [value]="diaClientNumber()" (input)="onInput('diaClientNumber', $event)" maxlength="100"
+                autocomplete="off" />
+            </label>
+            <label class="creg-field">
+              <span>Client location</span>
+              <input [value]="diaClientLocation()" (input)="onInput('diaClientLocation', $event)" maxlength="300"
+                autocomplete="off" />
+            </label>
+          </div>
+        </div>
+      }
+    }
+
+    @if (acceptError()) {
+      <p class="admin-error" role="alert">{{ acceptError() }}</p>
+    }
+
+    <div class="creg-modal-actions">
+      <button type="button" class="btn-admin btn-admin-primary" [disabled]="saving() || !acceptCategory()"
+        (click)="confirmAccept()">
+        {{ saving() ? 'Accepting…' : 'Accept client' }}
+      </button>
+      <button type="button" class="btn-admin btn-admin-ghost" [disabled]="saving()" (click)="closeAccept()">
+        Cancel
+      </button>
+    </div>
+  </div>
+}
+
+<!-- ===== Reject ===== -->
+@if (rejecting(); as item) {
+  <div class="creg-backdrop" (click)="closeReject()"></div>
+  <div class="creg-modal creg-modal--narrow" role="dialog" aria-modal="true" aria-labelledby="creg-reject-title">
+    <h2 id="creg-reject-title" class="creg-modal-title">Reject {{ item.fullName }}?</h2>
+    <p class="creg-modal-note">
+      They won't be able to sign in. They're told only that it wasn't approved — this reason is for
+      the team. They can register again later.
+    </p>
+
+    <label class="creg-field">
+      <span>Reason <i aria-hidden="true">*</i></span>
+      <textarea rows="4" maxlength="1000" [value]="rejectReason()" (input)="onReasonInput($event)"
+        placeholder="e.g. Site is outside our service area."></textarea>
+    </label>
+
+    @if (rejectError()) {
+      <p class="admin-error" role="alert">{{ rejectError() }}</p>
+    }
+
+    <div class="creg-modal-actions">
+      <button type="button" class="btn-admin btn-admin-danger" [disabled]="saving()" (click)="confirmReject()">
+        {{ saving() ? 'Rejecting…' : 'Reject' }}
+      </button>
+      <button type="button" class="btn-admin btn-admin-ghost" [disabled]="saving()" (click)="closeReject()">
+        Cancel
+      </button>
+    </div>
+  </div>
+}

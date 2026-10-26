@@ -3,6 +3,23 @@ import { CameraResolution, Option, UnitOfMeasurement } from './camera.model';
 /** Mirrors Jama.Domain.Enums.BoqStatus — the server sends the enum NAME. */
 export type BoqStatus = 'Draft' | 'Submitted' | 'Approved' | 'Rejected';
 
+/** Mirrors Jama.Application.Common.Interfaces.BoqTermsLanguage. English is
+ *  the default everywhere this is chosen. */
+export type BoqTermsLanguage = 'English' | 'Arabic' | 'Both';
+
+export const BOQ_TERMS_LANGUAGES: readonly Option<BoqTermsLanguage>[] = [
+  { value: 'English', label: 'English only' },
+  { value: 'Arabic', label: 'Arabic only' },
+  { value: 'Both', label: 'Both languages' },
+];
+
+/** Both standard terms pages, as plain text — mirrors
+ *  Jama.Application.Boqs.Queries.GetDefaultTerms.DefaultTermsDto. */
+export interface DefaultTerms {
+  english: string;
+  arabic: string;
+}
+
 export const BOQ_STATUSES: readonly Option<BoqStatus>[] = [
   { value: 'Draft', label: 'Draft' },
   { value: 'Submitted', label: 'Submitted' },
@@ -83,6 +100,14 @@ export interface Boq {
   issueDate: string;
   status: BoqStatus;
   notes: string | null;
+  /** Overrides the PDF's standard terms page (payment split, delivery,
+   *  warranty, etc.) for this quotation only. Null means the standard
+   *  wording prints. */
+  termsAndConditions: string | null;
+  /** The Arabic counterpart, typed independently by staff — never
+   *  machine-translated. Null means the standard Arabic wording prints when
+   *  Arabic is requested at all. */
+  termsAndConditionsAr: string | null;
   preparedById: string;
   preparedByName: string | null;
   /** Sum of the lines, before any discount. */
@@ -218,6 +243,13 @@ export interface SaveBoqRequest {
   contactNumber: string | null;
   issueDate: string;
   notes: string | null;
+  /** Overrides the PDF's standard terms page for this quotation only. Null
+   *  (or left matching the standard wording) keeps the standard terms. */
+  termsAndConditions?: string | null;
+  /** The Arabic counterpart, typed independently — never derived from
+   *  termsAndConditions. Null (or left matching the standard wording) keeps
+   *  the standard Arabic terms. */
+  termsAndConditionsAr?: string | null;
   /**
    * A lump sum off the finished quotation, in QAR. Zero for no discount.
    *

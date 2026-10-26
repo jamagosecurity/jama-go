@@ -71,7 +71,28 @@
 
 .staff-nav {
   display: grid;
+  align-content: start;
   gap: 8px;
+  /* The rail stays overflow:hidden, so the nav list has to be its own scroll
+     region — otherwise rows below the fold were simply unreachable once
+     there were enough of them to outgrow the screen. flex + min-height:0 is
+     what lets a grid child shrink below its content size inside the sidebar's
+     flex column at all. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.staff-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.staff-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
 }
 
 .staff-nav a {

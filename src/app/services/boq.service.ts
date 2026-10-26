@@ -8,6 +8,8 @@ import {
   BoqListItem,
   BoqListQuery,
   BoqNotifications,
+  BoqTermsLanguage,
+  DefaultTerms,
   SaveBoqRequest,
 } from '../models/boq.model';
 
@@ -39,6 +41,15 @@ export class BoqService {
 
   getById(id: string): Observable<Boq> {
     return this.http.get<ApiResult<Boq>>(`${this.baseUrl}/${id}`).pipe(map(unwrapApiResult));
+  }
+
+  /** Both standard terms pages as plain text — pre-fills the editor's
+   *  English and Arabic "Terms & Conditions" boxes so what staff see to edit
+   *  is exactly what would otherwise print. */
+  getDefaultTerms(): Observable<DefaultTerms> {
+    return this.http
+      .get<ApiResult<DefaultTerms>>(`${this.baseUrl}/default-terms`)
+      .pipe(map(unwrapApiResult));
   }
 
   create(request: SaveBoqRequest): Observable<Boq> {
@@ -92,9 +103,25 @@ export class BoqService {
       .pipe(map(unwrapApiResult));
   }
 
-  /** The PDF comes back as bytes, not the ApiResult envelope. */
-  downloadPdf(id: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/${id}/pdf`, { responseType: 'blob' });
+  /**
+   * The PDF comes back as bytes, not the ApiResult envelope.
+   *
+   * `includeTermsPage` defaults true, same as the server — some clients
+   * already have the standard commercial terms agreed elsewhere and just
+   * want the cover and the priced items. `termsLanguage` defaults to
+   * English, same as the server, regardless of whether this quotation has
+   * Arabic terms typed in — Arabic only ever prints because the download
+   * specifically asked for it.
+   */
+  downloadPdf(
+    id: string,
+    includeTermsPage = true,
+    termsLanguage: BoqTermsLanguage = 'English',
+  ): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${id}/pdf`, {
+      responseType: 'blob',
+      params: { includeTermsPage, termsLanguage },
+    });
   }
 
   /** Only exists once Approved — the server refuses anything earlier since a

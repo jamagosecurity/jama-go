@@ -3,19 +3,198 @@
 
 .boq-page { max-width: 1500px; }
 
-/* Sits in the header's action row now, beside Download PDF, so it takes button
-   metrics rather than the stacked-link ones it had under the old page title. */
+/* Where you are (left) against what you can do here (right) — the header
+   used to run "back / status / eight buttons" as one flat row, which is
+   where it started looking like a wall of pills. */
+.boq-page-header { display: block; }
+
+/* Never two rows: the back link + status stay put at their own width, and
+   the action group takes whatever is left and scrolls sideways rather than
+   wrapping — wrapping is what turned this into a tall stack of one button
+   per line on a narrower window. */
+.boq-head-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.boq-head-left { display: flex; align-items: center; gap: 10px; flex: none; }
+
 .boq-back {
   color: var(--admin-blue-ink);
+  font-weight: 700;
+  font-size: 0.86rem;
   text-decoration: none;
+  white-space: nowrap;
+}
+.boq-back:hover { text-decoration: underline; }
+
+/*
+ * overflow-x: auto used to sit here as a fallback for widths where the row
+ * doesn't fit. It's gone: setting overflow-x to anything but visible forces
+ * overflow-y to auto too (that's in the CSS spec, not a mistake), and that
+ * quietly clipped the Download/Share dropdown panels below — they render
+ * outside this row's own height since position:absolute takes them out of
+ * flow, so "auto" here meant "clip the menu nobody scrolled to look for".
+ * Real click-through-to-what's-underneath, confirmed by testing, not a
+ * hunch: elementFromPoint() at the menu item's own coordinates returned
+ * the Project card behind it. Wrapping (below) is the only fallback now,
+ * at a width comfortably before the row would ever actually overflow.
+ */
+.boq-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
 }
 
-/* Only actions left in this header — nothing to space them away from. */
-.boq-page-header {
-  justify-content: flex-end;
+@media (max-width: 1300px) {
+  .boq-head-bar { flex-wrap: wrap; }
+  .boq-head-actions { flex-wrap: wrap; }
 }
 
-.boq-head-actions { display: flex; align-items: center; gap: 12px; }
+.boq-head-divider {
+  width: 1px;
+  height: 20px;
+  margin: 0 6px;
+  background: rgba(15, 40, 70, 0.12);
+  flex: none;
+}
+
+/* Calculate storage / Show cost: routine but secondary next to Download and
+   Share, so they read as quiet, compact icon-chips rather than competing
+   with them on size. */
+.boq-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: none;
+  color: var(--admin-blue-ink-soft, #5a6b7d);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+.boq-action-link:hover { background: rgba(15, 40, 70, 0.05); color: var(--admin-blue-ink); }
+.boq-action-link svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Download and Share: each a single trigger that opens a small panel, so the
+   header shows two controls instead of the five buttons they used to be. */
+.boq-menu { position: relative; }
+
+/* Tighter than the global .btn-admin metrics (built for page-level CTAs) —
+   this is a header row that already has several controls in it. */
+.boq-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.boq-menu-chevron {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s ease;
+}
+.boq-menu-trigger.is-open .boq-menu-chevron { transform: rotate(180deg); }
+
+.boq-menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 220px;
+  padding: 8px;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(15, 40, 70, 0.16);
+}
+
+.boq-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+.boq-menu-item:hover { background: rgba(15, 40, 70, 0.06); }
+.boq-menu-item:disabled { color: var(--admin-muted); cursor: default; }
+.boq-menu-item:disabled:hover { background: none; }
+.boq-menu-item svg { width: 17px; height: 17px; flex: none; }
+
+.boq-menu-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  color: var(--admin-blue-ink-soft, #5a6b7d);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Stacked rather than inline like the checkbox above it: "Terms page
+   language" plus a dropdown wide enough to read its own options does not
+   fit one row inside a 220px menu. */
+.boq-menu-lang {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  cursor: default;
+}
+.boq-menu-lang select {
+  padding: 6px 8px;
+  border: 1px solid rgba(15, 40, 70, 0.16);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.boq-share-item--whatsapp svg { fill: currentColor; stroke: none; }
+.boq-share-item--whatsapp:hover { background: rgba(37, 211, 102, 0.12); color: #128c3e; }
+.boq-share-item--email:hover {
+  background: rgba(194, 102, 15, 0.1);
+  color: var(--admin-accent, #c2660f);
+}
 
 .boq-number {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
@@ -121,6 +300,15 @@
 }
 .boq-filters .boq-field { flex: 0 0 auto; width: 190px; }
 
+/* Status, Only mine and Clear move as one block when the row runs out of
+   room next to Search, rather than each wrapping to its own line. */
+.boq-filters-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
 /* ===== Status ===== */
 
 .boq-status {
@@ -166,12 +354,16 @@
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+  text-align: center;
   white-space: nowrap;
 }
 .boq-table thead th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
 .boq-table thead th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
 
 .boq-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+/* Headers read as a centered label row regardless of which column sorts its
+   own body cells right (Lines, Total) or left (everything else). */
+.boq-table thead th.num { text-align: center; }
 .boq-table tbody tr:last-child td { border-bottom: none; }
 .boq-table tbody tr:hover { background: rgba(37, 148, 210, 0.04); }
 
@@ -179,6 +371,18 @@
 .boq-linetext { display: grid; gap: 2px; min-width: 0; }
 .boq-projectcell small,
 .boq-linetext small { color: var(--admin-muted); font-size: 0.79rem; }
+
+/* Capped rather than left to its natural width: "No site recorded · Builder
+   Test Staff <builder@jamago.qa>" was the single widest thing in the row,
+   and on its own pushed the table past a normal laptop window before the
+   Actions column had any room left. Truncated with an ellipsis — the full
+   detail is one click away on the quotation itself. */
+.boq-projectcell { max-width: 260px; }
+.boq-projectcell small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .boq-row-actions { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
 
@@ -219,6 +423,18 @@
 .row-btn:hover { transform: translateY(-1px); }
 .row-btn:focus-visible { outline: 2px solid var(--admin-blue-deep); outline-offset: 2px; }
 .row-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
+
+/* Everything but Open used to repeat as its own full-text button down every
+   row — PDF, Contract, WhatsApp, Email, Delete, all five, on every approved
+   quotation. Icon-only and square instead: the tooltip carries the label,
+   the row carries far less width. */
+.row-btn--icon {
+  padding: 7px;
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+}
+.row-btn--icon svg { width: 16px; height: 16px; }
 
 .row-btn--edit {
   --btn-bg: rgba(37, 148, 210, 0.1);
@@ -276,15 +492,6 @@
   --btn-ink: #fff;
 }
 
-/* The header's Share pair — same icons as the row buttons, sized for a
-   .btn-admin-ghost rather than a table cell. */
-.btn-share--whatsapp svg { fill: currentColor; stroke: none; }
-.btn-share--whatsapp:hover { color: #fff; background: #25d366; border-color: #25d366; }
-.btn-share--email:hover {
-  color: #fff;
-  background: var(--admin-accent, #c2660f);
-  border-color: var(--admin-accent, #c2660f);
-}
 
 .boq-blank { color: var(--admin-muted); font-style: italic; opacity: 0.75; }
 
@@ -314,6 +521,184 @@
 }
 
 .boq-field--wide { grid-column: span 2; }
+
+/* Collapsed by default — this is an edge case, not an ordinary project
+   field, so it should not sit open at full height among short single-line
+   inputs. */
+.boq-terms-field { gap: 8px; }
+
+.boq-terms-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px dashed rgba(15, 40, 70, 0.18);
+  border-radius: 13px;
+  background: rgba(15, 40, 70, 0.02);
+  color: #1a334d;
+  font: inherit;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+}
+
+.boq-terms-toggle-btn:hover { background: rgba(15, 40, 70, 0.05); }
+
+.boq-terms-toggle-btn small {
+  margin-left: auto;
+  color: #6b7f94;
+  font-weight: 500;
+  font-size: 0.78rem;
+}
+
+.boq-terms-chevron {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  stroke: #6b7f94;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s ease;
+}
+
+.boq-terms-chevron.is-open { transform: rotate(90deg); }
+
+.boq-terms-tabs { display: flex; gap: 4px; margin-bottom: 8px; }
+
+.boq-terms-tab {
+  padding: 6px 14px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 999px;
+  background: #fff;
+  color: #6b7f94;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.boq-terms-tab:hover { background: rgba(15, 40, 70, 0.04); }
+.boq-terms-tab.is-active {
+  border-color: rgba(37, 148, 210, 0.5);
+  background: rgba(37, 148, 210, 0.1);
+  color: var(--admin-blue-ink, #12548f);
+}
+
+/* English and Arabic side by side — each box is typed independently and
+   neither is a translation of the other, so they read better as two equal
+   columns than as one stacked under the other. Collapses to one column
+   below the width a 760px modal actually reaches on a phone.
+   `[hidden]` needs its own rule below: a bare class carrying `display`
+   always wins over the UA stylesheet's `[hidden]{display:none}`, the same
+   clipping bug already hit once on this page's header actions. */
+.boq-terms-lang-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.boq-terms-lang-grid[hidden] { display: none; }
+
+@media (max-width: 720px) {
+  .boq-terms-lang-grid { grid-template-columns: 1fr; }
+}
+
+.boq-terms-lang-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+.boq-terms-lang-label {
+  color: #6b7f94;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Plain, on purpose — see the comment on termsPreviewLines in the
+   component for why Edit itself does not colour its headings the way
+   Preview does. No .boq-field ancestor inside the modal to inherit
+   width:100% from, hence setting it again here. */
+.boq-terms-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 13px;
+  color: var(--admin-ink);
+  font: inherit;
+  font-family: inherit;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  padding: 14px 16px;
+}
+
+.boq-terms-textarea[dir="rtl"] {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  line-height: 1.8;
+}
+
+.boq-terms-textarea:focus {
+  outline: none;
+  border-color: rgba(37, 148, 210, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+}
+
+/* Mirrors ComposeFreeformTerms on the server, line for line: a plain
+   textarea cannot show what the PDF actually does with this text (bold
+   numbered headings, bulleted clauses), so editing it read as an
+   undifferentiated wall of text. This is what it will really print as. */
+.boq-terms-preview {
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 16px 18px;
+  border: 1px solid rgba(15, 40, 70, 0.12);
+  border-radius: 13px;
+  background: #fff;
+}
+
+.boq-terms-preview-heading {
+  margin-top: 14px;
+  color: var(--admin-blue-ink, #12548f);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+.boq-terms-preview-heading:first-child { margin-top: 0; }
+
+.boq-terms-preview-bullet {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  padding-left: 4px;
+  color: #3e5872;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.boq-terms-preview-dot { flex: none; color: var(--admin-accent, #c2660f); }
+
+.boq-terms-preview-para {
+  margin-top: 4px;
+  color: #3e5872;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+/* dir="rtl" on the block already right-aligns the text and — since the
+   bullet row is a flex row — reverses the dot to the visual right on its
+   own; this just gives Arabic script the extra line-height it needs. */
+.boq-terms-preview--rtl {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+.boq-terms-preview--rtl .boq-terms-preview-heading,
+.boq-terms-preview--rtl .boq-terms-preview-bullet,
+.boq-terms-preview--rtl .boq-terms-preview-para {
+  line-height: 1.8;
+}
+
+.boq-terms-hint {
+  color: #6b7f94;
+  font-weight: 500;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
 
 @media (max-width: 1180px) {
   .boq-project-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1316,6 +1701,15 @@
 .boq-modal-title { margin: 0 0 6px; font-size: 1.15rem; }
 .boq-modal-note { margin: 0 0 16px; color: var(--admin-muted); font-size: 0.88rem; }
 .boq-modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+
+/* The reason/note modals are a short form; this one holds a 16-row textarea
+   plus its formatted preview, and 520px wrapped that content into an
+   unreadably narrow column. */
+.boq-modal--terms {
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
 
 /* Reasons run long; the column wraps rather than pushing the table wider. */
 .boq-reason-cell {

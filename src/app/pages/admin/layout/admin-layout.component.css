@@ -85,7 +85,29 @@
 .admin-nav {
   position: relative;
   display: grid;
+  align-content: start;
   gap: 8px;
+  /* The rail itself stays overflow:hidden (it clips the aurora glow), so the
+     nav list has to be its own scroll region — otherwise rows below the fold
+     were simply unreachable once there were enough of them to outgrow the
+     screen, with no scrollbar anywhere to say so. flex + min-height:0 is
+     what lets a grid child shrink below its content size inside a flex
+     column at all; without it this stays sized to fit everything. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.admin-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
 }
 
 /* Every nav row owns a hue (--accent / --accent-2). Idle rows show it only in
@@ -114,6 +136,32 @@
    set on `.admin-nav a` (0,1,1) above, which silently paints every row alike. */
 .admin-nav a.nav-staff { --accent: #4bb0e8; --accent-2: #2594d2; }
 .admin-nav a.nav-contacts { --accent: #7d92f0; --accent-2: #4f46e5; }
+.admin-nav a.nav-clients { --accent: #f9b877; --accent-2: #e07b1a; padding-right: 44px; }
+
+/* How many sign-ups are waiting. Pinned to the pill's corner rather than given
+   a grid column, so rows with and without a count keep identical layout. */
+.nav-count {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #f6993d;
+  color: #08192b;
+  font-size: 0.76rem;
+  font-weight: 900;
+  box-shadow: 0 6px 16px -6px rgba(246, 153, 61, 0.9);
+}
+
+.admin-nav a.active .nav-count {
+  background: #08192b;
+  color: #fff;
+}
 .admin-nav a.nav-dia { --accent: #4aa9dd; --accent-2: #0d6fae; }
 .admin-nav a.nav-storage { --accent: #57c2b0; --accent-2: #1c8577; }
 .admin-nav a.nav-vip { --accent: #6aa8ea; --accent-2: #3b5fd4; }

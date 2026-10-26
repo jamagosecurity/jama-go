@@ -1,0 +1,193 @@
+<section class="admin-login register-page">
+  <div class="login-stage">
+    <div class="atmosphere" aria-hidden="true">
+      <div class="orb orb-cyan"></div>
+      <div class="orb orb-amber"></div>
+      <div class="mesh"></div>
+    </div>
+
+    <div class="login-shell">
+      <aside class="login-visual">
+        <a class="back-link" href="/">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+          Jama Go
+        </a>
+
+        <div class="visual-core register-visual">
+          <p class="kicker">Client registration</p>
+          <h2 class="headline register-headline">Register your site with Jama Go</h2>
+
+          <ol class="register-steps">
+            <li>
+              <span class="register-step-num" aria-hidden="true">1</span>
+              <div>
+                <strong>Register</strong>
+                <span>Tell us who you are and where your site is.</span>
+              </div>
+            </li>
+            <li>
+              <span class="register-step-num" aria-hidden="true">2</span>
+              <div>
+                <strong>We review it</strong>
+                <span>Our team checks your details and assigns the right team for your site.</span>
+              </div>
+            </li>
+            <li>
+              <span class="register-step-num" aria-hidden="true">3</span>
+              <div>
+                <strong>Sign in</strong>
+                <span>Once approved, sign in with the email and password you choose here.</span>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <p class="visual-meta">Jama Go Security Equipment · Doha, Qatar</p>
+      </aside>
+
+      <div class="login-panel">
+        <div class="panel-inner register-inner">
+          @if (registeredName(); as name) {
+            <div class="register-done" role="status">
+              <div class="register-done-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+              </div>
+              <h1>Thank you, {{ name }}</h1>
+              <p>
+                Your registration has been sent to the Jama Go team. Once they approve it, you can
+                sign in with the email and password you just chose.
+              </p>
+              <a class="signin register-done-link" routerLink="/admin/login">
+                <span class="btn-label">Go to sign in</span>
+              </a>
+            </div>
+          } @else {
+            <header class="heading">
+              <p class="eyebrow">New client</p>
+              <h1>Create your account</h1>
+              <p>Your account becomes active once the Jama Go team approves it.</p>
+            </header>
+
+            <form class="login-form register-form" [formGroup]="form" (submit)="submit($event)" novalidate>
+              <div class="field">
+                <label for="reg-name">Full name</label>
+                <div class="control" [class.is-invalid]="showError('fullName')">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
+                  </svg>
+                  <input id="reg-name" formControlName="fullName" maxlength="150"
+                    autocomplete="name" placeholder="Your name" />
+                </div>
+                @if (showError('fullName')) {
+                  <p class="field-error">{{ errorFor('fullName') }}</p>
+                }
+              </div>
+
+              <div class="field">
+                <label for="reg-email">Email</label>
+                <div class="control" [class.is-invalid]="showError('email')">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="m4 7 8 6 8-6" />
+                  </svg>
+                  <input id="reg-email" type="email" formControlName="email" maxlength="256"
+                    autocomplete="email" placeholder="you@company.com" />
+                </div>
+                @if (showError('email')) {
+                  <p class="field-error">{{ errorFor('email') }}</p>
+                }
+              </div>
+
+              <div class="field">
+                <label for="reg-mobile">Mobile</label>
+                <div class="control" [class.is-invalid]="showError('mobile')">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="7" y="2.5" width="10" height="19" rx="2.2" />
+                    <path d="M11 18h2" />
+                  </svg>
+                  <input id="reg-mobile" type="tel" inputmode="tel" formControlName="mobile" maxlength="40"
+                    autocomplete="tel" placeholder="+974 3312 3456" />
+                </div>
+                @if (showError('mobile')) {
+                  <p class="field-error">{{ errorFor('mobile') }}</p>
+                }
+              </div>
+
+              <div class="field">
+                <label for="reg-site">Site location</label>
+                <div class="control" [class.is-invalid]="showError('siteLocation')">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" />
+                    <circle cx="12" cy="9.5" r="2.5" />
+                  </svg>
+                  <input id="reg-site" formControlName="siteLocation" maxlength="300"
+                    autocomplete="street-address" placeholder="Building, street, zone, area" />
+                </div>
+                @if (showError('siteLocation')) {
+                  <p class="field-error">{{ errorFor('siteLocation') }}</p>
+                }
+              </div>
+
+              <div class="field">
+                <label for="reg-password">Password</label>
+                <div class="control" [class.is-invalid]="showError('password')">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="5" y="10" width="14" height="11" rx="2" />
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" />
+                  </svg>
+                  <input id="reg-password" [type]="showPassword() ? 'text' : 'password'"
+                    formControlName="password" autocomplete="new-password" placeholder="Create a password" />
+                  <button class="password-toggle" type="button" (click)="togglePassword()"
+                    [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" />
+                      <circle cx="12" cy="12" r="2.5" />
+                    </svg>
+                  </button>
+                </div>
+                @if (showError('password')) {
+                  <p class="field-error">{{ errorFor('password') }}</p>
+                }
+              </div>
+
+              <div class="field">
+                <label for="reg-confirm">Confirm password</label>
+                <div class="control" [class.is-invalid]="showError('confirmPassword')">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="5" y="10" width="14" height="11" rx="2" />
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                    <path d="m9.5 15.5 1.8 1.8 3.2-3.3" />
+                  </svg>
+                  <input id="reg-confirm" [type]="showPassword() ? 'text' : 'password'"
+                    formControlName="confirmPassword" autocomplete="new-password" placeholder="Type it again" />
+                </div>
+                @if (showError('confirmPassword')) {
+                  <p class="field-error">{{ errorFor('confirmPassword') }}</p>
+                }
+              </div>
+
+              <ul class="password-rules" aria-label="Password needs">
+                @for (rule of passwordRules(); track rule.label) {
+                  <li [class.is-ok]="rule.ok">{{ rule.label }}</li>
+                }
+              </ul>
+
+              @if (error()) {
+                <p class="error" role="alert">{{ error() }}</p>
+              }
+
+              <button type="submit" class="signin" [disabled]="submitting()">
+                <span class="btn-label">{{ submitting() ? 'Sending…' : 'Register' }}</span>
+              </button>
+            </form>
+
+            <p class="register-switch">
+              Already registered? <a routerLink="/admin/login">Sign in</a>
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

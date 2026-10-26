@@ -11,19 +11,88 @@
 
   <main class="client-content">
     @if (loading()) {
-      <div class="admin-panel"><p>Loading your project…</p></div>
-    } @else if (error()) {
-      <div class="admin-panel"><p class="admin-error">{{ error() }}</p></div>
-    } @else if (project(); as item) {
-      <header class="admin-page-header">
-        <div>
-          <span class="admin-kicker">{{ item.projectName }}</span>
-          <h1>{{ item.folderName }}</h1>
-          <p>Documents shared with you by the Jama Go team.</p>
-        </div>
-      </header>
+      <div class="admin-panel"><p>Loading your account…</p></div>
+    } @else {
+      @if (error()) {
+        <div class="admin-panel"><p class="admin-error">{{ error() }}</p></div>
+      }
 
-      <app-vip-folders [folders]="item.folders" (download)="download($event)" />
+      @if (registration(); as reg) {
+        <header class="admin-page-header">
+          <div>
+            <span class="admin-kicker">Welcome</span>
+            <h1>{{ reg.fullName }}</h1>
+            <p>Your Jama Go client account.</p>
+          </div>
+        </header>
+
+        <section class="client-account surface-card">
+          <div class="client-account-status">
+            <span class="admin-badge admin-badge--active admin-badge--dot">Account active</span>
+            @if (reg.category) {
+              <span class="client-category" [class.client-category--moi]="reg.category === 'Moi'">
+                {{ categoryLabels[reg.category] }}
+              </span>
+            }
+          </div>
+
+          <dl class="client-account-details">
+            <div>
+              <dt>Site location</dt>
+              <dd>{{ reg.siteLocation }}</dd>
+            </div>
+            <div>
+              <dt>Mobile</dt>
+              <dd>{{ reg.mobile }}</dd>
+            </div>
+            <div>
+              <dt>Email</dt>
+              <dd>{{ reg.email }}</dd>
+            </div>
+            <div>
+              <dt>Approved</dt>
+              <dd>{{ reg.reviewedAt | date: 'd MMM y' }}</dd>
+            </div>
+          </dl>
+
+          @if (reg.teams.length) {
+            <div class="client-account-teams">
+              <span class="client-account-label">Your Jama Go team</span>
+              <div class="client-chips">
+                @for (team of reg.teams; track team.key) {
+                  <span class="client-chip">{{ team.name }}</span>
+                }
+              </div>
+            </div>
+          }
+
+          @if (reg.diaNumber) {
+            <div class="client-dia">
+              <div>
+                <span class="client-account-label">DIA inspection</span>
+                <strong>{{ reg.diaNumber }}</strong>
+              </div>
+              <span class="admin-badge admin-badge--dot"
+                [class.admin-badge--active]="reg.diaActive"
+                [class.admin-badge--new]="!reg.diaActive">
+                {{ reg.diaActive ? 'Inspections active' : 'Being set up' }}
+              </span>
+            </div>
+          }
+        </section>
+      }
+
+      @if (project(); as item) {
+        <header class="admin-page-header client-project-header">
+          <div>
+            <span class="admin-kicker">{{ item.projectName }}</span>
+            <h1>{{ item.folderName }}</h1>
+            <p>Documents shared with you by the Jama Go team.</p>
+          </div>
+        </header>
+
+        <app-vip-folders [folders]="item.folders" (download)="download($event)" />
+      }
     }
   </main>
 </div>

@@ -1,13 +1,21 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import {
-  ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal,
+  ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, OnInit, ViewChild,
+  computed, inject, signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
-import { BOQ_SECTION_TITLES, Boq, BoqLine, SaveBoqRequest } from '../../../models/boq.model';
+import {
+  BOQ_SECTION_TITLES,
+  BOQ_TERMS_LANGUAGES,
+  Boq,
+  BoqLine,
+  BoqTermsLanguage,
+  SaveBoqRequest,
+} from '../../../models/boq.model';
 import {
   Camera,
   CameraBrandCount,
@@ -100,6 +108,11 @@ interface DraftSection {
   title: string;
   lines: DraftLine[];
 }
+
+/** Exactly UpdateBoqCommandHandler's refusal text — the one signal that
+ *  tells a silent amend attempt "actually, ask the human", as opposed to
+ *  any other reason the save could have failed. */
+const REASON_REQUIRED_MESSAGE = 'Say why this approved quotation is being changed.';
 
 /**
  * Builds a bill of quantities from the stock catalogue.
@@ -216,6 +229,48 @@ export class BoqEditorComponent implements OnInit {
   protected readonly saving = signal(false);
   protected readonly downloading = signal(false);
   protected readonly downloadingContract = signal(false);
+  /** On by default — some clients already have the standard commercial
+   *  terms agreed elsewhere and just want the cover and the priced items. */
+  protected readonly includeTermsPage = signal(true);
+  /** English by default, every time — regardless of whether this quotation
+   *  has Arabic terms typed in, a download only ever comes out in Arabic
+   *  because someone at the point of download chose that. */
+  protected readonly downloadTermsLanguage = signal<BoqTermsLanguage>('English');
+  protected readonly termsLanguageOptions = BOQ_TERMS_LANGUAGES;
+
+  /**
+   * The header used to lay Download PDF / the terms checkbox / Download
+   * Contract / Share · WhatsApp / Share · Email out as five flat buttons —
+   * tidy at first, unreadable once all five exist on an approved quotation.
+   * Grouped into two small menus instead; closes on an outside click via
+   * the document listener below, the menu's own container being the only
+   * thing exempted from it.
+   */
+  @ViewChild('downloadMenu') private downloadMenuEl?: ElementRef<HTMLElement>;
+  @ViewChild('shareMenu') private shareMenuEl?: ElementRef<HTMLElement>;
+  protected readonly downloadMenuOpen = signal(false);
+  protected readonly shareMenuOpen = signal(false);
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+    if (this.downloadMenuOpen() && !this.downloadMenuEl?.nativeElement.contains(target)) {
+      this.downloadMenuOpen.set(false);
+    }
+    if (this.shareMenuOpen() && !this.shareMenuEl?.nativeElement.contains(target)) {
+      this.shareMenuOpen.set(false);
+    }
+  }
+
+  protected toggleDownloadMenu(): void {
+    this.shareMenuOpen.set(false);
+    this.downloadMenuOpen.update((open) => !open);
+  }
+
+  protected toggleShareMenu(): void {
+    this.downloadMenuOpen.set(false);
+    this.shareMenuOpen.update((open) => !open);
+  }
   protected readonly formError = signal('');
 
   /**
@@ -357,9 +412,156 @@ export class BoqEditorComponent implements OnInit {
     contactNumber: ['', [Validators.maxLength(40)]],
     issueDate: [new Date().toISOString().slice(0, 10), Validators.required],
     notes: ['', [Validators.maxLength(2000)]],
+    termsAndConditions: ['', [Validators.maxLength(4000)]],
+    termsAndConditionsAr: ['', [Validators.maxLength(4000)]],
   });
 
   protected readonly isEditing = computed(() => this.boq() !== null);
+
+  /**
+   * The standard terms page, as plain text — fetched once so the "Terms &
+   * Conditions" box has something to pre-fill with, and so save() can tell
+   * an untouched box from a genuine edit (see buildRequest()). The Arabic
+   * counterpart is fetched alongside it and pre-fills its own box the same
+   * way — the two languages are typed and saved independently, never
+   * translated from one another.
+   */
+  protected readonly defaultTermsText = signal('');
+  protected readonly defaultTermsTextAr = signal('');
+  /** Closed by default — almost no quotation touches this, so it should not
+   *  sit open among the ordinary project fields. A modal rather than an
+   *  inline expansion: the content (tabs, a 14-row textarea, the preview)
+   *  is too much to grow the Project card by every time someone glances at
+   *  it. Opens itself when a quotation already carries its own wording, so
+   *  an existing customisation is never hidden from whoever opens it next. */
+  protected readonly termsModalOpen = signal(false);
+
+  protected openTermsModal(): void {
+    this.termsModalOpen.set(true);
+  }
+
+  protected closeTermsModal(): void {
+    this.termsModalOpen.set(false);
+  }
+
+  /** "Done" used to just close the dialog, leaving the actual save for
+   *  whenever someone next reached the page's own Save button — a second,
+   *  easy-to-forget step for a change that already feels finished the
+   *  moment the dialog closes. This closes the modal and saves the whole
+   *  quotation immediately, reusing save() itself so an approved
+   *  quotation still goes through the same amend-reason prompt it always
+   *  has — closing first so that prompt never opens underneath this one. */
+  protected saveTermsAndClose(event: Event): void {
+    this.termsModalOpen.set(false);
+    this.save(event);
+  }
+
+  /** Whether this quotation's stored terms — either language — differ from
+   *  the standard wording, read straight off what was saved so it stays
+   *  correct even before defaultTermsText has loaded. Drives the summary
+   *  row's own hint. */
+  protected readonly hasCustomTerms = computed(
+    () => !!this.boq()?.termsAndConditions || !!this.boq()?.termsAndConditionsAr,
+  );
+
+  /**
+   * A plain <textarea> cannot show the bold headings and bullets the PDF
+   * actually prints — editing it looked like a wall of undifferentiated
+   * text. Preview renders the same content with the same two conventions
+   * ComposeFreeformTerms reads on the server ("N. " is a heading, "- " is a
+   * bullet), so what you see here is what prints.
+   */
+  protected readonly termsViewMode = signal<'edit' | 'preview'>('edit');
+
+  /**
+   * The modal sits outside &lt;form&gt; — same as the reject and amend
+   * modals — so its textareas cannot use formControlName. Reads the form
+   * control's live value and writes back through onTermsInput /
+   * onTermsArInput, which is what keeps the two in sync instead.
+   */
+  protected readonly termsAndConditionsValue = toSignal(
+    this.form.controls.termsAndConditions.valueChanges,
+    { initialValue: this.form.controls.termsAndConditions.value },
+  );
+  protected readonly termsAndConditionsArValue = toSignal(
+    this.form.controls.termsAndConditionsAr.valueChanges,
+    { initialValue: this.form.controls.termsAndConditionsAr.value },
+  );
+
+  protected onTermsInput(event: Event): void {
+    this.form.controls.termsAndConditions.setValue((event.target as HTMLTextAreaElement).value);
+  }
+
+  protected onTermsArInput(event: Event): void {
+    this.form.controls.termsAndConditionsAr.setValue((event.target as HTMLTextAreaElement).value);
+  }
+
+  private static readonly TERMS_HEADING = /^\d+\.\s+\S/;
+
+  /**
+   * Tried rendering Edit itself as a contenteditable with live-coloured
+   * headings, matching Preview — reverted. Angular's @for tracks its
+   * rendered children by its own view records, and contenteditable lets
+   * the browser split/insert DOM nodes directly while typing (Enter, in
+   * particular) with zero notice to Angular. The two fighting over the
+   * same nodes duplicated lines the moment the colouring re-rendered
+   * after a blur — confirmed by testing, not a hunch. A plain textarea
+   * here is correct and boring on purpose: Preview is where the colour
+   * belongs, since it only ever renders read-only, never mutates.
+   *
+   * Shared between English and Arabic: both follow the same two
+   * conventions ("N. " is a heading, "- " is a bullet), and the numerals
+   * stay Western even inside Arabic text, so one parser serves both.
+   */
+  private static parsePreviewLines(
+    text: string,
+  ): { text: string; kind: 'heading' | 'bullet' | 'paragraph' }[] {
+    const lines: { text: string; kind: 'heading' | 'bullet' | 'paragraph' }[] = [];
+
+    for (const raw of text.replace(/\r\n/g, '\n').split('\n')) {
+      const line = raw.trim();
+      if (!line) continue;
+
+      if (BoqEditorComponent.TERMS_HEADING.test(line)) {
+        lines.push({ text: line, kind: 'heading' });
+      } else if (line.startsWith('- ')) {
+        lines.push({ text: line.slice(2).trim(), kind: 'bullet' });
+      } else {
+        lines.push({ text: line, kind: 'paragraph' });
+      }
+    }
+
+    return lines;
+  }
+
+  protected readonly termsPreviewLines = computed(() =>
+    BoqEditorComponent.parsePreviewLines(this.termsAndConditionsValue() ?? ''),
+  );
+
+  protected readonly termsPreviewLinesAr = computed(() =>
+    BoqEditorComponent.parsePreviewLines(this.termsAndConditionsArValue() ?? ''),
+  );
+
+  private loadDefaultTerms(): void {
+    this.service
+      .getDefaultTerms()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ english, arabic }) => {
+          this.defaultTermsText.set(english);
+          this.defaultTermsTextAr.set(arabic);
+          // Only fills an empty box — a quotation already loaded with its own
+          // wording, or one the user has already started typing into, is left
+          // alone regardless of which of these two calls lands first.
+          const control = this.form.controls.termsAndConditions;
+          if (!control.value && !this.boq()?.termsAndConditions) control.setValue(english);
+
+          const controlAr = this.form.controls.termsAndConditionsAr;
+          if (!controlAr.value && !this.boq()?.termsAndConditionsAr) controlAr.setValue(arabic);
+        },
+        error: () => {},
+      });
+  }
 
   /** Mirrors the server's arithmetic so the figure moves as quantities change.
    *  The server recomputes on save and its answer is what gets stored. */
@@ -417,6 +619,7 @@ export class BoqEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCatalogue();
+    this.loadDefaultTerms();
 
     this.destroyRef.onDestroy(() => {
       if (this.savedNoticeTimer) clearTimeout(this.savedNoticeTimer);
@@ -467,6 +670,8 @@ export class BoqEditorComponent implements OnInit {
             contactNumber: boq.contactNumber ?? '',
             issueDate: boq.issueDate,
             notes: boq.notes ?? '',
+            termsAndConditions: boq.termsAndConditions ?? this.defaultTermsText(),
+            termsAndConditionsAr: boq.termsAndConditionsAr ?? this.defaultTermsTextAr(),
           });
           this.seedSections(boq);
         },
@@ -1147,6 +1352,18 @@ export class BoqEditorComponent implements OnInit {
       contactNumber: raw.contactNumber.trim() || null,
       issueDate: raw.issueDate,
       notes: raw.notes.trim() || null,
+      // Untouched (still exactly the standard wording) goes as null, so the
+      // PDF keeps its nicely formatted numbered layout rather than switching
+      // every ordinary quotation onto the plainer freeform rendering used for
+      // an actual edit.
+      termsAndConditions:
+        raw.termsAndConditions.trim() === this.defaultTermsText().trim()
+          ? null
+          : raw.termsAndConditions.trim() || null,
+      termsAndConditionsAr:
+        raw.termsAndConditionsAr.trim() === this.defaultTermsTextAr().trim()
+          ? null
+          : raw.termsAndConditionsAr.trim() || null,
       specialDiscount: this.discountApplied(),
       sections: filled.map((section) => ({
         title: section.title.trim(),
@@ -1164,17 +1381,12 @@ export class BoqEditorComponent implements OnInit {
       })),
     };
 
-    // Amending an approved quotation needs a reason on the record before
-    // anything is sent — the server refuses it without one regardless, but
-    // asking here means the admin explains themselves once, up front,
-    // instead of typing the whole form again after a refusal.
+    // Amending an approved quotation only needs a reason on the record when
+    // the change is more than a terms-page reword — and the server is what
+    // actually knows which this is. So try it silently first; the modal
+    // only appears when that attempt comes back asking for one.
     if (this.boq() && this.isAmending()) {
-      this.pendingAmendRequest = request;
-      this.amendNote.set('');
-      this.amendRequestedBy.set('');
-      this.amendError.set('');
-      this.confirmingAmend.set(true);
-      this.loadStaffOptionsOnce();
+      this.attemptAmend(request);
       return;
     }
 
@@ -1241,6 +1453,79 @@ export class BoqEditorComponent implements OnInit {
     this.performSave({ ...pending, amendmentNote: combinedNote });
   }
 
+  /** The save() path for an approved quotation: attempt it exactly as
+   *  typed, with no reason attached. Most of the time that succeeds outright
+   *  — a terms-only reword needs no explaining. Only the server's specific
+   *  refusal for a substantive change falls back to the modal, pre-filled
+   *  with a best guess at what moved so the reason rarely has to be typed
+   *  from scratch. */
+  private attemptAmend(request: SaveBoqRequest): void {
+    const existing = this.boq();
+    if (!existing) return;
+
+    this.saving.set(true);
+    this.formError.set('');
+    this.savedNotice.set('');
+
+    this.service
+      .update(existing.id, request)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false)))
+      .subscribe({
+        next: (saved) => this.handleSaved(saved, true),
+        error: (err: unknown) => {
+          const message = getApiErrorMessage(err, 'Unable to save the quotation.');
+          if (message !== REASON_REQUIRED_MESSAGE) {
+            this.formError.set(message);
+            return;
+          }
+
+          this.pendingAmendRequest = request;
+          this.amendNote.set(this.describeChanges());
+          this.amendRequestedBy.set('');
+          this.amendError.set('');
+          this.confirmingAmend.set(true);
+          this.loadStaffOptionsOnce();
+        },
+      });
+  }
+
+  /** A best-effort default for the Reason box — never what the server
+   *  actually relies on (it judges the real before/after itself), just
+   *  enough of a head start that an admin is rarely typing out what the
+   *  screen already shows. Always left fully editable. */
+  private describeChanges(): string {
+    const existing = this.boq();
+    if (!existing) return '';
+
+    const raw = this.form.getRawValue();
+    const fieldsChanged: string[] = [];
+    if (raw.projectName.trim() !== existing.projectName) fieldsChanged.push('project name');
+    if ((raw.siteLocation.trim() || null) !== existing.siteLocation) fieldsChanged.push('site location');
+    if ((raw.clientName.trim() || null) !== existing.clientName) fieldsChanged.push('client name');
+    if ((raw.contactNumber.trim() || null) !== existing.contactNumber) fieldsChanged.push('contact number');
+    if ((raw.notes.trim() || null) !== existing.notes) fieldsChanged.push('notes');
+    if (this.discountApplied() !== existing.specialDiscount) fieldsChanged.push('the discount');
+
+    const before = existing.sections.flatMap((s) => s.lines);
+    const beforeIds = new Set(before.filter((l) => l.cameraId).map((l) => l.cameraId as string));
+    const after = this.sections().flatMap((s) => s.lines);
+    const afterIds = new Set(after.filter((l) => l.cameraId).map((l) => l.cameraId as string));
+
+    const added = after
+      .filter((l) => l.cameraId && !beforeIds.has(l.cameraId as string))
+      .map((l) => l.itemName);
+    const removed = before
+      .filter((l) => l.cameraId && !afterIds.has(l.cameraId as string))
+      .map((l) => l.itemName);
+
+    const parts: string[] = [];
+    if (added.length) parts.push(`Added ${added.join(', ')}`);
+    if (removed.length) parts.push(`Removed ${removed.join(', ')}`);
+    if (fieldsChanged.length) parts.push(`Updated ${fieldsChanged.join(', ')}`);
+
+    return parts.join('. ');
+  }
+
   private performSave(request: SaveBoqRequest): void {
     const existing = this.boq();
     const save$ = existing ? this.service.update(existing.id, request) : this.service.create(request);
@@ -1252,26 +1537,28 @@ export class BoqEditorComponent implements OnInit {
     save$
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false)))
       .subscribe({
-        next: (saved) => {
-          this.boq.set(saved);
-          // Back in step with what the server actually wrote — the rates it
-          // recalculated, and the line ids it minted, which the next save has
-          // to quote.
-          this.seedSections(saved);
-          // The payable figure, not the pre-discount one: that is what the
-          // document ends on and what the reader is checking against.
-          this.noteSaved(
-            existing
-              ? `Saved. ${saved.boqNumber} now comes to ${this.money(saved.grandTotal)} ﷼.`
-              : `Saved as ${saved.boqNumber}, coming to ${this.money(saved.grandTotal)} ﷼.`,
-          );
-          // A new BOQ has just been given its number and id, so move the URL onto
-          // it — a refresh must not land back on /new.
-          if (!existing) void this.router.navigate([this.basePath, saved.id]);
-        },
+        next: (saved) => this.handleSaved(saved, !!existing),
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to save the quotation.')),
       });
+  }
+
+  private handleSaved(saved: Boq, hadExisting: boolean): void {
+    this.boq.set(saved);
+    // Back in step with what the server actually wrote — the rates it
+    // recalculated, and the line ids it minted, which the next save has
+    // to quote.
+    this.seedSections(saved);
+    // The payable figure, not the pre-discount one: that is what the
+    // document ends on and what the reader is checking against.
+    this.noteSaved(
+      hadExisting
+        ? `Saved. ${saved.boqNumber} now comes to ${this.money(saved.grandTotal)} ﷼.`
+        : `Saved as ${saved.boqNumber}, coming to ${this.money(saved.grandTotal)} ﷼.`,
+    );
+    // A new BOQ has just been given its number and id, so move the URL onto
+    // it — a refresh must not land back on /new.
+    if (!hadExisting) void this.router.navigate([this.basePath, saved.id]);
   }
 
   // ===== Approval actions =====
@@ -1506,12 +1793,19 @@ export class BoqEditorComponent implements OnInit {
     const boq = this.boq();
     if (!boq) return;
 
+    const language = this.downloadTermsLanguage();
+    // English needs no suffix — it is what "Download PDF" has always
+    // produced. The other two are a deliberate choice at the point of
+    // download, so the file itself says which one this is.
+    const suffix = language === 'Arabic' ? ' (Arabic)' : language === 'Both' ? ' (Bilingual)' : '';
+
+    this.downloadMenuOpen.set(false);
     this.downloading.set(true);
     this.service
-      .downloadPdf(boq.id)
+      .downloadPdf(boq.id, this.includeTermsPage(), language)
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.downloading.set(false)))
       .subscribe({
-        next: (blob) => downloadBlob(blob, `${boq.boqNumber}.pdf`),
+        next: (blob) => downloadBlob(blob, `${boq.boqNumber}${suffix}.pdf`),
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to download the PDF.')),
       });
@@ -1521,6 +1815,7 @@ export class BoqEditorComponent implements OnInit {
     const boq = this.boq();
     if (!boq) return;
 
+    this.downloadMenuOpen.set(false);
     this.downloadingContract.set(true);
     this.service
       .downloadContract(boq.id)
@@ -1544,6 +1839,7 @@ export class BoqEditorComponent implements OnInit {
     const boq = this.boq();
     if (!boq || !this.canShare()) return;
 
+    this.shareMenuOpen.set(false);
     this.download();
     window.open(
       whatsAppShareUrl(boq.contactNumber, boqShareMessage(boq)),
@@ -1556,6 +1852,7 @@ export class BoqEditorComponent implements OnInit {
     const boq = this.boq();
     if (!boq || !this.canShare()) return;
 
+    this.shareMenuOpen.set(false);
     this.download();
     window.location.href = mailtoShareUrl(
       `Quotation ${boq.boqNumber}${boq.projectName ? ' — ' + boq.projectName : ''}`,
