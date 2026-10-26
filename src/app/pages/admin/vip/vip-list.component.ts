@@ -6,6 +6,7 @@ import { finalize } from 'rxjs';
 import { VipClientListItem } from '../../../models/vip-client.model';
 import { VipClientService } from '../../../services/vip-client.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
+import { VIP_BASE_PATH } from './vip-base-path';
 
 @Component({
   selector: 'app-vip-list',
@@ -18,6 +19,8 @@ import { getApiErrorMessage } from '../../../utils/api-error.util';
 export class VipListComponent implements OnInit {
   private readonly service = inject(VipClientService);
   private readonly destroyRef = inject(DestroyRef);
+  /** Portal this screen is mounted under — see VIP_BASE_PATH. */
+  protected readonly base = inject(VIP_BASE_PATH);
 
   protected readonly clients = signal<VipClientListItem[]>([]);
   protected readonly loading = signal(true);

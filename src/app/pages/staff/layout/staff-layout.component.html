@@ -69,6 +69,20 @@
         </a>
       }
 
+      @if (canManageVip()) {
+        <a routerLink="/staff/vip" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            </svg>
+          </span>
+          <span>
+            <strong>VIP Clients</strong>
+            <small>Projects &amp; documents</small>
+          </span>
+        </a>
+      }
+
       @if (canSeeBoq()) {
         <!-- Parent and children, so "Approved" reads as a view of the
              quotations above it rather than as its own area. -->

@@ -14,6 +14,7 @@ import {
   shouldShowError,
   strongPassword,
 } from '../../../utils/form-validators.util';
+import { VIP_BASE_PATH } from './vip-base-path';
 
 @Component({
   selector: 'app-vip-editor',
@@ -29,6 +30,8 @@ export class VipEditorComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  /** Portal this screen is mounted under — see VIP_BASE_PATH. */
+  private readonly base = inject(VIP_BASE_PATH);
 
   readonly vipId = this.route.snapshot.paramMap.get('id');
   readonly isEditing = !!this.vipId;
@@ -123,14 +126,14 @@ export class VipEditorComponent {
         finalize(() => this.saving.set(false)),
       )
       .subscribe({
-        next: (id) => void this.router.navigate(['/admin/vip', this.vipId ?? id]),
+        next: (id) => void this.router.navigate([this.base, this.vipId ?? id]),
         error: (err: unknown) =>
           this.error.set(getApiErrorMessage(err, 'Could not save the VIP client.')),
       });
   }
 
   cancel(): void {
-    void this.router.navigate(['/admin/vip']);
+    void this.router.navigate([this.base]);
   }
 
   private load(id: string): void {

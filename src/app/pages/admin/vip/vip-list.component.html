@@ -5,7 +5,7 @@
       <h1>Client projects</h1>
       <p>Create a VIP client and hand over their project documents.</p>
     </div>
-    <a class="btn-admin btn-admin-primary" routerLink="/admin/vip/new">+ New VIP client</a>
+    <a class="btn-admin btn-admin-primary" [routerLink]="[base, 'new']">+ New VIP client</a>
   </header>
 
   @if (loading()) {
@@ -51,7 +51,7 @@
               {{ client.documentCount === 1 ? 'file' : 'files' }} ·
               added {{ client.createdAt | date: 'mediumDate' }}
             </span>
-            <a class="btn-admin btn-admin-primary" [routerLink]="['/admin/vip', client.id]">
+            <a class="btn-admin btn-admin-primary" [routerLink]="[base, client.id]">
               Open
             </a>
           </footer>

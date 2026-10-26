@@ -3,6 +3,7 @@ import { anyPermissionGuard, permissionGuard } from '../../guards/admin.guard';
 import { PERMISSIONS } from '../../models/auth.model';
 import { createCameraRoutes } from '../admin/cameras/cameras.routes';
 import { createDiaRoutes } from '../admin/dia/dia.routes';
+import { createVipRoutes } from '../admin/vip/vip.routes';
 import { createBoqRoutes } from './boq/boq.routes';
 import { createDrawingRoutes } from './drawings/drawing.routes';
 
@@ -78,6 +79,15 @@ export const STAFF_ROUTES: Routes = [
         path: 'dia',
         canActivate: [permissionGuard(PERMISSIONS.diaUpload)],
         children: createDiaRoutes('/staff/dia'),
+      },
+      {
+        // The VIP client screens, mounted inside the staff shell on the same
+        // terms as cameras above: vip.manage was grantable to a staff account,
+        // but the screens only existed under /admin, which is behind
+        // adminGuard — so the grant was a tick with nothing behind it.
+        path: 'vip',
+        canActivate: [permissionGuard(PERMISSIONS.vipManage)],
+        children: createVipRoutes('/staff/vip'),
       },
     ],
   },

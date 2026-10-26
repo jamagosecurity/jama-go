@@ -1,5 +1,5 @@
 <section class="admin-page">
-  <a class="back-link" routerLink="/admin/vip">
+  <a class="back-link" [routerLink]="base">
     <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
     Back to VIP clients
   </a>
@@ -16,7 +16,7 @@
         <p>{{ item.email }}</p>
       </div>
       <div class="vip-head-actions">
-        <a class="btn-admin btn-admin-ghost" [routerLink]="['/admin/vip', item.id, 'edit']">Edit</a>
+        <a class="btn-admin btn-admin-ghost" [routerLink]="[base, item.id, 'edit']">Edit</a>
         <button type="button" class="btn-admin btn-admin-danger" (click)="deleteClient()">Delete</button>
       </div>
     </header>

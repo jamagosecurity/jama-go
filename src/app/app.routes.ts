@@ -10,6 +10,7 @@ import {
   technicianGuard,
 } from './guards/admin.guard';
 import { createCameraRoutes } from './pages/admin/cameras/cameras.routes';
+import { createVipRoutes } from './pages/admin/vip/vip.routes';
 import { createBoqRoutes } from './pages/staff/boq/boq.routes';
 import { createDrawingRoutes } from './pages/staff/drawings/drawing.routes';
 import { PERMISSIONS } from './models/auth.model';
@@ -188,34 +189,12 @@ export const routes: Routes = [
               ),
           },
           {
+            // The same VIP screens staff hold vip.manage can reach too, mounted
+            // for admins here — see the /staff/vip mount for why this is a
+            // factory rather than inline routes.
             path: 'vip',
             canActivate: [permissionGuard(PERMISSIONS.vipManage)],
-            children: [
-              {
-                path: 'new',
-                title: 'New VIP Client — Jama Go Admin',
-                loadComponent: () =>
-                  import('./pages/admin/vip/vip-editor.component').then((m) => m.VipEditorComponent),
-              },
-              {
-                path: ':id/edit',
-                title: 'Edit VIP Client — Jama Go Admin',
-                loadComponent: () =>
-                  import('./pages/admin/vip/vip-editor.component').then((m) => m.VipEditorComponent),
-              },
-              {
-                path: ':id',
-                title: 'VIP Client — Jama Go Admin',
-                loadComponent: () =>
-                  import('./pages/admin/vip/vip-detail.component').then((m) => m.VipDetailComponent),
-              },
-              {
-                path: '',
-                title: 'VIP Clients — Jama Go Admin',
-                loadComponent: () =>
-                  import('./pages/admin/vip/vip-list.component').then((m) => m.VipListComponent),
-              },
-            ],
+            children: createVipRoutes('/admin/vip'),
           },
         ],
       },

@@ -41,6 +41,10 @@ export class StaffLayoutComponent {
    *  invisible: nothing in the staff portal led to the screens it unlocks. */
   readonly canManageCameras = computed(() => this.auth.can(PERMISSIONS.cameraManage));
 
+  /** Same shape as canManageCameras — vip.manage was grantable to a staff
+   *  account with no staff-portal link leading to it. */
+  readonly canManageVip = computed(() => this.auth.can(PERMISSIONS.vipManage));
+
   /** Same shape as canSeeBoq, for the drawings module — either grant reaches
    *  it, since an approver has to open a drawing to decide on it too. */
   readonly canSeeDrawings = computed(

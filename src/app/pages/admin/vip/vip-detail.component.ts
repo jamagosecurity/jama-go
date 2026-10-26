@@ -11,6 +11,7 @@ import {
   ConfirmationDialogData,
   DiaConfirmationDialogComponent,
 } from '../dia/shared/dia-shared.components';
+import { VIP_BASE_PATH } from './vip-base-path';
 import { VipFoldersComponent } from './vip-folders.component';
 
 @Component({
@@ -27,6 +28,8 @@ export class VipDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialog = inject(MatDialog);
+  /** Portal this screen is mounted under — see VIP_BASE_PATH. */
+  protected readonly base = inject(VIP_BASE_PATH);
 
   protected readonly id = this.route.snapshot.paramMap.get('id') ?? '';
   protected readonly client = signal<VipClientDetail | null>(null);
@@ -124,7 +127,7 @@ export class VipDetailComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: () => void this.router.navigate(['/admin/vip']),
+        next: () => void this.router.navigate([this.base]),
         error: (err: unknown) =>
           this.error.set(getApiErrorMessage(err, 'Could not delete this VIP client.')),
       });
