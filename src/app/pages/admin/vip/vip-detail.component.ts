@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Observable, filter, finalize, switchMap } from 'rxjs';
+import { Observable, catchError, concatMap, filter, finalize, from, of, switchMap, toArray } from 'rxjs';
 import { VipClientDetail, VipClientDocument } from '../../../models/vip-client.model';
 import { VipClientService } from '../../../services/vip-client.service';
 import { downloadBlob } from '../../../utils/download.util';
@@ -57,24 +57,43 @@ export class VipDetailComponent implements OnInit {
       });
   }
 
-  protected upload(event: { folderId: string; file: File }): void {
-    if (this.busyFolderId()) return;
+  /** Uploads one at a time rather than in parallel — the API takes one file
+   *  per request, and sequencing keeps the progress label and the eventual
+   *  folder reload meaningful instead of racing several requests together. */
+  protected upload(event: { folderId: string; files: File[] }): void {
+    if (this.busyFolderId() || !event.files.length) return;
     this.busyFolderId.set(event.folderId);
     this.error.set('');
 
-    this.service
-      .upload(event.folderId, event.file)
+    const failures: string[] = [];
+
+    from(event.files)
       .pipe(
+        concatMap((file) =>
+          this.service.upload(event.folderId, file).pipe(
+            catchError((err: unknown) => {
+              failures.push(`${file.name} (${getApiErrorMessage(err, 'upload failed')})`);
+              return of(null);
+            }),
+          ),
+        ),
+        toArray(),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.busyFolderId.set(null)),
       )
-      .subscribe({
-        next: () => {
-          this.notice.set(`${event.file.name} uploaded.`);
+      .subscribe((results) => {
+        const uploaded = results.filter((r) => r !== null).length;
+        if (uploaded) {
+          this.notice.set(uploaded === 1 ? '1 file uploaded.' : `${uploaded} files uploaded.`);
           this.load();
-        },
-        // Surfaces the API's own message, which names the rejected type or size.
-        error: (err: unknown) => this.error.set(getApiErrorMessage(err, 'Upload failed.')),
+        }
+        if (failures.length) {
+          this.error.set(
+            uploaded
+              ? `Some files failed: ${failures.join('; ')}.`
+              : `Upload failed: ${failures.join('; ')}.`,
+          );
+        }
       });
   }
 

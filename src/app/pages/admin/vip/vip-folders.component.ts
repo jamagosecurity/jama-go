@@ -49,11 +49,12 @@ export const MAX_UPLOAD_MB = 25;
               <label class="vip-upload">
                 <input
                   type="file"
+                  multiple
                   [attr.accept]="accept"
                   [disabled]="busyFolderId() === folder.id"
                   (change)="pick(folder.id, $event)"
                 />
-                <span>{{ busyFolderId() === folder.id ? 'Uploading…' : 'Upload file' }}</span>
+                <span>{{ busyFolderId() === folder.id ? 'Uploading…' : 'Upload files' }}</span>
               </label>
             }
           </header>
@@ -111,28 +112,37 @@ export class VipFoldersComponent {
   /** Folder currently uploading, so only that card shows a busy state. */
   readonly busyFolderId = input<string | null>(null);
 
-  readonly upload = output<{ folderId: string; file: File }>();
+  /** One or more files picked at once for the same folder — the handler
+   *  uploads them one by one and reports failures per file. */
+  readonly upload = output<{ folderId: string; files: File[] }>();
   readonly download = output<VipClientDocument>();
   readonly remove = output<VipClientDocument>();
-  /** Raised instead of `upload` when a file fails the local pre-check. */
+  /** Raised alongside `upload` for any file that fails the local pre-check;
+   *  the files that passed still upload. */
   readonly rejected = output<string>();
 
   protected readonly accept = ACCEPTED_EXTENSIONS.join(',');
 
   protected pick(folderId: string, event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    // Cleared first so picking the same file twice in a row still fires a change.
+    const picked = input.files ? Array.from(input.files) : [];
+    // Cleared first so picking the same file(s) twice in a row still fires a change.
     input.value = '';
-    if (!file) return;
+    if (!picked.length) return;
 
-    const reason = this.reject(file);
-    if (reason) {
-      this.rejected.emit(reason);
-      return;
+    const files: File[] = [];
+    for (const file of picked) {
+      const reason = this.reject(file);
+      if (reason) {
+        this.rejected.emit(reason);
+      } else {
+        files.push(file);
+      }
     }
 
-    this.upload.emit({ folderId, file });
+    if (files.length) {
+      this.upload.emit({ folderId, files });
+    }
   }
 
   private reject(file: File): string | null {
