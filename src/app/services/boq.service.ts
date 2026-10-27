@@ -129,4 +129,22 @@ export class BoqService {
   downloadContract(id: string): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/${id}/contract`, { responseType: 'blob' });
   }
+
+  /** The default Arabic contract wording for this quotation — what the
+   *  contract editor pre-fills its text box with the first time it is
+   *  opened, built from the quotation's own figures the same way the PDF
+   *  falls back to generating it on the spot if nobody ever saves an edit. */
+  getDefaultContractText(id: string): Observable<string> {
+    return this.http
+      .get<ApiResult<{ text: string }>>(`${this.baseUrl}/${id}/default-contract-text`)
+      .pipe(map((result) => unwrapApiResult(result).text));
+  }
+
+  /** Saves staff's own edited contract wording. Null (or blank) reverts to
+   *  the standard default the next time the contract is opened or downloaded. */
+  updateContractText(id: string, contractText: string | null): Observable<string> {
+    return this.http
+      .put<ApiResult<string>>(`${this.baseUrl}/${id}/contract-text`, { contractText })
+      .pipe(map(unwrapApiResult));
+  }
 }

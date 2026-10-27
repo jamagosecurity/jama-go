@@ -228,7 +228,6 @@ export class BoqEditorComponent implements OnInit {
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly downloading = signal(false);
-  protected readonly downloadingContract = signal(false);
   /** On by default — some clients already have the standard commercial
    *  terms agreed elsewhere and just want the cover and the priced items. */
   protected readonly includeTermsPage = signal(true);
@@ -1808,22 +1807,6 @@ export class BoqEditorComponent implements OnInit {
         next: (blob) => downloadBlob(blob, `${boq.boqNumber}${suffix}.pdf`),
         error: (err: unknown) =>
           this.formError.set(getApiErrorMessage(err, 'Unable to download the PDF.')),
-      });
-  }
-
-  protected downloadContract(): void {
-    const boq = this.boq();
-    if (!boq) return;
-
-    this.downloadMenuOpen.set(false);
-    this.downloadingContract.set(true);
-    this.service
-      .downloadContract(boq.id)
-      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.downloadingContract.set(false)))
-      .subscribe({
-        next: (blob) => downloadBlob(blob, `${boq.boqNumber} Contract.pdf`),
-        error: (err: unknown) =>
-          this.formError.set(getApiErrorMessage(err, 'Unable to download the contract.')),
       });
   }
 

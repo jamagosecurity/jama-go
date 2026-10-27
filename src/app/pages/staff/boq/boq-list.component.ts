@@ -142,19 +142,6 @@ export class BoqListComponent implements OnInit {
     return boq.status === 'Approved';
   }
 
-  protected downloadContract(boq: BoqListItem): void {
-    this.busyId.set(boq.id);
-    this.listError.set('');
-    this.service
-      .downloadContract(boq.id)
-      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busyId.set(null)))
-      .subscribe({
-        next: (blob) => downloadBlob(blob, `${boq.boqNumber} Contract.pdf`),
-        error: (err: unknown) =>
-          this.listError.set(getApiErrorMessage(err, 'Unable to download the contract.')),
-      });
-  }
-
   // ===== Share (super admin, approved only) =====
 
   /** Sending an approved document out is a decision above even an

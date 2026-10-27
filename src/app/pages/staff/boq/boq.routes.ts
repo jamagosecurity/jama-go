@@ -40,6 +40,13 @@ export function createBoqRoutes(basePath: string, storagePath: string): Routes {
           loadComponent: () =>
             import('./boq-decisions.component').then((m) => m.BoqDecisionsComponent),
         },
+        // Before :id, same reason as decisions above.
+        {
+          path: ':id/contract',
+          title: 'Contract — Jama Go',
+          loadComponent: () =>
+            import('./contract-editor.component').then((m) => m.ContractEditorComponent),
+        },
         {
           path: ':id',
           title: 'Quotation — Jama Go',

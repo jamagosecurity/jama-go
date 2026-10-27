@@ -74,10 +74,10 @@
                   </label>
                 }
                 @if (saved.status === 'Approved') {
-                  <button type="button" class="boq-menu-item" [disabled]="downloadingContract()"
-                    (click)="downloadContract()">
-                    {{ downloadingContract() ? 'Preparing…' : 'Download Contract' }}
-                  </button>
+                  <a class="boq-menu-item" [routerLink]="[basePath, saved.id, 'contract']"
+                    (click)="downloadMenuOpen.set(false)">
+                    Contract
+                  </a>
                 }
               </div>
             }

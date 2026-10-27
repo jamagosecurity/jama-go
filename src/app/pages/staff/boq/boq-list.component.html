@@ -114,14 +114,14 @@
                       </button>
 
                       @if (canDownloadContract(boq)) {
-                        <button type="button" class="row-btn row-btn--icon" [disabled]="busyId() === boq.id"
-                          title="Download Contract" (click)="downloadContract(boq)">
+                        <a class="row-btn row-btn--icon" title="Contract"
+                          [routerLink]="[basePath, boq.id, 'contract']">
                           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/>
                             <path d="M14 3v5h5M9 13h6M9 17h6"/>
                           </svg>
-                        </button>
+                        </a>
                       }
 
                       @if (canShare(boq)) {

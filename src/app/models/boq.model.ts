@@ -141,6 +141,14 @@ export interface Boq {
   sections: BoqSection[];
   createdAt: string;
   updatedAt: string | null;
+
+  /** Starts at 1, increments on every amendment after approval — what the
+   *  contract's own revision line reflects. */
+  revisionNumber: number;
+  /** The signed contract's own wording, typed by staff over the pre-filled
+   *  default. Null means the contract screen has never been saved for this
+   *  quotation. */
+  contractText: string | null;
 }
 
 export interface BoqListItem {

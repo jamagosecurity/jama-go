@@ -1,0 +1,69 @@
+<section class="staff-editor-page">
+  <button type="button" class="back-link" (click)="back()">
+    <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+    Back to quotation
+  </button>
+
+  @if (loading()) {
+    <div class="editor-card"><p class="editor-loading">Loading…</p></div>
+  } @else if (boq(); as item) {
+    <header class="editor-header">
+      <div class="editor-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 3h6l1 2h3v16H5V5h3z" />
+          <path d="M9 11h6M9 15h6M9 19h3" />
+        </svg>
+      </div>
+      <div>
+        <p class="editor-eyebrow">{{ item.boqNumber }} · Revision {{ item.revisionNumber }}</p>
+        <h1>Contract</h1>
+        <p>{{ item.clientName || 'No client name' }} — {{ item.projectName }}</p>
+      </div>
+    </header>
+
+    @if (item.status !== 'Approved') {
+      <div class="editor-card">
+        <p class="admin-error">
+          A contract can only be generated once this quotation is approved.
+        </p>
+      </div>
+    } @else {
+      <div class="editor-card">
+        @if (error()) {
+          <p class="admin-error">{{ error() }}</p>
+        }
+        @if (notice()) {
+          <p class="admin-success">{{ notice() }}</p>
+        }
+
+        <div class="form-section-heading">
+          <strong>Contract text</strong>
+          <small>
+            Pre-filled from the standard contract — edit anything before saving or downloading.
+            Bracketed placeholders like [رقم البطاقة الشخصية] need filling in by hand.
+          </small>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="save()">
+          <textarea
+            class="contract-text"
+            formControlName="contractText"
+            dir="rtl"
+            rows="28"
+            spellcheck="false"
+          ></textarea>
+
+          <footer class="editor-actions">
+            <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"
+              (click)="download()">
+              {{ downloading() ? 'Preparing…' : 'Download PDF' }}
+            </button>
+            <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
+              {{ saving() ? 'Saving…' : 'Save contract' }}
+            </button>
+          </footer>
+        </form>
+      </div>
+    }
+  }
+</section>
