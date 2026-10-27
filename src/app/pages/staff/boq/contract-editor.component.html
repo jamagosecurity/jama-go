@@ -44,6 +44,16 @@
           </small>
         </div>
 
+        <div class="contract-legend">
+          <p>How a line prints, decided by how it starts:</p>
+          <ul>
+            <li><code>البند ...</code> — a bold section heading, same as the rest of the contract.</li>
+            <li><code>- ...</code> — a bulleted point, like the payment schedule below.</li>
+            <li>Anything else — a plain paragraph.</li>
+          </ul>
+          <p>A blank line between two lines starts a new paragraph or clause.</p>
+        </div>
+
         <form [formGroup]="form" (ngSubmit)="save()">
           <textarea
             class="contract-text"
@@ -52,6 +62,22 @@
             rows="28"
             spellcheck="false"
           ></textarea>
+
+          <div class="contract-structure">
+            @if (detectedHeadings().length) {
+              <p><strong>{{ detectedHeadings().length }}</strong> heading(s) detected — these print bold:</p>
+              <ol dir="rtl">
+                @for (heading of detectedHeadings(); track $index) {
+                  <li>{{ heading }}</li>
+                }
+              </ol>
+            } @else {
+              <p class="admin-error">
+                No "البند ..." lines detected — the whole text will print as plain paragraphs,
+                with no bold headings at all.
+              </p>
+            }
+          </div>
 
           <footer class="editor-actions">
             <button type="button" class="btn-admin btn-admin-ghost" [disabled]="downloading()"

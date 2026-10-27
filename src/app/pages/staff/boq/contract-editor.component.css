@@ -16,3 +16,60 @@
   outline: 2px solid var(--jama-blue-action, #2594d2);
   outline-offset: 1px;
 }
+
+.contract-legend {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(37, 148, 210, 0.07);
+  border: 1px solid rgba(37, 148, 210, 0.18);
+  font-size: 0.82rem;
+  color: var(--admin-muted);
+}
+
+.contract-legend p {
+  margin: 0 0 6px;
+}
+
+.contract-legend ul {
+  margin: 0 0 8px;
+  padding-inline-start: 18px;
+}
+
+.contract-legend li {
+  margin-bottom: 3px;
+}
+
+.contract-legend code {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(15, 40, 70, 0.08);
+  color: var(--admin-ink);
+  font-size: 0.82rem;
+  direction: rtl;
+  unicode-bidi: embed;
+}
+
+.contract-structure {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid rgba(15, 40, 70, 0.1);
+  font-size: 0.82rem;
+}
+
+.contract-structure p {
+  margin: 0;
+  color: var(--admin-muted);
+}
+
+.contract-structure ol {
+  margin: 8px 0 0;
+  padding-inline-start: 20px;
+  color: var(--admin-ink);
+}
+
+.contract-structure li {
+  margin-bottom: 2px;
+}

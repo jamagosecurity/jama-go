@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of, switchMap, tap } from 'rxjs';
@@ -54,6 +54,28 @@ export class ContractEditorComponent {
   protected readonly form = this.formBuilder.nonNullable.group({
     contractText: [''],
   });
+
+  /** Same two conventions ContractPdfGenerator reads: a line starting
+   *  "البند" prints bold as a clause heading, one starting "- " prints as a
+   *  bulleted point, everything else is a plain paragraph. Live, so staff
+   *  can see how a line will be read the moment they type it rather than
+   *  guessing and finding out only in the downloaded PDF. */
+  private readonly contractTextValue = toSignal(this.form.controls.contractText.valueChanges, {
+    initialValue: '',
+  });
+
+  protected readonly detectedHeadings = computed(() =>
+    ContractEditorComponent.detectHeadings(this.contractTextValue()),
+  );
+
+  private static readonly ClauseHeading = /^البند\s+\S/;
+
+  private static detectHeadings(text: string): string[] {
+    return text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => ContractEditorComponent.ClauseHeading.test(line));
+  }
 
   constructor() {
     this.service
