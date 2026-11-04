@@ -1,3 +1,126 @@
+/* Self-hosted rather than shared via styleUrls with staff-editor.component.css:
+   that cross-file combination silently failed to apply (Angular's per-component
+   style bundling does not reliably merge a second component's own stylesheet
+   in), which showed up as an unsized back-link icon and an unstyled form —
+   see the same fix on the Uber module's trip-detail page. */
+.staff-editor-page {
+  width: 100%;
+  animation: admin-rise 0.4s ease both;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+  padding: 0;
+  border: 0;
+  color: var(--admin-blue-deep);
+  background: transparent;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.back-link svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.18s ease;
+}
+.back-link:hover svg {
+  transform: translateX(-3px);
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.editor-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 21px;
+  color: #fff;
+  background: var(--admin-avatar-grad);
+  box-shadow: 0 18px 34px -18px rgba(37, 148, 210, 0.9);
+}
+.editor-icon svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.editor-eyebrow {
+  margin-bottom: 4px;
+  color: var(--admin-blue-deep);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.editor-header h1 {
+  color: var(--admin-ink);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  letter-spacing: -0.04em;
+}
+.editor-header > div:last-child > p:last-child {
+  margin-top: 5px;
+  color: var(--admin-muted);
+}
+
+.editor-card {
+  padding: clamp(24px, 4vw, 42px);
+  border: 1px solid rgba(15, 40, 70, 0.09);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(246, 153, 61, 0.1), transparent 30%),
+    rgba(255, 255, 255, 0.94);
+  box-shadow: 0 28px 64px -40px rgba(11, 31, 51, 0.5);
+}
+.editor-loading {
+  color: var(--admin-muted);
+  text-align: center;
+}
+
+.form-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(15, 40, 70, 0.09);
+}
+.form-section-heading strong {
+  color: var(--admin-ink);
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+.form-section-heading small {
+  color: #718398;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(15, 40, 70, 0.09);
+}
+
 .contract-text {
   width: 100%;
   min-height: 520px;

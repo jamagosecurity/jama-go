@@ -27,10 +27,7 @@ import { BOQ_BASE_PATH } from './boq-base-path';
   imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './contract-editor.component.html',
-  styleUrls: [
-    '../../admin/staff-editor/staff-editor.component.css',
-    './contract-editor.component.css',
-  ],
+  styleUrl: './contract-editor.component.css',
 })
 export class ContractEditorComponent {
   private readonly route = inject(ActivatedRoute);
