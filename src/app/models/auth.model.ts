@@ -25,6 +25,10 @@ export const PERMISSIONS = {
    *  items. Previously the super administrator alone; grantable now — see
    *  Jama.Application.Common.Permissions. */
   boqAmend: 'boq.amend',
+  /** Oversight: browse every quotation, whoever built it and whatever its
+   *  status — not just their own plus the ones already Approved. Read-only —
+   *  see Jama.Application.Common.Permissions. */
+  boqViewAll: 'boq.viewAll',
   /** Drafting and submitting CAD drawings. Its own module, independent of
    *  quotations — see Jama.Application.Common.Permissions. */
   drawingManage: 'drawing.manage',

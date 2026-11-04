@@ -76,6 +76,9 @@ export class StaffEditorComponent {
     'boq.manage': ['M9 3h6l1 2h3v16H5V5h3z', 'M9 11h6M9 15h6M9 19h3'],
     // A tick on a document: approving somebody else's work, not writing it.
     'boq.approve': ['M9 3h6l1 2h3v16H5V5h3z', 'm9 13 2 2 4-4'],
+    // An eye: oversight, not authorship — seeing every quotation without
+    // building or deciding on any of them.
+    'boq.viewAll': ['M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z', 'M12 9.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z'],
     // A ruled sheet: a drawing rather than a priced document.
     'drawing.manage': ['M3 3h18v18H3z', 'M9 3v18M15 3v18M3 9h18M3 15h18'],
     'drawing.approve': ['M3 3h18v18H3z', 'M9 3v18M15 3v18M3 9h18M3 15h18', 'm9 13 2 2 4-4'],
