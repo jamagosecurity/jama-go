@@ -5,7 +5,7 @@ import {
   computed, inject, signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import {
@@ -406,6 +406,16 @@ export class BoqEditorComponent implements OnInit {
 
   protected readonly form = this.formBuilder.nonNullable.group({
     projectName: ['', [Validators.required, Validators.maxLength(200)]],
+    // Left at 1 the quotation says nothing about revisions; typing another number prints "Rev N" on it.
+    revisionNumber: [
+      1,
+      [
+        Validators.required,
+        Validators.min(1),
+        Validators.max(999),
+        (c: AbstractControl) => (Number.isInteger(c.value) ? null : { pattern: true }),
+      ],
+    ],
     siteLocation: ['', [Validators.maxLength(200)]],
     clientName: ['', [Validators.maxLength(200)]],
     contactNumber: ['', [Validators.maxLength(40)]],
@@ -664,6 +674,7 @@ export class BoqEditorComponent implements OnInit {
           this.boq.set(boq);
           this.form.reset({
             projectName: boq.projectName,
+            revisionNumber: boq.revisionNumber ?? 1,
             siteLocation: boq.siteLocation ?? '',
             clientName: boq.clientName ?? '',
             contactNumber: boq.contactNumber ?? '',
@@ -1346,6 +1357,7 @@ export class BoqEditorComponent implements OnInit {
     const raw = this.form.getRawValue();
     const request: SaveBoqRequest = {
       projectName: raw.projectName.trim(),
+      revisionNumber: raw.revisionNumber,
       siteLocation: raw.siteLocation.trim() || null,
       clientName: raw.clientName.trim() || null,
       contactNumber: raw.contactNumber.trim() || null,

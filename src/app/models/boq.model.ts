@@ -265,6 +265,8 @@ export interface SaveBoqRequest {
    * lines it priced, so a client cannot state its own final figure.
    */
   specialDiscount: number;
+  /** The revision box. 1 (the default) prints nothing on the quotation; any other number prints as "Rev N". */
+  revisionNumber: number | null;
   sections: SaveBoqSection[];
   /** Why an already-approved quotation is being changed. Required by the
    *  server only when it actually is one — see BoqEditorComponent's amend

@@ -1914,3 +1914,7 @@
 
 /* Anything still blue here takes the sidebar's midnight. */
 .boq-tabs .boq-tab.boq-tab--ok:not(.is-active) { color: #3f3e36; }
+
+/* The Revision box sits beside the project name and stays small: it is a number. */
+.boq-field--revision input { max-width: 120px; }
+.boq-field--revision .field-hint { max-width: 260px; }

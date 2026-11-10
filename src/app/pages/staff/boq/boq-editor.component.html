@@ -153,6 +153,16 @@
             <textarea formControlName="notes" rows="2" maxlength="2000"
               placeholder="Anything that should appear under the bill"></textarea>
           </label>
+          <label class="boq-field boq-field--revision">
+            <span>Revision</span>
+            <input type="number" formControlName="revisionNumber" min="1" max="999" step="1" inputmode="numeric"
+              [class.is-invalid]="showError('revisionNumber')" />
+            @if (showError('revisionNumber')) {
+              <small class="field-error">{{ errorFor('revisionNumber', 'Revision') }}</small>
+            } @else {
+              <small class="field-hint">1 = first issue, not shown. Change it to print "Rev N" on the quotation.</small>
+            }
+          </label>
           <div class="boq-field boq-field--wide boq-terms-field">
             <button type="button" class="boq-terms-toggle-btn" (click)="openTermsModal()">
               <svg class="boq-terms-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
