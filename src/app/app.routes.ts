@@ -219,7 +219,7 @@ export const routes: Routes = [
             // The Non-MOI price list every maintenance checklist is built
             // from — the counterpart of the stock inventory quotations read.
             path: 'non-moi',
-            canActivate: [permissionGuard(PERMISSIONS.maintenanceManage)],
+            canActivate: [permissionGuard(PERMISSIONS.nonMoiJobManage)],
             children: createNonMoiRoutes('/admin/non-moi'),
           },
           {

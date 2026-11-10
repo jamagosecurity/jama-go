@@ -105,7 +105,7 @@ export const STAFF_ROUTES: Routes = [
         // The Non-MOI price list, on the same terms as the stock inventory:
         // only an account granted maintenance.manage reaches it.
         path: 'non-moi',
-        canActivate: [permissionGuard(PERMISSIONS.maintenanceManage)],
+        canActivate: [permissionGuard(PERMISSIONS.nonMoiJobManage)],
         children: createNonMoiRoutes('/staff/non-moi'),
       },
       {
