@@ -16,62 +16,32 @@
     </div>
   }
 
-  <header class="admin-page-header">
-    <div>
-      <span class="admin-kicker">Inventory</span>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M3 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z" /><path d="m16 11 5-3v8l-5-3z" /><path d="M6 20h5" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Inventory</p>
       <h1>Stock items</h1>
-      <p>One line per brand, type and model, with pricing, warranty and photos.</p>
-    </div>
-
-    <div class="camera-head-actions">
-      @if (canEditStock()) {
-        <a class="btn-admin btn-admin-primary" [routerLink]="[base, 'new']">Add item</a>
+      @if (summary(); as totals) {
+        <!-- Whole-inventory figures from /summary, not the visible page. -->
+        <p class="page-banner-sub camera-summary">
+          <span><strong>{{ totals.totalLines | number }}</strong> stock lines</span>
+          <span><strong>{{ totals.totalUnits | number }}</strong> units</span>
+          <span>Stock value <strong>{{ totals.stockValue | number: '1.0-0' }} ﷼</strong></span>
+          <span class="camera-summary-low" [class.is-warn]="totals.lowStockCount > 0">
+            {{ totals.lowStockCount > 0 ? totals.lowStockCount + ' low on stock' : 'No low stock' }}
+          </span>
+        </p>
+      } @else {
+        <p class="page-banner-sub">One line per brand, type and model, with pricing, warranty and photos.</p>
       }
     </div>
-
-    @if (summary(); as totals) {
-      <!-- Whole-inventory figures from /summary, not the visible page. -->
-      <!-- Each tile carries its own accent and mark so the four read as
-           distinct figures at a glance rather than four identical boxes. -->
-      <dl class="camera-stats">
-        <div data-tone="value">
-          <span class="camera-stat-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5.5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          </span>
-          <div>
-            <dt>Stock value</dt>
-            <dd>{{ totals.stockValue | number: '1.0-0' }} <span class="camera-cur">﷼</span></dd>
-          </div>
-        </div>
-        <div data-tone="units">
-          <span class="camera-stat-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
-          </span>
-          <div>
-            <dt>Units in stock</dt>
-            <dd>{{ totals.totalUnits | number }}</dd>
-          </div>
-        </div>
-        <div data-tone="lines">
-          <span class="camera-stat-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>
-          </span>
-          <div>
-            <dt>Stock lines</dt>
-            <dd>{{ totals.totalLines | number }}</dd>
-          </div>
-        </div>
-        <div data-tone="low" [class.is-warn]="totals.lowStockCount > 0">
-          <span class="camera-stat-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
-          </span>
-          <div>
-            <dt>Low stock</dt>
-            <dd>{{ totals.lowStockCount | number }}</dd>
-          </div>
-        </div>
-      </dl>
-    }
+    <div class="camera-head-actions page-banner-actions">
+      @if (canEditStock()) {
+        <a class="banner-gold" [routerLink]="[base, 'new']">Add item</a>
+      }
+    </div>
   </header>
 
   <div class="camera-filters">

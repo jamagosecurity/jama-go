@@ -51,7 +51,7 @@
   border-radius: 21px;
   color: #fff;
   background: var(--admin-avatar-grad);
-  box-shadow: 0 18px 34px -18px rgba(37, 148, 210, 0.9);
+  box-shadow: 0 18px 34px -18px rgba(50, 90, 160, 0.9);
 }
 
 .editor-icon svg {
@@ -86,12 +86,12 @@
 
 .editor-card {
   padding: clamp(24px, 4vw, 42px);
-  border: 1px solid rgba(15, 40, 70, 0.09);
+  border: 1px solid rgba(26, 55, 103, 0.09);
   border-radius: 28px;
   background:
-    radial-gradient(circle at 100% 0%, rgba(246, 153, 61, 0.1), transparent 30%),
+    radial-gradient(circle at 100% 0%, rgba(163, 161, 144, 0.1), transparent 30%),
     rgba(255, 255, 255, 0.94);
-  box-shadow: 0 28px 64px -40px rgba(11, 31, 51, 0.5);
+  box-shadow: 0 28px 64px -40px rgba(20, 41, 76, 0.5);
 }
 
 .editor-loading {
@@ -106,7 +106,7 @@
   gap: 12px;
   margin-bottom: 24px;
   padding-bottom: 18px;
-  border-bottom: 1px solid rgba(15, 40, 70, 0.09);
+  border-bottom: 1px solid rgba(26, 55, 103, 0.09);
 }
 
 .form-section-heading span {
@@ -136,13 +136,13 @@
   display: grid;
   align-content: start;
   gap: 8px;
-  color: #1a334d;
+  color: #234379;
   font-size: 0.92rem;
   font-weight: 750;
 }
 
 .editor-grid label > span i {
-  color: #e11d48;
+  color: #e11d24;
   font-style: normal;
 }
 
@@ -151,7 +151,7 @@
   width: 100%;
   min-height: 52px;
   padding: 14px 16px;
-  border: 1px solid rgba(15, 40, 70, 0.12);
+  border: 1px solid rgba(26, 55, 103, 0.12);
   border-radius: 15px;
   color: var(--admin-ink);
   background: #fff;
@@ -163,8 +163,8 @@
 .editor-grid input:focus,
 .editor-grid select:focus {
   outline: none;
-  border-color: rgba(37, 148, 210, 0.55);
-  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
 }
 
 .editor-grid label > small {
@@ -179,9 +179,9 @@
   gap: 14px;
   margin-top: 26px;
   padding: 18px;
-  border: 1px solid rgba(37, 148, 210, 0.14);
+  border: 1px solid rgba(50, 90, 160, 0.14);
   border-radius: 18px;
-  background: linear-gradient(120deg, rgba(37, 148, 210, 0.08), rgba(246, 153, 61, 0.09));
+  background: linear-gradient(120deg, rgba(50, 90, 160, 0.08), rgba(163, 161, 144, 0.09));
   cursor: pointer;
 }
 
@@ -206,9 +206,9 @@
   margin-top: 10px;
   padding: 11px 14px;
   border-radius: 14px;
-  border: 1px solid rgba(217, 119, 6, 0.32);
-  background: rgba(217, 119, 6, 0.1);
-  color: #b45309;
+  border: 1px solid rgba(122, 120, 101, 0.32);
+  background: rgba(122, 120, 101, 0.1);
+  color: #676556;
   font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.45;
@@ -232,7 +232,7 @@
   height: 19px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 2px 6px rgba(11, 31, 51, 0.25);
+  box-shadow: 0 2px 6px rgba(20, 41, 76, 0.25);
   transition: transform 0.2s ease;
 }
 
@@ -250,7 +250,7 @@
 }
 
 .visibility-control strong {
-  color: #16324d;
+  color: #204076;
 }
 
 .visibility-control small {
@@ -264,7 +264,7 @@
   gap: 12px;
   margin-top: 28px;
   padding-top: 22px;
-  border-top: 1px solid rgba(15, 40, 70, 0.09);
+  border-top: 1px solid rgba(26, 55, 103, 0.09);
 }
 
 @media (max-width: 720px) {
@@ -296,8 +296,8 @@
 .permission-section {
   padding: 16px;
   border-radius: 16px;
-  border: 1px solid rgba(15, 40, 70, 0.1);
-  background: rgba(37, 148, 210, 0.04);
+  border: 1px solid rgba(26, 55, 103, 0.1);
+  background: rgba(50, 90, 160, 0.04);
 }
 
 .permission-heading strong {
@@ -362,21 +362,21 @@
   padding: 13px 14px;
   border-radius: 14px;
   background: #fff;
-  border: 1.5px solid rgba(15, 40, 70, 0.1);
+  border: 1.5px solid rgba(26, 55, 103, 0.1);
   cursor: pointer;
   transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease,
     transform 0.18s ease;
 }
 
 .permission-item:hover {
-  border-color: rgba(37, 148, 210, 0.5);
+  border-color: rgba(50, 90, 160, 0.5);
   transform: translateY(-1px);
 }
 
 .permission-item.is-granted {
   border-color: var(--admin-blue);
-  background: linear-gradient(150deg, rgba(37, 148, 210, 0.1), #fff 60%);
-  box-shadow: 0 10px 22px -18px rgba(37, 148, 210, 0.9);
+  background: linear-gradient(150deg, rgba(50, 90, 160, 0.1), #fff 60%);
+  box-shadow: 0 10px 22px -18px rgba(50, 90, 160, 0.9);
 }
 
 /* Visually hidden, still focusable and announced. */
@@ -399,7 +399,7 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: rgba(15, 40, 70, 0.06);
+  background: rgba(26, 55, 103, 0.06);
   color: var(--admin-muted);
   transition: background 0.18s ease, color 0.18s ease;
 }
@@ -415,7 +415,7 @@
 }
 
 .permission-item.is-granted .permission-icon {
-  background: rgba(37, 148, 210, 0.16);
+  background: rgba(50, 90, 160, 0.16);
   color: var(--admin-blue-ink);
 }
 
@@ -442,7 +442,7 @@
   height: 22px;
   margin-top: 2px;
   border-radius: 50%;
-  border: 1.5px solid rgba(15, 40, 70, 0.22);
+  border: 1.5px solid rgba(26, 55, 103, 0.22);
   background: #fff;
   transition: background 0.18s ease, border-color 0.18s ease;
 }
@@ -487,8 +487,8 @@
 .permission-count {
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(37, 148, 210, 0.12);
-  border: 1px solid rgba(37, 148, 210, 0.28);
+  background: rgba(50, 90, 160, 0.12);
+  border: 1px solid rgba(50, 90, 160, 0.28);
   color: var(--admin-blue-ink);
   font-size: 0.75rem;
   font-weight: 800;
@@ -526,3 +526,385 @@
 
 /* .field-error and .is-invalid moved to styles.css — they were scoped to this
    component, so the staff profile and technician forms could not use them. */
+
+
+/* ===== Compact layout =====
+   The page was ~3,000px tall: an oversized header, 52px inputs, two full-width
+   switch boxes and sixteen permission cards stacked in one column. Everything
+   below tightens that without touching behaviour — later rules win. */
+
+.back-link { margin-bottom: 10px; font-size: 0.86rem; }
+
+.editor-header { gap: 12px; margin-bottom: 14px; }
+.editor-icon { width: 44px; height: 44px; border-radius: 14px; box-shadow: 0 10px 20px -12px rgba(50, 90, 160, 0.9); }
+.editor-icon svg { width: 22px; height: 22px; }
+.editor-eyebrow { margin-bottom: 0; font-size: 0.7rem; }
+.editor-header h1 { font-size: clamp(1.35rem, 2vw, 1.7rem); letter-spacing: -0.03em; }
+.editor-header > div:last-child > p:last-child { margin-top: 2px; font-size: 0.86rem; }
+
+.editor-card { padding: 20px 22px; border-radius: 18px; }
+
+.form-section-heading { margin-bottom: 14px; padding-bottom: 10px; }
+.form-section-heading span { font-size: 0.98rem; }
+.form-section-heading small { font-size: 0.78rem; }
+
+/* Name, email, password and department on one row on a wide screen. */
+.editor-grid { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px 14px; }
+.editor-grid label { gap: 5px; font-size: 0.82rem; }
+.editor-grid input,
+.editor-grid select { min-height: 40px; padding: 8px 12px; border-radius: 11px; font-size: 0.9rem; }
+.editor-grid input:focus,
+.editor-grid select:focus { box-shadow: 0 0 0 3px rgba(50, 90, 160, 0.14); }
+.field-hint { margin-top: 2px; font-size: 0.72rem; line-height: 1.4; }
+
+/* The two switches side by side, each a slim row. */
+.visibility-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.visibility-control { margin-top: 0; padding: 10px 14px; gap: 12px; border-radius: 12px; }
+.visibility-control + .visibility-control { margin-top: 0; }
+.visibility-control strong { font-size: 0.88rem; }
+.visibility-control small { font-size: 0.74rem; line-height: 1.4; }
+.switch-track { width: 40px; height: 22px; }
+.switch-track i { top: 3px; left: 3px; width: 16px; height: 16px; }
+.visibility-control > input:checked + .switch-track i { transform: translateX(18px); }
+
+.access-warning { margin-top: 8px; padding: 8px 12px; border-radius: 10px; font-size: 0.8rem; }
+
+.editor-actions { margin-top: 16px; padding-top: 14px; }
+
+/* Permissions: compact rows, with the areas flowing into as many columns as fit. */
+.permission-section { margin-top: 16px; padding: 12px 14px; border-radius: 14px; }
+.permission-heading strong { font-size: 0.92rem; }
+.permission-heading small { margin-top: 2px; font-size: 0.76rem; line-height: 1.4; }
+
+.permission-areas { column-width: 330px; column-gap: 18px; margin-top: 4px; }
+.permission-area { break-inside: avoid; margin-top: 0; margin-bottom: 14px; padding-top: 10px; }
+.permission-area-label { margin-bottom: 6px; font-size: 0.68rem; }
+.permission-list { grid-template-columns: 1fr; gap: 6px; }
+
+.permission-item { grid-template-columns: 30px 1fr 18px; gap: 10px; padding: 8px 10px; border-radius: 11px; border-width: 1px; }
+.permission-item:hover { transform: none; }
+.permission-item.is-granted { box-shadow: none; }
+.permission-icon { width: 30px; height: 30px; border-radius: 9px; }
+.permission-icon svg { width: 16px; height: 16px; }
+.permission-copy strong { font-size: 0.84rem; }
+.permission-copy small {
+  margin-top: 1px;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  /* The full text is in the tooltip; two lines are enough to tell them apart. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.permission-check { width: 18px; height: 18px; margin-top: 1px; }
+.permission-check svg { width: 11px; height: 11px; }
+
+@media (max-width: 720px) {
+  .editor-card { padding: 14px; }
+  .visibility-row { grid-template-columns: 1fr; }
+  .editor-icon { width: 38px; height: 38px; border-radius: 12px; }
+}
+
+/* The department's effect is shown by colour alone: grey until one is chosen,
+   then blue — and teal for Technician, the one that lands in a different
+   portal. Its explanation lives in the label's tooltip. */
+.editor-grid select { color: var(--admin-muted); }
+.editor-grid select.has-value { color: var(--admin-blue-ink, #27467c); font-weight: 750; }
+.editor-grid select.is-technician { color: #0f6b5f; }
+.editor-grid select option { color: var(--admin-ink); font-weight: 500; }
+
+/* ===== Luxe layout: banner, account card on the left, permissions on the right ===== */
+
+.editor-header {
+  position: relative;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  border-radius: 20px;
+  border: 1px solid rgba(165, 164, 148, 0.4);
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(165, 164, 148, 0.22), transparent 55%),
+    linear-gradient(135deg, #0e244e 0%, #112e62 55%, #163d7a 100%);
+  box-shadow: 0 24px 50px -30px rgba(13, 32, 64, 0.9);
+}
+.editor-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: #22221e;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  border: 2px solid rgba(237, 237, 235, 0.85);
+  box-shadow: 0 0 0 4px rgba(165, 164, 148, 0.2), 0 10px 22px -8px rgba(181, 180, 168, 0.8);
+}
+.editor-icon svg { width: 24px; height: 24px; }
+.editor-eyebrow { color: #b9b8ac; letter-spacing: 0.2em; }
+.editor-header h1 { color: #f3f3f2; }
+.editor-header > div:last-child > p:last-child { color: rgba(230, 230, 227, 0.75); }
+
+/* The card becomes a plain two-column canvas; each side is its own card. */
+.editor-card.se-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.se-account {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid rgba(26, 55, 103, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 50px -34px rgba(13, 32, 64, 0.6);
+}
+.se-account .form-section-heading {
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(165, 164, 148, 0.45);
+}
+.se-account .form-section-heading span { color: var(--admin-ink); font-size: 1.02rem; }
+.se-account .form-section-heading small { display: none; }
+
+/* Account fields stack in this narrow column. */
+.se-account .editor-grid { grid-template-columns: 1fr; gap: 12px; }
+.se-account .editor-grid input,
+.se-account .editor-grid select { min-height: 42px; border-radius: 12px; background: #fbfdff; }
+.se-account .editor-grid input:focus,
+.se-account .editor-grid select:focus { border-color: #a5a494; box-shadow: 0 0 0 3px rgba(165, 164, 148, 0.25); }
+
+.se-account .visibility-row { grid-template-columns: 1fr; margin-top: 0; gap: 8px; }
+.se-account .visibility-control {
+  padding: 10px 12px;
+  border: 1px solid rgba(26, 55, 103, 0.1);
+  border-radius: 14px;
+  background: #fbfdff;
+}
+.se-account .visibility-control:hover { border-color: rgba(165, 164, 148, 0.6); }
+.visibility-control > input:checked + .switch-track { background: linear-gradient(135deg, #b5b4a8, #8f8d77); }
+
+.se-account .editor-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(26, 55, 103, 0.08);
+}
+.se-account .editor-actions .btn-admin { justify-content: center; }
+
+/* ---- Permissions ---- */
+.permission-section {
+  margin-top: 0;
+  padding: 20px;
+  border: 1px solid rgba(26, 55, 103, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 50px -34px rgba(13, 32, 64, 0.6);
+}
+.permission-heading { padding-bottom: 14px; border-bottom: 1px solid rgba(165, 164, 148, 0.45); }
+.permission-heading strong { font-size: 1.05rem; }
+.permission-heading small { max-width: 52ch; }
+
+.permission-count {
+  background: rgba(165, 164, 148, 0.2);
+  border-color: rgba(165, 164, 148, 0.6);
+  color: #3f3e36;
+}
+.perm-meter {
+  display: block;
+  width: 110px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(26, 55, 103, 0.1);
+}
+.perm-meter i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b5b4a8, #8f8d77);
+  transition: width 0.25s ease;
+}
+.permission-link { color: #555449; }
+
+/* Each area is a labelled group; items sit two across inside it. */
+.permission-areas { column-width: auto; columns: 1; margin-top: 6px; }
+.permission-area { margin-bottom: 18px; padding-top: 14px; }
+.permission-area-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #555449;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+}
+.permission-area-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(135deg, #dededa, #8f8d77);
+  transform: rotate(45deg);
+}
+.permission-area-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(165, 164, 148, 0.6), transparent);
+}
+.permission-list { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
+
+.permission-item {
+  grid-template-columns: 38px 1fr 22px;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(26, 55, 103, 0.12);
+  border-radius: 14px;
+  background: #fbfdff;
+}
+.permission-item:hover { border-color: rgba(165, 164, 148, 0.8); background: #fafaf9; transform: none; }
+.permission-item.is-granted {
+  border-color: #8f8d77;
+  background: linear-gradient(140deg, rgba(222, 222, 218, 0.55), #fbfbfb 70%);
+  box-shadow: 0 10px 22px -16px rgba(143, 141, 119, 0.9);
+}
+.permission-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: #555449;
+  background: radial-gradient(circle at 30% 25%, rgba(215, 215, 210, 0.4), rgba(165, 164, 148, 0.08));
+  border: 1px solid rgba(165, 164, 148, 0.55);
+}
+.permission-icon svg { width: 18px; height: 18px; }
+.permission-item.is-granted .permission-icon {
+  color: #22221e;
+  background: linear-gradient(145deg, #dededa, #b5b4a8 60%, #8f8d77);
+  border-color: rgba(237, 237, 235, 0.9);
+}
+.permission-copy strong { font-size: 0.9rem; }
+.permission-copy small { font-size: 0.76rem; }
+.permission-check { width: 22px; height: 22px; border-color: rgba(26, 55, 103, 0.25); }
+.permission-item.is-granted .permission-check {
+  background: linear-gradient(145deg, #b5b4a8, #8f8d77);
+  border-color: #8f8d77;
+}
+.permission-item.is-granted .permission-check svg { stroke: #181816; }
+
+@media (max-width: 1100px) {
+  .editor-card.se-layout { grid-template-columns: 1fr; }
+  .se-account { position: static; }
+}
+@media (max-width: 720px) {
+  .editor-header { padding: 14px 16px; }
+  .se-account, .permission-section { padding: 14px; }
+  .permission-list { grid-template-columns: 1fr; }
+}
+
+/* Groups flow into two columns so the list is short; items stack inside a group. */
+.permission-areas { columns: 2 300px; column-gap: 22px; }
+.permission-area { break-inside: avoid; margin-bottom: 16px; padding-top: 10px; }
+.permission-list { grid-template-columns: 1fr; gap: 8px; }
+@media (max-width: 720px) { .permission-areas { columns: 1; } }
+
+/* The two switches as slim one-line rows; the explanation is the hover tooltip. */
+.se-account .visibility-row { gap: 6px; }
+.se-account .visibility-control { padding: 8px 12px; gap: 12px; align-items: center; }
+.se-account .visibility-control strong { font-size: 0.88rem; font-weight: 700; color: var(--admin-ink); }
+
+/* "Back to staff" lives in the banner, top right, as a gold-outlined pill. */
+.banner-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 9px 16px;
+  border: 1px solid rgba(165, 164, 148, 0.6);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d5d4ce;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.banner-back svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.18s ease; }
+.banner-back:hover,
+.banner-back:focus-visible { background: linear-gradient(145deg, #dededa, #b5b4a8); border-color: transparent; color: #121210; outline: none; }
+.banner-back:hover svg { transform: translateX(-3px); }
+
+/* The account card scrolls with the page like everything else. */
+.se-account { position: static; }
+
+@media (max-width: 720px) {
+  .editor-header { flex-wrap: wrap; }
+  .banner-back { margin-left: 0; width: 100%; justify-content: center; order: 3; padding: 11px 16px; }
+}
+
+/* ===== Desktop: banner and account card stay put, only the permissions scroll =====
+   The page takes the height of the window; the banner and the account card keep
+   their place, and the permission list scrolls inside its own card. On a narrower
+   screen everything flows and the page scrolls as normal. */
+@media (min-width: 1101px) {
+  .staff-editor-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 118px);
+    min-height: 520px;
+  }
+  .editor-header { flex: 0 0 auto; }
+  .editor-card.se-layout { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+
+  .se-account { align-self: start; max-height: 100%; overflow-y: auto; }
+
+  .permission-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .permission-heading { flex: 0 0 auto; }
+  .permission-areas {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    columns: auto;
+    margin-right: -8px;
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(165, 164, 148, 0.7) transparent;
+  }
+  .permission-list { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+}
+
+/* The subtitle's colour rule keyed on "last div", which the back button displaced. */
+.editor-header > div > p:last-child { margin-top: 2px; color: rgba(230, 230, 227, 0.78); font-size: 0.88rem; }
+
+
+/* LIGHT THEME */
+.editor-header { background: #fff; border: 1px solid #e7e5df; box-shadow: 0 1px 2px rgba(20,48,95,.04), 0 16px 34px -26px rgba(20,48,95,.3); }
+.editor-icon { color: #14305f; background: #f1efe9; border: 1px solid #e2dfd6; box-shadow: none; }
+.editor-eyebrow { color: #d21319; }
+.editor-header h1 { color: #14305f; }
+.editor-header > div:last-child > p:last-child { color: #6b7280; }
+.editor-header .banner-back { border: 1px solid #c9ccd6; background: #fff; color: #14305f; }
+.editor-header .banner-back:hover { background: #f6f4ef; color: #14305f; }
+
+.editor-header p:not(.editor-eyebrow) { color: #6b7280; }

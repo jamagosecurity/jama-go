@@ -1,229 +1,159 @@
-/* ===== Status tabs — the three counts, clickable ===== */
+/* ===== Tabs + search on one line ===== */
 
-.creg-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.creg-tab {
-  width: 100%;
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-}
-
-.creg-tab.is-current {
-  outline: 2.5px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.creg-tab:focus-visible {
-  outline: 3px solid var(--admin-blue);
-  outline-offset: 3px;
-}
-
-/* ===== Cards ===== */
-
-.creg-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
-  gap: 16px;
-  transition: opacity 0.2s ease;
-}
-
-.creg-grid.is-refreshing {
-  opacity: 0.55;
-}
-
-.creg-card {
-  --accent: var(--jama-amber);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 18px;
-}
-
-.creg-card--approved { --accent: var(--jama-teal); }
-.creg-card--rejected { --accent: var(--jama-slate); }
-
-.creg-card-head {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.creg-avatar {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: var(--admin-avatar-grad, linear-gradient(135deg, #2594d2, #4f46e5));
-  color: #fff;
-  font-family: "Sora", "Inter", sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-}
-
-.creg-card-title {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.creg-card-title h2 {
-  margin: 0;
-  font-size: 1.05rem;
-  color: var(--admin-ink);
-  overflow-wrap: anywhere;
-}
-
-.creg-card-title p {
-  margin: 3px 0 0;
-  color: var(--admin-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.creg-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 14px;
-  margin: 0;
-}
-
-.creg-details-wide {
-  grid-column: 1 / -1;
-}
-
-.creg-details dt {
-  color: var(--admin-muted);
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.creg-details dd {
-  margin: 3px 0 0;
-  color: var(--admin-ink);
-  font-size: 0.9rem;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.creg-details a {
-  color: var(--admin-blue-ink);
-}
-
-.creg-details a:hover {
-  text-decoration: underline;
-}
-
-.creg-outcome {
-  display: grid;
-  gap: 8px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--admin-line);
-}
-
-.creg-outcome-row {
+.creg-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
-.creg-category {
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: var(--admin-ink);
-  color: #fff;
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-}
-
-.creg-category--moi {
-  background: linear-gradient(120deg, #0b5c92, #3730a3);
-}
-
-.creg-team {
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--jama-teal) 14%, #fff);
-  border: 1px solid color-mix(in srgb, var(--jama-teal) 30%, transparent);
-  color: var(--jama-teal-ink);
-  font-size: 0.74rem;
-  font-weight: 800;
-}
-
-.creg-dia-link {
+.creg-tabs { display: flex; gap: 6px; padding: 4px; border-radius: 12px; background: rgba(26, 55, 103, 0.05); }
+.creg-tab {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  width: fit-content;
-  color: var(--admin-blue-ink);
-  font-size: 0.88rem;
-  font-weight: 800;
-}
-
-.creg-dia-link svg {
-  width: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: transform 0.15s ease;
-}
-
-.creg-dia-link:hover svg {
-  transform: translateX(3px);
-}
-
-.creg-muted {
-  margin: 0;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
   color: var(--admin-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.creg-reason {
-  display: grid;
-  gap: 4px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(225, 29, 72, 0.06);
-  border: 1px solid rgba(225, 29, 72, 0.16);
-}
-
-.creg-reason strong {
-  color: #9f1239;
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.creg-reason p {
-  margin: 0;
-  color: var(--admin-ink);
+  font: inherit;
   font-size: 0.88rem;
-  line-height: 1.45;
-  overflow-wrap: anywhere;
+  font-weight: 750;
+  cursor: pointer;
 }
-
-.creg-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: auto;
-  padding-top: 4px;
+.creg-tab b {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(26, 55, 103, 0.08);
+  font-size: 0.78rem;
+  text-align: center;
 }
+.creg-tab:hover { color: var(--admin-ink); }
+.creg-tab.is-current { background: #fff; color: var(--admin-ink); box-shadow: 0 2px 8px rgba(26, 55, 103, 0.08); }
+.creg-tab--pending.is-current b { background: rgba(163, 161, 144, 0.2); color: #5d5c4f; }
+.creg-tab--approved.is-current b { background: rgba(28, 133, 119, 0.16); color: #0f6b5f; }
+.creg-tab--rejected.is-current b { background: rgba(225, 29, 36, 0.12); color: #9f1217; }
+.creg-tab:focus-visible { outline: 2px solid var(--admin-blue-deep); outline-offset: 2px; }
 
-.creg-reject:hover {
-  color: #9f1239;
-  border-color: rgba(225, 29, 72, 0.35);
+.creg-search { flex: 1 1 280px; max-width: 460px; margin: 0; }
+.is-refreshing { opacity: 0.6; transition: opacity 0.15s ease; }
+
+/* ===== Table: one line per registration, centred ===== */
+
+.creg-table-wrap { overflow-x: auto; }
+.creg-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 0.9rem; color: var(--admin-ink-soft, #204078); }
+.creg-table th,
+.creg-table td {
+  padding: 12px 12px;
+  text-align: center;
+  border-bottom: 1px solid rgba(26, 55, 103, 0.08);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.creg-table thead th {
+  background: linear-gradient(135deg, #0d2040 0%, #143366 55%, #1d4589 100%);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.creg-table thead th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+.creg-table thead th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+.creg-table tbody tr:hover { background: rgba(50, 90, 160, 0.05); }
+.creg-table tbody tr:last-child td { border-bottom: none; }
+.creg-table th:nth-child(1) { width: 14%; }
+.creg-table th:nth-child(2) { width: 19%; }
+.creg-table th:nth-child(3) { width: 12%; }
+.creg-table th:nth-child(4) { width: 15%; }
+.creg-table th:nth-child(5) { width: 10%; }
+.creg-table th:nth-child(6) { width: 15%; }
+.creg-table th.col-actions { width: 200px; }
+.creg-table td.col-actions,
+.creg-table td.col-status { overflow: visible; }
+.creg-table .col-name { color: var(--admin-ink); font-weight: 750; }
+.creg-table a { color: var(--admin-blue-ink, #27467c); text-decoration: none; }
+.creg-table a:hover { text-decoration: underline; }
+
+/* The outcome of a decision sits under the badge, small. */
+.creg-sub {
+  display: block;
+  margin-top: 4px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+.creg-category { color: var(--admin-ink-soft); font-weight: 800; }
+.creg-category--moi { color: #315086; }
+.creg-dia-link { display: block; margin-top: 2px; font-size: 0.76rem; font-weight: 750; }
+.creg-done { color: var(--admin-muted); font-size: 0.8rem; font-weight: 650; }
+
+/* The shared row buttons, as on the quotation and staff lists. */
+.creg-row-actions { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.row-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border: 1px solid var(--btn-line, var(--admin-line));
+  border-radius: 10px;
+  background: var(--btn-bg, #fff);
+  color: var(--btn-ink, var(--admin-ink-soft));
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.row-btn:hover { transform: translateY(-1px); }
+.row-btn:focus-visible { outline: 2px solid var(--admin-blue-deep); outline-offset: 2px; }
+.row-btn--accept { --btn-bg: rgba(28, 133, 119, 0.12); --btn-line: rgba(28, 133, 119, 0.35); --btn-ink: #0f6b5f; }
+.row-btn--accept:hover { --btn-bg: #1c8577; --btn-line: #1c8577; --btn-ink: #fff; }
+.row-btn--delete { --btn-bg: #fff; --btn-line: var(--admin-line); --btn-ink: var(--admin-muted); }
+.row-btn--delete:hover { --btn-bg: rgba(225, 29, 36, 0.1); --btn-line: rgba(225, 29, 36, 0.4); --btn-ink: var(--jama-rose-ink, #9f1217); }
+
+/* Phones: each registration becomes a labelled block. */
+@media (max-width: 760px) {
+  .creg-table { table-layout: auto; }
+  .creg-table thead { display: none; }
+  .creg-table, .creg-table tbody, .creg-table tr, .creg-table td { display: block; width: 100%; }
+  .creg-table tr { padding: 10px 0; border-bottom: 1px solid rgba(26, 55, 103, 0.08); }
+  .creg-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 4px 4px;
+    border-bottom: none;
+    text-align: right;
+    overflow: visible;
+    white-space: normal;
+  }
+  .creg-table td[data-label]::before {
+    content: attr(data-label);
+    flex: none;
+    color: var(--admin-muted);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .creg-table td.col-name { font-size: 1rem; }
+  .creg-table td.col-status { align-items: flex-start; flex-wrap: wrap; }
+  .creg-row-actions { justify-content: flex-start; padding-top: 6px; }
+  .creg-row-actions .row-btn { flex: 1; justify-content: center; }
+  .creg-search { max-width: none; }
 }
 
 /* ===== Dialogs ===== */
@@ -232,7 +162,7 @@
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: rgba(15, 40, 70, 0.45);
+  background: rgba(26, 55, 103, 0.45);
 }
 
 .creg-modal {
@@ -247,7 +177,7 @@
   padding: 24px;
   border-radius: 20px;
   background: #fff;
-  box-shadow: 0 24px 60px rgba(15, 40, 70, 0.28);
+  box-shadow: 0 24px 60px rgba(26, 55, 103, 0.28);
 }
 
 .creg-modal--narrow {
@@ -313,13 +243,13 @@
 }
 
 .creg-segment-option:hover {
-  border-color: rgba(37, 148, 210, 0.45);
+  border-color: rgba(50, 90, 160, 0.45);
 }
 
 .creg-segment-option.is-selected {
   border-color: var(--admin-blue);
-  background: rgba(37, 148, 210, 0.08);
-  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.14);
+  background: rgba(50, 90, 160, 0.08);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.14);
 }
 
 .creg-segment-option.is-selected strong {
@@ -359,7 +289,7 @@
 }
 
 .creg-team-option:focus-within {
-  outline: 3px solid rgba(37, 148, 210, 0.35);
+  outline: 3px solid rgba(50, 90, 160, 0.35);
   outline-offset: 1px;
 }
 
@@ -401,8 +331,8 @@
 .creg-dia {
   padding: 16px;
   border-radius: 16px;
-  background: linear-gradient(160deg, rgba(37, 148, 210, 0.08), rgba(79, 70, 229, 0.05));
-  border: 1px solid rgba(37, 148, 210, 0.2);
+  background: linear-gradient(160deg, rgba(50, 90, 160, 0.08), rgba(61, 109, 193, 0.05));
+  border: 1px solid rgba(50, 90, 160, 0.2);
 }
 
 .creg-dia-note {
@@ -421,7 +351,7 @@
 }
 
 .creg-field i {
-  color: #e11d48;
+  color: #e11d24;
   font-style: normal;
 }
 
@@ -442,7 +372,7 @@
 .creg-field textarea:focus {
   outline: none;
   border-color: var(--admin-blue);
-  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.15);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.15);
 }
 
 .creg-field-row {
@@ -468,4 +398,94 @@
   .creg-details {
     grid-template-columns: 1fr;
   }
+}
+
+/* ===== Tabs: a segmented bar, the open tab a gold pill ===== */
+.page-banner-sub strong { color: #b9b8ac; }
+.creg-bar {
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--admin-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+}
+.creg-tabs { background: rgba(26, 55, 103, 0.06); border: 1px solid rgba(26, 55, 103, 0.06); }
+.creg-tab { padding: 9px 16px; color: #3a4b66; }
+.creg-tab b { background: rgba(26, 55, 103, 0.1); }
+.creg-tab.is-current {
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  color: #181816;
+  box-shadow: 0 8px 18px -10px rgba(143, 141, 119, 0.9);
+}
+.creg-tab.is-current b,
+.creg-tab--pending.is-current b,
+.creg-tab--approved.is-current b,
+.creg-tab--rejected.is-current b { background: rgba(255, 255, 255, 0.55); color: #181816; }
+.creg-search { box-shadow: none; }
+
+@media (max-width: 640px) {
+  .creg-bar { padding: 10px; }
+  .creg-tabs { width: 100%; }
+  .creg-tab { flex: 1 1 0; justify-content: center; padding: 11px 8px; }
+}
+
+/* ===== Status tabs, coloured like the Approvals tabs =====
+   Accepted is gold, Rejected is red, Waiting is navy. Each is a tint until it is
+   the open tab, then it fills solid. */
+.creg-tabs { gap: 8px; padding: 6px; background: rgba(26, 55, 103, 0.05); }
+.creg-tabs .creg-tab {
+  padding: 10px 20px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-weight: 800;
+  box-shadow: none;
+}
+.creg-tabs .creg-tab--pending { background: rgba(25, 94, 191, 0.1); border-color: rgba(25, 94, 191, 0.35); color: #195ebf; }
+.creg-tabs .creg-tab--approved { background: rgba(165, 164, 148, 0.16); border-color: rgba(143, 141, 119, 0.5); color: #3f3e36; }
+.creg-tabs .creg-tab--rejected { background: rgba(225, 29, 36, 0.1); border-color: rgba(225, 29, 36, 0.35); color: #be1218; }
+.creg-tabs .creg-tab b { background: rgba(255, 255, 255, 0.7); }
+
+.creg-tabs .creg-tab--pending.is-current {
+  background: linear-gradient(135deg, #1f4a8e 0%, #195ebf 100%);
+  border-color: #195ebf;
+  color: #fff;
+  box-shadow: 0 12px 24px -12px rgba(25, 94, 191, 0.9);
+}
+.creg-tabs .creg-tab--approved.is-current {
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  border-color: #8f8d77;
+  color: #181816;
+  box-shadow: 0 12px 24px -12px rgba(143, 141, 119, 0.95);
+}
+.creg-tabs .creg-tab--rejected.is-current {
+  background: linear-gradient(135deg, #f0484e 0%, #d4161c 100%);
+  border-color: #c01c21;
+  color: #fff;
+  box-shadow: 0 12px 24px -12px rgba(212, 22, 28, 0.9);
+}
+.creg-tabs .creg-tab.is-current b { background: rgba(255, 255, 255, 0.35); color: inherit; }
+
+@media (max-width: 640px) {
+  .creg-tabs { width: 100%; gap: 6px; padding: 5px; }
+  .creg-tabs .creg-tab { flex: 1 1 0; min-width: 0; justify-content: center; gap: 6px; padding: 11px 6px; font-size: 0.84rem; }
+}
+
+/* Waiting uses the sidebar's midnight, not a separate blue. */
+.creg-tabs .creg-tab--pending { background: rgba(14, 36, 78, 0.07); border-color: rgba(14, 36, 78, 0.3); color: #112e62; }
+.creg-tabs .creg-tab--pending.is-current {
+  background: linear-gradient(135deg, #0e244e 0%, #163d7a 100%);
+  border-color: rgba(165, 164, 148, 0.7);
+  color: #f3f3f2;
+  box-shadow: 0 12px 24px -12px rgba(14, 36, 78, 0.95), 0 0 0 1px rgba(165, 164, 148, 0.25);
+}
+
+/* Actions follow the other tables: a gold pill, then a round icon (rose on hover). */
+.creg-row-actions .row-btn--icon svg { width: 16px; height: 16px; }
+
+/* Icons need their own size here (this stylesheet had none), and the round
+   reject button must stay round when the pill beside it stretches on a phone. */
+.creg-row-actions .row-btn svg { width: 15px; height: 15px; flex: none; }
+.creg-row-actions .row-btn--icon svg { width: 16px; height: 16px; }
+@media (max-width: 760px) {
+  .creg-table .creg-row-actions .row-btn--icon { flex: 0 0 44px; width: 44px; min-width: 44px; padding: 0; }
 }

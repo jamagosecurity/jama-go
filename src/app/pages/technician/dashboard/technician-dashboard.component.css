@@ -59,9 +59,9 @@
   align-items: center;
   gap: 10px;
   padding: 9px 11px;
-  border: 1px solid rgba(15, 40, 70, 0.1);
+  border: 1px solid rgba(26, 55, 103, 0.1);
   border-radius: 13px;
-  background: rgba(15, 40, 70, 0.035);
+  background: rgba(26, 55, 103, 0.035);
   color: inherit;
   text-decoration: none;
   transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
@@ -139,7 +139,7 @@
   min-height: 44px;
   padding: 5px 2px;
   border-radius: 11px;
-  background: rgba(15, 40, 70, 0.07);
+  background: rgba(26, 55, 103, 0.07);
   color: var(--admin-muted);
   font-size: 0.76rem;
   font-weight: 800;
@@ -185,9 +185,9 @@
 /* A quarter whose window closed with nothing submitted. Amber rather than red:
    it is a backlog to work through, not an error, and several sites carry two. */
 .tech-pip--overdue {
-  background: color-mix(in srgb, #f6993d 18%, #fff);
-  color: #8a4b06;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #f6993d 45%, transparent);
+  background: color-mix(in srgb, #a3a190 18%, #fff);
+  color: #4e4d42;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #a3a190 45%, transparent);
 }
 
 .tech-cycle-count {
@@ -205,7 +205,7 @@
 .tech-bar {
   height: 6px;
   border-radius: 999px;
-  background: rgba(15, 40, 70, 0.08);
+  background: rgba(26, 55, 103, 0.08);
   overflow: hidden;
 }
 
@@ -283,7 +283,7 @@
   gap: 10px;
   margin-top: auto;
   padding-top: 12px;
-  border-top: 1px solid rgba(15, 40, 70, 0.08);
+  border-top: 1px solid rgba(26, 55, 103, 0.08);
   flex-wrap: wrap;
 }
 
@@ -315,3 +315,28 @@
     width: 100%;
   }
 }
+
+/* One line of figures under the title, instead of four tiles. */
+.tech-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin: 6px 0 0; color: var(--admin-muted); font-size: 0.92rem; }
+.tech-summary strong { color: var(--admin-ink); font-weight: 800; }
+.tech-summary .is-ok { color: #0f6b5f; font-weight: 700; }
+.tech-summary .is-soon { padding: 2px 10px; border-radius: 999px; background: rgba(245, 158, 11, 0.16); color: #92400e; font-weight: 700; }
+.tech-summary .is-late { padding: 2px 10px; border-radius: 999px; background: rgba(225, 29, 36, 0.12); color: #9f1217; font-weight: 700; }
+
+/* ===== Whole card opens the site: the name is a link stretched over the card ===== */
+.tech-site { position: relative; cursor: pointer; transition: transform 0.18s ease, box-shadow 0.22s ease; }
+.tech-site:hover { transform: translateY(-2px); }
+.tech-site-open { color: inherit; text-decoration: none; }
+.tech-site-open::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.tech-site-open:focus-visible::after { outline: 3px solid #d21319; outline-offset: 2px; }
+/* The location link and the button sit above the stretched link, so they still do their own thing. */
+.tech-site .tech-site-nav, .tech-site .tech-site-cta { position: relative; z-index: 2; }
+.tech-site-cta {
+  background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%) !important;
+  box-shadow: 0 12px 26px -14px rgba(210, 19, 25, 0.9);
+}
+.tech-summary span { color: #6b7280; }
+.tech-summary strong { color: #14305f; }
+.tech-summary .is-ok { color: #0f6b5f; font-weight: 700; }
+.tech-summary .is-late { color: #b3141b; font-weight: 700; }
+.tech-summary .is-soon { color: #a65f00; font-weight: 700; }

@@ -1,34 +1,23 @@
 <section class="admin-page">
-  <header class="admin-page-header">
-    <div>
-      <p class="admin-kicker">Enquiry inbox</p>
-      <h1>Contact submissions</h1>
-      <p>Review enquiries from the public site and respond with confidence.</p>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z" /><path d="m4 7 8 6 8-6" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Enquiry inbox</p>
+      <h1>Enquiry inbox</h1>
+      <p class="page-banner-sub">
+        {{ submissions().length }} {{ submissions().length === 1 ? 'enquiry' : 'enquiries' }}
+        · {{ recentCount() }} in the last 7 days
+      </p>
     </div>
-    <button type="button" class="btn-admin btn-admin-ghost" (click)="reload()">
+    <div class="page-banner-actions">
+    <button type="button" class="banner-ghost" (click)="reload()">
       <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
       Refresh
     </button>
+    </div>
   </header>
-
-  <div class="admin-stats">
-    <article class="admin-stat admin-stat--blue">
-      <strong>{{ submissions().length }}</strong>
-      <span>Total enquiries</span>
-    </article>
-    <article class="admin-stat admin-stat--orange">
-      <strong>{{ recentCount() }}</strong>
-      <span>Last 7 days</span>
-    </article>
-    <article class="admin-stat admin-stat--teal">
-      <strong>{{ serviceCount() }}</strong>
-      <span>Services requested</span>
-    </article>
-    <article class="admin-stat admin-stat--indigo">
-      <strong>{{ withPhoneCount() }}</strong>
-      <span>With phone number</span>
-    </article>
-  </div>
 
   @if (error()) {
     <p class="admin-error">{{ error() }}</p>
@@ -64,35 +53,67 @@
         </p>
       </div>
     } @else {
-      <div class="contact-list">
-        @for (item of filtered(); track item.id) {
-          <article class="contact-card">
-            <div class="contact-card-top">
-              <div class="contact-avatar" aria-hidden="true">{{ initials(item.fullName) }}</div>
-              <div class="contact-identity">
-                <h3>{{ item.fullName }}</h3>
-                <p>
+      <div class="ct-table-wrap">
+        <table class="ct-table">
+          <thead>
+            <tr>
+              <th scope="col" class="ct-col-name">Name</th>
+              <th scope="col" class="ct-col-contact">Email / phone</th>
+              <th scope="col" class="ct-col-service">Service</th>
+              <th scope="col">Message</th>
+              <th scope="col" class="ct-col-date">Received</th>
+              <th scope="col" class="ct-col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of filtered(); track item.id) {
+              <tr>
+                <td data-label="Name" class="ct-name">{{ item.fullName }}</td>
+                <td data-label="Email / phone" class="ct-contact">
                   <a [href]="'mailto:' + item.email">{{ item.email }}</a>
-                  @if (item.phone) {
-                    <span>·</span>
-                    <a [href]="'tel:' + item.phone">{{ item.phone }}</a>
-                  }
-                </p>
-              </div>
-              <div class="contact-meta">
-                <span class="admin-badge admin-badge--new admin-badge--dot">{{ item.status }}</span>
-                <time>{{ formatDate(item.createdAt) }}</time>
-              </div>
-            </div>
-
-            <div class="contact-service">
-              <span>Service interest</span>
-              <strong>{{ item.service || 'General enquiry' }}</strong>
-            </div>
-
-            <p class="contact-message">{{ item.message }}</p>
-          </article>
-        }
+                  @if (item.phone) { <a [href]="'tel:' + item.phone">{{ item.phone }}</a> }
+                </td>
+                <td data-label="Service"><span class="ct-service">{{ item.service || 'General' }}</span></td>
+                <td data-label="Message" class="ct-msg">
+                  <button type="button" class="ct-msg-btn" [class.is-open]="expandedId() === item.id"
+                    [attr.aria-expanded]="expandedId() === item.id" (click)="toggleMessage(item.id)"
+                    title="Click to read the whole message">{{ item.message }}</button>
+                </td>
+                <td data-label="Received" class="ct-date">{{ formatDate(item.createdAt) }}</td>
+                <td class="ct-col-actions">
+                  <div class="ct-actions">
+                    @if (pendingDeleteId() === item.id) {
+                      <button type="button" class="row-btn row-btn--danger"
+                        [disabled]="deletingId() === item.id" (click)="confirmDelete(item)">
+                        {{ deletingId() === item.id ? 'Deleting…' : 'Delete' }}
+                      </button>
+                      <button type="button" class="row-btn" [disabled]="deletingId() === item.id"
+                        (click)="pendingDeleteId.set(null)">Keep</button>
+                    } @else {
+                      <a class="row-btn row-btn--edit" [href]="'mailto:' + item.email">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M4 5h16v14H4z" /><path d="m4 7 8 6 8-6" />
+                        </svg>
+                        Reply
+                      </a>
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete" title="Delete"
+                        [attr.aria-label]="'Delete enquiry from ' + item.fullName"
+                        (click)="pendingDeleteId.set(item.id)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     }
   </div>

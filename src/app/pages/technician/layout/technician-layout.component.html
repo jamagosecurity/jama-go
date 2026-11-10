@@ -1,0 +1,92 @@
+<!-- Same shell as the staff portal (and the same stylesheet), so a technician gets the
+     sidebar everyone else has: MOI work and Non-MOI work as two clear choices. -->
+<div class="staff-shell" [class.is-menu-open]="menuOpen()">
+  @if (menuOpen()) {
+    <div class="staff-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
+  }
+
+  <aside id="tech-sidebar" class="staff-sidebar" aria-label="Technician sidebar">
+    <button type="button" class="staff-drawer-close" (click)="closeMenu()" aria-label="Close menu">×</button>
+    <div class="staff-sidebar-head">
+      <div class="staff-brand">
+        <div class="staff-logo-badge">
+          <img class="staff-logo" src="/JamaGoLogo-navy.png" alt="Jama Go" width="360" height="108" />
+        </div>
+        <div class="staff-brand-copy">
+          <p class="staff-eyebrow">Technician Portal</p>
+          <h2>Jama Go Technician</h2>
+        </div>
+      </div>
+    </div>
+
+    <nav class="staff-nav" aria-label="Technician">
+      <p class="nav-sub nav-sub--moi"><i aria-hidden="true"></i>MOI</p>
+      <a routerLink="/technician" [class.active]="tab() === 'dia'">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M9 3h6l1 2h3v16H5V5h3z" />
+            <path d="M9 12l2 2 4-4M9 18h6" />
+          </svg>
+        </span>
+        <span>
+          <strong>DIA Inspections</strong>
+          <small>Quarterly site visits</small>
+        </span>
+      </a>
+
+      <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
+      <a routerLink="/technician/maintenance" [class.active]="tab() === 'maintenance'">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+          </svg>
+        </span>
+        <span>
+          <strong>Maintenance</strong>
+          <small>Report &amp; track issues</small>
+        </span>
+      </a>
+      <a routerLink="/technician/non-moi-jobs" [class.active]="tab() === 'jobs'">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+            <circle cx="12" cy="10" r="2.6" />
+          </svg>
+        </span>
+        <span>
+          <strong>Non-MOI Jobs</strong>
+          <small>Issued to you</small>
+        </span>
+      </a>
+    </nav>
+
+    <div class="staff-sidebar-foot">
+      <div class="staff-user">
+        <div class="staff-avatar" aria-hidden="true">{{ initials() }}</div>
+        <div class="staff-user-meta">
+          <p>{{ auth.currentUser()?.fullName || 'Technician' }}</p>
+          <small>{{ auth.currentUser()?.email }}</small>
+          <span class="profile-role">Technician</span>
+        </div>
+        <button type="button" class="profile-logout" (click)="auth.logout()" aria-label="Sign out" title="Sign out">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="staff-main">
+    <header class="staff-topbar">
+      <button type="button" class="staff-menu-btn" (click)="menuOpen.set(!menuOpen())"
+        [attr.aria-expanded]="menuOpen()" aria-controls="tech-sidebar" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        <span>Menu</span>
+      </button>
+      <img class="staff-topbar-logo" src="/JamaGoLogo-navy.png" alt="Jama Go" width="360" height="108" />
+    </header>
+
+    <div class="staff-content">
+      <router-outlet />
+    </div>
+  </div>
+</div>

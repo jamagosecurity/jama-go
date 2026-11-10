@@ -35,6 +35,15 @@ export const PERMISSIONS = {
   /** Deciding on a drawing somebody else drafted. Separate from
    *  drawingManage on the same terms as boqApprove is from boqManage. */
   drawingApprove: 'drawing.approve',
+  /** Managing maintenance tickets — assign, resolve, cancel, edit, and see
+   *  the company-wide queue. A client or any staff can file one regardless;
+   *  this is only for handling them — see Jama.Application.Common.Permissions. */
+  maintenanceManage: 'maintenance.manage',
+  /** Issuing Non-MOI jobs to technicians. Implied by maintenanceManage, so nobody who could already
+   *  issue them loses that — see Jama.Application.Common.Permissions. */
+  nonMoiJobManage: 'nonmoijob.manage',
+  /** Reading the company mailboxes. Read-only: sending stays with administrators. */
+  mailRead: 'mail.read',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

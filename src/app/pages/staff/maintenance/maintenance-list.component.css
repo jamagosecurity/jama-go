@@ -1,0 +1,147 @@
+.mnt-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.mnt-filters .mnt-search {
+  height: 44px;
+  padding: 10px 14px;
+  border: 1px solid rgba(26, 55, 103, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-weight: 500;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.mnt-search { flex: 1 1 260px; min-width: 200px; }
+.mnt-filters .mnt-search:focus {
+  outline: none;
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
+}
+
+/* The dropdowns are <app-select>, a custom element with its own closed-field
+   and open-panel styling — this just sizes it to sit beside the search box
+   and the checkbox instead of stretching full width. */
+.mnt-filters app-select {
+  flex: 0 1 190px;
+  min-width: 150px;
+}
+.mnt-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #234379;
+  white-space: nowrap;
+}
+.mnt-checkbox input { width: 17px; height: 17px; accent-color: var(--admin-blue-deep, #27467c); cursor: pointer; }
+
+.mnt-empty { text-align: center; color: var(--admin-muted); padding: 40px 20px; }
+
+.mnt-table-wrap { padding: 0; overflow-x: auto; }
+.mnt-table { width: 100%; border-collapse: collapse; min-width: 760px; }
+.mnt-table thead th {
+  text-align: left;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--admin-muted);
+  font-weight: 800;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(26, 55, 103, 0.09);
+}
+.mnt-table tbody td {
+  padding: 14px 18px;
+  font-size: 0.9rem;
+  color: var(--admin-ink);
+  border-bottom: 1px solid rgba(26, 55, 103, 0.06);
+}
+.mnt-row { cursor: pointer; transition: background-color 0.15s ease; }
+.mnt-row:hover { background: rgba(50, 90, 160, 0.06); }
+.mnt-number { font-weight: 800; color: var(--admin-blue-ink, #27467c); }
+
+.mnt-status-badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: rgba(26, 55, 103, 0.08);
+  color: var(--admin-ink);
+  white-space: nowrap;
+}
+.mnt-status-badge[data-status="Resolved"] { background: rgba(34, 197, 94, 0.14); color: #15803d; }
+.mnt-status-badge[data-status="Cancelled"] { background: rgba(225, 29, 36, 0.12); color: #be1218; }
+.mnt-status-badge[data-status="InProgress"] { background: rgba(50, 90, 160, 0.14); color: #27467c; }
+.mnt-status-badge[data-status="Open"] { background: rgba(163, 161, 144, 0.18); color: #676556; }
+
+.mnt-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 0.86rem;
+  color: var(--admin-muted);
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .mnt-filters {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+  .mnt-filters app-select,
+  .mnt-search { flex: 1 1 auto; width: 100%; }
+  .mnt-checkbox { padding: 4px 0; }
+
+  /* Five columns cannot stay legible at phone width, and a horizontally
+     scrolling table hides half the row — the same stacked-card treatment
+     used on the camera and staff tables elsewhere in the app. */
+  .mnt-table-wrap { overflow-x: visible; }
+  .mnt-table { min-width: 0; }
+  .mnt-table thead { display: none; }
+  .mnt-table, .mnt-table tbody, .mnt-table tr, .mnt-table td {
+    display: block;
+    width: 100%;
+  }
+  .mnt-row {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(26, 55, 103, 0.08);
+  }
+  .mnt-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 5px 0;
+    border-bottom: none;
+  }
+  .mnt-table td::before {
+    content: attr(data-label);
+    color: #63758a;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  /* The ticket number leads the card like a heading, not a label/value pair. */
+  .mnt-table td[data-label='Ticket'] {
+    padding-bottom: 8px;
+    font-size: 1rem;
+  }
+  .mnt-table td[data-label='Ticket']::before { display: none; }
+}
+
+@media (max-width: 480px) {
+  .mnt-pagination { flex-wrap: wrap; gap: 10px; }
+  .mnt-pagination .btn-admin { flex: 1 1 auto; }
+}

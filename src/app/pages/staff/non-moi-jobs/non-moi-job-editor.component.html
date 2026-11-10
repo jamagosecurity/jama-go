@@ -1,0 +1,139 @@
+<section class="admin-page">
+  <header class="admin-page-header">
+    <div>
+      <a class="nj-back" [routerLink]="base">← All jobs</a>
+      <span class="admin-kicker">Non-MOI Jobs</span>
+      <h1>{{ isEditing() ? 'Edit job' : 'Issue job' }}</h1>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading…</p></div>
+  } @else {
+    <div class="admin-panel nj-form-panel">
+      <form [formGroup]="form" (submit)="save($event)">
+        <h3 class="nj-title">
+          <span class="nj-title-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><circle cx="12" cy="10" r="2.6" /></svg>
+          </span>
+          Customer &amp; site
+        </h3>
+        <div class="nj-grid">
+          <label class="nj-field">
+            <span>Customer name <i aria-hidden="true">*</i></span>
+            <input formControlName="customerName" maxlength="200" autocomplete="off"
+              placeholder="Al Noor Trading" [class.is-invalid]="showError('customerName')" />
+            @if (showError('customerName')) {
+              <small class="field-error">{{ errorFor('customerName', 'Customer name') }}</small>
+            }
+          </label>
+
+          <label class="nj-field">
+            <span>Customer number <i aria-hidden="true">*</i></span>
+            <input formControlName="customerNumber" maxlength="30" autocomplete="off" inputmode="tel"
+              placeholder="+974 5555 0000" [class.is-invalid]="showError('customerNumber')" />
+            @if (showError('customerNumber')) {
+              <small class="field-error">{{ errorFor('customerNumber', 'Customer number') }}</small>
+            }
+          </label>
+
+          <div class="nj-field">
+            <span>Technician <i aria-hidden="true">*</i></span>
+            <app-select formControlName="assignedToId" [options]="technicianOptions()"
+              placeholder="Choose technician" ariaLabel="Technician" />
+            @if (showError('assignedToId')) {
+              <small class="field-error">{{ errorFor('assignedToId', 'Technician') }}</small>
+            } @else if (!technicianOptions().length) {
+              <small class="nj-hint">
+                No technician accounts yet.
+                @if (canLinkStaff) { <a routerLink="/admin/staff">Add one in Staff</a> (department: Technician). }
+              </small>
+            }
+          </div>
+
+          <label class="nj-field nj-span-3">
+            <span>Customer location <i aria-hidden="true">*</i></span>
+            <input formControlName="location" maxlength="300" autocomplete="off"
+              placeholder="Building, street, area" [class.is-invalid]="showError('location')" />
+            @if (showError('location')) {
+              <small class="field-error">{{ errorFor('location', 'Location') }}</small>
+            }
+          </label>
+
+          <!-- The pin turns the address into a one-tap Navigate on the
+               technician's card. One compact row, optional. -->
+          <label class="nj-field">
+            <span>Latitude <em>optional</em></span>
+            <input formControlName="latitude" inputmode="decimal" autocomplete="off"
+              placeholder="25.286106" (paste)="pasteCoordinates($event)"
+              [class.is-invalid]="!!coordinateError('latitude')" />
+          </label>
+
+          <label class="nj-field">
+            <span>Longitude <em>optional</em></span>
+            <input formControlName="longitude" inputmode="decimal" autocomplete="off"
+              placeholder="51.534817" (paste)="pasteCoordinates($event)"
+              [class.is-invalid]="!!coordinateError('longitude')" />
+          </label>
+
+          <div class="nj-pin-actions">
+            @if (canLocate) {
+              <button type="button" class="nj-link" [disabled]="locating() || saving()"
+                (click)="useCurrentLocation()">{{ locating() ? 'Locating…' : 'Use my location' }}</button>
+            }
+            @if (previewUrl(); as url) {
+              <a class="nj-link" [href]="url" target="_blank" rel="noopener noreferrer">Preview on map</a>
+              <button type="button" class="nj-link" (click)="clearPin()">Clear</button>
+            }
+          </div>
+
+          <p class="nj-pin-line nj-span-3" [class.is-error]="pinError() || coordinateError('latitude') || coordinateError('longitude')">
+            @if (pinError() || coordinateError('latitude') || coordinateError('longitude'); as message) {
+              {{ message }}
+            } @else if (pinNote()) {
+              {{ pinNote() }}
+            } @else {
+              Tip: paste a Google Maps link or “25.286106, 51.534817” into either box and both fill in.
+            }
+          </p>
+        </div>
+
+        <h3 class="nj-title">
+          <span class="nj-title-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z" /></svg>
+          </span>
+          Maintenance description
+        </h3>
+        <div class="nj-grid nj-grid--2">
+          <label class="nj-field">
+            <span>English <i aria-hidden="true">*</i>
+              <em class="nj-count">{{ values().descriptionEn.length }}/{{ descriptionMax }}</em></span>
+            <textarea formControlName="descriptionEn" [maxlength]="descriptionMax" rows="4"
+              placeholder="What the technician has to do at the site…"
+              [class.is-invalid]="showError('descriptionEn')"></textarea>
+            @if (showError('descriptionEn')) {
+              <small class="field-error">{{ errorFor('descriptionEn', 'Description (English)') }}</small>
+            }
+          </label>
+
+          <label class="nj-field nj-field--ar">
+            <span>الوصف <em>Arabic</em></span>
+            <textarea formControlName="descriptionAr" [maxlength]="descriptionMax" rows="4" dir="rtl" lang="ar"
+              placeholder="ما الذي يجب على الفني القيام به في الموقع…"
+              [class.is-invalid]="showError('descriptionAr')"></textarea>
+          </label>
+        </div>
+
+        <div class="nj-form-actions">
+          <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : isEditing() ? 'Save changes' : 'Issue job' }}
+          </button>
+          <a class="btn-admin btn-admin-ghost" [routerLink]="base">Cancel</a>
+          @if (formError()) {
+            <span class="nj-form-error" role="alert">{{ formError() }}</span>
+          }
+        </div>
+      </form>
+    </div>
+  }
+</section>

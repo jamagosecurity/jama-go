@@ -15,6 +15,12 @@ export class ContactService {
       .pipe(map((result) => unwrapApiResult(result)));
   }
 
+  remove(id: string): Observable<string> {
+    return this.http
+      .delete<ApiResult<string>>(`${environment.apiUrl}/contacts/${id}`)
+      .pipe(map((result) => unwrapApiResult(result)));
+  }
+
   getAll(): Observable<ContactSubmission[]> {
     return this.http
       .get<ApiResult<ContactSubmission[]>>(`${environment.apiUrl}/contacts`)

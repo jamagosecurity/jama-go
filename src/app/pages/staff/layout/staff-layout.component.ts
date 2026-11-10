@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { ApprovalBellComponent } from '../../../components/approval-bell/approval-bell.component';
 import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
@@ -12,8 +14,52 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './staff-layout.component.html',
   styleUrl: './staff-layout.component.css',
 })
-export class StaffLayoutComponent {
+export class StaffLayoutComponent implements OnInit {
   readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** On a phone the sidebar is a drawer behind the menu button; on a desktop
+   *  it is always on screen and this is never set. */
+  readonly menuOpen = signal(false);
+
+  /** Which sidebar groups (Inventory, Quotation, Drawings) show their sub-links.
+   *  The group you are working in opens itself; the arrow opens or closes the rest. */
+  readonly openGroups = signal<ReadonlySet<string>>(new Set());
+  private readonly groupRoutes: Record<string, RegExp> = {
+    inventory: /^\/staff\/(cameras|non-moi)(\/|\?|$)/,
+    quotation: /^\/staff\/boq(\/|\?|$)/,
+    drawings: /^\/staff\/drawings(\/|\?|$)/,
+  };
+
+  isOpen(key: string): boolean {
+    return this.openGroups().has(key);
+  }
+
+  toggleGroup(key: string): void {
+    this.openGroups.update((open) => {
+      const next = new Set(open);
+      if (!next.delete(key)) next.add(key);
+      return next;
+    });
+  }
+
+  private revealCurrentGroup(url: string): void {
+    const current = Object.keys(this.groupRoutes).filter((key) => this.groupRoutes[key].test(url));
+    if (current.length) this.openGroups.update((open) => new Set([...open, ...current]));
+  }
+
+  ngOnInit(): void {
+    // Picking a page in the drawer should land on that page, not leave the
+    // drawer covering it.
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
+      .subscribe((e) => {
+        this.menuOpen.set(false);
+        this.revealCurrentGroup((e as NavigationEnd).urlAfterRedirects);
+      });
+    this.revealCurrentGroup(this.router.url);
+  }
 
   /** Drives the DIA nav item. currentUser is a signal, so revoking the grant
    *  removes the link on the next session refresh without a reload. */
@@ -51,6 +97,17 @@ export class StaffLayoutComponent {
     () => this.auth.can(PERMISSIONS.drawingManage) || this.auth.can(PERMISSIONS.drawingApprove),
   );
 
+  /** Drives the nav subtitle only — the Maintenance link itself has no
+   *  permission guard, since every staff account can log and track its own
+   *  tickets the same as a client can. */
+  readonly canManageMaintenance = computed(() => this.auth.can(PERMISSIONS.maintenanceManage));
+
+  /** The Non-MOI Jobs link: its own grant now, which maintenance.manage implies. */
+  readonly canIssueJobs = computed(() => this.auth.can(PERMISSIONS.nonMoiJobManage));
+
+  /** The Company mail link — read-only for staff. */
+  readonly canReadMail = computed(() => this.auth.can(PERMISSIONS.mailRead));
+
   readonly initials = computed(() => {
     const name = this.auth.currentUser()?.fullName?.trim() || 'Staff';
     const parts = name.split(/\s+/).filter(Boolean);
@@ -60,6 +117,10 @@ export class StaffLayoutComponent {
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   });
 
+  @HostListener('document:keydown.escape')
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
 
   logout(): void {
     this.auth.logout();

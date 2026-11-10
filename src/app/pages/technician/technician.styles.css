@@ -1,25 +1,49 @@
 .dia-page { --dia-blue:var(--admin-blue);--dia-orange:var(--admin-orange);--dia-ink:var(--admin-ink); }
 .tech-header-actions,.dia-actions,.tech-form-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.tech-section{margin-bottom:24px;padding:20px;border:1px solid rgba(15,40,70,.1);border-radius:18px;background:#fff}
+.tech-section{margin-bottom:24px;padding:20px;border:1px solid rgba(26, 55, 103,.1);border-radius:18px;background:#fff}
 .tech-section h2{margin:0 0 16px;font-size:1.05rem;color:var(--dia-ink)}
 .tech-full-width{width:100%}
 .tech-notes{white-space:pre-wrap;margin:0 0 12px;color:#334155;line-height:1.5}
 .tech-notes:last-child{margin-bottom:0}
 .tech-muted{color:#64748b}
 .tech-detail-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;margin:0}
-.tech-detail-list div{padding:10px 12px;border-radius:12px;background:#f8fbff;border:1px solid rgba(15,40,70,.06)}
+.tech-detail-list div{padding:10px 12px;border-radius:12px;background:#fafbfd;border:1px solid rgba(26, 55, 103,.06)}
 .tech-detail-list .span-2{grid-column:1/-1}
 .tech-detail-list dt{margin:0 0 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;color:#64748b}
-.tech-detail-list dd{margin:0;color:#0b1f33;font-weight:600;white-space:pre-wrap}
+.tech-detail-list dd{margin:0;color:#14294c;font-weight:600;white-space:pre-wrap}
 .tech-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px}
 .tech-grid .span-2{grid-column:1/-1}
-.tech-camera-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) auto;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid rgba(15,40,70,.08)}
+.tech-camera-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) auto;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid rgba(26, 55, 103,.08)}
 /* .tech-status and its six quarter variants are gone — replaced by the shared
    .chip plus a status class. They carried cyan, purple and green that appeared
    nowhere else in the product, and colour-coded the quarter number next to a
    heading that already spelled the quarter out. */
-.tech-shell{min-height:100vh;background:linear-gradient(180deg,#edf4fb 0%,#f8fbff 40%,#eef3f8 100%)}
-.tech-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid rgba(15,40,70,.08);background:rgba(255,255,255,.92);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
-.tech-brand strong{display:block;font:800 1.1rem Sora,Inter,sans-serif;color:#0b1f33}.tech-brand span{font-size:.8rem;color:var(--admin-muted)}
+.tech-shell{min-height:100vh;background:linear-gradient(180deg,#eef2fa 0%,#fafbfd 40%,#eef2f8 100%)}
+.tech-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid rgba(26, 55, 103,.08);background:rgba(255,255,255,.92);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+.tech-brand strong{display:block;font:800 1.1rem Sora,Inter,sans-serif;color:#14294c}.tech-brand span{font-size:.8rem;color:var(--admin-muted)}
 .tech-content{max-width:1200px;margin:0 auto;padding:24px}
+.tech-nav{display:flex;gap:6px;padding:4px;border-radius:12px;background:rgba(26, 55, 103,.05)}
+.tech-nav a{padding:8px 16px;border-radius:9px;color:var(--admin-muted);font-weight:700;font-size:.9rem;text-decoration:none;white-space:nowrap}
+.tech-nav a:hover{color:var(--admin-ink)}
+.tech-nav a.active{background:#fff;color:#27467c;box-shadow:0 2px 8px rgba(26, 55, 103,.08)}
+@media(max-width:720px){.tech-topbar{flex-wrap:wrap;padding:12px 16px}.tech-nav{order:3;width:100%}.tech-nav a{flex:1 1 auto;min-width:0;padding:8px 6px;font-size:.82rem;text-align:center}.tech-content{padding:16px}}
 @media(max-width:900px){.tech-grid,.tech-camera-row,.tech-detail-list{grid-template-columns:1fr}}
+
+/* ===== Midnight & gold top bar — the sidebar's look, for the technician portal ===== */
+.tech-topbar{background:linear-gradient(180deg,#0e244e 0%,#0d2040 100%);border-bottom:1px solid rgba(165, 164, 148,.35);box-shadow:0 10px 30px -18px rgba(0,0,0,.7);backdrop-filter:none}
+.tech-brand strong{color:#f3f3f2}
+.tech-brand span{color:rgba(230, 230, 227,.7)}
+.tech-nav{background:rgba(255,255,255,.06);border:1px solid rgba(165, 164, 148,.25)}
+.tech-nav a{color:rgba(230, 230, 227,.78)}
+.tech-nav a:hover{color:#f3f3f2;background:rgba(165, 164, 148,.1)}
+.tech-nav a.active{background:linear-gradient(145deg,#dededa 0%,#b5b4a8 55%,#8f8d77 100%);color:#181816;box-shadow:0 6px 16px -8px rgba(181, 180, 168,.8)}
+.tech-header-actions span{color:#e6e6e3;font-weight:600}
+.tech-header-actions button{color:#e6e6e3;border-color:rgba(165, 164, 148,.5)}
+.tech-header-actions button:hover{background:linear-gradient(145deg,#dededa,#b5b4a8);color:#121210;border-color:transparent}
+
+/* ===== Navy / stone / crimson: the active tab and primary buttons match the admin console ===== */
+.tech-nav a.active{background:linear-gradient(145deg,#e8383f 0%,#d21319 55%,#a40f14 100%);color:#fff;box-shadow:0 6px 16px -8px rgba(210,19,25,.8)}
+.tech-header-actions button:hover{background:linear-gradient(145deg,#e8383f,#d21319);color:#fff;border-color:transparent}
+.tech-brand strong{letter-spacing:.01em}
+
+.page-banner .banner-ghost svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }

@@ -108,20 +108,30 @@
                   <td class="camera-row-actions">
                     @if (pendingDeleteId() === quote.id) {
                       <span class="camera-confirm">Delete {{ quote.quoteNumber }}?</span>
-                      <button type="button" class="btn-admin btn-admin-danger"
+                      <button type="button" class="row-btn row-btn--danger"
                         [disabled]="busyId() === quote.id" (click)="confirmDelete(quote)">
-                        {{ busyId() === quote.id ? 'Deleting…' : 'Yes, delete' }}
+                        {{ busyId() === quote.id ? 'Deleting…' : 'Delete' }}
                       </button>
-                      <button type="button" class="btn-admin btn-admin-ghost"
+                      <button type="button" class="row-btn"
                         [disabled]="busyId() === quote.id" (click)="cancelDelete()">Keep</button>
                     } @else {
-                      <a class="btn-admin btn-admin-ghost" [routerLink]="['/quotations', quote.id]">Open</a>
-                      <button type="button" class="btn-admin btn-admin-ghost"
+                      <a class="row-btn row-btn--edit" [routerLink]="['/quotations', quote.id]">Open</a>
+                      <button type="button" class="row-btn row-btn--icon" title="Download PDF"
                         [disabled]="busyId() === quote.id" (click)="download(quote)">
-                        {{ busyId() === quote.id ? 'Preparing…' : 'PDF' }}
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+                        </svg>
                       </button>
-                      <button type="button" class="btn-admin btn-admin-ghost camera-delete"
-                        (click)="askDelete(quote)">Delete</button>
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete" title="Delete"
+                        (click)="askDelete(quote)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                          <line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+                        </svg>
+                      </button>
                     }
                   </td>
                 </tr>

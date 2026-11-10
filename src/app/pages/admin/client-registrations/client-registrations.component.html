@@ -1,40 +1,39 @@
 <section class="admin-page">
-  <header class="admin-page-header">
-    <div>
-      <span class="admin-kicker">Clients</span>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Clients</p>
       <h1>Client registrations</h1>
-      <p>
-        People who signed up on the website. Accept each one as MOI or Non-MOI and allot their
-        team — MOI clients get their DIA inspection created automatically.
+      <p class="page-banner-sub">
+        @if (counts().pending) { <strong>{{ counts().pending }}</strong> waiting for review · }
+        Accept each sign-up as MOI or Non-MOI and allot their team.
       </p>
     </div>
   </header>
 
-  <!-- The three counts ARE the tabs: one glance says how much is waiting, one
-       click shows it. -->
-  <div class="creg-tabs" role="tablist" aria-label="Registration status">
-    <button type="button" role="tab" class="admin-stat admin-stat--orange creg-tab"
-      [class.is-current]="status() === 'Pending'" [attr.aria-selected]="status() === 'Pending'"
-      (click)="setStatus('Pending')">
-      <strong>{{ counts().pending }}</strong>
-      <span>Waiting for review</span>
-    </button>
-    <button type="button" role="tab" class="admin-stat admin-stat--teal creg-tab"
-      [class.is-current]="status() === 'Approved'" [attr.aria-selected]="status() === 'Approved'"
-      (click)="setStatus('Approved')">
-      <strong>{{ counts().approved }}</strong>
-      <span>Accepted</span>
-    </button>
-    <button type="button" role="tab" class="admin-stat admin-stat--rose creg-tab"
-      [class.is-current]="status() === 'Rejected'" [attr.aria-selected]="status() === 'Rejected'"
-      (click)="setStatus('Rejected')">
-      <strong>{{ counts().rejected }}</strong>
-      <span>Rejected</span>
-    </button>
-  </div>
+  <div class="creg-bar">
+    <!-- The three counts ARE the tabs: one glance says how much is waiting. -->
+    <div class="creg-tabs" role="tablist" aria-label="Registration status">
+      <button type="button" role="tab" class="creg-tab creg-tab--pending"
+        [class.is-current]="status() === 'Pending'" [attr.aria-selected]="status() === 'Pending'"
+        (click)="setStatus('Pending')">
+        Waiting <b>{{ counts().pending }}</b>
+      </button>
+      <button type="button" role="tab" class="creg-tab creg-tab--approved"
+        [class.is-current]="status() === 'Approved'" [attr.aria-selected]="status() === 'Approved'"
+        (click)="setStatus('Approved')">
+        Accepted <b>{{ counts().approved }}</b>
+      </button>
+      <button type="button" role="tab" class="creg-tab creg-tab--rejected"
+        [class.is-current]="status() === 'Rejected'" [attr.aria-selected]="status() === 'Rejected'"
+        (click)="setStatus('Rejected')">
+        Rejected <b>{{ counts().rejected }}</b>
+      </button>
+    </div>
 
-  <div class="admin-toolbar">
-    <label class="admin-search">
+    <label class="admin-search creg-search">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
       <input type="search" placeholder="Search name, email, mobile or site" aria-label="Search registrations"
         (input)="onSearch($event)" />
@@ -60,88 +59,74 @@
       </div>
     </div>
   } @else {
-    <div class="creg-grid" [class.is-refreshing]="loading()">
-      @for (item of items(); track item.id) {
-        <article class="creg-card surface-card surface-card--raised"
-          [class.creg-card--pending]="item.status === 'Pending'"
-          [class.creg-card--approved]="item.status === 'Approved'"
-          [class.creg-card--rejected]="item.status === 'Rejected'">
-          <header class="creg-card-head">
-            <div class="creg-avatar" aria-hidden="true">{{ item.fullName.charAt(0).toUpperCase() }}</div>
-            <div class="creg-card-title">
-              <h2>{{ item.fullName }}</h2>
-              <p>Registered {{ item.createdAt | date: 'd MMM y, h:mm a' }}</p>
-            </div>
-            @switch (item.status) {
-              @case ('Pending') { <span class="admin-badge admin-badge--new admin-badge--dot">Waiting</span> }
-              @case ('Approved') { <span class="admin-badge admin-badge--active admin-badge--dot">Accepted</span> }
-              @default { <span class="admin-badge admin-badge--hidden admin-badge--dot">Rejected</span> }
+    <div class="admin-panel" [class.is-refreshing]="loading()">
+      <div class="creg-table-wrap">
+        <table class="creg-table">
+          <thead>
+            <tr>
+              <th scope="col">Client</th>
+              <th scope="col">Email</th>
+              <th scope="col">Mobile</th>
+              <th scope="col">Site location</th>
+              <th scope="col">Date</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.id) {
+              <tr>
+                <td data-label="Client" class="col-name" [attr.title]="item.fullName">{{ item.fullName }}</td>
+                <td data-label="Email" [attr.title]="item.email"><a [href]="'mailto:' + item.email">{{ item.email }}</a></td>
+                <td data-label="Mobile"><a [href]="'tel:' + item.mobile">{{ item.mobile }}</a></td>
+                <td data-label="Site location" [attr.title]="item.siteLocation">{{ item.siteLocation }}</td>
+                <td data-label="Date">{{ item.createdAt | date: 'd MMM y' }}</td>
+                <td data-label="Status" class="col-status">
+                  @switch (item.status) {
+                    @case ('Pending') { <span class="admin-badge admin-badge--new admin-badge--dot">Waiting</span> }
+                    @case ('Approved') { <span class="admin-badge admin-badge--active admin-badge--dot">Accepted</span> }
+                    @default { <span class="admin-badge admin-badge--hidden admin-badge--dot">Rejected</span> }
+                  }
+                  @if (item.status === 'Approved') {
+                    <small class="creg-sub">
+                      <span class="creg-category" [class.creg-category--moi]="item.category === 'Moi'">
+                        {{ item.category ? categoryLabels[item.category] : '' }}
+                      </span>
+                      @if (item.teams.length) { · {{ teamNames(item) }} }
+                    </small>
+                    @if (item.diaInspectionId) {
+                      <a class="creg-dia-link" [routerLink]="['/admin/dia', item.diaInspectionId]">DIA {{ item.diaNumber }} →</a>
+                    }
+                  }
+                  @if (item.status === 'Rejected' && item.rejectionReason) {
+                    <small class="creg-sub" [attr.title]="item.rejectionReason">{{ item.rejectionReason }}</small>
+                  }
+                </td>
+                <td class="col-actions">
+                  <div class="creg-row-actions">
+                    @if (item.status !== 'Approved') {
+                      <button type="button" class="row-btn row-btn--edit" (click)="openAccept(item)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7" /></svg>
+                        {{ item.status === 'Rejected' ? 'Accept anyway' : 'Accept' }}
+                      </button>
+                    } @else {
+                      <span class="creg-done">{{ item.reviewedAt | date: 'd MMM y' }}</span>
+                    }
+                    @if (item.status === 'Pending') {
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete" title="Reject"
+                        [attr.aria-label]="'Reject ' + item.fullName" (click)="openReject(item)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
             }
-          </header>
-
-          <dl class="creg-details">
-            <div>
-              <dt>Email</dt>
-              <dd><a [href]="'mailto:' + item.email">{{ item.email }}</a></dd>
-            </div>
-            <div>
-              <dt>Mobile</dt>
-              <dd><a [href]="'tel:' + item.mobile">{{ item.mobile }}</a></dd>
-            </div>
-            <div class="creg-details-wide">
-              <dt>Site location</dt>
-              <dd>{{ item.siteLocation }}</dd>
-            </div>
-          </dl>
-
-          @if (item.status === 'Approved') {
-            <div class="creg-outcome">
-              <div class="creg-outcome-row">
-                <span class="creg-category" [class.creg-category--moi]="item.category === 'Moi'">
-                  {{ item.category ? categoryLabels[item.category] : '' }}
-                </span>
-                @for (team of item.teams; track team.key) {
-                  <span class="creg-team">{{ team.name }}</span>
-                }
-              </div>
-              @if (item.diaInspectionId) {
-                <a class="creg-dia-link" [routerLink]="['/admin/dia', item.diaInspectionId]">
-                  DIA inspection {{ item.diaNumber }}
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </a>
-              } @else if (item.category === 'Moi') {
-                <p class="creg-muted">The DIA record for this client has since been deleted.</p>
-              }
-              <p class="creg-muted">
-                Accepted {{ item.reviewedAt | date: 'd MMM y' }}@if (reviewer(item.reviewedByName)) { by {{ reviewer(item.reviewedByName) }}}
-              </p>
-            </div>
-          }
-
-          @if (item.status === 'Rejected') {
-            <div class="creg-reason">
-              <strong>Why it was rejected</strong>
-              <p>{{ item.rejectionReason }}</p>
-              <span class="creg-muted">
-                {{ item.reviewedAt | date: 'd MMM y' }}@if (reviewer(item.reviewedByName)) { · {{ reviewer(item.reviewedByName) }}}
-              </span>
-            </div>
-          }
-
-          @if (item.status !== 'Approved') {
-            <footer class="creg-actions">
-              @if (item.status === 'Pending') {
-                <button type="button" class="btn-admin btn-admin-ghost creg-reject" (click)="openReject(item)">
-                  Reject
-                </button>
-              }
-              <button type="button" class="btn-admin btn-admin-primary" (click)="openAccept(item)">
-                {{ item.status === 'Rejected' ? 'Accept anyway' : 'Accept' }}
-              </button>
-            </footer>
-          }
-        </article>
-      }
+          </tbody>
+        </table>
+      </div>
     </div>
   }
 </section>

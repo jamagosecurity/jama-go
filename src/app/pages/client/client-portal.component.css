@@ -1,9 +1,9 @@
 .client-shell {
   min-height: 100dvh;
   background:
-    radial-gradient(circle at 8% 4%, rgba(37, 148, 210, 0.16), transparent 32%),
-    radial-gradient(circle at 88% 96%, rgba(246, 153, 61, 0.14), transparent 34%),
-    linear-gradient(180deg, #eef6ff 0%, #fbfdff 44%, #f2f7fd 100%);
+    radial-gradient(circle at 8% 4%, rgba(50, 90, 160, 0.16), transparent 32%),
+    radial-gradient(circle at 88% 96%, rgba(163, 161, 144, 0.14), transparent 34%),
+    linear-gradient(180deg, #f2f5fb 0%, #fcfdfe 44%, #f4f6fb 100%);
 }
 
 .client-topbar {
@@ -70,7 +70,7 @@
 }
 
 .client-category--moi {
-  background: linear-gradient(120deg, #0b5c92, #3730a3);
+  background: linear-gradient(120deg, #2a549d, #2b4d88);
 }
 
 .client-account-details {
@@ -122,8 +122,8 @@
   gap: 12px;
   padding: 14px 16px;
   border-radius: 14px;
-  background: linear-gradient(160deg, rgba(37, 148, 210, 0.08), rgba(79, 70, 229, 0.05));
-  border: 1px solid rgba(37, 148, 210, 0.2);
+  background: linear-gradient(160deg, rgba(50, 90, 160, 0.08), rgba(61, 109, 193, 0.05));
+  border: 1px solid rgba(50, 90, 160, 0.2);
 }
 
 .client-dia strong {
@@ -138,6 +138,100 @@
   margin-top: 28px;
 }
 
+/* ===== Maintenance tickets ===== */
+
+.client-ticket-form { margin-bottom: 18px; }
+
+.client-ticket-heading {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(26, 55, 103, 0.09);
+}
+.client-ticket-heading strong { font-size: 1.02rem; font-weight: 800; color: var(--admin-ink); }
+.client-ticket-error { margin-top: 16px; }
+.client-req { color: #e11d24; font-style: normal; }
+.client-ticket-grid input.ng-invalid.ng-touched {
+  border-color: rgba(225, 29, 36, 0.6);
+  box-shadow: 0 0 0 4px rgba(225, 29, 36, 0.08);
+}
+
+.client-ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 18px;
+}
+.client-ticket-span-2 { grid-column: 1 / -1; }
+
+.client-ticket-grid label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #234379;
+}
+.client-ticket-grid input,
+.client-ticket-grid textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid rgba(26, 55, 103, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-weight: 500;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.client-ticket-grid input:focus,
+.client-ticket-grid textarea:focus {
+  outline: none;
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
+}
+
+.client-ticket-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 22px 0 26px;
+}
+
+.client-ticket-side { display: inline-flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.client-ticket-total {
+  color: var(--admin-ink);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.client-ticket-list { display: grid; gap: 2px; padding: 8px; }
+.client-ticket-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+.client-ticket-row:hover { background: rgba(50, 90, 160, 0.06); }
+.client-ticket-row strong { display: block; color: var(--admin-ink); font-size: 0.94rem; }
+.client-ticket-row small { display: block; margin-top: 2px; color: var(--admin-muted); font-size: 0.78rem; }
+
+.client-ticket-status {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: rgba(26, 55, 103, 0.08);
+  color: var(--admin-ink);
+}
+.client-ticket-status[data-status="Resolved"] { background: rgba(34, 197, 94, 0.14); color: #15803d; }
+.client-ticket-status[data-status="Cancelled"] { background: rgba(225, 29, 36, 0.12); color: #be1218; }
+.client-ticket-status[data-status="InProgress"] { background: rgba(50, 90, 160, 0.14); color: #27467c; }
+.client-ticket-status[data-status="Open"] { background: rgba(163, 161, 144, 0.18); color: #676556; }
+
 @media (max-width: 720px) {
   .client-topbar,
   .client-content {
@@ -148,4 +242,13 @@
   .client-account-details {
     grid-template-columns: 1fr;
   }
+
+  .client-ticket-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .client-ticket-form { padding: 16px; }
+  .client-ticket-actions { flex-direction: column-reverse; }
+  .client-ticket-actions .btn-admin { width: 100%; }
 }

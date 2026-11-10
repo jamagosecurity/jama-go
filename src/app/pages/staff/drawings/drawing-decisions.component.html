@@ -1,19 +1,25 @@
 <section class="admin-page boq-page">
-  <header class="admin-page-header">
-    <div>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 12l2 2 4-4M9 18h6" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Decisions</p>
       <h1>Approvals</h1>
-      <p class="admin-page-note">{{ blurb() }}</p>
+      <p class="page-banner-sub">{{ blurb() }}</p>
     </div>
-    <a class="btn-admin btn-admin-ghost" [routerLink]="basePath">← All drawings</a>
+    <div class="page-banner-actions">
+      <a class="banner-ghost" [routerLink]="basePath">← All drawings</a>
+    </div>
   </header>
 
   <div class="boq-tabs" role="tablist" aria-label="Decided drawings">
-    <button type="button" class="boq-tab" role="tab"
+    <button type="button" class="boq-tab boq-tab--ok" role="tab"
       [class.is-active]="!rejected()" [attr.aria-selected]="!rejected()"
       (click)="showTab('Approved')">
       Approved
     </button>
-    <button type="button" class="boq-tab" role="tab"
+    <button type="button" class="boq-tab boq-tab--no" role="tab"
       [class.is-active]="rejected()" [attr.aria-selected]="rejected()"
       (click)="showTab('Rejected')">
       Rejected

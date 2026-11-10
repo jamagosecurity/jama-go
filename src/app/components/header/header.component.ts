@@ -3,6 +3,7 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   NgZone,
   PLATFORM_ID,
   inject,
@@ -54,13 +55,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private mediaQuery: MediaQueryList | null = null;
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  private onHashChange = () => this.syncNavState();
+  // These handlers are plain DOM listeners, not template bindings, so a field
+  // they change never marks the view dirty — and the ancestors (AppComponent,
+  // HomeComponent) are OnPush, so a tick alone never reaches this view. Each
+  // one has to markForCheck() or the header keeps rendering stale state.
+  private onHashChange = () => {
+    this.syncNavState();
+    this.cdr.markForCheck();
+  };
   private onMediaChange = (e: MediaQueryListEvent) => {
     this.isDesktopNav = e.matches;
     if (e.matches) this.openDropdown = null;
+    this.cdr.markForCheck();
   };
   private onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') this.closeDropdown();
+    if (e.key !== 'Escape') return;
+    this.closeDropdown();
+    this.cdr.markForCheck();
   };
   /**
    * Bound outside the Angular zone: scroll fires continuously and only the
@@ -69,15 +80,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private onScroll = () => {
     const next = window.scrollY > 24;
     if (next === this.scrolled) return;
-    this.zone.run(() => (this.scrolled = next));
+    this.zone.run(() => {
+      this.scrolled = next;
+      this.cdr.markForCheck();
+    });
   };
   private readonly navSub;
   private readonly zone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   constructor(private readonly router: Router) {
     this.navSub = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => this.syncNavState());
+      .subscribe(() => {
+        this.syncNavState();
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnInit(): void {

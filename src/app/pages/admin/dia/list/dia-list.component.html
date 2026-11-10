@@ -1,30 +1,34 @@
 <section class="admin-page dia-page">
-  <header class="admin-page-header">
-    <div>
-      <span class="admin-kicker">DIA register</span>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 12l2 2 4-4M9 18h6" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">DIA register</p>
       <h1>Inspection records</h1>
-      <p>Search, filter and manage client inspection schedules.</p>
+      @if (result(); as summary) {
+        <p class="page-banner-sub"><strong>{{ summary.totalCount }}</strong> {{ summary.totalCount === 1 ? 'record' : 'records' }}{{ searchControl.value || statusControl.value ? ' match your filters' : '' }}</p>
+      } @else {
+        <p class="page-banner-sub">Search, filter and manage client inspection schedules.</p>
+      }
     </div>
-    <a mat-flat-button [routerLink]="[base, 'new']">Create DIA</a>
+    <div class="page-banner-actions">
+      <a class="banner-gold" [routerLink]="[base, 'new']">Create DIA</a>
+    </div>
   </header>
 
   <div class="dia-filters" aria-label="DIA filters">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Search inspections</mat-label>
-      <input matInput [formControl]="searchControl" placeholder="DIA, client or location" />
-    </mat-form-field>
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Status</mat-label>
-      <mat-select [formControl]="statusControl">
-        <mat-option value="">All statuses</mat-option>
-        @for (status of statuses; track status) {
-          <mat-option [value]="status">{{ statusLabel(status) }}</mat-option>
-        }
-        <mat-option value="Archived">Archived</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <label class="dia-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>
+      <input type="search" [formControl]="searchControl" autocomplete="off"
+        placeholder="Search by DIA number, client or location…" aria-label="Search inspections" />
+    </label>
+    <div class="dia-status-filter">
+      <span>Status</span>
+      <app-select [formControl]="statusControl" [options]="statusOptions" ariaLabel="Filter by status" />
+    </div>
     @if (searchControl.value || statusControl.value) {
-      <button mat-button type="button" (click)="clearFilters()">Clear filters</button>
+      <button type="button" class="dia-clear" (click)="clearFilters()">Clear filters</button>
     }
   </div>
 
@@ -95,78 +99,30 @@
                   @if (item.isArchived) {
                     <!-- Archived records are read-only until restored: the API
                          rejects edit, activate and deactivate on them. -->
-                    <button
-                      class="dia-act dia-act--restore"
-                      type="button"
-                      [disabled]="actionId() === item.id"
-                      matTooltip="Restore to register"
-                      aria-label="Restore to register"
-                      (click)="confirmAction(item, 'restore')"
-                    >
-                      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></svg>
-                    </button>
-
+                    <button class="row-btn row-btn--edit" type="button" [disabled]="actionId() === item.id"
+                      (click)="confirmAction(item, 'restore')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></svg> Restore</button>
                     @if (canDeletePermanently) {
                       <!-- Super admin only, and only once archived: the two steps
                            are what stop a live record being destroyed by a stray
                            click. The API refuses anything with inspections on it. -->
-                      <button
-                        class="dia-act dia-act--delete"
-                        type="button"
-                        [disabled]="actionId() === item.id"
-                        matTooltip="Delete permanently"
-                        aria-label="Delete permanently"
-                        (click)="confirmAction(item, 'delete')"
-                      >
-                        <svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M5 7l1 13h12l1-13" /><path d="M9 7V4h6v3" /></svg>
-                      </button>
+                      <button class="row-btn row-btn--icon row-btn--delete" type="button"
+                        [disabled]="actionId() === item.id" matTooltip="Delete permanently"
+                        aria-label="Delete permanently" (click)="confirmAction(item, 'delete')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M5 7l1 13h12l1-13" /><path d="M9 7V4h6v3" /></svg></button>
                     }
                   } @else {
-                  <a
-                    class="dia-act dia-act--view"
-                    [routerLink]="[base, item.id]"
-                    matTooltip="View details"
-                    aria-label="View details"
-                  >
-                    <svg viewBox="0 0 24 24"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="2.8" /></svg>
-                  </a>
-
-                  <a
-                    class="dia-act dia-act--edit"
-                    [routerLink]="[base, item.id, 'edit']"
-                    matTooltip="Edit record"
-                    aria-label="Edit record"
-                  >
-                    <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
-                  </a>
-
-                  <button
-                    class="dia-act"
-                    [class.dia-act--deactivate]="item.isActive"
-                    [class.dia-act--activate]="!item.isActive"
-                    type="button"
-                    [disabled]="actionId() === item.id"
-                    [matTooltip]="item.isActive ? 'Deactivate' : 'Activate'"
-                    [attr.aria-label]="item.isActive ? 'Deactivate' : 'Activate'"
-                    (click)="confirmAction(item, item.isActive ? 'deactivate' : 'activate')"
-                  >
-                    @if (item.isActive) {
-                      <svg viewBox="0 0 24 24"><path d="M18.4 6.6a9 9 0 1 1-12.8 0" /><path d="M12 2v10" /></svg>
-                    } @else {
-                      <svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7" /></svg>
-                    }
-                  </button>
-
-                  <button
-                    class="dia-act dia-act--danger"
-                    type="button"
-                    [disabled]="actionId() === item.id"
-                    matTooltip="Archive"
-                    aria-label="Archive"
-                    (click)="confirmAction(item, 'archive')"
-                  >
-                    <svg viewBox="0 0 24 24"><path d="M3 7h18v4H3z" /><path d="M5 11v9h14v-9M10 15h4" /></svg>
-                  </button>
+                    <a class="row-btn row-btn--edit" [routerLink]="[base, item.id]" aria-label="Open record"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="2.8" /></svg> Open</a>
+                    <a class="row-btn row-btn--icon" [routerLink]="[base, item.id, 'edit']"
+                      matTooltip="Edit record" aria-label="Edit record"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg></a>
+                    <button class="row-btn row-btn--icon" [class.row-btn--on]="!item.isActive" type="button"
+                      [disabled]="actionId() === item.id"
+                      [matTooltip]="item.isActive ? 'Deactivate' : 'Activate'"
+                      [attr.aria-label]="item.isActive ? 'Deactivate' : 'Activate'"
+                      (click)="confirmAction(item, item.isActive ? 'deactivate' : 'activate')">
+                      @if (item.isActive) { <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.4 6.6a9 9 0 1 1-12.8 0" /><path d="M12 2v10" /></svg> } @else { <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5L20 7" /></svg> }
+                    </button>
+                    <button class="row-btn row-btn--icon row-btn--delete" type="button"
+                      [disabled]="actionId() === item.id" matTooltip="Archive" aria-label="Archive"
+                      (click)="confirmAction(item, 'archive')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v4H3z" /><path d="M5 11v9h14v-9M10 15h4" /></svg></button>
                   }
                 </div>
               </td>
@@ -217,10 +173,21 @@
           (page)="pageChanged($event)"
         />
       } @else {
-        <app-dia-empty-state
-          title="No DIA records found"
-          message="Try changing your filters or create the first DIA inspection."
-        />
+        @if (searchControl.value || statusControl.value) {
+          <app-dia-empty-state
+            title="No DIA records match"
+            message="Nothing fits those filters. Try a different search or status."
+            actionLabel="Clear filters"
+            (action)="clearFilters()"
+          />
+        } @else {
+          <app-dia-empty-state
+            title="No DIA records yet"
+            message="Create the first DIA inspection and it will appear here."
+            actionLabel="Create DIA"
+            (action)="create()"
+          />
+        }
       }
     }
   </div>

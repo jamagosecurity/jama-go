@@ -101,13 +101,13 @@ export class SifeddineLandingComponent implements OnInit {
     {
       title: 'Security Solutions Consulting',
       desc: 'Advising businesses on tailored surveillance, access-control and safety equipment that fit their real-world risk.',
-      accent: '#2594d2',
+      accent: '#325aa0',
       icon: 'shield',
     },
     {
       title: 'Client Partnerships',
       desc: 'Building trusted, long-term relationships with organisations across Qatar and the wider Gulf.',
-      accent: '#f6993d',
+      accent: '#a3a190',
       icon: 'handshake',
     },
     {
@@ -131,7 +131,7 @@ export class SifeddineLandingComponent implements OnInit {
     {
       title: 'Cross-Border Experience',
       desc: 'Bridging markets and cultures across Qatar and Türkiye with a genuinely international perspective.',
-      accent: '#e11d48',
+      accent: '#e11d24',
       icon: 'globe',
     },
   ];
@@ -143,7 +143,7 @@ export class SifeddineLandingComponent implements OnInit {
       type: 'Full-time',
       period: 'Sep 2024 — Present',
       location: 'Doha, Qatar',
-      accent: '#2594d2',
+      accent: '#325aa0',
     },
     {
       role: 'General Manager',
@@ -159,7 +159,7 @@ export class SifeddineLandingComponent implements OnInit {
       type: 'Contract',
       period: 'Jan 2018 — Jul 2021',
       location: '3 yrs 7 mos',
-      accent: '#f6993d',
+      accent: '#a3a190',
     },
   ];
 

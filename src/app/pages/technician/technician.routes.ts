@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { createMaintenanceRoutes } from '../staff/maintenance/maintenance.routes';
 
 export const TECHNICIAN_ROUTES: Routes = [
   {
@@ -36,6 +37,27 @@ export const TECHNICIAN_ROUTES: Routes = [
         title: 'Final Summary — Jama Go',
         loadComponent: () =>
           import('./summary/technician-final-summary.component').then((m) => m.TechnicianFinalSummaryComponent),
+      },
+      {
+        // Non-MOI maintenance — the same screens staff use. A technician sees
+        // the jobs assigned to them and files new ones at admin's prices; the
+        // queue, repricing and discounts stay with maintenance.manage.
+        path: 'maintenance',
+        children: createMaintenanceRoutes('/technician/maintenance'),
+      },
+      {
+        path: 'non-moi-jobs/:id',
+        title: 'Non-MOI Job — Jama Go',
+        loadComponent: () =>
+          import('./non-moi-jobs/technician-non-moi-job-detail.component').then((m) => m.TechnicianNonMoiJobDetailComponent),
+      },
+      {
+        // Jobs admin issued to this technician — the Non-MOI counterpart of
+        // the DIA list, but only their own.
+        path: 'non-moi-jobs',
+        title: 'Non-MOI Jobs — Jama Go',
+        loadComponent: () =>
+          import('./non-moi-jobs/technician-non-moi-jobs.component').then((m) => m.TechnicianNonMoiJobsComponent),
       },
     ],
   },

@@ -6,6 +6,9 @@ import { createDiaRoutes } from '../admin/dia/dia.routes';
 import { createVipRoutes } from '../admin/vip/vip.routes';
 import { createBoqRoutes } from './boq/boq.routes';
 import { createDrawingRoutes } from './drawings/drawing.routes';
+import { createMaintenanceRoutes } from './maintenance/maintenance.routes';
+import { createNonMoiRoutes } from './maintenance/non-moi/non-moi.routes';
+import { createNonMoiJobRoutes } from './non-moi-jobs/non-moi-jobs.routes';
 
 export const STAFF_ROUTES: Routes = [
   {
@@ -88,6 +91,35 @@ export const STAFF_ROUTES: Routes = [
         path: 'vip',
         canActivate: [permissionGuard(PERMISSIONS.vipManage)],
         children: createVipRoutes('/staff/vip'),
+      },
+      {
+        // Maintenance tickets — open to every staff account, not just those
+        // with maintenance.manage: anyone can log a callout and see their own,
+        // the same as a client can from their portal. The queue, assigning,
+        // resolving, cancelling and editing all still require the permission,
+        // checked inside the screens and enforced again server-side.
+        path: 'maintenance',
+        children: createMaintenanceRoutes('/staff/maintenance'),
+      },
+      {
+        // The Non-MOI price list, on the same terms as the stock inventory:
+        // only an account granted maintenance.manage reaches it.
+        path: 'non-moi',
+        canActivate: [permissionGuard(PERMISSIONS.maintenanceManage)],
+        children: createNonMoiRoutes('/staff/non-moi'),
+      },
+      {
+        path: 'non-moi-jobs',
+        canActivate: [permissionGuard(PERMISSIONS.nonMoiJobManage)],
+        children: createNonMoiJobRoutes('/staff/non-moi-jobs'),
+      },
+      {
+        // The company mailboxes, read-only for staff an admin granted mail.read.
+        path: 'mail',
+        canActivate: [permissionGuard(PERMISSIONS.mailRead)],
+        title: 'Company Mail — Jama Go Staff',
+        loadComponent: () =>
+          import('../admin/mail/admin-mail.component').then((m) => m.AdminMailComponent),
       },
     ],
   },

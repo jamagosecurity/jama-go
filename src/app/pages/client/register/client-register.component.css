@@ -36,12 +36,12 @@
 }
 
 .control.is-invalid {
-  border-color: rgba(225, 29, 72, 0.55);
+  border-color: rgba(225, 29, 36, 0.55);
 }
 
 .field-error {
   margin-top: 6px;
-  color: #9f1239;
+  color: #9f1217;
   font-size: 0.76rem;
   font-weight: 700;
   line-height: 1.35;
@@ -133,8 +133,8 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f6993d, #f9b877);
-  color: #0a0f2b;
+  background: linear-gradient(135deg, #a3a190, #bebdb2);
+  color: #122341;
   font-weight: 900;
   font-size: 0.86rem;
 }
@@ -169,7 +169,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #14b8a6, #2594d2);
+  background: linear-gradient(135deg, #14b8a6, #325aa0);
   box-shadow: 0 18px 40px -16px rgba(20, 184, 166, 0.75);
 }
 

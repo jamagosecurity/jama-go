@@ -1,0 +1,89 @@
+.mnt-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--admin-blue-ink, #27467c);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.mnt-back-link svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mnt-client-panel { margin-bottom: 18px; }
+
+.mnt-form-heading {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(26, 55, 103, 0.09);
+}
+.mnt-form-heading strong {
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--admin-ink);
+}
+
+.mnt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 20px;
+}
+.mnt-span-2 { grid-column: 1 / -1; }
+
+.mnt-grid label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #234379;
+}
+.mnt-grid input,
+.mnt-grid textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid rgba(26, 55, 103, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-weight: 500;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.mnt-grid textarea { resize: vertical; }
+.mnt-req { color: #e11d24; font-style: normal; }
+.mnt-grid input.ng-invalid.ng-touched {
+  border-color: rgba(225, 29, 36, 0.6);
+  box-shadow: 0 0 0 4px rgba(225, 29, 36, 0.08);
+}
+.mnt-grid input:focus,
+.mnt-grid textarea:focus {
+  outline: none;
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
+}
+
+.mnt-error { margin-top: 16px; }
+
+.mnt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+@media (max-width: 640px) {
+  .mnt-actions { flex-direction: column-reverse; }
+  .mnt-actions .btn-admin { width: 100%; }
+}

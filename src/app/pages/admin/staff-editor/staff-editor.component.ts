@@ -59,6 +59,9 @@ export class StaffEditorComponent {
     { prefix: 'camera.', label: 'Stock inventory' },
     { prefix: 'boq.', label: 'Quotations & storage' },
     { prefix: 'drawing.', label: 'CAD drawings' },
+    { prefix: 'maintenance.', label: 'Maintenance tickets' },
+    { prefix: 'nonmoijob.', label: 'Non-MOI jobs' },
+    { prefix: 'mail.', label: 'Company mail' },
   ];
 
   /** Icon path data per permission, so each card is scannable at a glance. */
@@ -82,6 +85,12 @@ export class StaffEditorComponent {
     // A ruled sheet: a drawing rather than a priced document.
     'drawing.manage': ['M3 3h18v18H3z', 'M9 3v18M15 3v18M3 9h18M3 15h18'],
     'drawing.approve': ['M3 3h18v18H3z', 'M9 3v18M15 3v18M3 9h18M3 15h18', 'm9 13 2 2 4-4'],
+    // A wrench: fixing something, not building or deciding on a document.
+    'maintenance.manage': ['M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-2.6 2.6-2-2z'],
+    // A map pin: a job at a customer's site, handed to one technician.
+    'nonmoijob.manage': ['M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z', 'M12 7.4a2.6 2.6 0 1 0 0 5.2 2.6 2.6 0 0 0 0-5.2Z'],
+    // An envelope: reading the company's mail.
+    'mail.read': ['M3 6h18v12H3z', 'm3 7 9 6 9-6'],
   };
 
   readonly permissionCatalogue = signal<PermissionDefinition[]>([]);
@@ -192,7 +201,10 @@ export class StaffEditorComponent {
     password: ['', this.isEditing ? [strongPassword] : [Validators.required, strongPassword]],
     department: this.formBuilder.nonNullable.control<StaffDepartment | null>(null),
     /** Public "Our Team" visibility. */
-    isActive: [true],
+    // Not on the form any more: a new person is NOT listed on the public Our Team
+    // section (internal staff should not land on the home page). Editing keeps
+    // whatever the person already has.
+    isActive: [false],
     /**
      * Login enabled. Deliberately separate from isActive — internal staff sign
      * in without appearing on the marketing site.

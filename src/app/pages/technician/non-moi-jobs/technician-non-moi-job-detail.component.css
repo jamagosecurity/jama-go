@@ -1,0 +1,92 @@
+.tjd-ar { color: #4a5567; }
+
+.tjd-group, .admin-panel { margin-bottom: 14px; }
+.tjd-h { margin: 0 0 8px; color: #1a2f52; font-size: 1.02rem; }
+.tjd-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 14px; padding: 9px 10px; border-top: 1px solid #eceae4; border-radius: 8px; }
+.tjd-row:first-of-type { border-top: 0; }
+.tjd-row.is-on { background: #f6e7e8; }
+.tjd-pick { display: flex; align-items: center; gap: 10px; cursor: pointer; color: #1a2f52; font-weight: 600; }
+.tjd-pick input { width: 20px; height: 20px; accent-color: #d21319; flex: none; }
+.tjd-price { color: #4a5567; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.tjd-bar { position: sticky; bottom: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 -4px; padding: 12px 18px; background: #fff; border: 1px solid #dcdde3; border-radius: 16px; box-shadow: 0 -14px 34px -16px rgba(13, 32, 64, 0.55); }
+.tjd-notes-in { display: flex; flex-direction: column; gap: 4px; color: #6b7280; font-size: 0.78rem; font-weight: 700; }
+.tjd-notes-in textarea { border: 1px solid #c9ccd6; border-radius: 8px; padding: 8px 10px; font: inherit; resize: vertical; }
+.tjd-total { display: flex; flex-direction: column; align-items: flex-end; color: #6b7280; font-size: 0.8rem; }
+.tjd-total strong { color: #1a2f52; font-size: 1.25rem; }
+.tjd-complete { border: 0; border-radius: 999px; padding: 13px 26px; background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%); color: #fff; font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 12px 26px -14px rgba(210, 19, 25, 0.9); }
+.tjd-complete:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+
+.tjd-table { width: 100%; border-collapse: collapse; }
+.tjd-table th { text-align: left; padding: 8px 10px; background: #14305f; color: #e8e7e0; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.tjd-table td { padding: 10px; border-top: 1px solid #eceae4; color: #1a2f52; }
+.tjd-table small { display: block; color: #6b7280; }
+.tjd-table tfoot td { font-weight: 800; border-top: 2px solid #1a2f52; }
+.tjd-table th.tjd-num, .tjd-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tjd-notes { margin: 12px 0 0; color: #4a5567; white-space: pre-wrap; }
+
+.page-banner .banner-ghost svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 720px) {
+    .tjd-group { padding: 14px 12px; }
+  .tjd-row { grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 8px; min-height: 56px; }
+  .tjd-pick { grid-column: 1; grid-row: 1; align-items: flex-start; line-height: 1.3; }
+  .tjd-pick input { width: 26px; height: 26px; margin-top: 1px; }
+  .tjd-price { grid-column: 2; grid-row: 1; font-size: 0.84rem; align-self: center; }
+        .tjd-bar { position: sticky; bottom: 0; margin: 0 -12px; padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); border-radius: 18px 18px 0 0; border-width: 1px 0 0; }
+  .tjd-total { align-items: flex-start; }
+  .tjd-total strong { font-size: 1.15rem; }
+  .tjd-complete { flex: 1; max-width: 190px; min-height: 50px; padding: 0 18px; }
+  .tjd-table { font-size: 0.86rem; }
+  .tjd-table th, .tjd-table td { padding: 8px 6px; }
+}
+
+/* Slim top bar instead of a banner: the details sit right below, so nothing is said twice. */
+.tjd-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.tjd-back { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 16px 0 10px; border: 1px solid #c9ccd6; border-radius: 999px; background: #fff; color: #1a2f52; font-weight: 700; text-decoration: none; }
+.tjd-back svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tjd-jobno { color: #d21319; letter-spacing: 0.06em; }
+.tjd-date { color: #6b7280; font-size: 0.86rem; }
+.tjd-state { margin-left: auto; padding: 4px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; background: #e3e8f2; color: #1a2f52; }
+.tjd-state.is-done { background: #d9f2ea; color: #0f6b5f; }
+
+/* ===== Job details card ===== */
+.tjd-card { display: flex; flex-direction: column; gap: 16px; padding: 20px 22px; }
+.tjd-card-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.tjd-avatar { flex: none; width: 52px; height: 52px; display: grid; place-items: center; border-radius: 50%; background: linear-gradient(145deg, #dededa, #b5b4a8 55%, #8f8d77); color: #14305f; font: 800 1.3rem Sora, Inter, sans-serif; text-transform: uppercase; box-shadow: 0 8px 18px -10px rgba(13, 32, 64, 0.7); }
+.tjd-who { flex: 1 1 200px; min-width: 0; }
+.tjd-label { display: block; color: #6b7280; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.tjd-cust { margin: 2px 0 0; color: #14305f; font: 800 1.45rem Sora, Inter, sans-serif; line-height: 1.2; overflow-wrap: anywhere; }
+.tjd-actions { display: flex; gap: 10px; flex: none; }
+.tjd-act { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 999px; font-weight: 800; font-size: 0.92rem; text-decoration: none; white-space: nowrap; transition: transform 0.18s ease, box-shadow 0.2s ease; }
+.tjd-act svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tjd-act:hover { transform: translateY(-1px); }
+.tjd-act--call { background: #fff; color: #14305f; border: 1.5px solid #14305f; }
+.tjd-act--nav { background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%); color: #fff; border: 0; box-shadow: 0 12px 24px -14px rgba(210, 19, 25, 0.9); }
+.tjd-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tjd-tile { padding: 12px 14px; border: 1px solid #e3e2dc; border-radius: 12px; background: #faf9f6; }
+.tjd-tile strong { display: block; margin-top: 3px; color: #14305f; font-weight: 700; overflow-wrap: anywhere; }
+.tjd-work { padding: 14px 16px; border-radius: 12px; background: #f1f4fa; border-left: 4px solid #d21319; }
+.tjd-work p { margin: 6px 0 0; color: #14305f; font-weight: 600; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tjd-work .tjd-ar { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #c3cadb; color: #3b4a66; }
+.tjd-top + .tjd-card { margin-top: 0; }
+
+@media (max-width: 720px) {
+  .tjd-card { padding: 16px 14px; gap: 14px; }
+  .tjd-card-head { gap: 12px; }
+  .tjd-avatar { width: 46px; height: 46px; font-size: 1.15rem; }
+  .tjd-who { flex-basis: calc(100% - 60px); }
+  .tjd-cust { font-size: 1.25rem; }
+  .tjd-actions { flex: 1 1 100%; }
+  .tjd-act { flex: 1; min-height: 50px; font-size: 1rem; }
+  .tjd-tiles { grid-template-columns: 1fr; gap: 10px; }
+}
+
+@media (max-width: 720px) {
+  .tjd-top { flex-wrap: nowrap; gap: 10px; }
+  .tjd-date { display: none; }
+}
+
+/* The card is now just who + Call + Navigate; the details live on the list. */
+.tjd-card { gap: 0; padding: 16px 22px; }
+@media (max-width: 720px) { .tjd-card { padding: 14px; } }

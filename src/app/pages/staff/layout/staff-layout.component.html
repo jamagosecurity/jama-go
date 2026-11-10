@@ -1,11 +1,17 @@
-<div class="staff-shell">
-  <aside class="staff-sidebar" aria-label="Staff sidebar">
+<div class="staff-shell" [class.is-menu-open]="menuOpen()">
+  <!-- Phones only: dims the page behind the open drawer, and closes it on tap. -->
+  @if (menuOpen()) {
+    <div class="staff-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
+  }
+
+  <aside id="staff-sidebar" class="staff-sidebar" aria-label="Staff sidebar">
+    <button type="button" class="staff-drawer-close" (click)="closeMenu()" aria-label="Close menu">×</button>
     <div class="staff-sidebar-head">
       <div class="staff-brand">
         <div class="staff-logo-badge">
           <img
             class="staff-logo"
-            src="/JamaGoLogo-trim.png"
+            src="/JamaGoLogo-navy.png"
             alt="Jama Go"
             width="360"
             height="108"
@@ -22,6 +28,9 @@
          public-site link were removed at the owner's request; their routes still
          exist and are reachable by URL. -->
     <nav class="staff-nav" aria-label="Staff">
+      @if (canUploadDia() || canManageCameras()) {
+        <p class="nav-sub nav-sub--moi"><i aria-hidden="true"></i>MOI</p>
+      }
       @if (canUploadDia()) {
         <a routerLink="/staff/dia" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
@@ -36,7 +45,67 @@
           </span>
         </a>
       }
+      @if (canManageCameras()) {
+        <a routerLink="/staff/cameras" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z" />
+              <path d="m16 11 5-3v8l-5-3z" />
+              <path d="M6 20h5" />
+            </svg>
+          </span>
+          <span>
+            <strong>Moi Inventory</strong>
+            <small>Brand, type &amp; price</small>
+          </span>
+        </a>
+      }
 
+      <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
+      <a routerLink="/staff/maintenance" routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+          </svg>
+        </span>
+        <span>
+          <strong>Maintenance</strong>
+          <small>{{ canManageMaintenance() ? 'All service tickets' : 'Report an issue' }}</small>
+        </span>
+      </a>
+      @if (canIssueJobs()) {
+        <a routerLink="/staff/non-moi-jobs" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+              <circle cx="12" cy="10" r="2.6" />
+            </svg>
+          </span>
+          <span>
+            <strong>Non-MOI Jobs</strong>
+            <small>Issued to technicians</small>
+          </span>
+        </a>
+      }
+      @if (canManageMaintenance()) {
+        <a routerLink="/staff/non-moi" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 3h6l1 2h3v16H5V5h3z" />
+              <path d="M9 11h2M9 15h2M14 11h1M14 15h1" />
+            </svg>
+          </span>
+          <span>
+            <strong>Non-MOI Inventory</strong>
+            <small>Services &amp; prices</small>
+          </span>
+        </a>
+      }
+
+      @if (canBuildBoq() || canSeeBoq() || canSeeDrawings() || canManageVip()) {
+        <p class="nav-label">Quotations &amp; documents</p>
+      }
       @if (canBuildBoq()) {
         <a routerLink="/staff/storage" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
@@ -52,37 +121,6 @@
           </span>
         </a>
       }
-
-      @if (canManageCameras()) {
-        <a routerLink="/staff/cameras" routerLinkActive="active">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M3 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z" />
-              <path d="m16 11 5-3v8l-5-3z" />
-              <path d="M6 20h5" />
-            </svg>
-          </span>
-          <span>
-            <strong>Stock Inventory</strong>
-            <small>Brand, type &amp; price</small>
-          </span>
-        </a>
-      }
-
-      @if (canManageVip()) {
-        <a routerLink="/staff/vip" routerLinkActive="active">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            </svg>
-          </span>
-          <span>
-            <strong>VIP Clients</strong>
-            <small>Projects &amp; documents</small>
-          </span>
-        </a>
-      }
-
       @if (canSeeBoq()) {
         <!-- Parent and children, so "Approved" reads as a view of the
              quotations above it rather than as its own area. -->
@@ -100,7 +138,11 @@
               <small>Priced from stock</small>
             </span>
           </a>
+          <button type="button" class="nav-chevron" [class.is-open]="isOpen('quotation')"
+            [attr.aria-expanded]="isOpen('quotation')" aria-label="Show or hide quotation links"
+            (click)="toggleGroup('quotation')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></button>
 
+          @if (isOpen('quotation')) {
           <div class="nav-subs">
             <a routerLink="/staff/boq/decisions" [queryParams]="{ status: 'Approved' }"
               routerLinkActive="active"
@@ -115,9 +157,9 @@
               Rejected
             </a>
           </div>
+          }
         </div>
       }
-
       @if (canSeeDrawings()) {
         <!-- Same parent-plus-decisions shape as Quotation, and a standalone
              module — no relation to quotations at all. -->
@@ -135,7 +177,11 @@
               <small>CAD submissions</small>
             </span>
           </a>
+          <button type="button" class="nav-chevron" [class.is-open]="isOpen('drawings')"
+            [attr.aria-expanded]="isOpen('drawings')" aria-label="Show or hide drawings links"
+            (click)="toggleGroup('drawings')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></button>
 
+          @if (isOpen('drawings')) {
           <div class="nav-subs">
             <a routerLink="/staff/drawings/decisions" [queryParams]="{ status: 'Approved' }"
               routerLinkActive="active"
@@ -150,7 +196,33 @@
               Rejected
             </a>
           </div>
+          }
         </div>
+      }
+      @if (canManageVip()) {
+        <a routerLink="/staff/vip" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            </svg>
+          </span>
+          <span>
+            <strong>VIP Clients</strong>
+            <small>Projects &amp; documents</small>
+          </span>
+        </a>
+      }
+      @if (canReadMail()) {
+        <p class="nav-label">Communication</p>
+        <a routerLink="/staff/mail" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z" /><path d="m3 7 9 6 9-6" /></svg>
+          </span>
+          <span>
+            <strong>Company mail</strong>
+            <small>Read-only inbox</small>
+          </span>
+        </a>
       }
     </nav>
 
@@ -160,8 +232,11 @@
         <div class="staff-user-meta">
           <p>{{ auth.currentUser()?.fullName || 'Staff member' }}</p>
           <small>{{ auth.currentUser()?.email }}</small>
+          <span class="profile-role">Staff</span>
         </div>
-        <button type="button" class="signout" (click)="logout()">Sign out</button>
+        <button type="button" class="profile-logout" (click)="logout()" aria-label="Sign out" title="Sign out">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /></svg>
+        </button>
       </div>
     </div>
   </aside>
@@ -170,11 +245,19 @@
     <!-- The same bar the admin console has. A staff member needs telling that
          their quotation was approved or sent back at least as much as an
          administrator does — more, since they are the one who has to act on it. -->
-    @if (canSeeBoq()) {
-      <header class="staff-topbar">
+    <!-- Always rendered for the phone menu button; on a desktop it is hidden
+         again for accounts without the bell, so their layout is unchanged. -->
+    <header class="staff-topbar" [class.has-bell]="canSeeBoq()">
+      <button type="button" class="staff-menu-btn" (click)="menuOpen.set(!menuOpen())"
+        [attr.aria-expanded]="menuOpen()" aria-controls="staff-sidebar" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        <span>Menu</span>
+      </button>
+      <img class="staff-topbar-logo" src="/JamaGoLogo-navy.png" alt="Jama Go" width="360" height="108" />
+      @if (canSeeBoq()) {
         <app-approval-bell basePath="/staff/boq" />
-      </header>
-    }
+      }
+    </header>
 
     <div class="staff-content">
       <router-outlet />

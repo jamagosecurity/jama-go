@@ -1,0 +1,68 @@
+<button
+  type="button"
+  #trigger
+  #origin="cdkOverlayOrigin"
+  cdkOverlayOrigin
+  class="app-select-trigger"
+  [class.is-open]="isOpen()"
+  [class.is-placeholder]="!selected()"
+  [disabled]="isDisabled()"
+  [attr.aria-haspopup]="'listbox'"
+  [attr.aria-expanded]="isOpen()"
+  [attr.aria-label]="ariaLabel || null"
+  (click)="toggle()"
+  (keydown)="onTriggerKeydown($event)"
+>
+  <span class="app-select-value">{{ selectedLabel() }}</span>
+  <svg class="app-select-chevron" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayWidth]="triggerWidth()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="app-select-backdrop"
+  (backdropClick)="close()"
+  (detach)="close()"
+>
+  <div class="app-select-panel" role="listbox" tabindex="-1" (keydown)="onPanelKeydown($event)">
+    <div class="app-select-list">
+    @for (option of options; track option.value; let i = $index) {
+      <button
+        type="button"
+        class="app-select-option"
+        role="option"
+        [class.is-selected]="option.value === selected()"
+        [class.is-active]="i === activeIndex()"
+        [attr.aria-selected]="option.value === selected()"
+        (click)="choose(option)"
+        (mouseenter)="activeIndex.set(i)"
+      >
+        <span>{{ option.label }}</span>
+        @if (option.value === selected()) {
+          <svg class="app-select-check" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        }
+      </button>
+    }
+    </div>
+    @if (createLabel) {
+      <div class="app-select-divider" aria-hidden="true"></div>
+      <button
+        type="button"
+        class="app-select-option app-select-create"
+        [class.is-active]="activeIndex() === options.length"
+        (click)="startCreate()"
+        (mouseenter)="activeIndex.set(options.length)"
+      >
+        <span>+ {{ createLabel }}</span>
+      </button>
+    }
+  </div>
+</ng-template>

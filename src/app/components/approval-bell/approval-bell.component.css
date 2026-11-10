@@ -17,22 +17,22 @@
   align-items: center;
   gap: 9px;
   padding: 9px 14px;
-  border: 1px solid rgba(15, 40, 70, 0.14);
+  border: 1px solid rgba(26, 55, 103, 0.14);
   border-radius: 999px;
   background: #fff;
-  color: #0f2846;
+  color: #1a3767;
   font: inherit;
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(15, 40, 70, 0.06);
+  box-shadow: 0 1px 2px rgba(26, 55, 103, 0.06);
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .admin-bell:hover,
 .admin-bell.is-open {
-  border-color: rgba(37, 148, 210, 0.55);
-  box-shadow: 0 4px 14px -6px rgba(15, 40, 70, 0.35);
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 4px 14px -6px rgba(26, 55, 103, 0.35);
 }
 
 .admin-bell-icon svg {
@@ -50,8 +50,8 @@
   min-width: 20px;
   padding: 1px 6px;
   border-radius: 999px;
-  background: #f6993d;
-  color: #08192b;
+  background: #a3a190;
+  color: #102240;
   font-size: 0.72rem;
   font-weight: 800;
   text-align: center;
@@ -73,10 +73,10 @@
   max-height: min(70vh, 560px);
   overflow-y: auto;
   padding: 6px;
-  border: 1px solid rgba(15, 40, 70, 0.1);
+  border: 1px solid rgba(26, 55, 103, 0.1);
   border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 26px 60px rgba(4, 16, 30, 0.24);
+  box-shadow: 0 26px 60px rgba(11, 24, 44, 0.24);
 }
 
 .admin-notifs-head {
@@ -85,11 +85,11 @@
   justify-content: space-between;
   gap: 12px;
   padding: 10px 12px 8px;
-  color: #0f2846;
+  color: #1a3767;
   font-size: 0.88rem;
 }
 .admin-notifs-head a {
-  color: #12548f;
+  color: #2b56a2;
   font-size: 0.8rem;
   font-weight: 700;
   text-decoration: none;
@@ -114,27 +114,27 @@
   border-left: 3px solid transparent;
   border-radius: 10px;
   background: transparent;
-  color: #0f2846;
+  color: #1a3767;
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.admin-notif:hover { background: rgba(37, 148, 210, 0.08); }
+.admin-notif:hover { background: rgba(50, 90, 160, 0.08); }
 
 /* The colours the status badges use, so panel and table agree. */
 .admin-notif[data-action="Approved"] { border-left-color: #0f766e; }
-.admin-notif[data-action="Rejected"] { border-left-color: #e11d48; }
+.admin-notif[data-action="Rejected"] { border-left-color: #e11d24; }
 
 /* Unread sits on a tint rather than carrying a dot: the whole row is the news. */
-.admin-notif.is-unread { background: rgba(246, 153, 61, 0.1); }
-.admin-notif.is-unread:hover { background: rgba(246, 153, 61, 0.16); }
+.admin-notif.is-unread { background: rgba(163, 161, 144, 0.1); }
+.admin-notif.is-unread:hover { background: rgba(163, 161, 144, 0.16); }
 
 .admin-notif-line { display: flex; align-items: baseline; gap: 8px; }
 
 .admin-notif-what { font-weight: 800; font-size: 0.86rem; }
 .admin-notif[data-action="Approved"] .admin-notif-what { color: #0f766e; }
-.admin-notif[data-action="Rejected"] .admin-notif-what { color: #9f1239; }
+.admin-notif[data-action="Rejected"] .admin-notif-what { color: #9f1217; }
 
 .admin-notif-no {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -151,7 +151,7 @@
 
 .admin-notif-project { font-size: 0.84rem; font-weight: 600; }
 .admin-notif-who { color: #5b7288; font-size: 0.78rem; }
-.admin-notif-reason { color: #9f1239; font-size: 0.79rem; font-style: italic; }
+.admin-notif-reason { color: #9f1217; font-size: 0.79rem; font-style: italic; }
 .admin-notif-when { color: #93a7b8; font-size: 0.73rem; }
 
 @media (max-width: 620px) {
@@ -161,7 +161,97 @@
 
 /* How many times round this one has been. */
 .admin-notif-attempts {
-  color: #b45309;
+  color: #676556;
   font-size: 0.76rem;
   font-weight: 700;
 }
+
+/* ===== Midnight & gold ===== */
+
+/* The bell: a midnight pill with a gold edge and a gold ring on the icon. */
+.admin-bell {
+  gap: 10px;
+  padding: 7px 14px 7px 8px;
+  border: 1px solid rgba(165, 164, 148, 0.6);
+  background: linear-gradient(135deg, #0e244e 0%, #163d7a 100%);
+  color: #f3f3f2;
+  box-shadow: 0 10px 22px -14px rgba(13, 32, 64, 0.9);
+}
+.admin-bell:hover,
+.admin-bell.is-open {
+  border-color: #b9b8ac;
+  box-shadow: 0 0 0 3px rgba(165, 164, 148, 0.2), 0 12px 24px -12px rgba(165, 164, 148, 0.6);
+}
+.admin-bell-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #22221e;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  box-shadow: 0 0 12px -2px rgba(181, 180, 168, 0.8);
+}
+.admin-bell-icon svg { width: 16px; height: 16px; }
+.admin-bell-count {
+  background: linear-gradient(145deg, #f9a3a6, #e11d24);
+  color: #fff;
+  box-shadow: 0 0 0 2px #0e244e;
+}
+
+/* The panel: a midnight header over a clean list. */
+.admin-notifs {
+  padding: 0;
+  border: 1px solid rgba(165, 164, 148, 0.55);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 70px -20px rgba(11, 24, 44, 0.55);
+}
+.admin-notifs-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #0e244e 0%, #163d7a 100%);
+  border-bottom: 1px solid rgba(165, 164, 148, 0.45);
+  color: #f3f3f2;
+}
+.admin-notifs-head strong { font-size: 0.92rem; letter-spacing: 0.01em; }
+.admin-notifs-head a {
+  padding: 4px 12px;
+  border: 1px solid rgba(165, 164, 148, 0.6);
+  border-radius: 999px;
+  color: #d5d4ce;
+}
+.admin-notifs-head a:hover { background: linear-gradient(145deg, #dededa, #b5b4a8); color: #121210; text-decoration: none; }
+.admin-notifs-list, .admin-notifs-empty { overflow-y: auto; padding: 6px; }
+.admin-notifs-list { overscroll-behavior: contain; }
+.admin-notif { border-radius: 12px; }
+.admin-notif:hover { background: rgba(165, 164, 148, 0.12); }
+.admin-notif.is-unread { background: rgba(165, 164, 148, 0.16); }
+.admin-notif-no { color: #555449; }
+
+/* Phone: a sheet that drops from under the top bar, the full width of the screen,
+   instead of a small card hanging off the corner. */
+@media (max-width: 640px) {
+  .admin-notifs {
+    position: fixed;
+    top: 72px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: calc(100dvh - 92px);
+  }
+  .admin-panel-scrim { background: rgba(9, 39, 71, 0.45); backdrop-filter: blur(2px); }
+  .admin-notif { padding: 12px; }
+  .admin-notifs-head a { padding: 8px 14px; }
+}
+
+
+/* LIGHT THEME */
+.admin-bell { border: 1px solid #d3d0c6; background: #fff; color: #14305f; box-shadow: 0 10px 22px -16px rgba(20, 48, 95, .5); }
+.admin-bell:hover, .admin-bell.is-open { border-color: #d21319; box-shadow: 0 0 0 3px rgba(210, 19, 25, .12); }
+.admin-bell-icon { color: #14305f; background: #f1efe9; box-shadow: none; }
+.admin-bell-count { box-shadow: 0 0 0 2px #fff; }

@@ -1,0 +1,212 @@
+@for (section of sections(); track section.category) {
+  <div class="admin-panel mck-section" [class.is-filled]="section.tickedCount > 0">
+    <div class="mck-section-head">
+      <span class="mck-section-lead">
+        <span class="mck-section-no">{{ section.no }}</span>
+        <h3 class="mck-section-title">{{ section.title }}</h3>
+      </span>
+      <span class="mck-section-meta">
+        @if (section.tickedCount) {
+          <span class="mck-section-count">{{ section.tickedCount }} selected</span>
+        }
+      </span>
+    </div>
+
+    <div class="mck-table-wrap">
+      <table class="mck-table">
+        <caption class="mck-visually-hidden">Issues under {{ section.title }}</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="mck-col-check"><span class="mck-visually-hidden">Selected</span></th>
+            <th scope="col" class="mck-col-issue">Issue</th>
+            <th scope="col" class="num mck-col-qty">Qty</th>
+            <th scope="col" class="num mck-col-price">Price (QAR)</th>
+            <th scope="col" class="num mck-col-total">Total amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of section.rows; track row.issueType; let i = $index) {
+            <tr class="mck-row" [class.is-ticked]="row.line">
+              <td class="mck-col-check">
+                @if (readonly()) {
+                  <svg class="mck-tick" viewBox="0 0 24 24" role="img" aria-label="Included">
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                } @else {
+                  <input
+                    type="checkbox"
+                    class="mck-checkbox"
+                    [id]="'mck-' + section.category + '-' + i"
+                    [checked]="!!row.line"
+                    (change)="toggle(section.category, row)"
+                  />
+                }
+              </td>
+              <td class="mck-col-issue">
+                <div class="mck-issuecell">
+                @if (row.images[0]; as photo) {
+                  <img class="mck-thumb" [src]="photo.url" [alt]="row.issueType" loading="lazy" />
+                }
+                <div class="mck-issuetext">
+                @if (readonly()) {
+                  <span class="mck-issue">{{ row.issueType }}</span>
+                } @else {
+                  <label class="mck-issue" [for]="'mck-' + section.category + '-' + i">{{ row.issueType }}</label>
+                }
+                @if (row.descriptionEn) {
+                  <small class="mck-desc">{{ row.descriptionEn }}</small>
+                }
+                @if (row.descriptionAr) {
+                  <small class="mck-desc mck-ar" dir="rtl" lang="ar">{{ row.descriptionAr }}</small>
+                }
+                </div>
+                </div>
+              </td>
+              <td class="num" data-label="Qty">
+                @if (row.line && !readonly()) {
+                  <input
+                    class="mck-num"
+                    type="number"
+                    min="1"
+                    max="999"
+                    step="1"
+                    [value]="row.line.quantity"
+                    [attr.aria-label]="'Quantity for ' + row.issueType"
+                    (input)="onQuantityInput(row.line, $event)"
+                    (blur)="restoreInput($event, row.line.quantity)"
+                  />
+                } @else if (row.line) {
+                  {{ row.line.quantity }}
+                } @else {
+                  <span class="mck-dash">—</span>
+                }
+              </td>
+              <td class="num" data-label="Price">
+                @if (row.line && canSetFee() && !readonly()) {
+                  <input
+                    class="mck-num mck-fee"
+                    [class.is-repriced]="isRepriced(row.line)"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    [value]="row.line.unitFee"
+                    [attr.aria-label]="'Price for ' + row.issueType"
+                    (input)="onFeeInput(row.line, $event)"
+                    (blur)="restoreInput($event, row.line.unitFee)"
+                  />
+                  @if (isRepriced(row.line)) {
+                    <button
+                      type="button"
+                      class="mck-fee-reset"
+                      [title]="'Standard price ' + (row.line.catalogueFee | number: '1.2-2') + ' — click to restore'"
+                      (click)="resetFee(row.line)"
+                    >
+                      was {{ row.line.catalogueFee | number: '1.2-2' }} ↺
+                    </button>
+                  }
+                } @else {
+                  <span [class.mck-muted]="!row.line">
+                    {{ (row.line ? row.line.unitFee : row.defaultFee) | number: '1.2-2' }}
+                  </span>
+                }
+              </td>
+              <td class="num" data-label="Total">
+                @if (row.line) {
+                  <strong>{{ row.line.quantity * row.line.unitFee | number: '1.2-2' }}</strong>
+                } @else {
+                  <span class="mck-dash">—</span>
+                }
+              </td>
+            </tr>
+          }
+
+          @if (section.takesTypedIssue) {
+            <tr class="mck-typed-row">
+              <td class="mck-col-check"><span class="mck-plus" aria-hidden="true">+</span></td>
+              <td colspan="4">
+                <div class="mck-typed">
+                  <input
+                    type="text"
+                    maxlength="200"
+                    placeholder="Type any other issue…"
+                    aria-label="Other issue"
+                    [value]="customDraft()"
+                    (input)="customDraft.set($any($event.target).value)"
+                    (keydown.enter)="$event.preventDefault(); addTypedIssue(section.category)"
+                  />
+                  <button
+                    type="button"
+                    class="btn-admin btn-admin-ghost"
+                    [disabled]="!customDraft().trim()"
+                    (click)="addTypedIssue(section.category)"
+                  >
+                    Add
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+
+          @if (section.tickedCount) {
+            <tr class="mck-subtotal">
+              <td colspan="4" class="num">Section total</td>
+              <td class="num"><strong>{{ section.total | number: '1.2-2' }}</strong></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+@if (readonly() && !sections().length) {
+  <div class="admin-panel mck-empty">No issues on this ticket.</div>
+}
+
+<div class="mck-foot">
+  <div class="mck-money">
+    <div class="mck-money-row">
+      <span class="mck-money-label">Subtotal</span>
+      <span class="mck-figure">{{ subtotal() | number: '1.2-2' }} <span>QAR</span></span>
+    </div>
+
+    @if (canSetFee() && !readonly()) {
+      <div class="mck-money-row">
+        <label class="mck-money-label" for="mck-discount">Discount</label>
+        <span class="mck-money-entry">
+          <span class="mck-money-minus" aria-hidden="true">−</span>
+          <input
+            id="mck-discount"
+            class="mck-num mck-discount"
+            type="number"
+            min="0"
+            step="0.01"
+            [value]="discount()"
+            (input)="onDiscountInput($event)"
+            (blur)="restoreInput($event, discount())"
+          />
+          <span>QAR</span>
+        </span>
+      </div>
+    } @else if (discount() > 0) {
+      <div class="mck-money-row">
+        <span class="mck-money-label">Discount</span>
+        <span class="mck-figure mck-figure--discount">− {{ discount() | number: '1.2-2' }} <span>QAR</span></span>
+      </div>
+    }
+
+    <div class="mck-money-row mck-money-final">
+      <span class="mck-money-label">{{ discount() > 0 ? 'Final amount' : 'Amount payable' }}</span>
+      <span class="mck-figure">{{ payable() | number: '1.2-2' }} <span>QAR</span></span>
+    </div>
+  </div>
+
+  @if (discountTooLarge()) {
+    <p class="mck-warn" role="alert">
+      A discount of {{ discount() | number: '1.2-2' }} QAR is more than the subtotal.
+    </p>
+  }
+  @if (!canSetFee() && !readonly()) {
+    <p class="mck-note">Standard rates — the Jama Go team confirms the final amount.</p>
+  }
+</div>

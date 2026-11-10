@@ -13,6 +13,9 @@ import { createCameraRoutes } from './pages/admin/cameras/cameras.routes';
 import { createVipRoutes } from './pages/admin/vip/vip.routes';
 import { createBoqRoutes } from './pages/staff/boq/boq.routes';
 import { createDrawingRoutes } from './pages/staff/drawings/drawing.routes';
+import { createMaintenanceRoutes } from './pages/staff/maintenance/maintenance.routes';
+import { createNonMoiRoutes } from './pages/staff/maintenance/non-moi/non-moi.routes';
+import { createNonMoiJobRoutes } from './pages/staff/non-moi-jobs/non-moi-jobs.routes';
 import { PERMISSIONS } from './models/auth.model';
 
 /**
@@ -181,6 +184,13 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'mail',
+            canActivate: [permissionGuard(PERMISSIONS.mailRead)],
+            title: 'Company Mail — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/admin/mail/admin-mail.component').then((m) => m.AdminMailComponent),
+          },
+          {
             path: 'contacts',
             title: 'Contact Submissions — Jama Go Admin',
             loadComponent: () =>
@@ -195,6 +205,29 @@ export const routes: Routes = [
             path: 'vip',
             canActivate: [permissionGuard(PERMISSIONS.vipManage)],
             children: createVipRoutes('/admin/vip'),
+          },
+          {
+            // Maintenance tickets — unlike the modules above, this one has no
+            // permission gate on the path itself: any signed-in account, staff
+            // or client, may log a ticket and see their own. maintenance.manage
+            // is checked inside the screens for the company-wide queue, assign,
+            // resolve, cancel and edit actions.
+            path: 'maintenance',
+            children: createMaintenanceRoutes('/admin/maintenance'),
+          },
+          {
+            // The Non-MOI price list every maintenance checklist is built
+            // from — the counterpart of the stock inventory quotations read.
+            path: 'non-moi',
+            canActivate: [permissionGuard(PERMISSIONS.maintenanceManage)],
+            children: createNonMoiRoutes('/admin/non-moi'),
+          },
+          {
+            // Jobs admin issues to a technician — the Non-MOI counterpart of an
+            // activated DIA record.
+            path: 'non-moi-jobs',
+            canActivate: [permissionGuard(PERMISSIONS.nonMoiJobManage)],
+            children: createNonMoiJobRoutes('/admin/non-moi-jobs'),
           },
         ],
       },

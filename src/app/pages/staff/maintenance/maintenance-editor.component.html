@@ -1,0 +1,61 @@
+<section class="admin-page">
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Maintenance</p>
+      <h1>New ticket</h1>
+      <p class="page-banner-sub">Tick every issue found at the site — the total adds itself up.</p>
+    </div>
+    <div class="page-banner-actions">
+      <button type="button" class="banner-ghost" (click)="cancel()">← Back to tickets</button>
+    </div>
+  </header>
+
+  <div class="admin-panel mnt-client-panel" [formGroup]="form">
+    <div class="mnt-form-heading"><strong>Client &amp; site</strong></div>
+    <div class="mnt-grid">
+      <label>
+        <span>Client name</span>
+        <input formControlName="clientName" maxlength="200" />
+      </label>
+      <label>
+        <span>Client email <i class="mnt-req" aria-hidden="true">*</i></span>
+        <input formControlName="clientEmail" type="email" maxlength="256" required
+          placeholder="e.g. owner@company.qa" autocomplete="email" />
+      </label>
+      <label>
+        <span>Contact number</span>
+        <input formControlName="contactNumber" maxlength="50" placeholder="e.g. +974 3312 3456" />
+      </label>
+      <label>
+        <span>Site location</span>
+        <input formControlName="siteLocation" maxlength="400" placeholder="e.g. Al Waab, Doha" />
+      </label>
+      <label class="mnt-span-2">
+        <span>Description (optional)</span>
+        <textarea formControlName="description" rows="2" maxlength="2000"
+          placeholder="Anything the technician should know before going"></textarea>
+      </label>
+    </div>
+  </div>
+
+  <app-maintenance-checklist
+    [catalogue]="issueOptions()"
+    [canSetFee]="canSetFee"
+    [(lines)]="lines"
+    [(discount)]="discount"
+  />
+
+  @if (error()) {
+    <p class="admin-error mnt-error">{{ error() }}</p>
+  }
+
+  <footer class="mnt-actions">
+    <button type="button" class="btn-admin btn-admin-ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="btn-admin btn-admin-primary" [disabled]="saving()" (click)="save()">
+      {{ saving() ? 'Saving…' : 'Create ticket' }}
+    </button>
+  </footer>
+</section>

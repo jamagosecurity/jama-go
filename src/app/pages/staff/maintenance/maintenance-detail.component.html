@@ -1,0 +1,178 @@
+<section class="admin-page">
+  <button type="button" class="mnt-back-link" (click)="back()">
+    <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+    Back to tickets
+  </button>
+
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading ticket…</p></div>
+  } @else if (ticket(); as item) {
+    <header class="admin-page-header">
+      <div>
+        <span class="admin-kicker">
+          {{ item.requestNumber }} · {{ item.lines.length }} {{ item.lines.length === 1 ? 'issue' : 'issues' }}
+        </span>
+        <h1>{{ item.clientName || item.siteLocation || 'Service ticket' }}</h1>
+        <p>
+          @if (item.clientName && item.siteLocation) { {{ item.siteLocation }} · }
+          Reported by {{ item.reportedByName || 'Unknown' }} · {{ item.createdAt | date: 'd MMM y' }}
+        </p>
+      </div>
+      <span class="mnt-status-badge" [attr.data-status]="item.status">{{ item.status }}</span>
+    </header>
+
+    @if (item.status === 'Resolved') {
+      <div class="admin-panel mnt-closed-panel">
+        <strong>Resolved</strong>
+        <p>{{ item.resolutionNotes }}</p>
+        <small>{{ item.resolvedByName }} · {{ item.resolvedAt | date: 'medium' }}</small>
+      </div>
+    }
+    @if (item.status === 'Cancelled') {
+      <div class="admin-panel mnt-closed-panel mnt-closed-panel--cancelled">
+        <strong>Cancelled</strong>
+        <p>{{ item.cancellationReason }}</p>
+      </div>
+    }
+
+    <div class="admin-panel">
+      <div class="mnt-form-heading">
+        <strong>Client &amp; site</strong>
+        @if (!editable()) {
+          <small>{{ canManage ? 'Closed — no longer editable.' : 'Only maintenance staff can edit this.' }}</small>
+        }
+      </div>
+
+      @if (editable()) {
+        <div class="mnt-grid" [formGroup]="form">
+          <label>
+            <span>Client name</span>
+            <input formControlName="clientName" maxlength="200" />
+          </label>
+          <label>
+            <span>Client email <i class="mnt-req" aria-hidden="true">*</i></span>
+            <input formControlName="clientEmail" type="email" maxlength="256" required autocomplete="email" />
+          </label>
+          <label>
+            <span>Contact number</span>
+            <input formControlName="contactNumber" maxlength="50" />
+          </label>
+          <label>
+            <span>Site location</span>
+            <input formControlName="siteLocation" maxlength="400" />
+          </label>
+          <label class="mnt-span-2">
+            <span>Description (optional)</span>
+            <textarea formControlName="description" rows="2" maxlength="2000"></textarea>
+          </label>
+        </div>
+      } @else {
+        <div class="mnt-readonly-grid">
+          <div><span>Client name</span><strong>{{ item.clientName || '—' }}</strong></div>
+          <div><span>Client email</span><strong>{{ item.clientEmail || '—' }}</strong></div>
+          <div><span>Contact number</span><strong>{{ item.contactNumber || '—' }}</strong></div>
+          <div><span>Site location</span><strong>{{ item.siteLocation || '—' }}</strong></div>
+          <div class="mnt-span-2"><span>Description</span><strong>{{ item.description || '—' }}</strong></div>
+        </div>
+      }
+    </div>
+
+    <app-maintenance-checklist
+      [catalogue]="issueOptions()"
+      [canSetFee]="editable()"
+      [readonly]="!editable()"
+      [(lines)]="lines"
+      [(discount)]="discount"
+    />
+
+    @if (error()) {
+      <p class="admin-error mnt-message">{{ error() }}</p>
+    }
+    @if (notice()) {
+      <p class="admin-success mnt-message">{{ notice() }}</p>
+    }
+
+    @if (editable()) {
+      <footer class="mnt-save-row">
+        <button type="button" class="btn-admin btn-admin-primary" [disabled]="saving()" (click)="save()">
+          {{ saving() ? 'Saving…' : 'Save changes' }}
+        </button>
+      </footer>
+    }
+
+    @if (canManage) {
+      <div class="admin-panel">
+        <div class="mnt-form-heading"><strong>Assignment</strong></div>
+        @if (item.assignedToName) {
+          <p class="mnt-assigned-to">Currently assigned to <strong>{{ item.assignedToName }}</strong></p>
+        } @else {
+          <p class="mnt-assigned-to">Not yet assigned.</p>
+        }
+
+        @if (isOpen()) {
+          <div class="mnt-assign-row">
+            <app-select
+              [options]="assignableStaffOptions()"
+              [value]="selectedAssignee()"
+              (valueChange)="selectedAssignee.set($event)"
+              placeholder="Choose staff…"
+            />
+            <button type="button" class="btn-admin btn-admin-primary" [disabled]="!selectedAssignee() || saving()" (click)="assign()">
+              {{ item.assignedToName ? 'Reassign' : 'Assign' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (isOpen()) {
+        <div class="admin-panel mnt-actions-panel">
+          <button type="button" class="btn-admin btn-admin-primary" (click)="showResolveBox.set(true)">
+            Mark resolved
+          </button>
+          <button type="button" class="btn-admin btn-admin-danger" (click)="showCancelBox.set(true)">
+            Cancel ticket
+          </button>
+          @if (item.status === 'Open') {
+            <button type="button" class="btn-admin btn-admin-ghost" [disabled]="saving()" (click)="deleteTicket()">
+              Delete
+            </button>
+          }
+        </div>
+      }
+    }
+
+    @if (showResolveBox()) {
+      <div class="mnt-overlay" (click)="showResolveBox.set(false)">
+        <div class="admin-panel mnt-overlay-box" (click)="$event.stopPropagation()">
+          <strong>Mark this ticket resolved</strong>
+          <textarea rows="3" placeholder="What was done to fix it…"
+            [value]="resolveNotes()" (input)="resolveNotes.set($any($event.target).value)"></textarea>
+          <footer class="mnt-actions">
+            <button type="button" class="btn-admin btn-admin-ghost" (click)="showResolveBox.set(false)">Cancel</button>
+            <button type="button" class="btn-admin btn-admin-primary" [disabled]="!resolveNotes().trim() || saving()" (click)="confirmResolve()">
+              Confirm
+            </button>
+          </footer>
+        </div>
+      </div>
+    }
+
+    @if (showCancelBox()) {
+      <div class="mnt-overlay" (click)="showCancelBox.set(false)">
+        <div class="admin-panel mnt-overlay-box" (click)="$event.stopPropagation()">
+          <strong>Cancel this ticket</strong>
+          <textarea rows="3" placeholder="Reason…"
+            [value]="cancelReason()" (input)="cancelReason.set($any($event.target).value)"></textarea>
+          <footer class="mnt-actions">
+            <button type="button" class="btn-admin btn-admin-ghost" (click)="showCancelBox.set(false)">Back</button>
+            <button type="button" class="btn-admin btn-admin-danger" [disabled]="!cancelReason().trim() || saving()" (click)="confirmCancel()">
+              Confirm cancel
+            </button>
+          </footer>
+        </div>
+      </div>
+    }
+  } @else if (error()) {
+    <p class="admin-error">{{ error() }}</p>
+  }
+</section>

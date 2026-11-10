@@ -1,0 +1,93 @@
+<section class="dia-page">
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading job…</p></div>
+  } @else if (!job()) {
+    <div class="admin-panel">
+      <p class="admin-error">{{ error() }}</p>
+      <a class="row-btn" routerLink="/technician/non-moi-jobs">Back to my jobs</a>
+    </div>
+  } @else if (job(); as j) {
+    <div class="tjd-top">
+      <a class="tjd-back" routerLink="/technician/non-moi-jobs" aria-label="Back to jobs">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>Jobs
+      </a>
+      <strong class="tjd-jobno">{{ j.jobNumber }}</strong>
+      <span class="tjd-date">{{ j.createdAt | date: 'd MMM y' }}</span>
+      <span class="tjd-state" [class.is-done]="j.status === 'Completed'">{{ j.status === 'Completed' ? 'Completed' : 'To do' }}</span>
+    </div>
+
+    <section class="admin-panel tjd-card" aria-label="Job details">
+      <div class="tjd-card-head">
+        <span class="tjd-avatar" aria-hidden="true">{{ j.customerName.trim().charAt(0) }}</span>
+        <div class="tjd-who">
+          <span class="tjd-label">Customer</span>
+          <h1 class="tjd-cust">{{ j.customerName }}</h1>
+        </div>
+        <div class="tjd-actions">
+          <a class="tjd-act tjd-act--call" [href]="'tel:' + j.customerNumber">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
+            Call
+          </a>
+          <a class="tjd-act tjd-act--nav" [href]="navigateTo(j)" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><circle cx="12" cy="10" r="2.6" /></svg>
+            {{ isPinned(j) ? 'Navigate' : 'Search map' }}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    @if (error()) { <p class="admin-error">{{ error() }}</p> }
+
+    @if (j.status === 'Completed') {
+      <div class="admin-panel">
+        <h2 class="tjd-h">Work done · {{ j.completedAt | date: 'd MMM y, HH:mm' }}</h2>
+        <table class="tjd-table">
+          <thead><tr><th>Issue</th><th class="tjd-num">Price</th><th class="tjd-num">Total</th></tr></thead>
+          <tbody>
+            @for (l of j.lines; track $index) {
+              <tr>
+                <td><strong>{{ l.issueType }}</strong><small>{{ categoryLabel(l.category) }}</small></td>
+                <td class="tjd-num">{{ l.unitFee | number: '1.2-2' }}</td>
+                <td class="tjd-num">{{ l.lineTotal | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot><tr><td colspan="2">Amount</td><td class="tjd-num">{{ j.workTotal | number: '1.2-2' }} QAR</td></tr></tfoot>
+        </table>
+        @if (j.completionNotes) { <p class="tjd-notes">{{ j.completionNotes }}</p> }
+      </div>
+    } @else {
+      @for (g of groups(); track g.category) {
+        <div class="admin-panel tjd-group">
+          <h2 class="tjd-h">{{ categoryLabel(g.category) }}</h2>
+          @for (i of g.items; track i.id) {
+            <div class="tjd-row" [class.is-on]="isPicked(i)">
+              <label class="tjd-pick">
+                <input type="checkbox" [checked]="isPicked(i)" (change)="toggle(i)" />
+                <span>{{ i.issueType }}</span>
+              </label>
+              <span class="tjd-price">{{ i.defaultFee | number: '1.2-2' }} QAR</span>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="admin-panel tjd-notes-panel">
+        <label class="tjd-notes-in">
+          <span>Notes (optional)</span>
+          <textarea rows="2" maxlength="1000" [value]="notes()" (input)="notes.set($any($event.target).value)"></textarea>
+        </label>
+      </div>
+
+      <div class="tjd-bar">
+        <div class="tjd-total">
+          <span>{{ count() }} {{ count() === 1 ? 'issue' : 'issues' }} ticked</span>
+          <strong>{{ total() | number: '1.2-2' }} QAR</strong>
+        </div>
+        <button type="button" class="tjd-complete" [disabled]="!count() || saving()" (click)="complete()">
+          {{ saving() ? 'Completing…' : 'Complete job' }}
+        </button>
+      </div>
+    }
+  }
+</section>

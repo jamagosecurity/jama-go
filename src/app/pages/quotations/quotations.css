@@ -64,12 +64,12 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: rgba(15, 40, 70, 0.08);
+  background: rgba(26, 55, 103, 0.08);
   color: var(--admin-muted);
 }
 
 .quote-status[data-status="Sent"] {
-  background: rgba(37, 148, 210, 0.14);
+  background: rgba(50, 90, 160, 0.14);
   color: var(--admin-blue-ink);
 }
 
@@ -79,13 +79,13 @@
 }
 
 .quote-status[data-status="Rejected"] {
-  background: rgba(225, 29, 72, 0.12);
-  color: var(--jama-rose-ink, #9f1239);
+  background: rgba(225, 29, 36, 0.12);
+  color: var(--jama-rose-ink, #9f1217);
 }
 
 .quote-status[data-status="Expired"] {
-  background: rgba(246, 153, 61, 0.16);
-  color: var(--admin-orange-ink, #b45309);
+  background: rgba(163, 161, 144, 0.16);
+  color: var(--admin-orange-ink, #676556);
 }
 
 /* ===== Editor layout ===== */
@@ -161,8 +161,8 @@
 }
 
 .quote-picker-results button:hover {
-  border-color: rgba(37, 148, 210, 0.45);
-  background: rgba(37, 148, 210, 0.05);
+  border-color: rgba(50, 90, 160, 0.45);
+  background: rgba(50, 90, 160, 0.05);
 }
 
 .quote-pick-mark {
@@ -179,7 +179,7 @@
   width: 26px;
   height: 20px;
   border-radius: 7px;
-  background: rgba(15, 40, 70, 0.07);
+  background: rgba(26, 55, 103, 0.07);
   color: var(--admin-muted);
   font-size: 0.68rem;
   font-weight: 800;
@@ -221,7 +221,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(37, 148, 210, 0.12);
+  background: rgba(50, 90, 160, 0.12);
   color: var(--admin-blue-ink);
   font-size: 1.05rem;
   line-height: 1;
@@ -239,7 +239,7 @@
   width: 100%;
   min-height: 38px;
   padding: 7px 10px;
-  border: 1px solid rgba(15, 40, 70, 0.12);
+  border: 1px solid rgba(26, 55, 103, 0.12);
   border-radius: 10px;
   background: #fff;
   color: var(--admin-ink);
@@ -250,8 +250,8 @@
 .quote-line-name:focus,
 .quote-line-num:focus {
   outline: none;
-  border-color: rgba(37, 148, 210, 0.55);
-  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 3px rgba(50, 90, 160, 0.12);
 }
 
 .quote-line-num {
@@ -291,7 +291,7 @@
 }
 
 .quote-line-actions button:hover:not(:disabled) {
-  border-color: rgba(37, 148, 210, 0.45);
+  border-color: rgba(50, 90, 160, 0.45);
   color: var(--admin-blue-ink);
 }
 
@@ -301,8 +301,8 @@
 }
 
 .quote-line-remove:hover:not(:disabled) {
-  border-color: var(--jama-rose, #e11d48) !important;
-  color: var(--jama-rose-ink, #9f1239) !important;
+  border-color: var(--jama-rose, #e11d24) !important;
+  color: var(--jama-rose-ink, #9f1217) !important;
 }
 
 .quote-empty {
@@ -374,7 +374,7 @@
   padding: 11px 12px;
   border-bottom: none;
   border-radius: 12px;
-  background: linear-gradient(100deg, var(--admin-blue-deep), var(--admin-indigo, #4f46e5));
+  background: linear-gradient(100deg, var(--admin-blue-deep), var(--admin-indigo, #3d6dc1));
 }
 
 .quote-totals .is-grand dt,
@@ -444,13 +444,13 @@
   display: grid;
   align-content: start;
   gap: 6px;
-  color: #1a334d;
+  color: #234379;
   font-size: 0.86rem;
   font-weight: 750;
 }
 
 .quote-page .camera-field > span i {
-  color: #e11d48;
+  color: #e11d24;
   font-style: normal;
 }
 
@@ -460,7 +460,7 @@
   width: 100%;
   min-height: 46px;
   padding: 11px 14px;
-  border: 1px solid rgba(15, 40, 70, 0.12);
+  border: 1px solid rgba(26, 55, 103, 0.12);
   border-radius: 13px;
   color: var(--admin-ink);
   background: #fff;
@@ -478,8 +478,8 @@
 .quote-page .camera-field select:focus,
 .quote-page .camera-field textarea:focus {
   outline: none;
-  border-color: rgba(37, 148, 210, 0.55);
-  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
 }
 
 .quote-page .camera-form {
@@ -563,7 +563,7 @@
 .quote-page .camera-table td {
   padding: 11px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(15, 40, 70, 0.08);
+  border-bottom: 1px solid rgba(26, 55, 103, 0.08);
   vertical-align: middle;
 }
 
@@ -582,7 +582,7 @@
 }
 
 .quote-page .camera-table tbody tr:hover {
-  background: rgba(37, 148, 210, 0.045);
+  background: rgba(50, 90, 160, 0.045);
 }
 
 .quote-page .camera-table .num {
@@ -620,8 +620,38 @@
   font-weight: 700;
 }
 
-.quote-page .camera-delete:hover {
-  color: #e11d48;
+/* The same row buttons as the quotation list under /staff/boq. */
+.quote-page .row-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 1px solid var(--btn-line, var(--admin-line));
+  border-radius: 10px;
+  background: var(--btn-bg, #fff);
+  color: var(--btn-ink, var(--admin-ink-soft));
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.quote-page .row-btn:hover { transform: translateY(-1px); }
+.quote-page .row-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
+.quote-page .row-btn--icon { padding: 7px; width: 30px; height: 30px; justify-content: center; }
+.quote-page .row-btn--icon svg { width: 16px; height: 16px; }
+.quote-page .row-btn--edit { --btn-bg: rgba(50, 90, 160, 0.1); --btn-line: rgba(50, 90, 160, 0.28); --btn-ink: #2e5bab; }
+.quote-page .row-btn--edit:hover { --btn-bg: var(--admin-blue-deep, #2a4c86); --btn-line: var(--admin-blue-deep, #2a4c86); --btn-ink: #fff; }
+.quote-page .row-btn--delete { --btn-bg: #fff; --btn-line: var(--admin-line); --btn-ink: var(--admin-muted); }
+.quote-page .row-btn--delete:hover { --btn-bg: rgba(225, 29, 36, 0.1); --btn-line: rgba(225, 29, 36, 0.4); --btn-ink: var(--jama-rose-ink, #9f1217); }
+.quote-page .row-btn--danger {
+  --btn-bg: linear-gradient(135deg, #f2555a, #d92329);
+  --btn-line: #c81d23;
+  --btn-ink: #fff;
+  box-shadow: 0 4px 12px -4px rgba(217, 35, 41, 0.6);
 }
 
 .quote-page .camera-foot {
@@ -675,3 +705,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* The remove button is the shared round rose icon now. */
+.quote-page .quote-line-remove.row-btn { width: 32px; height: 32px; padding: 0; }
+.quote-page .quote-line-remove.row-btn svg { width: 15px; height: 15px; }

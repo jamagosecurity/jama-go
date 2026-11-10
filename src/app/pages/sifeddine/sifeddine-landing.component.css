@@ -1,6 +1,6 @@
 /* ================= Sifeddine Taghelabet — landing page ================= */
 /* Aliased onto the shared brand ramp in styles.css rather than repeating the
-   hexes. --sf-blue-deep was #1a7bb5, which this page uses as 12px text on a
+   hexes. --sf-blue-deep was #2a4c86, which this page uses as 12px text on a
    pale blue chip — 4.05:1, under the AA floor. The ramp's ink weight exists
    precisely for text and clears it comfortably. */
 .sf-page {
@@ -8,10 +8,10 @@
   --sf-blue-deep: var(--jama-blue-ink);
   --sf-orange: var(--jama-orange-fill);
   --sf-orange-deep: var(--jama-orange-action);
-  --sf-navy: #0b1f3d;
-  --sf-ink: #101f33;
+  --sf-navy: #172f58;
+  --sf-ink: #152c52;
   --sf-muted: #5c6b82;
-  --sf-line: rgba(15, 23, 42, 0.09);
+  --sf-line: rgba(21, 38, 68, 0.09);
   font-family: "Inter", system-ui, sans-serif;
   color: var(--sf-ink);
   overflow: hidden;
@@ -60,11 +60,11 @@
   text-transform: uppercase;
   margin-bottom: 14px;
 }
-.sf-tag--blue { background: rgba(37, 148, 210, 0.12); color: var(--sf-blue-deep); }
-.sf-tag--orange { background: rgba(246, 153, 61, 0.16); color: var(--sf-orange-deep); }
+.sf-tag--blue { background: rgba(50, 90, 160, 0.12); color: var(--sf-blue-deep); }
+.sf-tag--orange { background: rgba(163, 161, 144, 0.16); color: var(--sf-orange-deep); }
 .sf-tag--purple { background: rgba(124, 58, 237, 0.12); color: #7c3aed; }
 .sf-tag--teal { background: rgba(13, 148, 136, 0.12); color: #0d9488; }
-.sf-tag--gold { background: rgba(212, 175, 55, 0.18); color: #d4af37; }
+.sf-tag--gold { background: rgba(145, 143, 122, 0.18); color: #918f7a; }
 
 /* ================= Buttons ================= */
 .sf-btn {
@@ -84,7 +84,7 @@
 .sf-btn--primary {
   color: #fff;
   background: linear-gradient(120deg, var(--sf-orange), var(--sf-orange-deep));
-  box-shadow: 0 16px 34px -14px rgba(239, 127, 22, 0.75);
+  box-shadow: 0 16px 34px -14px rgba(143, 141, 118, 0.75);
 }
 .sf-btn--ghost { color: #fff; border-color: rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.05); }
 .sf-btn--ghost:hover { background: rgba(255, 255, 255, 0.14); }
@@ -142,7 +142,7 @@
 .sf-btn-app--wa { background: #25d366; }
 .sf-btn-app--wa svg { fill: #fff; stroke: none; }
 .sf-btn-app--mail { background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06); }
-.sf-btn-app--mail svg { fill: none; stroke: #ea4335; stroke-width: 2.1; }
+.sf-btn-app--mail svg { fill: none; stroke: #ea353b; stroke-width: 2.1; }
 
 /* ================= Hero =================
    Copy on the left, the equipment reel on the right as a lit screen, and a
@@ -171,8 +171,8 @@
      — on the full reel this much frame would have put the scene titles back on
      screen. */
   min-height: min(88vh, 940px);
-  background: #071627;
-  color: #eaf2fb;
+  background: #0f1f3a;
+  color: #ecf1f9;
 }
 
 .sf-hero-stage {
@@ -223,18 +223,18 @@
   background:
     linear-gradient(
       90deg,
-      rgba(6, 17, 32, 0.72) 0%,
-      rgba(6, 17, 32, 0.34) 38%,
-      rgba(6, 17, 32, 0) 68%
+      rgba(13, 25, 49, 0.72) 0%,
+      rgba(13, 25, 49, 0.34) 38%,
+      rgba(13, 25, 49, 0) 68%
     ),
     linear-gradient(
       180deg,
-      rgba(6, 17, 32, 0.55) 0%,
-      rgba(6, 17, 32, 0.22) 10%,
-      rgba(6, 17, 32, 0.12) 24%,
-      rgba(6, 17, 32, 0.26) 46%,
-      rgba(6, 17, 32, 0.8) 76%,
-      rgba(6, 17, 32, 0.95) 100%
+      rgba(13, 25, 49, 0.55) 0%,
+      rgba(13, 25, 49, 0.22) 10%,
+      rgba(13, 25, 49, 0.12) 24%,
+      rgba(13, 25, 49, 0.26) 46%,
+      rgba(13, 25, 49, 0.8) 76%,
+      rgba(13, 25, 49, 0.95) 100%
     );
 }
 
@@ -278,7 +278,7 @@
 .sf-hero-lead {
   font-size: clamp(1rem, 1.3vw, 1.12rem);
   line-height: 1.75;
-  color: rgba(234, 242, 251, 0.78);
+  color: rgba(236, 241, 249, 0.78);
   max-width: 36em;
   margin-bottom: 32px;
 }
@@ -303,7 +303,7 @@
   position: relative;
   z-index: 2;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(4, 14, 28, 0.42);
+  background: rgba(12, 23, 41, 0.42);
   backdrop-filter: blur(10px);
 }
 
@@ -323,7 +323,7 @@
   border-radius: 16px;
   font-size: 0.86rem;
   line-height: 1.4;
-  color: rgba(234, 242, 251, 0.66);
+  color: rgba(236, 241, 249, 0.66);
   background: linear-gradient(150deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
   border: 1px solid rgba(255, 255, 255, 0.09);
   transition:
@@ -451,17 +451,17 @@
   padding: clamp(48px, 6vw, 76px) 0;
   color: #fff;
   background:
-    radial-gradient(circle at 12% 30%, rgba(212, 175, 55, 0.22), transparent 45%),
-    linear-gradient(135deg, #0a1a30 0%, #12305a 60%, #0a1a30 100%);
-  border-top: 1px solid rgba(212, 175, 55, 0.35);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+    radial-gradient(circle at 12% 30%, rgba(145, 143, 122, 0.22), transparent 45%),
+    linear-gradient(135deg, #132647 0%, #224681 60%, #132647 100%);
+  border-top: 1px solid rgba(145, 143, 122, 0.35);
+  border-bottom: 1px solid rgba(145, 143, 122, 0.35);
 }
 .sf-highlight-orb {
   position: absolute;
   width: 360px;
   height: 360px;
   border-radius: 50%;
-  background: #d4af37;
+  background: #918f7a;
   filter: blur(90px);
   opacity: 0.22;
   top: -120px;
@@ -482,9 +482,9 @@
   width: 172px;
   height: 172px;
   border-radius: 26px;
-  background: linear-gradient(150deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.06));
-  border: 1.5px solid rgba(212, 175, 55, 0.55);
-  box-shadow: inset 0 0 40px rgba(212, 175, 55, 0.15), 0 24px 50px -26px rgba(0, 0, 0, 0.7);
+  background: linear-gradient(150deg, rgba(145, 143, 122, 0.25), rgba(145, 143, 122, 0.06));
+  border: 1.5px solid rgba(145, 143, 122, 0.55);
+  box-shadow: inset 0 0 40px rgba(145, 143, 122, 0.15), 0 24px 50px -26px rgba(0, 0, 0, 0.7);
 }
 .sf-highlight-crest { font-size: 3.6rem; line-height: 1; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.4)); }
 .sf-highlight-badge-label {
@@ -492,25 +492,25 @@
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.22em;
-  color: #ffe6a3;
+  color: #d4d4ce;
 }
 .sf-h2--light { color: #fff; }
 .sf-highlight-copy p {
   margin-top: 14px;
   font-size: 1.08rem;
-  color: rgba(234, 242, 251, 0.86);
+  color: rgba(236, 241, 249, 0.86);
   max-width: 44em;
 }
-.sf-highlight-copy strong { color: #ffe6a3; }
+.sf-highlight-copy strong { color: #d4d4ce; }
 .sf-highlight-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .sf-highlight-pills span {
   padding: 8px 16px;
   border-radius: 999px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #ffe6a3;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #d4d4ce;
+  background: rgba(145, 143, 122, 0.1);
+  border: 1px solid rgba(145, 143, 122, 0.4);
 }
 
 /* ================= Marquee ================= */
@@ -538,8 +538,8 @@
 .sf-section { padding: clamp(60px, 8vw, 110px) 0; background: #fff; }
 .sf-section--tint {
   background:
-    radial-gradient(circle at 90% 0%, rgba(246, 153, 61, 0.08), transparent 40%),
-    radial-gradient(circle at 0% 100%, rgba(37, 148, 210, 0.08), transparent 40%),
+    radial-gradient(circle at 90% 0%, rgba(163, 161, 144, 0.08), transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(50, 90, 160, 0.08), transparent 40%),
     #f5f8fc;
 }
 .sf-section-head { max-width: 720px; margin: 0 auto 48px; text-align: center; }
@@ -552,15 +552,15 @@
 .sf-about-card {
   padding: 30px;
   border-radius: 22px;
-  background: linear-gradient(165deg, #0b1f3d, #14335c);
+  background: linear-gradient(165deg, #172f58, #234785);
   color: #fff;
-  box-shadow: 0 28px 60px -30px rgba(11, 31, 61, 0.7);
+  box-shadow: 0 28px 60px -30px rgba(23, 47, 88, 0.7);
 }
 .sf-about-card h3 { font-family: "Sora", sans-serif; font-size: 1.2rem; margin-bottom: 16px; }
 .sf-about-card ul { list-style: none; display: grid; gap: 14px; }
 .sf-about-card li { display: flex; flex-direction: column; gap: 2px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
 .sf-about-card li:last-child { border-bottom: 0; }
-.sf-about-card span { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; color: #8fd0ff; }
+.sf-about-card span { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; color: #7d9dd6; }
 .sf-about-card strong { font-size: 1rem; font-weight: 700; }
 
 /* ================= Focus grid ================= */
@@ -571,7 +571,7 @@
   border-radius: 22px;
   background: #fff;
   border: 1px solid var(--sf-line);
-  box-shadow: 0 20px 45px -30px rgba(15, 23, 42, 0.4);
+  box-shadow: 0 20px 45px -30px rgba(21, 38, 68, 0.4);
   overflow: hidden;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
@@ -582,7 +582,7 @@
   height: 5px;
   background: var(--accent);
 }
-.sf-focus-card:hover { transform: translateY(-6px); box-shadow: 0 30px 55px -28px rgba(15, 23, 42, 0.45); }
+.sf-focus-card:hover { transform: translateY(-6px); box-shadow: 0 30px 55px -28px rgba(21, 38, 68, 0.45); }
 .sf-focus-icon {
   display: grid;
   place-items: center;
@@ -607,14 +607,14 @@
   background:
     radial-gradient(
       90% 70% at 82% 8%,
-      rgba(37, 148, 210, 0.2) 0%,
-      rgba(37, 148, 210, 0) 60%
+      rgba(50, 90, 160, 0.2) 0%,
+      rgba(50, 90, 160, 0) 60%
     ),
-    linear-gradient(165deg, #0a1c35 0%, #0d2547 55%, #091a31 100%);
+    linear-gradient(165deg, #14294d 0%, #1a3665 55%, #132647 100%);
 }
 
 .sf-section-sub--light {
-  color: rgba(234, 242, 251, 0.78);
+  color: rgba(236, 241, 249, 0.78);
 }
 
 .sf-reel-frame {
@@ -622,18 +622,18 @@
   margin: 0 auto;
   border-radius: 20px;
   overflow: hidden;
-  background: #08182c;
+  background: #102241;
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
     0 34px 80px -34px rgba(0, 0, 0, 0.85),
-    0 22px 64px -32px rgba(37, 148, 210, 0.45);
+    0 22px 64px -32px rgba(50, 90, 160, 0.45);
 }
 
 .sf-reel-video {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #08182c;
+  background: #102241;
 }
 
 /* ================= Timeline ================= */
@@ -667,7 +667,7 @@
   background: #fff;
   border: 1px solid var(--sf-line);
   border-left: 5px solid var(--accent);
-  box-shadow: 0 18px 40px -30px rgba(15, 23, 42, 0.4);
+  box-shadow: 0 18px 40px -30px rgba(21, 38, 68, 0.4);
   transition: transform 0.2s ease;
 }
 .sf-tl-card:hover { transform: translateX(5px); }
@@ -699,13 +699,13 @@
   background-image: linear-gradient(#fff, #fff), linear-gradient(120deg, var(--sf-orange), var(--sf-blue));
   background-origin: border-box;
   background-clip: padding-box, border-box;
-  box-shadow: 0 10px 26px -18px rgba(15, 23, 42, 0.5);
+  box-shadow: 0 10px 26px -18px rgba(21, 38, 68, 0.5);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
-.sf-skill-pill:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 16px 30px -18px rgba(37, 148, 210, 0.6); }
+.sf-skill-pill:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 16px 30px -18px rgba(50, 90, 160, 0.6); }
 
 /* ================= Stats ================= */
-.sf-stats { padding: clamp(50px, 7vw, 90px) 0; background: linear-gradient(160deg, #0b1f3d, #14335c); }
+.sf-stats { padding: clamp(50px, 7vw, 90px) 0; background: linear-gradient(160deg, #172f58, #234785); }
 .sf-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 22px; }
 .sf-stat {
   position: relative;
@@ -718,8 +718,8 @@
 }
 .sf-stat strong { display: block; font-family: "Sora", sans-serif; font-size: clamp(2.4rem, 4vw, 3.2rem); line-height: 1; }
 .sf-stat span { display: block; margin-top: 10px; font-size: 0.92rem; color: rgba(255, 255, 255, 0.85); }
-.sf-stat--blue { background: linear-gradient(150deg, #2594d2, #1a7bb5); }
-.sf-stat--orange { background: linear-gradient(150deg, #f6993d, #ef7f16); }
+.sf-stat--blue { background: linear-gradient(150deg, #325aa0, #2a4c86); }
+.sf-stat--orange { background: linear-gradient(150deg, #a3a190, #8f8d76); }
 .sf-stat--green { background: linear-gradient(150deg, #16a34a, #0d9488); }
 .sf-stat--purple { background: linear-gradient(150deg, #7c3aed, #5b21b6); }
 
@@ -732,7 +732,7 @@
   margin: 0 auto;
   padding: 34px;
   border-radius: 24px;
-  background: linear-gradient(120deg, rgba(37, 148, 210, 0.08), rgba(246, 153, 61, 0.08));
+  background: linear-gradient(120deg, rgba(50, 90, 160, 0.08), rgba(163, 161, 144, 0.08));
   border: 1px solid var(--sf-line);
 }
 .sf-edu-badge {
@@ -744,7 +744,7 @@
   border-radius: 20px;
   font-size: 2rem;
   background: linear-gradient(135deg, var(--sf-blue), var(--sf-orange));
-  box-shadow: 0 16px 34px -16px rgba(37, 148, 210, 0.7);
+  box-shadow: 0 16px 34px -16px rgba(50, 90, 160, 0.7);
 }
 .sf-edu-card h3 { font-family: "Sora", sans-serif; font-size: 1.5rem; color: var(--sf-navy); margin: 4px 0 8px; }
 .sf-edu-card p { color: var(--sf-muted); }
@@ -757,16 +757,16 @@
   text-align: center;
   color: #fff;
   background:
-    radial-gradient(circle at 20% 20%, rgba(37, 148, 210, 0.5), transparent 45%),
-    radial-gradient(circle at 80% 80%, rgba(246, 153, 61, 0.5), transparent 45%),
-    linear-gradient(140deg, #0b1f3d, #14335c);
+    radial-gradient(circle at 20% 20%, rgba(50, 90, 160, 0.5), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(163, 161, 144, 0.5), transparent 45%),
+    linear-gradient(140deg, #172f58, #234785);
 }
 .sf-cta-orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.5; }
-.sf-cta-orb--1 { width: 320px; height: 320px; background: #2594d2; top: -60px; left: 8%; }
-.sf-cta-orb--2 { width: 280px; height: 280px; background: #f6993d; bottom: -70px; right: 10%; }
+.sf-cta-orb--1 { width: 320px; height: 320px; background: #325aa0; top: -60px; left: 8%; }
+.sf-cta-orb--2 { width: 280px; height: 280px; background: #a3a190; bottom: -70px; right: 10%; }
 .sf-cta-inner { position: relative; z-index: 2; }
 .sf-cta-title { font-family: "Sora", sans-serif; font-size: clamp(2rem, 4vw, 3.2rem); letter-spacing: -0.03em; margin-bottom: 16px; }
-.sf-cta-sub { max-width: 40em; margin: 0 auto 34px; color: rgba(234, 242, 251, 0.85); font-size: 1.08rem; }
+.sf-cta-sub { max-width: 40em; margin: 0 auto 34px; color: rgba(236, 241, 249, 0.85); font-size: 1.08rem; }
 .sf-cta-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 30px; }
 .sf-cta-back { display: inline-block; font-weight: 700; color: rgba(255, 255, 255, 0.75); border-bottom: 1px solid transparent; transition: border-color 0.2s; }
 .sf-cta-back:hover { border-color: rgba(255, 255, 255, 0.6); }

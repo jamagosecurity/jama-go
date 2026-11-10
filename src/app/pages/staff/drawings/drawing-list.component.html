@@ -1,9 +1,15 @@
 <section class="admin-page boq-page">
-  <header class="admin-page-header">
-    <div>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z" /><path d="M9 3v18M15 3v18M3 9h18M3 15h18" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Drawings</p>
       <h1>Drawings</h1>
     </div>
-    <a class="btn-admin btn-admin-primary" [routerLink]="[basePath, 'new']">New drawing</a>
+    <div class="page-banner-actions">
+    <a class="banner-gold" [routerLink]="[basePath, 'new']">New drawing</a>
+    </div>
   </header>
 
   <div class="boq-filters">

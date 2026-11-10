@@ -27,20 +27,16 @@ export class AdminContactsComponent {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly query = signal('');
-
-  readonly serviceCount = computed(() => {
-    const set = new Set(this.submissions().map((s) => s.service).filter(Boolean));
-    return set.size;
-  });
+  /** The row showing its Delete / Keep confirmation, as the other lists do. */
+  readonly pendingDeleteId = signal<string | null>(null);
+  readonly deletingId = signal<string | null>(null);
+  /** The enquiry whose full message is open; the rest show two lines. */
+  readonly expandedId = signal<string | null>(null);
 
   readonly recentCount = computed(() => {
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     return this.submissions().filter((s) => Date.parse(s.createdAt) >= weekAgo).length;
   });
-
-  readonly withPhoneCount = computed(
-    () => this.submissions().filter((s) => !!s.phone?.trim()).length,
-  );
 
   readonly filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
@@ -80,6 +76,26 @@ export class AdminContactsComponent {
         error: (err: unknown) => {
           this.error.set(getApiErrorMessage(err, 'Could not load contact submissions.'));
         },
+      });
+  }
+
+  toggleMessage(id: string): void {
+    this.expandedId.update((current) => (current === id ? null : id));
+  }
+
+  confirmDelete(item: ContactSubmission): void {
+    if (this.deletingId()) return;
+    this.deletingId.set(item.id);
+    this.error.set(null);
+    this.contactService
+      .remove(item.id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.deletingId.set(null)))
+      .subscribe({
+        next: () => {
+          this.submissions.update((all) => all.filter((s) => s.id !== item.id));
+          this.pendingDeleteId.set(null);
+        },
+        error: (err: unknown) => this.error.set(getApiErrorMessage(err, 'Could not delete that enquiry.')),
       });
   }
 

@@ -141,8 +141,11 @@
                             aria-label="Move up">↑</button>
                           <button type="button" [disabled]="i === lines().length - 1"
                             (click)="moveLine(i, 1)" aria-label="Move down">↓</button>
-                          <button type="button" class="quote-line-remove" (click)="removeLine(i)"
-                            aria-label="Remove line">×</button>
+                          <button type="button" class="quote-line-remove row-btn row-btn--icon row-btn--delete"
+                            (click)="removeLine(i)" aria-label="Remove line" title="Remove line">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                          </button>
                         </td>
                       </tr>
                     }

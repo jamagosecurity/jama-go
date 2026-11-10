@@ -4,13 +4,16 @@
   } @else if (error()) {
     <div class="admin-panel"><p>{{ error() }}</p></div>
   } @else if (detail(); as item) {
-    <header class="admin-page-header">
-      <div>
-        <span class="admin-kicker">DIA inspection</span>
+    <header class="page-banner">
+      <span class="page-banner-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" /></svg></span>
+      <div class="page-banner-text">
+        <p class="page-banner-eyebrow">DIA inspection</p>
         <h1>{{ item.diaNumber }}</h1>
-        <p>{{ item.clientName }} · {{ item.clientLocation }}</p>
+        <p class="page-banner-sub">{{ item.clientName }} · {{ item.clientLocation }}</p>
       </div>
-      <a mat-stroked-button routerLink="/technician">Back to dashboard</a>
+      <div class="page-banner-actions">
+        <a class="banner-ghost" routerLink="/technician"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>Back to dashboard</a>
+      </div>
     </header>
 
     <div class="admin-panel tech-dia-hero">

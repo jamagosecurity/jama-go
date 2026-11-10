@@ -1,0 +1,154 @@
+/* A compact one-panel form: three fields to a row, small inputs, no boxes
+   inside the box. Mirrors the Non-MOI price list's editor palette. */
+
+.nj-back {
+  display: block;
+  width: fit-content;
+  margin-bottom: 8px;
+  color: var(--admin-blue-ink);
+  font-size: 0.86rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+.nj-back:hover { text-decoration: underline; }
+
+.nj-form-panel { margin-bottom: 22px; }
+
+.nj-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--admin-line);
+  color: var(--admin-ink);
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+.nj-grid + .nj-title { margin-top: 26px; }
+.nj-title-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(163, 161, 144, 0.2), rgba(50, 90, 160, 0.2));
+  color: var(--admin-blue-ink, #27467c);
+}
+.nj-title-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nj-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 14px;
+  align-items: start;
+}
+.nj-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nj-span-3 { grid-column: 1 / -1; }
+
+.nj-field { display: grid; gap: 5px; min-width: 0; }
+.nj-field > span {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--admin-ink);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+.nj-count { margin-left: auto; }
+.nj-field > span i { color: var(--jama-rose, #e11d24); font-style: normal; }
+.nj-field > span em {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nj-field input,
+.nj-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 11px;
+  border: 1px solid var(--admin-line);
+  border-radius: 10px;
+  background: #fcfdfe;
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 0.9rem;
+}
+.nj-field > span { min-height: 22px; }
+.nj-field textarea { height: 108px; min-height: 80px; resize: vertical; line-height: 1.5; }
+.nj-field input:focus,
+.nj-field textarea:focus {
+  outline: none;
+  border-color: var(--admin-blue, #325aa0);
+  box-shadow: 0 0 0 3px rgba(50, 90, 160, 0.16);
+}
+.nj-field input.is-invalid,
+.nj-field textarea.is-invalid { border-color: var(--jama-rose, #e11d24); }
+.nj-field--ar textarea { line-height: 1.7; }
+
+/* The shared dropdown, sized to match the inputs beside it. */
+.nj-field ::ng-deep .app-select-trigger { padding: 8px 11px; font-size: 0.9rem; border-radius: 10px; }
+
+.nj-hint { color: var(--admin-muted); font-size: 0.78rem; }
+.nj-hint a { color: var(--admin-blue-ink); font-weight: 700; }
+
+/* ===== Map pin: a single row of inline links, not a box ===== */
+
+.nj-pin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  align-self: end;
+  padding-bottom: 8px;
+}
+.nj-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--admin-blue-ink);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+}
+.nj-link:hover { text-decoration: underline; }
+.nj-link:disabled { opacity: 0.55; cursor: default; text-decoration: none; }
+
+.nj-pin-line { margin: -4px 0 0; color: var(--admin-muted); font-size: 0.78rem; }
+.nj-pin-line.is-error { color: var(--jama-rose, #e11d24); font-weight: 650; }
+
+/* ===== Actions ===== */
+
+.nj-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--admin-line);
+}
+.nj-form-error { color: var(--jama-rose, #e11d24); font-size: 0.86rem; font-weight: 650; }
+
+@media (max-width: 720px) {
+  .nj-grid,
+  .nj-grid--2 { grid-template-columns: 1fr; }
+  .nj-pin-actions { padding-bottom: 0; }
+  .nj-form-actions .btn-admin { flex: 1 1 auto; text-align: center; }
+}

@@ -1,9 +1,15 @@
 <section class="admin-page boq-page">
-  <header class="admin-page-header">
-    <div>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 11h6M9 15h6M9 19h3" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Quotations</p>
       <h1>Quotations</h1>
     </div>
-    <a class="btn-admin btn-admin-primary" [routerLink]="[basePath, 'new']">New quotation</a>
+    <div class="page-banner-actions">
+    <a class="banner-gold" [routerLink]="[basePath, 'new']">New quotation</a>
+    </div>
   </header>
 
   <div class="boq-filters">

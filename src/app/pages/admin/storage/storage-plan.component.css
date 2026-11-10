@@ -128,7 +128,7 @@
 code {
   font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
   font-size: 0.85em;
-  background: rgba(15, 40, 70, 0.06);
+  background: rgba(26, 55, 103, 0.06);
   border-radius: 4px;
   padding: 0.08em 0.36em;
 }
@@ -150,7 +150,7 @@ code {
   padding: 11px 13px;
   border: 1px solid var(--admin-line);
   border-radius: 12px;
-  background: rgba(15, 40, 70, 0.04);
+  background: rgba(26, 55, 103, 0.04);
 }
 
 .plan-hop-op {
@@ -183,7 +183,7 @@ code {
 }
 
 .plan-hop.is-final {
-  background: rgba(246, 153, 61, 0.12);
+  background: rgba(163, 161, 144, 0.12);
   border-color: var(--admin-orange);
 }
 
@@ -268,7 +268,7 @@ code {
 }
 
 .plan-table thead th {
-  background: rgba(15, 40, 70, 0.05);
+  background: rgba(26, 55, 103, 0.05);
   font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.07em;
@@ -294,12 +294,12 @@ code {
 }
 
 .plan-table tr.is-total td {
-  background: rgba(15, 40, 70, 0.05);
+  background: rgba(26, 55, 103, 0.05);
   font-weight: 800;
 }
 
 .plan-table tr.is-result td {
-  background: rgba(246, 153, 61, 0.12);
+  background: rgba(163, 161, 144, 0.12);
   font-weight: 800;
   color: var(--admin-orange-ink);
 }
@@ -322,7 +322,7 @@ code {
   border: 1px solid var(--admin-line);
   border-left: 3px solid var(--admin-blue);
   border-radius: 14px;
-  background: rgba(37, 148, 210, 0.08);
+  background: rgba(50, 90, 160, 0.08);
   color: var(--admin-ink-soft);
   font-size: 0.88rem;
 }
@@ -334,7 +334,7 @@ code {
 
 .plan-callout.is-bad {
   border-left-color: var(--admin-rose);
-  background: rgba(200, 60, 80, 0.08);
+  background: rgba(218, 42, 48, 0.08);
 }
 
 /* ---- defects ---- */
@@ -368,7 +368,7 @@ code {
   display: grid;
   place-items: center;
   border-radius: 7px;
-  background: rgba(200, 60, 80, 0.12);
+  background: rgba(218, 42, 48, 0.12);
   color: var(--admin-rose-ink);
   font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace;
   font-size: 0.7rem;

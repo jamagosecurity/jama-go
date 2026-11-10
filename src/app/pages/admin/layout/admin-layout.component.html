@@ -1,10 +1,16 @@
-<div class="admin-shell">
-  <aside class="admin-sidebar" aria-label="Admin sidebar">
+<div class="admin-shell" [class.is-menu-open]="menuOpen()">
+  <!-- Phones only: dims the page behind the open drawer, and closes it on tap. -->
+  @if (menuOpen()) {
+    <div class="admin-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
+  }
+
+  <aside id="admin-sidebar" class="admin-sidebar" aria-label="Admin sidebar">
+    <button type="button" class="admin-drawer-close" (click)="closeMenu()" aria-label="Close menu">×</button>
     <div class="admin-brand">
       <div class="admin-logo-badge">
         <img
           class="admin-logo"
-          src="/JamaGoLogo-trim.png"
+          src="/JamaGoLogo-navy.png"
           alt="Jama Go"
           width="360"
           height="108"
@@ -13,6 +19,7 @@
     </div>
 
     <nav class="admin-nav" aria-label="Admin">
+        <p class="nav-label">People</p>
         <a routerLink="/admin/staff" routerLinkActive="active" class="nav-staff">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>
@@ -33,6 +40,16 @@
           </span>
         </a>
 
+        <a routerLink="/admin/mail" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z" /><path d="m3 7 9 6 9-6" /></svg>
+          </span>
+          <span>
+            <strong>Company mail</strong>
+            <small>All mailboxes, in &amp; out</small>
+          </span>
+        </a>
+
         <a routerLink="/admin/client-registrations" routerLinkActive="active" class="nav-clients">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
@@ -48,6 +65,7 @@
           }
         </a>
 
+        <p class="nav-sub nav-sub--moi"><i aria-hidden="true"></i>MOI</p>
         <a routerLink="/admin/dia" routerLinkActive="active" class="nav-dia">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
@@ -60,22 +78,7 @@
             <small>Quarterly schedules</small>
           </span>
         </a>
-
-        @if (canManageVip()) {
-          <a routerLink="/admin/vip" routerLinkActive="active" class="nav-vip">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              </svg>
-            </span>
-            <span>
-              <strong>VIP Clients</strong>
-              <small>Project documents</small>
-            </span>
-          </a>
-        }
-
-        <a routerLink="/admin/cameras" routerLinkActive="active" class="nav-cameras">
+        <a routerLink="/admin/cameras" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M3 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z" />
@@ -84,11 +87,49 @@
             </svg>
           </span>
           <span>
-            <strong> Moi Inventory</strong>
+            <strong>Moi Inventory</strong>
             <small>Brand, type &amp; quantity</small>
           </span>
         </a>
 
+        <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
+        <a routerLink="/admin/maintenance" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+            </svg>
+          </span>
+          <span>
+            <strong>Maintenance</strong>
+            <small>Service tickets</small>
+          </span>
+        </a>
+        <a routerLink="/admin/non-moi-jobs" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+              <circle cx="12" cy="10" r="2.6" />
+            </svg>
+          </span>
+          <span>
+            <strong>Non-MOI Jobs</strong>
+            <small>Issued to technicians</small>
+          </span>
+        </a>
+        <a routerLink="/admin/non-moi" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 3h6l1 2h3v16H5V5h3z" />
+              <path d="M9 11h2M9 15h2M14 11h1M14 15h1" />
+            </svg>
+          </span>
+          <span>
+            <strong>Non-MOI Inventory</strong>
+            <small>Services &amp; prices</small>
+          </span>
+        </a>
+
+        <p class="nav-label">Quotations &amp; documents</p>
         <!-- Quotation and what has been decided on one, as a parent and its
              children. They were three competing pills before, which made
              "Approved" read as its own area of the system rather than as a view
@@ -107,10 +148,14 @@
               <small>Priced from stock</small>
             </span>
           </a>
+          <button type="button" class="nav-chevron" [class.is-open]="isOpen('quotation')"
+            [attr.aria-expanded]="isOpen('quotation')" aria-label="Show or hide quotation links"
+            (click)="toggleGroup('quotation')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></button>
 
           <!-- Always on screen rather than revealed on hover or once the parent
                is open: an approver should be able to see where the decided work
                lives without first guessing to click into it. -->
+          @if (isOpen('quotation')) {
           <div class="nav-subs">
             <!-- Both carry the status, so the highlight follows the tab. The
                  page defaults to approved when the parameter is missing. -->
@@ -127,6 +172,7 @@
               Rejected
             </a>
           </div>
+          }
         </div>
 
         <!-- CAD drawings: same parent-plus-decisions shape as Quotation, and
@@ -145,7 +191,11 @@
               <small>CAD submissions</small>
             </span>
           </a>
+          <button type="button" class="nav-chevron" [class.is-open]="isOpen('drawings')"
+            [attr.aria-expanded]="isOpen('drawings')" aria-label="Show or hide drawings links"
+            (click)="toggleGroup('drawings')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></button>
 
+          @if (isOpen('drawings')) {
           <div class="nav-subs">
             <a routerLink="/admin/drawings/decisions" [queryParams]="{ status: 'Approved' }"
               routerLinkActive="active"
@@ -160,7 +210,22 @@
               Rejected
             </a>
           </div>
+          }
         </div>
+
+        @if (canManageVip()) {
+          <a routerLink="/admin/vip" routerLinkActive="active" class="nav-vip">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              </svg>
+            </span>
+            <span>
+              <strong>VIP Clients</strong>
+              <small>Project documents</small>
+            </span>
+          </a>
+        }
 
         <a routerLink="/" class="admin-nav-muted nav-site">
           <span class="nav-icon" aria-hidden="true">
@@ -179,9 +244,10 @@
         <div class="admin-user-meta">
           <p>{{ auth.currentUser()?.fullName || 'Administrator' }}</p>
           <small>{{ auth.currentUser()?.email }}</small>
+          <span class="profile-role">Administrator</span>
         </div>
-        <button type="button" class="btn-admin btn-admin-ghost signout" (click)="logout()">
-          Sign out
+        <button type="button" class="profile-logout" (click)="logout()" aria-label="Sign out" title="Sign out">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /></svg>
         </button>
       </div>
     </div>
@@ -193,6 +259,13 @@
          strip — the heavy top bar this replaces was removed because it competed
          with those headers. -->
     <header class="admin-topbar">
+      <!-- Phones only — on a desktop the sidebar is always there. -->
+      <button type="button" class="admin-menu-btn" (click)="menuOpen.set(!menuOpen())"
+        [attr.aria-expanded]="menuOpen()" aria-controls="admin-sidebar" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        <span>Menu</span>
+      </button>
+      <img class="admin-topbar-logo" src="/JamaGoLogo-navy.png" alt="Jama Go" width="360" height="108" />
       <app-approval-bell basePath="/admin/boq" />
     </header>
 

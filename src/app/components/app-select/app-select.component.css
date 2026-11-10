@@ -1,0 +1,136 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.app-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(26, 55, 103, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--admin-ink, #102240);
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.app-select-trigger:hover { border-color: rgba(50, 90, 160, 0.35); }
+.app-select-trigger:focus-visible,
+.app-select-trigger.is-open {
+  outline: none;
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
+}
+.app-select-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background: rgba(26, 55, 103, 0.03);
+}
+
+.app-select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-select-trigger.is-placeholder .app-select-value {
+  color: #8a9bb0;
+}
+
+.app-select-chevron {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #40506d;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.16s ease;
+}
+.app-select-trigger.is-open .app-select-chevron { transform: rotate(180deg); }
+
+/* The backdrop is transparent — this isn't a modal, just a click-outside
+   catcher — but it still needs to sit above the page so the click lands on
+   it instead of on whatever is underneath the panel. */
+::ng-deep .app-select-backdrop {
+  background: transparent;
+}
+
+::ng-deep .app-select-panel {
+  display: flex;
+  flex-direction: column;
+  /* The overlay pane is a flex container sized to the trigger; without this the
+     panel shrinks to its longest option instead of matching the field. */
+  width: 100%;
+  box-sizing: border-box;
+  max-height: 300px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid var(--admin-line, rgba(26, 55, 103, 0.12));
+  border-radius: 14px;
+  box-shadow: var(--admin-shadow, 0 22px 50px -28px rgba(20, 41, 76, 0.45));
+}
+
+/* The options scroll; a create row below them stays put, so it is never
+   scrolled out of reach at the bottom of a long list. */
+::ng-deep .app-select-list {
+  display: grid;
+  gap: 2px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+::ng-deep .app-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--admin-ink, #102240);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+::ng-deep .app-select-option.is-active { background: rgba(50, 90, 160, 0.09); }
+::ng-deep .app-select-option.is-selected {
+  background: rgba(50, 90, 160, 0.12);
+  color: var(--admin-blue-ink, #27467c);
+  font-weight: 700;
+}
+::ng-deep .app-select-option.is-selected.is-active { background: rgba(50, 90, 160, 0.18); }
+
+::ng-deep .app-select-check {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+::ng-deep .app-select-divider {
+  flex: 0 0 auto;
+  height: 1px;
+  margin: 4px 6px;
+  background: rgba(26, 55, 103, 0.1);
+}
+::ng-deep .app-select-create {
+  flex: 0 0 auto;
+  color: var(--admin-blue-ink, #27467c);
+  font-weight: 700;
+}

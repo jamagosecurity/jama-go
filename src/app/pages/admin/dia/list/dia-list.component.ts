@@ -18,6 +18,7 @@ import { DIA_STATUSES, Dia, DiaListQuery, DiaStatus, PaginatedData } from '../..
 import { AuthService } from '../../../../services/auth.service';
 import { DiaService } from '../../../../services/dia.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
+import { AppSelectComponent } from '../../../../components/app-select/app-select.component';
 import { DIA_BASE_PATH } from '../dia-base-path';
 import {
   ConfirmationDialogData,
@@ -44,6 +45,7 @@ import {
     MatSortModule,
     MatTableModule,
     MatTooltipModule,
+    AppSelectComponent,
     DiaEmptyStateComponent,
     DiaSkeletonComponent,
     DiaStatusChipComponent,
@@ -70,6 +72,12 @@ export class DiaListComponent implements OnInit {
   protected readonly canDeletePermanently = inject(AuthService).isSuperAdmin();
 
   protected readonly statuses = DIA_STATUSES;
+  /** The status filter, in the app's own dropdown rather than a Material select. */
+  protected readonly statusOptions = [
+    { value: '', label: 'All statuses' },
+    ...DIA_STATUSES.map((status) => ({ value: status, label: this.statusLabel(status) })),
+    { value: 'Archived', label: 'Archived' },
+  ];
   protected readonly searchControl = new FormControl('', { nonNullable: true });
   /** 'Archived' is a filter mode, not a cycle status — it swaps the list over
    *  to soft-deleted records rather than filtering the live ones. */
@@ -154,6 +162,10 @@ export class DiaListComponent implements OnInit {
       sortBy: sort.active,
       sortDirection: sort.direction || 'desc',
     });
+  }
+
+  protected create(): void {
+    void this.router.navigate([this.base, 'new']);
   }
 
   protected clearFilters(): void {

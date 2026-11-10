@@ -42,10 +42,10 @@
   font-size: 0.95rem;
   font-weight: 800;
   /* Ink on the bright fill: white drops under 3:1 on this blue. */
-  color: #08192b;
-  background: linear-gradient(140deg, #7fc7ef, #2594d2);
+  color: #102240;
+  background: linear-gradient(140deg, #688ecf, #325aa0);
   box-shadow:
-    0 8px 18px -10px rgba(37, 148, 210, 0.85),
+    0 8px 18px -10px rgba(50, 90, 160, 0.85),
     inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
@@ -81,9 +81,9 @@
   align-self: center;
   padding: 5px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(37, 148, 210, 0.28);
-  background: rgba(37, 148, 210, 0.09);
-  color: #14618d;
+  border: 1px solid rgba(50, 90, 160, 0.28);
+  background: rgba(50, 90, 160, 0.09);
+  color: #2b56a2;
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.03em;
@@ -136,7 +136,7 @@
 .boq-field select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid rgba(15, 40, 70, 0.14);
+  border: 1px solid rgba(26, 55, 103, 0.14);
   border-radius: 11px;
   background: #fff;
   font: inherit;
@@ -148,8 +148,8 @@
 .boq-field input:focus,
 .boq-field select:focus {
   outline: none;
-  border-color: rgba(37, 148, 210, 0.55);
-  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 3px rgba(50, 90, 160, 0.12);
 }
 
 /* The quotation, once chosen — a card rather than a sentence, so what is being
@@ -161,15 +161,15 @@
   gap: 6px 12px;
   padding: 12px 14px;
   border-radius: 13px;
-  border: 1px solid rgba(37, 148, 210, 0.26);
-  background: linear-gradient(120deg, rgba(37, 148, 210, 0.09), rgba(246, 153, 61, 0.06));
+  border: 1px solid rgba(50, 90, 160, 0.26);
+  background: linear-gradient(120deg, rgba(50, 90, 160, 0.09), rgba(163, 161, 144, 0.06));
 }
 
 .storage-loaded-no {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
   font-size: 0.86rem;
   font-weight: 700;
-  color: #14618d;
+  color: #2b56a2;
 }
 
 .storage-loaded-name {
@@ -204,9 +204,9 @@
 
 /* Amber, not red: a missing bitrate is something to fill in, not a failure. */
 .storage-warn {
-  border: 1px solid rgba(194, 102, 15, 0.26);
-  background: rgba(246, 153, 61, 0.1);
-  color: #7d4406;
+  border: 1px solid rgba(114, 112, 95, 0.26);
+  background: rgba(163, 161, 144, 0.1);
+  color: #46463d;
 }
 
 .storage-warn-tag {
@@ -219,7 +219,7 @@
   white-space: nowrap;
 }
 
-.storage-warn-tag { color: #fff; background: #c2660f; }
+.storage-warn-tag { color: #fff; background: #72705f; }
 
 /* ===== Empty states ===== */
 
@@ -230,8 +230,8 @@
   margin-top: 16px;
   padding: 30px 20px;
   border-radius: 14px;
-  border: 1px dashed rgba(15, 40, 70, 0.16);
-  background: rgba(15, 40, 70, 0.02);
+  border: 1px dashed rgba(26, 55, 103, 0.16);
+  background: rgba(26, 55, 103, 0.02);
   text-align: center;
 }
 
@@ -249,7 +249,7 @@
   width: 30px;
   height: 30px;
   fill: none;
-  stroke: rgba(15, 40, 70, 0.3);
+  stroke: rgba(26, 55, 103, 0.3);
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -262,7 +262,7 @@
   /* Wide tables scroll inside their own box rather than pushing the page. */
   overflow-x: auto;
   border-radius: 13px;
-  border: 1px solid rgba(15, 40, 70, 0.09);
+  border: 1px solid rgba(26, 55, 103, 0.09);
 }
 
 .storage-table {
@@ -280,9 +280,9 @@
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: #4a6480;
-  background: #f2f7fb;
-  border-bottom: 1px solid rgba(15, 40, 70, 0.09);
+  color: #3f506d;
+  background: #f2f5fb;
+  border-bottom: 1px solid rgba(26, 55, 103, 0.09);
   white-space: nowrap;
 }
 
@@ -296,7 +296,7 @@
 
 .storage-table td {
   padding: 9px 14px;
-  border-bottom: 1px solid rgba(15, 40, 70, 0.06);
+  border-bottom: 1px solid rgba(26, 55, 103, 0.06);
   color: var(--admin-ink);
 }
 
@@ -315,15 +315,15 @@
 .storage-dim { color: var(--admin-muted); }
 
 .storage-table tbody tr.is-missing td {
-  background: rgba(246, 153, 61, 0.06);
+  background: rgba(163, 161, 144, 0.06);
 }
 
 .storage-flag {
   margin-left: 8px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(246, 153, 61, 0.18);
-  color: #7d4406;
+  background: rgba(163, 161, 144, 0.18);
+  color: #46463d;
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -332,14 +332,14 @@
 }
 
 .storage-table--read tbody tr:hover td {
-  background: rgba(37, 148, 210, 0.035);
+  background: rgba(50, 90, 160, 0.035);
 }
 
 .storage-input {
   width: 100%;
   max-width: 120px;
   padding: 7px 10px;
-  border: 1px solid rgba(15, 40, 70, 0.14);
+  border: 1px solid rgba(26, 55, 103, 0.14);
   border-radius: 9px;
   background: #fff;
   font: inherit;
@@ -357,14 +357,14 @@
 
 .storage-input:focus {
   outline: none;
-  border-color: rgba(37, 148, 210, 0.55);
-  box-shadow: 0 0 0 3px rgba(37, 148, 210, 0.12);
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 3px rgba(50, 90, 160, 0.12);
 }
 
 .row-btn {
   padding: 5px 11px;
   border-radius: 9px;
-  border: 1px solid rgba(15, 40, 70, 0.14);
+  border: 1px solid rgba(26, 55, 103, 0.14);
   background: #fff;
   font: inherit;
   font-size: 0.76rem;
@@ -375,9 +375,9 @@
 }
 
 .row-btn--delete:hover {
-  color: #b91c1c;
-  border-color: rgba(185, 28, 28, 0.4);
-  background: rgba(185, 28, 28, 0.06);
+  color: #b91c21;
+  border-color: rgba(185, 28, 33, 0.4);
+  background: rgba(185, 28, 33, 0.06);
 }
 
 .storage-add { margin-top: 16px; }
@@ -393,9 +393,9 @@
   margin-bottom: 18px;
   padding: 16px 20px;
   border-radius: 18px;
-  border: 1px solid rgba(15, 40, 70, 0.1);
-  background: linear-gradient(120deg, #ffffff, #f5faff);
-  box-shadow: 0 14px 34px -26px rgba(15, 40, 70, 0.5);
+  border: 1px solid rgba(26, 55, 103, 0.1);
+  background: linear-gradient(120deg, #ffffff, #f7f9fd);
+  box-shadow: 0 14px 34px -26px rgba(26, 55, 103, 0.5);
 }
 
 .storage-cta-note {
@@ -427,8 +427,8 @@
 }
 
 .storage-verdict.is-short {
-  border-color: rgba(185, 28, 28, 0.26);
-  background: linear-gradient(120deg, rgba(185, 28, 28, 0.09), rgba(185, 28, 28, 0.03));
+  border-color: rgba(185, 28, 33, 0.26);
+  background: linear-gradient(120deg, rgba(185, 28, 33, 0.09), rgba(185, 28, 33, 0.03));
 }
 
 .storage-verdict-head {
@@ -449,7 +449,7 @@
   text-transform: uppercase;
 }
 
-.storage-verdict.is-short .storage-verdict-badge { background: #b91c1c; }
+.storage-verdict.is-short .storage-verdict-badge { background: #b91c21; }
 
 .storage-verdict-pct {
   font-family: "Sora", "Inter", sans-serif;
@@ -460,14 +460,14 @@
   font-variant-numeric: tabular-nums;
 }
 
-.storage-verdict.is-short .storage-verdict-pct { color: #8f1616; }
+.storage-verdict.is-short .storage-verdict-pct { color: #8f161a; }
 
 /* Coverage as a bar as well as a number: "141%" and "94%" look alike in text
    and could not be more different in what they mean for the job. */
 .storage-bar {
   height: 9px;
   border-radius: 999px;
-  background: rgba(15, 40, 70, 0.09);
+  background: rgba(26, 55, 103, 0.09);
   overflow: hidden;
 }
 
@@ -480,7 +480,7 @@
 }
 
 .storage-verdict.is-short .storage-bar-fill {
-  background: linear-gradient(90deg, #ef6a6a, #b91c1c);
+  background: linear-gradient(90deg, #ef6a6e, #b91c21);
 }
 
 .storage-verdict-figure {
@@ -504,7 +504,7 @@
   gap: 3px;
   padding: 14px 16px;
   border-radius: 14px;
-  border: 1px solid rgba(15, 40, 70, 0.1);
+  border: 1px solid rgba(26, 55, 103, 0.1);
   background: #fff;
   overflow: hidden;
 }
@@ -515,16 +515,16 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(180deg, #7fc7ef, #2594d2);
+  background: linear-gradient(180deg, #688ecf, #325aa0);
 }
 
 .storage-stat--total {
-  border-color: rgba(37, 148, 210, 0.34);
-  background: linear-gradient(120deg, rgba(37, 148, 210, 0.08), rgba(37, 148, 210, 0.02));
+  border-color: rgba(50, 90, 160, 0.34);
+  background: linear-gradient(120deg, rgba(50, 90, 160, 0.08), rgba(50, 90, 160, 0.02));
 }
 
 .storage-stat--total::before {
-  background: linear-gradient(180deg, #f9b877, #f6993d);
+  background: linear-gradient(180deg, #bebdb2, #a3a190);
 }
 
 .storage-stat-label {
@@ -584,9 +584,9 @@
 .storage-buy {
   margin-top: 16px;
   padding: 18px 20px;
-  border: 1px solid rgba(37, 148, 210, 0.28);
+  border: 1px solid rgba(50, 90, 160, 0.28);
   border-radius: 16px;
-  background: linear-gradient(120deg, rgba(37, 148, 210, 0.09), rgba(246, 153, 61, 0.08));
+  background: linear-gradient(120deg, rgba(50, 90, 160, 0.09), rgba(163, 161, 144, 0.08));
 }
 
 .storage-buy-label {
@@ -603,7 +603,7 @@
   font-family: "Sora", "Inter", sans-serif;
   font-size: clamp(1.5rem, 3vw, 2.1rem);
   letter-spacing: -0.02em;
-  color: var(--admin-blue-ink, #0f2846);
+  color: var(--admin-blue-ink, #1a3767);
 }
 
 .storage-buy-figure strong { font-weight: 800; }
@@ -631,19 +631,19 @@
 .storage-spec td {
   padding: 9px 12px;
   font-weight: 700;
-  color: var(--admin-ink, #0f2846);
+  color: var(--admin-ink, #1a3767);
 }
 
 /* Rules group the table into requirement / array / capacity, so the reader is
    not scanning eighteen undifferentiated rows. */
 .storage-spec .storage-spec-rule th,
 .storage-spec .storage-spec-rule td {
-  border-top: 1px solid rgba(15, 40, 70, 0.12);
+  border-top: 1px solid rgba(26, 55, 103, 0.12);
 }
 
 .storage-spec .storage-spec-total th,
 .storage-spec .storage-spec-total td {
-  background: rgba(37, 148, 210, 0.07);
+  background: rgba(50, 90, 160, 0.07);
   font-size: 1.02rem;
 }
 
@@ -667,7 +667,7 @@
   margin: 14px 0 0;
   font-size: 0.95rem;
   line-height: 1.5;
-  color: var(--admin-ink, #0f2846);
+  color: var(--admin-ink, #1a3767);
 }
 
 .storage-setup strong,
@@ -678,7 +678,7 @@
    disks does not, and leaving them open is what made the page unreadable. */
 .storage-details {
   margin-top: 18px;
-  border: 1px solid rgba(15, 40, 70, 0.12);
+  border: 1px solid rgba(26, 55, 103, 0.12);
   border-radius: 13px;
   overflow: hidden;
 }
@@ -689,12 +689,12 @@
   font-size: 0.86rem;
   font-weight: 700;
   color: var(--admin-muted);
-  background: rgba(15, 40, 70, 0.03);
+  background: rgba(26, 55, 103, 0.03);
   user-select: none;
 }
 
-.storage-details > summary:hover { color: var(--admin-ink, #0f2846); }
-.storage-details[open] > summary { border-bottom: 1px solid rgba(15, 40, 70, 0.1); }
+.storage-details > summary:hover { color: var(--admin-ink, #1a3767); }
+.storage-details[open] > summary { border-bottom: 1px solid rgba(26, 55, 103, 0.1); }
 
 /* ===== Disk table =====
    Deliberately the quotation table's shape — same header band, same total row
@@ -712,12 +712,12 @@
 .storage-disks td {
   padding: 11px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(15, 40, 70, 0.07);
+  border-bottom: 1px solid rgba(26, 55, 103, 0.07);
   vertical-align: middle;
 }
 
 .storage-disks thead th {
-  background: linear-gradient(135deg, #1b357c 0%, #12548f 55%, #0d6fae 100%);
+  background: linear-gradient(135deg, #0d2040 0%, #143366 55%, #1d4589 100%);
   color: #fff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -731,19 +731,19 @@
 .storage-disks thead th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
 
 .storage-disks .num { text-align: right; font-variant-numeric: tabular-nums; }
-.storage-disks tbody tr:hover { background: rgba(37, 148, 210, 0.04); }
+.storage-disks tbody tr:hover { background: rgba(50, 90, 160, 0.04); }
 .storage-disks tbody td strong { font-weight: 750; }
 
 /* The total is a column now, so it is set apart down the right rather than
    along the bottom. Same emphasis a section total gets on a quotation. */
 .storage-disks .storage-col-total {
-  background: rgba(37, 148, 210, 0.08);
+  background: rgba(50, 90, 160, 0.08);
   font-weight: 800;
-  border-left: 2px solid rgba(37, 148, 210, 0.3);
+  border-left: 2px solid rgba(50, 90, 160, 0.3);
 }
 
 .storage-disks thead th.storage-col-total {
-  background: linear-gradient(135deg, #12548f 0%, #0d6fae 100%);
+  background: linear-gradient(135deg, #2b56a2 0%, #264479 100%);
   border-left: 2px solid rgba(255, 255, 255, 0.35);
 }
 
@@ -806,13 +806,13 @@
   padding: 9px 14px;
   border-radius: 11px;
   background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(15, 40, 70, 0.09);
+  border: 1px solid rgba(26, 55, 103, 0.09);
   font-size: 0.9rem;
 }
 
 .storage-group-no {
   font-weight: 800;
-  color: var(--admin-blue-ink, #0f2846);
+  color: var(--admin-blue-ink, #1a3767);
 }
 
 .storage-group-make { color: var(--admin-muted); }
@@ -820,12 +820,12 @@
 .storage-group-total {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: var(--admin-ink, #0f2846);
+  color: var(--admin-ink, #1a3767);
 }
 
 /* The spare belongs to no group, so it is set apart rather than numbered. */
 .storage-groups .storage-group-spare {
-  background: rgba(37, 148, 210, 0.07);
+  background: rgba(50, 90, 160, 0.07);
   border-style: dashed;
 }
 
@@ -841,14 +841,14 @@
 
 .storage-disks .is-chosen,
 .storage-table .is-chosen {
-  background: rgba(37, 148, 210, 0.09);
+  background: rgba(50, 90, 160, 0.09);
 }
 
 .storage-table .is-chosen td { font-weight: 700; }
 
 .storage-flag--pick {
   color: #fff;
-  background: #1a7bb5;
+  background: #2a4c86;
 }
 
 .storage-why-note {
@@ -867,8 +867,8 @@
   margin-left: 8px;
   padding: 2px 9px;
   border-radius: 999px;
-  background: rgba(37, 148, 210, 0.12);
-  color: var(--admin-blue-ink, #0f2846);
+  background: rgba(50, 90, 160, 0.12);
+  color: var(--admin-blue-ink, #1a3767);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -877,8 +877,8 @@
 /* ===== MOI submission sheet =====
 
    Palette and layout taken from the Ministry's own sheet, not approximated:
-   #8A1538 is Qatar's maroon and carries the banners and the header block's
-   label cells; #0E233D the summary titles; the data table itself is white with
+   #8a1519 is Qatar's maroon and carries the banners and the header block's
+   label cells; #18305b the summary titles; the data table itself is white with
    black rules, which is why the header row is NOT maroon.
 
    The red/green on the figures is the sheet's own coding and carries meaning:
@@ -891,11 +891,11 @@
    something that no longer matches the sheet it reproduces. */
 
 .storage-moi {
-  --moi-maroon: #8a1538;
-  --moi-navy: #0e233d;
+  --moi-maroon: #8a1519;
+  --moi-navy: #18305b;
   --moi-shade: #f2f2f2;
   --moi-rule: #000000;
-  --moi-req: #c00000;
+  --moi-req: #b40c11;
   --moi-prop: #00b050;
 }
 

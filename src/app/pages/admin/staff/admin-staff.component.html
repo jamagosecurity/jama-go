@@ -1,34 +1,21 @@
 <section class="admin-page">
-  <header class="admin-page-header">
-    <div>
-      <p class="admin-kicker">Team roster</p>
-      <h1>Staff management</h1>
-      <p>Craft the public team section with clear roles, order, and live visibility.</p>
+  <header class="admin-page-header staff-banner">
+    <div class="staff-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
     </div>
-    <button type="button" class="btn-admin btn-admin-primary" (click)="startCreate()">
+    <div class="staff-banner-text">
+      <p class="staff-banner-eyebrow">Team roster</p>
+      <h1>Staff management</h1>
+      <p class="staff-banner-sub">{{ staff().length }} {{ staff().length === 1 ? 'member' : 'members' }}</p>
+    </div>
+    <button type="button" class="staff-banner-add" (click)="startCreate()">
       <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
       Add staff
     </button>
   </header>
-
-  <div class="admin-stats">
-    <article class="admin-stat admin-stat--blue">
-      <strong>{{ staff().length }}</strong>
-      <span>Total members</span>
-    </article>
-    <article class="admin-stat admin-stat--teal">
-      <strong>{{ activeCount() }}</strong>
-      <span>Live on website</span>
-    </article>
-    <article class="admin-stat admin-stat--orange">
-      <strong>{{ hiddenCount() }}</strong>
-      <span>Hidden profiles</span>
-    </article>
-    <article class="admin-stat admin-stat--indigo">
-      <strong>{{ departments() }}</strong>
-      <span>Departments</span>
-    </article>
-  </div>
 
   @if (error()) {
     <p class="admin-error staff-feedback">{{ error() }}</p>
@@ -48,7 +35,10 @@
         placeholder="Search name, email, role, department…"
       />
     </label>
-    <button type="button" class="btn-admin btn-admin-ghost" (click)="loadStaff()">Refresh</button>
+    <button type="button" class="staff-refresh" (click)="loadStaff()" aria-label="Refresh the list">
+      <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
+      Refresh
+    </button>
   </div>
 
   <div class="admin-panel">
@@ -65,56 +55,64 @@
         </p>
       </div>
     } @else {
-      <div class="staff-grid">
-        @for (member of filteredStaff(); track member.id) {
-          <article
-            class="staff-card surface-card surface-card--rail surface-card--raised"
-            [class.is-active]="member.isActive"
-            [class.is-off]="!member.isActive"
-            [class.staff-card--hidden]="!member.isActive"
-          >
-            <div class="staff-card-top">
-              <div class="staff-avatar" aria-hidden="true">{{ initials(member.fullName) }}</div>
-              <div class="staff-card-meta">
-                <h3>{{ member.fullName }}</h3>
-                <p>{{ member.role }}</p>
-                <small>{{ member.email || 'Login not configured' }}</small>
-              </div>
-              <span
-                class="admin-badge admin-badge--dot"
-                [class.admin-badge--active]="member.isActive"
-                [class.admin-badge--hidden]="!member.isActive"
-              >
-                {{ member.isActive ? 'Live' : 'Hidden' }}
-              </span>
-            </div>
-
-            <p class="staff-copy">{{ member.responsibility }}</p>
-
-            <div class="staff-tags">
-              <span class="status-chip">{{ member.department || 'General' }}</span>
-              <span class="status-chip status-chip--muted">Order {{ member.displayOrder }}</span>
-            </div>
-
-            <div class="staff-card-actions">
-              <button
-                type="button"
-                class="btn-admin btn-admin-ghost"
-                (click)="startEdit(member); $event.stopPropagation()"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                class="btn-admin btn-admin-danger"
-                [disabled]="deletingId() === member.id"
-                (click)="deleteStaff(member, $event)"
-              >
-                {{ deletingId() === member.id ? 'Deleting…' : 'Delete' }}
-              </button>
-            </div>
-          </article>
-        }
+      <div class="staff-table-wrap">
+        <table class="staff-table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Role</th>
+              <th scope="col">Login email</th>
+              <th scope="col">Department</th>
+              <th scope="col" class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (member of filteredStaff(); track member.id) {
+              <tr>
+                <td data-label="Name" class="col-name">{{ member.fullName }}</td>
+                <td data-label="Role">{{ member.role }}</td>
+                <td data-label="Login email">
+                  @if (member.email) { {{ member.email }} } @else { <span class="staff-none">—</span> }
+                </td>
+                <td data-label="Department" class="col-dept">
+                  <span class="dept-chip" [attr.data-dept]="member.department || 'General'">
+                    {{ member.department || 'General' }}
+                  </span>
+                </td>
+                <td class="col-actions">
+                  <div class="staff-row-actions">
+                    @if (pendingDeleteId() === member.id) {
+                      <button type="button" class="row-btn row-btn--danger"
+                        [disabled]="deletingId() === member.id" (click)="deleteStaff(member, $event)">
+                        {{ deletingId() === member.id ? 'Deleting…' : 'Delete' }}
+                      </button>
+                      <button type="button" class="row-btn" [disabled]="deletingId() === member.id"
+                        (click)="pendingDeleteId.set(null)">Keep</button>
+                    } @else {
+                      <button type="button" class="row-btn row-btn--edit"
+                        (click)="startEdit(member); $event.stopPropagation()">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                        </svg>
+                        Edit
+                      </button>
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete" title="Delete"
+                        [attr.aria-label]="'Delete ' + member.fullName" (click)="pendingDeleteId.set(member.id)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     }
   </div>

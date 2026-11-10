@@ -1,11 +1,16 @@
 <section class="admin-page">
-  <header class="admin-page-header">
-    <div>
-      <span class="admin-kicker">VIP clients</span>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">VIP clients</p>
       <h1>Client projects</h1>
-      <p>Create a VIP client and hand over their project documents.</p>
+      <p class="page-banner-sub">Create a VIP client and hand over their project documents.</p>
     </div>
-    <a class="btn-admin btn-admin-primary" [routerLink]="[base, 'new']">+ New VIP client</a>
+    <div class="page-banner-actions">
+    <a class="banner-gold" [routerLink]="[base, 'new']">+ New VIP client</a>
+    </div>
   </header>
 
   @if (loading()) {

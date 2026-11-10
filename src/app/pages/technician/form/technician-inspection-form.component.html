@@ -1,11 +1,14 @@
 <section class="dia-page tech-wizard">
-  <header class="admin-page-header">
-    <div>
-      <span class="admin-kicker">Inspection form</span>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="m9 13 2 2 4-4" /></svg></span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Inspection form</p>
       <h1>Quarterly site inspection</h1>
-      <p>Capture camera, network, VMS, UPS, ANPR and K'Poi details.</p>
+      <p class="page-banner-sub">Capture camera, network, VMS, UPS, ANPR and K'Poi details.</p>
     </div>
-    <a mat-stroked-button routerLink="/technician">Back to dashboard</a>
+    <div class="page-banner-actions">
+      <a class="banner-ghost" routerLink="/technician"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>Back to dashboard</a>
+    </div>
   </header>
 
   @if (loading()) {

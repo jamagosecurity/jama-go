@@ -134,6 +134,10 @@ export class ClientRegistrationsComponent implements OnInit {
 
   /** "Jane Doe <jane@jamago.qa>" reads as "Jane Doe" — the address is the
    *  same company domain on every row and only adds noise. */
+  protected teamNames(item: { teams: { name: string }[] }): string {
+    return item.teams.map((t) => t.name).join(', ');
+  }
+
   protected reviewer(name: string | null): string {
     return (name ?? '').replace(/\s*<[^>]*>\s*$/, '').trim();
   }

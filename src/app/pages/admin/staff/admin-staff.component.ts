@@ -28,6 +28,8 @@ export class AdminStaffComponent {
   readonly staff = signal<AdminStaffMember[]>([]);
   readonly loading = signal(true);
   readonly deletingId = signal<string | null>(null);
+  /** The row showing its Delete / Keep confirmation, as the quotation list does. */
+  readonly pendingDeleteId = signal<string | null>(null);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly query = signal('');
@@ -104,10 +106,6 @@ export class AdminStaffComponent {
       return;
     }
 
-    if (!confirm(`Delete ${member.fullName}?`)) {
-      return;
-    }
-
     this.deletingId.set(member.id);
     this.error.set(null);
     this.success.set(null);
@@ -120,6 +118,7 @@ export class AdminStaffComponent {
       )
       .subscribe({
         next: () => {
+          this.pendingDeleteId.set(null);
           this.success.set(`${member.fullName} deleted.`);
           this.loadStaff();
         },

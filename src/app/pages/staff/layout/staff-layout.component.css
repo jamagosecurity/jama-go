@@ -7,9 +7,9 @@
   display: grid;
   grid-template-columns: var(--sidebar) 1fr;
   background:
-    radial-gradient(circle at 12% 10%, rgba(37, 148, 210, 0.16), transparent 28%),
-    radial-gradient(circle at 90% 0%, rgba(246, 153, 61, 0.18), transparent 26%),
-    linear-gradient(180deg, #eef6fc 0%, #f7fafc 42%, #f3f7fb 100%);
+    radial-gradient(circle at 12% 10%, rgba(50, 90, 160, 0.16), transparent 28%),
+    radial-gradient(circle at 90% 0%, rgba(163, 161, 144, 0.18), transparent 26%),
+    linear-gradient(180deg, #f0f4fa 0%, #f7f9fc 42%, #f3f6fb 100%);
 }
 
 .staff-sidebar {
@@ -20,10 +20,10 @@
   flex-direction: column;
   gap: 18px;
   padding: 16px 14px 14px;
-  color: #e8f3fb;
+  color: #eaf0f9;
   background:
-    linear-gradient(165deg, rgba(20, 120, 180, 0.22), transparent 42%),
-    linear-gradient(180deg, #0b1f33 0%, #102a42 55%, #0d2236 100%);
+    linear-gradient(165deg, rgba(41, 73, 129, 0.22), transparent 42%),
+    linear-gradient(180deg, #14294c 0%, #1b3462 55%, #152c52 100%);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
 }
@@ -41,7 +41,7 @@
   border-radius: 16px;
   background: #ffffff;
   box-shadow:
-    0 18px 34px -18px rgba(2, 12, 24, 0.7),
+    0 18px 34px -18px rgba(9, 18, 35, 0.7),
     0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
@@ -55,7 +55,7 @@
 
 .staff-eyebrow {
   display: inline-flex;
-  color: #7dd3fc;
+  color: #6f93d2;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -102,7 +102,7 @@
   align-items: center;
   padding: 12px;
   border-radius: 18px;
-  color: #d7e7f4;
+  color: #d8e2f3;
   border: 1px solid transparent;
   transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
@@ -115,7 +115,7 @@
 .staff-nav a small {
   display: block;
   margin-top: 2px;
-  color: #8eadc4;
+  color: #6d86b3;
   font-size: 0.76rem;
 }
 
@@ -144,8 +144,8 @@
 }
 
 .staff-nav a.active {
-  background: linear-gradient(120deg, rgba(246, 153, 61, 0.22), rgba(37, 148, 210, 0.28));
-  border-color: rgba(125, 211, 252, 0.22);
+  background: linear-gradient(120deg, rgba(163, 161, 144, 0.22), rgba(50, 90, 160, 0.28));
+  border-color: rgba(111, 147, 210, 0.22);
 }
 
 .staff-nav a.active .nav-icon {
@@ -180,7 +180,7 @@
   height: 44px;
   border-radius: 14px;
   font-weight: 800;
-  color: #10233a;
+  color: #183059;
   background: var(--admin-avatar-grad);
 }
 
@@ -190,7 +190,7 @@
 }
 
 .staff-user-meta small {
-  color: #94b4cb;
+  color: #718bba;
   font-size: 0.76rem;
   word-break: break-all;
 }
@@ -201,7 +201,7 @@
   padding: 9px 12px;
   border-radius: 12px;
   cursor: pointer;
-  color: #e8f3fb;
+  color: #eaf0f9;
   font: inherit;
   font-weight: 700;
   font-size: 0.85rem;
@@ -227,7 +227,7 @@
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(15, 40, 70, 0.08);
+  border: 1px solid rgba(26, 55, 103, 0.08);
   color: #334155;
   font-size: 0.8rem;
   font-weight: 700;
@@ -254,28 +254,6 @@
   min-width: 0;
 }
 
-@media (max-width: 980px) {
-  .staff-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .staff-sidebar {
-    position: relative;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .staff-logo-badge {
-    max-width: 260px;
-  }
-
-  .staff-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  }
-
 /* ===== Nested nav ===== */
 
 /* Kept together, so the gap between nav rows does not open up between a heading
@@ -289,7 +267,7 @@
   gap: 1px;
   margin: 2px 0 4px 32px;
   padding-left: 22px;
-  border-left: 1px solid rgba(215, 231, 244, 0.16);
+  border-left: 1px solid rgba(216, 226, 243, 0.16);
 }
 
 /* Deliberately not the tile-and-two-line treatment the parent rows get. These
@@ -301,7 +279,7 @@
   padding: 7px 12px;
   border: none;
   border-radius: 10px;
-  color: rgba(215, 231, 244, 0.72);
+  color: rgba(216, 226, 243, 0.72);
   font-size: 0.85rem;
   font-weight: 650;
 }
@@ -309,7 +287,7 @@
 .staff-nav .nav-subs a:hover {
   transform: none;
   background: rgba(255, 255, 255, 0.07);
-  color: #eaf4ff;
+  color: #eff3fa;
 }
 
 /* Quieter than an active parent: a child says where you are, the parent says
@@ -329,7 +307,13 @@
   flex: 0 0 auto;
 }
 .nav-dot--ok { background: #57c2b0; }
-.nav-dot--no { background: #f2708d; }
+.nav-dot--no { background: #f27074; }
+.nav-dot--moi { background: #6e92d1; }
+.nav-dot--non { background: #bebdb2; }
+
+/* The group heading only names the two lists under it, so it is not a link:
+   no pointer, no hover lift. */
+.staff-nav a.nav-parent { pointer-events: none; cursor: default; }
 
 /* ===== Top bar ===== */
 
@@ -344,6 +328,743 @@
   padding: 18px 28px 0;
 }
 
-@media (max-width: 620px) {
-  .staff-topbar { padding: 14px 16px 0; }
+/* Without the bell there is nothing for the bar to hold on a desktop. */
+.staff-topbar:not(.has-bell) { display: none; }
+
+/* ===== Phones & small tablets: the sidebar becomes a drawer =====
+   Stacked above the page it pushed every screen a full nav-length down, so on
+   a phone nothing but the menu was visible on arrival. It now waits behind a
+   Menu button in the top bar and slides in over the page when asked for. */
+
+.staff-menu-btn,
+.staff-topbar-logo,
+.staff-drawer-close,
+.staff-backdrop {
+  display: none;
 }
+
+@media (max-width: 980px) {
+  .staff-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .staff-sidebar {
+    position: fixed;
+    z-index: 80;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(300px, 86vw);
+    height: 100dvh;
+    transform: translateX(-105%);
+    transition: transform 0.26s ease;
+  }
+  .staff-shell.is-menu-open .staff-sidebar {
+    transform: none;
+    box-shadow: 18px 0 50px rgba(16, 34, 64, 0.45);
+  }
+
+  .staff-backdrop {
+    display: block;
+    position: fixed;
+    z-index: 70;
+    inset: 0;
+    background: rgba(16, 34, 64, 0.5);
+    backdrop-filter: blur(2px);
+    animation: staff-fade-in 0.2s ease both;
+  }
+
+  .staff-drawer-close {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    z-index: 2;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .staff-logo-badge { max-width: 210px; }
+
+  .staff-topbar,
+  .staff-topbar:not(.has-bell) {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid var(--admin-line);
+    backdrop-filter: blur(12px);
+  }
+
+  .staff-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--admin-line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--admin-ink);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 750;
+    cursor: pointer;
+  }
+  .staff-menu-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  .staff-topbar-logo {
+    display: block;
+    width: auto;
+    height: 30px;
+    margin-right: auto;
+  }
+
+  .staff-content { padding: 18px 16px 32px; }
+}
+
+@media (max-width: 420px) {
+  .staff-menu-btn span { display: none; }
+}
+
+@keyframes staff-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== Compact sidebar =====
+   Seventeen two-line rows made the rail scroll and read as a wall of boxes.
+   One line per entry, smaller icon tiles and short group headings fit the
+   whole menu on a laptop screen. Later rules win. */
+
+.staff-nav { gap: 3px; }
+.staff-nav a { padding: 8px 10px; gap: 10px; grid-template-columns: 34px 1fr; border-radius: 13px; }
+.staff-nav a strong { font-size: 0.92rem; }
+/* The one-line descriptions are decoration; the title says where the link goes. */
+.staff-nav > a small,
+.staff-nav > .nav-group > a small { display: none; }
+.staff-nav .nav-icon { width: 34px; height: 34px; border-radius: 11px; }
+.staff-nav .nav-icon svg { width: 16px; height: 16px; }
+.staff-nav .nav-subs { margin: 0 0 2px 26px; padding-left: 18px; }
+.staff-nav .nav-subs a { padding: 6px 10px; }
+
+.nav-label {
+  margin: 10px 0 2px;
+  padding: 0 12px;
+  color: rgba(233, 238, 248, 0.5);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.nav-label:first-child { margin-top: 2px; }
+
+/* ===== Luxe icons =====
+   The rainbow of bright tiles with a dark glyph is replaced by one restrained
+   look: frosted-glass tiles, a champagne-gold hairline and a gold glyph. The
+   current page is the one gold-filled tile, on a softly lit row. */
+
+.staff-nav a .nav-icon {
+  position: relative;
+  color: #cfcfc8;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
+    rgba(16, 34, 64, 0.35);
+  border: 1px solid rgba(207, 207, 200, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -8px 14px -10px rgba(207, 207, 200, 0.35),
+    0 8px 16px -10px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+}
+.staff-nav a .nav-icon svg {
+  stroke-width: 1.55;
+  filter: drop-shadow(0 0 4px rgba(207, 207, 200, 0.55));
+}
+.staff-nav a:hover .nav-icon {
+  color: #ededeb;
+  border-color: rgba(207, 207, 200, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 0 0 3px rgba(207, 207, 200, 0.12),
+    0 10px 20px -10px rgba(207, 207, 200, 0.6);
+}
+
+.staff-nav a.active {
+  color: #fff;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.06));
+  border-color: rgba(207, 207, 200, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 14px 28px -18px rgba(0, 0, 0, 0.7);
+}
+.staff-nav a.active small { color: rgba(255, 255, 255, 0.78); }
+.staff-nav a.active .nav-icon {
+  color: #22221e;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  border-color: rgba(237, 237, 235, 0.85);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 8px 18px -8px rgba(181, 180, 168, 0.8);
+  transform: none;
+}
+.staff-nav a.active .nav-icon svg { filter: none; }
+.staff-sidebar-foot .signout { padding: 7px 12px; font-size: 0.82rem; }
+
+/* ===== Midnight & gold =====
+   The rail was a bright blue wash with boxed icons. This takes it to a deep
+   midnight panel with a faint gold glow, ivory type, thin gold-ring icons, and
+   a gold bar and wash on the current page. Later rules win over everything above. */
+
+.staff-sidebar {
+  background:
+    radial-gradient(120% 55% at 50% -10%, rgba(165, 164, 148, 0.22), transparent 60%),
+    linear-gradient(180deg, #132649 0%, #11203d 52%, #0d1a2d 100%);
+  border-right: 1px solid rgba(165, 164, 148, 0.22);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04), 18px 0 60px -40px rgba(0, 0, 0, 0.9);
+}
+.staff-sidebar::before {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(165, 164, 148, 0.18), transparent 45%),
+    radial-gradient(circle at 80% 90%, rgba(50, 90, 160, 0.16), transparent 50%);
+  opacity: 0.7;
+}
+
+.staff-nav a {
+  color: #e6e6e3;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.staff-nav a strong { font-weight: 600; letter-spacing: 0.012em; color: inherit; }
+.staff-nav a::before { display: none; }
+.staff-nav a:hover { background: rgba(165, 164, 148, 0.08); transform: none; }
+
+/* Icon: a thin gold ring, glyph in gold line-art — no filled box. */
+.staff-nav a .nav-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #b8b7ac;
+  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(165, 164, 148, 0.45);
+  box-shadow: inset 0 0 12px -4px rgba(165, 164, 148, 0.35);
+  backdrop-filter: none;
+}
+.staff-nav a .nav-icon svg { width: 17px; height: 17px; stroke-width: 1.4; filter: none; }
+.staff-nav a:hover .nav-icon {
+  color: #dcdcd7;
+  border-color: rgba(182, 180, 168, 0.85);
+  box-shadow: inset 0 0 12px -2px rgba(182, 180, 168, 0.5), 0 0 14px -4px rgba(182, 180, 168, 0.55);
+  transform: none;
+}
+
+/* Current page: soft gold wash, a gold bar on the edge, and a filled gold ring. */
+.staff-nav a.active {
+  position: relative;
+  color: #f3f3f2;
+  background: linear-gradient(100deg, rgba(165, 164, 148, 0.2), rgba(165, 164, 148, 0.03) 85%);
+  border-color: rgba(165, 164, 148, 0.35);
+  box-shadow: none;
+}
+.staff-nav a.active::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, #d5d4ce, #8f8d77);
+  box-shadow: 0 0 10px rgba(181, 180, 168, 0.7);
+}
+.staff-nav a.active strong { font-weight: 700; }
+.staff-nav a.active .nav-icon {
+  color: #22221e;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  border-color: rgba(237, 237, 235, 0.9);
+  box-shadow: 0 0 16px -2px rgba(181, 180, 168, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.staff-nav .nav-label { color: rgba(165, 164, 148, 0.75); letter-spacing: 0.2em; }
+.staff-nav .nav-subs { border-left-color: rgba(165, 164, 148, 0.25); }
+.staff-nav .nav-subs a { color: rgba(230, 230, 227, 0.75); border-radius: 9px; }
+.staff-nav .nav-subs a:hover { background: rgba(165, 164, 148, 0.08); color: #f3f3f2; }
+.staff-nav .nav-subs a.active { background: rgba(165, 164, 148, 0.16); color: #f3f3f2; border-color: transparent; }
+.staff-nav .nav-subs a.active::after { display: none; }
+
+.nav-count { box-shadow: 0 0 0 2px #11203d; }
+
+.staff-sidebar-foot .signout {
+  color: #e6e6e3 !important;
+  background: transparent !important;
+  border: 1px solid rgba(165, 164, 148, 0.4) !important;
+}
+.staff-sidebar-foot .signout:hover {
+  color: #121210 !important;
+  background: linear-gradient(145deg, #dededa, #b5b4a8) !important;
+  border-color: transparent !important;
+}
+
+/* ===== Show that there is more =====
+   Entries below the first screen looked missing. Tighter rows, and a soft fade
+   at the bottom edge so a scrolling menu reads as scrolling. */
+
+.staff-nav { padding-bottom: 22px; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); scrollbar-color: rgba(165, 164, 148, 0.5) transparent; }
+.staff-nav a { padding: 6px 10px; }
+.staff-nav .nav-label { margin: 8px 0 0; }
+.staff-nav .nav-subs a { padding: 5px 10px; }
+
+/* ===== Hierarchy, brighter icons, one alignment =====
+   Level 1  section heading   (People / Operations / Catalogue & sales)
+   Level 2  entry or group    (Staff … Inventory, Quotation, Drawings)
+   Level 3  sub-entry         (Moi / Non-MOI Inventory, Approved / Rejected)
+   Everything hangs off two vertical lines: the icon column (x = 10-46px) and
+   the text column (x = 56px), so the three levels line up row after row. */
+
+/* Level 1 — a gold diamond, the title, and a rule that fades out to the right. */
+.staff-nav .nav-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 4px;
+  padding: 0 10px;
+  color: #b9b8ac;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+.staff-nav .nav-label::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(135deg, #dededa, #8f8d77);
+  transform: rotate(45deg);
+  box-shadow: 0 0 8px rgba(185, 184, 172, 0.8);
+}
+.staff-nav .nav-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(185, 184, 172, 0.55), transparent);
+}
+
+/* Level 2 — brighter ring and glyph. */
+.staff-nav a .nav-icon {
+  color: #d0cfc9;
+  background: radial-gradient(circle at 30% 22%, rgba(206, 206, 199, 0.3), rgba(165, 164, 148, 0.07) 70%);
+  border-color: rgba(188, 187, 176, 0.75);
+  box-shadow: inset 0 0 14px -3px rgba(188, 187, 176, 0.55), 0 0 12px -5px rgba(188, 187, 176, 0.6);
+}
+.staff-nav a .nav-icon svg {
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 5px rgba(193, 192, 182, 0.75));
+}
+.staff-nav a:hover .nav-icon {
+  color: #e7e7e4;
+  border-color: #ccccc5;
+  box-shadow: inset 0 0 14px -2px rgba(206, 206, 199, 0.7), 0 0 18px -3px rgba(188, 187, 176, 0.85);
+}
+
+/* Level 3 — a tree: one vertical rule under the parent's icon, a short branch
+   into each child, and the child's text on the same column as the parent's. */
+.staff-nav .nav-subs {
+  position: relative;
+  margin: 0 0 4px 27px;
+  padding: 0 0 0 0;
+  border-left: 1px solid rgba(185, 184, 172, 0.4);
+}
+.staff-nav .nav-subs a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-left: 0;
+  padding: 6px 10px 6px 29px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+.staff-nav .nav-subs a::before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 16px;
+  height: 1px;
+  background: rgba(185, 184, 172, 0.4);
+}
+.staff-nav .nav-subs a.active::before { background: #ccccc5; box-shadow: 0 0 6px rgba(204, 204, 197, 0.8); }
+.staff-nav .nav-dot { width: 8px; height: 8px; box-shadow: 0 0 8px currentColor; }
+.staff-nav .nav-dot--ok { background: #5fe0c4; color: #5fe0c4; }
+.staff-nav .nav-dot--no { background: #f7878a; color: #f7878a; }
+.staff-nav .nav-dot--moi { background: #8aa7da; color: #8aa7da; }
+.staff-nav .nav-dot--non { background: #c8c8c0; color: #c8c8c0; }
+
+/* ===== Profile card =====
+   A single gold-edged card: ringed avatar, name, a small role tag, and a round
+   sign-out icon — in place of the avatar, three text lines and a full-width
+   Sign out button. */
+.staff-sidebar .staff-user {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 12px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(165, 164, 148, 0.16), rgba(255, 255, 255, 0.04) 70%);
+  border: 1px solid rgba(165, 164, 148, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 14px 28px -18px rgba(0, 0, 0, 0.8);
+}
+.staff-sidebar .staff-avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #22221e;
+  font-size: 0.9rem;
+  font-weight: 800;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  border: 2px solid rgba(237, 237, 235, 0.85);
+  box-shadow: 0 0 0 3px rgba(165, 164, 148, 0.22), 0 8px 18px -8px rgba(181, 180, 168, 0.8);
+}
+.staff-sidebar .staff-user-meta { min-width: 0; display: grid; gap: 1px; }
+.staff-sidebar .staff-user-meta p {
+  margin: 0;
+  overflow: hidden;
+  color: #f3f3f2;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.staff-sidebar .staff-user-meta small {
+  overflow: hidden;
+  color: rgba(230, 230, 227, 0.65);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.staff-sidebar .profile-role {
+  width: fit-content;
+  margin-top: 3px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(165, 164, 148, 0.2);
+  color: #b9b8ac;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.staff-sidebar .profile-logout {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid rgba(165, 164, 148, 0.5);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: #b9b8ac;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.staff-sidebar .profile-logout svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.staff-sidebar .profile-logout:hover,
+.staff-sidebar .profile-logout:focus-visible {
+  background: linear-gradient(145deg, #dededa, #b5b4a8);
+  border-color: transparent;
+  color: #121210;
+  box-shadow: 0 0 16px -2px rgba(181, 180, 168, 0.7);
+  outline: none;
+}
+
+/* Room for a full name: slightly smaller avatar and type. */
+.staff-sidebar .staff-user { grid-template-columns: 38px minmax(0, 1fr) 34px; gap: 8px; padding: 10px 9px 10px 10px; }
+.staff-sidebar .staff-avatar { width: 38px; height: 38px; font-size: 0.82rem; }
+.staff-sidebar .staff-user-meta p { font-size: 0.82rem; }
+.staff-sidebar .profile-logout { width: 34px; height: 34px; }
+
+/* ===== Logo on the midnight panel =====
+   The gold logo is drawn for a dark ground, so the white plate it used to sit on
+   is gone: it floats on the panel with a fine gold rule beneath. */
+.staff-sidebar .staff-logo-badge {
+  background: transparent;
+  box-shadow: none;
+  padding: 4px 6px 12px;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(165, 164, 148, 0.3);
+  position: relative;
+}
+.staff-sidebar .staff-logo-badge::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(135deg, #dededa, #8f8d77);
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 0 0 8px rgba(185, 184, 172, 0.8);
+}
+.staff-sidebar .staff-logo { filter: drop-shadow(0 4px 14px rgba(165, 164, 148, 0.25)); max-width: 100%; }
+
+/* ===== Bigger, brighter icons =====
+   The glyphs were ~17px, thin and a dull gold inside a 36px ring. Now a 40px
+   ring, a 21px glyph with a firmer line, a soft gold fill inside the shapes, and
+   a brighter gold that still reads against the midnight panel. */
+.staff-nav { gap: 4px; }
+.staff-nav a { grid-template-columns: 40px 1fr; gap: 12px; padding: 6px 10px; }
+.staff-nav a .nav-icon {
+  width: 40px;
+  height: 40px;
+  color: #d3d2cc;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(215, 215, 210, 0.42), rgba(165, 164, 148, 0.1) 70%);
+  border: 1.5px solid rgba(188, 187, 176, 0.8);
+  box-shadow:
+    inset 0 0 16px -3px rgba(188, 187, 176, 0.6),
+    0 0 14px -5px rgba(188, 187, 176, 0.65);
+}
+.staff-nav a .nav-icon svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.75;
+  fill: rgba(211, 210, 204, 0.16);
+  filter: drop-shadow(0 0 5px rgba(193, 192, 182, 0.7));
+}
+.staff-nav a:hover .nav-icon {
+  color: #eaeae7;
+  border-color: #d4d3cd;
+  box-shadow: inset 0 0 16px -2px rgba(215, 215, 210, 0.8), 0 0 20px -3px rgba(188, 187, 176, 0.9);
+}
+.staff-nav a.active .nav-icon { color: #22221e; }
+.staff-nav a.active .nav-icon svg { fill: rgba(34, 34, 30, 0.16); }
+.staff-nav a strong { font-size: 0.95rem; }
+
+/* The logo, larger — the panel is 300px wide and it used to leave dead space. */
+.staff-sidebar .staff-logo-badge { padding: 2px 4px 14px; }
+.staff-sidebar .staff-logo { width: 100%; max-width: 262px; height: auto; display: block; margin: 0 auto; }
+
+/* ===== Group arrows =====
+   Inventory, Quotation and Drawings fold their sub-links away; the chevron on the
+   right shows the state and turns when open. */
+.staff-nav .nav-group { position: relative; }
+.staff-nav a.nav-parent { pointer-events: auto; cursor: pointer; }
+.staff-nav .nav-group > a { padding-right: 52px; }
+.nav-chevron {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(165, 164, 148, 0.45);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: #b9b8ac;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.nav-chevron svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s ease;
+}
+.nav-chevron:hover,
+.nav-chevron:focus-visible { background: rgba(165, 164, 148, 0.22); color: #eaeae7; outline: none; }
+.nav-chevron.is-open { background: rgba(165, 164, 148, 0.2); border-color: rgba(185, 184, 172, 0.8); }
+.nav-chevron.is-open svg { transform: rotate(180deg); }
+
+/* ===== Sub-sections: MOI and Non-MOI inside the Inspection panel ===== */
+.staff-nav .nav-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 2px 10px;
+  padding: 3px 12px 3px 8px;
+  width: fit-content;
+  border-radius: 999px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.staff-nav .nav-sub i { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+.staff-nav .nav-sub--moi { background: rgba(178, 164, 255, 0.16); color: #cfc6ff; }
+.staff-nav .nav-sub--moi i { background: #b2a4ff; }
+.staff-nav .nav-sub--non { background: rgba(255, 201, 137, 0.16); color: #ffd9a8; }
+.staff-nav .nav-sub--non i { background: #ffc989; }
+
+
+/* The current page is crimson: a filled ring and an edge bar. Everything else is stone. */
+.staff-nav a.active::after { background: linear-gradient(180deg, #e8383f, #a40f14); box-shadow: 0 0 10px rgba(210, 19, 25, 0.8); }
+.staff-nav a.active .nav-icon {
+  color: #fff;
+  background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 16px -2px rgba(210, 19, 25, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.staff-nav a.active .nav-icon svg { fill: rgba(255, 255, 255, 0.12); }
+
+/* ===== All four sidebar labels share one centred style: text between two fading rules.
+   Rules and sub-titles use the logo's red; section titles are larger and white. ===== */
+.staff-nav .nav-label,
+.staff-nav .nav-sub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: auto;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+.staff-nav .nav-label::before,
+.staff-nav .nav-sub::before,
+.staff-nav .nav-label::after,
+.staff-nav .nav-sub::after {
+  content: "";
+  flex: 1;
+  width: auto;
+  height: 2px;
+  border-radius: 2px;
+  transform: none;
+  box-shadow: none;
+}
+.staff-nav .nav-label::before, .staff-nav .nav-sub::before { background: linear-gradient(270deg, #e8383f, rgba(210, 19, 25, 0.12)); }
+.staff-nav .nav-label::after,  .staff-nav .nav-sub::after  { background: linear-gradient(90deg,  #e8383f, rgba(210, 19, 25, 0.12)); }
+.staff-nav .nav-sub i { display: none; }
+
+/* Big: the two section titles. */
+.staff-nav .nav-label {
+  margin: 18px 0 8px; padding: 0 6px;
+  font-size: 0.8rem; font-weight: 800; letter-spacing: 0.09em; color: #f0474d;
+}
+/* MOI and Non-MOI now match the section titles: same size, red, centred between red rules. */
+.staff-nav .nav-sub,
+.staff-nav .nav-sub--moi,
+.staff-nav .nav-sub--non {
+  margin: 18px 0 8px; padding: 0 6px; background: none;
+  font-size: 0.8rem; font-weight: 800; letter-spacing: 0.09em; color: #f0474d;
+}
+.staff-nav .nav-sub:first-child { margin-top: 4px; }
+
+/* Group arrows match the red section titles. */
+.nav-chevron { color: #f0474d; border-color: rgba(240, 71, 77, 0.6); }
+.nav-chevron:hover,
+.nav-chevron:focus-visible { background: rgba(210, 19, 25, 0.22); color: #ff7a7f; border-color: #f0474d; }
+.nav-chevron.is-open { background: rgba(210, 19, 25, 0.2); border-color: #f0474d; }
+
+
+/* =====================================================================
+   LIGHT THEME — clean, calm, white. Navy for text, crimson only for the
+   active item and the main buttons. Overrides everything above.
+   ===================================================================== */
+.staff-sidebar {
+  color: #14305f;
+  background: #ffffff;
+  border-right: 1px solid #e7e5df;
+  box-shadow: 1px 0 0 rgba(20, 48, 95, 0.02), 14px 0 40px -34px rgba(20, 48, 95, 0.35);
+}
+.staff-sidebar::before { display: none; }
+.staff-logo-badge { background: transparent; box-shadow: none; padding: 8px 10px; }
+.staff-nav { scrollbar-color: rgba(20, 48, 95, 0.22) transparent; }
+.staff-nav::-webkit-scrollbar-thumb { background: rgba(20, 48, 95, 0.18); }
+
+.staff-nav a { color: #14305f; background: transparent; border-color: transparent; box-shadow: none; }
+.staff-nav a strong { color: #14305f; font-weight: 650; }
+.staff-nav a small { color: #6b7280; }
+.staff-nav a:hover { background: #f6f4ef; transform: none; }
+.staff-nav a .nav-icon,
+.staff-nav .nav-icon {
+  color: #14305f;
+  background: #f1efe9;
+  border: 1px solid #e2dfd6;
+  box-shadow: none;
+}
+.staff-nav a:hover .nav-icon { transform: none; box-shadow: none; background: #ebe8df; }
+.staff-nav a.active { color: #14305f; background: #fdecec; border-color: #f4c7c9; box-shadow: none; }
+.staff-nav a.active::before { background: #d21319; }
+.staff-nav a.active strong { color: #a40f14; font-weight: 750; }
+.staff-nav a.active small { color: #6b7280; }
+.staff-nav a.active .nav-icon {
+  color: #fff;
+  background: #d21319;
+  border-color: #d21319;
+  box-shadow: 0 8px 16px -10px rgba(210, 19, 25, 0.8);
+  transform: none;
+}
+.nav-count { background: #e8e6df; color: #14305f; box-shadow: none; }
+.staff-nav a.active .nav-count { background: #d21319; color: #fff; }
+
+.staff-nav .nav-label,
+.staff-nav .nav-sub,
+.staff-nav .nav-sub--moi,
+.staff-nav .nav-sub--non { color: #c0141a; }
+.staff-nav .nav-label::before, .staff-nav .nav-sub::before { background: linear-gradient(270deg, rgba(210, 19, 25, 0.55), transparent); }
+.staff-nav .nav-label::after,  .staff-nav .nav-sub::after  { background: linear-gradient(90deg,  rgba(210, 19, 25, 0.55), transparent); }
+
+.nav-chevron { color: #c0141a; border-color: rgba(210, 19, 25, 0.45); background: #fff; }
+.nav-chevron:hover, .nav-chevron:focus-visible { background: #fdecec; color: #a40f14; border-color: #d21319; }
+.nav-chevron.is-open { background: #fdecec; border-color: #d21319; }
+.staff-nav .nav-subs a { color: #4a5567; }
+.staff-nav .nav-subs a:hover { background: #f6f4ef; color: #14305f; }
+.staff-nav .nav-subs a.active { background: #fdecec; color: #a40f14; }
+
+.staff-user { background: #f7f5f0; border: 1px solid #e7e5df; }
+.staff-user-meta p { color: #14305f; }
+.staff-user-meta small { color: #6b7280; }
+.staff-avatar { color: #14305f; background: #e8e6df; box-shadow: none; }
+.profile-role { background: #e8e6df; color: #14305f; }
+.profile-logout { color: #14305f; background: #fff; border: 1px solid #d3d0c6; }
+.profile-logout:hover { background: #fdecec; color: #a40f14; border-color: #d21319; }
+.signout { color: #14305f !important; background: #fff !important; border: 1px solid #d3d0c6 !important; }
+
+.staff-eyebrow { color: #d21319; }
+.staff-brand-copy h2 { color: #14305f; }
+.staff-drawer-close { color: #14305f; background: #f1efe9; border-color: #e2dfd6; }
+
+.staff-sidebar .staff-user { background: #f7f5f0; border: 1px solid #e7e5df; box-shadow: none; }
+.staff-sidebar .staff-avatar { color: #14305f; background: #e8e6df; border: 1px solid #d9d6cb; box-shadow: none; }
+.staff-sidebar .staff-user-meta p { color: #14305f; }
+.staff-sidebar .staff-user-meta small { color: #6b7280; }
+.staff-sidebar .profile-role { background: #e8e6df; color: #14305f; border-color: transparent; }
+.staff-sidebar .profile-logout { color: #14305f; background: #fff; border: 1px solid #d3d0c6; box-shadow: none; }
+.staff-sidebar .profile-logout:hover { background: #fdecec; color: #a40f14; border-color: #d21319; }

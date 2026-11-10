@@ -1,11 +1,16 @@
 <section class="admin-page dia-page dia-form-page">
-  <header class="admin-page-header">
-    <div>
-      <span class="admin-kicker">{{ isEdit ? 'Update record' : 'New inspection' }}</span>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 12l2 2 4-4M9 18h6" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">{{ isEdit ? 'Update record' : 'New inspection' }}</p>
       <h1>{{ isEdit ? 'Edit DIA inspection' : 'Create DIA inspection' }}</h1>
-      <p>{{ isEdit ? 'Update the client and DIA reference details.' : 'Add a client record before activating its inspection schedule.' }}</p>
+      <p class="page-banner-sub">{{ isEdit ? 'Update the client and DIA reference details.' : 'Add a client record before activating its inspection schedule.' }}</p>
     </div>
-    <a mat-stroked-button [routerLink]="[base, 'list']">Back to list</a>
+    <div class="page-banner-actions">
+      <a class="banner-ghost" [routerLink]="[base, 'list']">Back to list</a>
+    </div>
   </header>
 
   <div class="admin-panel">

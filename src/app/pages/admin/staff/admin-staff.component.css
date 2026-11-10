@@ -15,7 +15,7 @@
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: rgba(11, 31, 51, 0.36);
+  background: rgba(20, 41, 76, 0.36);
   backdrop-filter: blur(6px);
   animation: modal-backdrop-in 0.2s ease both;
 }
@@ -38,11 +38,11 @@
   border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 28px;
   background:
-    radial-gradient(circle at 100% 0%, rgba(246, 153, 61, 0.13), transparent 34%),
-    radial-gradient(circle at 0% 100%, rgba(37, 148, 210, 0.12), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(163, 161, 144, 0.13), transparent 34%),
+    radial-gradient(circle at 0% 100%, rgba(50, 90, 160, 0.12), transparent 34%),
     #fff;
   transform: translate(-50%, -50%);
-  box-shadow: 0 32px 90px -22px rgba(11, 31, 51, 0.62);
+  box-shadow: 0 32px 90px -22px rgba(20, 41, 76, 0.62);
 }
 
 .staff-modal-header {
@@ -52,7 +52,7 @@
   gap: 20px;
   margin-bottom: 28px;
   padding-bottom: 22px;
-  border-bottom: 1px solid rgba(15, 40, 70, 0.09);
+  border-bottom: 1px solid rgba(26, 55, 103, 0.09);
 }
 
 .staff-modal-title {
@@ -70,7 +70,7 @@
   border-radius: 17px;
   color: #fff;
   background: var(--admin-avatar-grad);
-  box-shadow: 0 16px 30px -16px rgba(37, 148, 210, 0.85);
+  box-shadow: 0 16px 30px -16px rgba(50, 90, 160, 0.85);
 }
 
 .staff-modal-icon svg {
@@ -101,16 +101,16 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(15, 40, 70, 0.1);
+  border: 1px solid rgba(26, 55, 103, 0.1);
   border-radius: 13px;
   color: #334155;
-  background: #f5f8fb;
+  background: #f5f7fb;
   cursor: pointer;
   transition: transform 0.18s ease, background 0.18s ease;
 }
 
 .staff-modal-close:hover {
-  background: #eaf3f9;
+  background: #eaf0f9;
   transform: rotate(5deg);
 }
 
@@ -143,13 +143,13 @@
   gap: 8px;
   font-size: 0.92rem;
   font-weight: 700;
-  color: #1a334d;
+  color: #234379;
 }
 
 .staff-form input,
 .staff-form textarea {
   width: 100%;
-  border: 1px solid rgba(15, 40, 70, 0.1);
+  border: 1px solid rgba(26, 55, 103, 0.1);
   min-height: 50px;
   border-radius: 15px;
   padding: 13px 15px;
@@ -161,8 +161,8 @@
 .staff-form input:focus,
 .staff-form textarea:focus {
   outline: none;
-  border-color: rgba(37, 148, 210, 0.45);
-  box-shadow: 0 0 0 4px rgba(37, 148, 210, 0.12);
+  border-color: rgba(50, 90, 160, 0.45);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
 }
 
 .field-help {
@@ -177,8 +177,8 @@
   gap: 12px;
   padding: 17px 18px;
   border-radius: 18px;
-  background: linear-gradient(120deg, rgba(37, 148, 210, 0.08), rgba(246, 153, 61, 0.1));
-  border: 1px solid rgba(37, 148, 210, 0.12);
+  background: linear-gradient(120deg, rgba(50, 90, 160, 0.08), rgba(163, 161, 144, 0.1));
+  border: 1px solid rgba(50, 90, 160, 0.12);
 }
 
 .staff-switch input {
@@ -204,99 +204,155 @@
   gap: 12px;
   margin-top: 26px;
   padding-top: 22px;
-  border-top: 1px solid rgba(15, 40, 70, 0.09);
+  border-top: 1px solid rgba(26, 55, 103, 0.09);
 }
 
-.staff-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+/* ===== Roster: a plain table, one line per person ===== */
+
+.staff-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-/* Layout only. The wash, border, rail and hover lift come from .surface-card
-   in styles.css; the hue rotation from .accent-cycle on the grid. --accent is
-   still read here, for the avatar and role chip. */
-.staff-card {
-  display: grid;
-  gap: 14px;
-  padding: 18px 18px 18px 22px;
+.staff-table-wrap { overflow-x: auto; }
+.staff-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 0.92rem; color: var(--admin-ink-soft, #204078); }
+.staff-table th,
+.staff-table td {
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(26, 55, 103, 0.08);
+  vertical-align: middle;
 }
-
-.staff-card--hidden {
-  opacity: 0.82;
-}
-
-.staff-card-top {
-  display: grid;
-  grid-template-columns: 48px 1fr auto;
-  gap: 12px;
-  align-items: center;
-}
-
-/* White initials on the old orange→blue gradient sat near 2:1 at the warm end.
-   Solid accent + white now, which also ties the avatar to the card's hue. */
-.staff-avatar {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
+.staff-table thead th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background: linear-gradient(135deg, #0d2040 0%, #143366 55%, #1d4589 100%);
   color: #fff;
+  font-size: 0.74rem;
   font-weight: 800;
-  background: linear-gradient(140deg,
-    color-mix(in srgb, var(--accent) 88%, #000),
-    color-mix(in srgb, var(--accent) 70%, #000));
-  box-shadow: 0 12px 24px -14px color-mix(in srgb, var(--accent) 90%, transparent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
+.staff-table thead th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+.staff-table thead th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+.staff-table tbody tr:hover { background: rgba(50, 90, 160, 0.05); }
+.staff-table tbody tr:last-child td { border-bottom: none; }
 
-.staff-card-meta h3 {
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: 1.05rem;
-  letter-spacing: -0.02em;
-  color: var(--admin-ink);
+.staff-table .col-name { color: var(--admin-ink); font-weight: 750; }
+/* Every department is a soft pill in its own colour — a tinted fill, a coloured
+   dot and matching ink — so the roster can be read by colour. Anything not
+   listed (a new department) takes the neutral slate. */
+.dept-chip {
+  --c: #475569;
+  --bg: rgba(71, 85, 105, 0.12);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--c);
+  font-size: 0.8rem;
+  font-weight: 750;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
-.staff-card-meta p {
-  color: color-mix(in srgb, var(--accent) 72%, #000);
-  font-size: 0.88rem;
-  font-weight: 800;
+.dept-chip::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 3px var(--bg);
 }
+.dept-chip[data-dept="Technician"] { --c: #0f766e; --bg: rgba(20, 184, 166, 0.16); }
+.dept-chip[data-dept="MOI DIA Inspection"] { --c: #6d28d9; --bg: rgba(139, 92, 246, 0.15); }
+.dept-chip[data-dept="MOI DIA Upload"] { --c: #3730a3; --bg: rgba(99, 102, 241, 0.15); }
+.dept-chip[data-dept="Panels"] { --c: #b45309; --bg: rgba(245, 158, 11, 0.18); }
+.dept-chip[data-dept="Operations"] { --c: #15803d; --bg: rgba(34, 197, 94, 0.15); }
+.dept-chip[data-dept="Client Services"] { --c: #be185d; --bg: rgba(236, 72, 153, 0.14); }
+.dept-chip[data-dept="Technical"] { --c: #0369a1; --bg: rgba(14, 165, 233, 0.16); }
+.staff-none { color: var(--admin-muted); }
+.staff-table th:nth-child(1) { width: 22%; }
+.staff-table th:nth-child(2) { width: 19%; }
+.staff-table th:nth-child(3) { width: 22%; }
+.staff-table th:nth-child(4) { width: auto; }
+.staff-table .col-actions { width: 170px; white-space: nowrap; }
+.staff-table td:not(.col-actions) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.staff-card-meta small {
-  display: block;
-  margin-top: 2px;
-  color: var(--admin-muted);
-  font-size: 0.76rem;
-  overflow-wrap: anywhere;
+.staff-row-actions { display: flex; align-items: center; justify-content: flex-start; gap: 6px; }
+/* The same row buttons the quotation list uses: a blue Edit pill, a trash icon,
+   and an inline Delete / Keep confirmation. */
+.row-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 1px solid var(--btn-line, var(--admin-line));
+  border-radius: 10px;
+  background: var(--btn-bg, #fff);
+  color: var(--btn-ink, var(--admin-ink-soft));
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
-
-.staff-copy {
-  color: var(--admin-muted);
-  font-size: 0.92rem;
-  line-height: 1.5;
-  min-height: 2.8em;
+.row-btn svg { width: 14px; height: 14px; flex: none; }
+.row-btn:hover { transform: translateY(-1px); }
+.row-btn:focus-visible { outline: 2px solid var(--admin-blue-deep); outline-offset: 2px; }
+.row-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
+.row-btn--icon { padding: 7px; width: 30px; height: 30px; justify-content: center; }
+.row-btn--icon svg { width: 16px; height: 16px; }
+.row-btn--edit { --btn-bg: rgba(50, 90, 160, 0.1); --btn-line: rgba(50, 90, 160, 0.28); --btn-ink: #2e5bab; }
+.row-btn--edit:hover { --btn-bg: var(--admin-blue-deep, #2a4c86); --btn-line: var(--admin-blue-deep, #2a4c86); --btn-ink: #fff; }
+.row-btn--delete { --btn-bg: #fff; --btn-line: var(--admin-line); --btn-ink: var(--admin-muted); }
+.row-btn--delete:hover { --btn-bg: rgba(225, 29, 36, 0.1); --btn-line: rgba(225, 29, 36, 0.4); --btn-ink: var(--jama-rose-ink, #9f1217); }
+.row-btn--danger {
+  --btn-bg: linear-gradient(135deg, #f2555a, #d92329);
+  --btn-line: #c81d23;
+  --btn-ink: #fff;
+  box-shadow: 0 4px 12px -4px rgba(217, 35, 41, 0.6);
 }
+.row-btn--danger:hover { --btn-bg: linear-gradient(135deg, #e84449, #c01c21); }
 
-.staff-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* .tag and .tag-soft became the shared .chip and .chip--muted in styles.css. */
-
-.staff-card-actions {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  gap: 8px;
-  padding-top: 4px;
-}
-
-@media (max-width: 900px) {
-  .staff-grid {
-    grid-template-columns: 1fr;
+/* Phones: each person becomes a small labelled block. */
+@media (max-width: 640px) {
+  .staff-table { table-layout: auto; }
+  .staff-table td:not(.col-actions) { overflow: visible; white-space: normal; }
+  .staff-table thead { display: none; }
+  .staff-table, .staff-table tbody, .staff-table tr, .staff-table td { display: block; width: 100%; }
+  .staff-table tr { padding: 10px 0; border-bottom: 1px solid rgba(26, 55, 103, 0.08); }
+  .staff-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 4px 4px;
+    border-bottom: none;
+    text-align: right;
   }
+  .staff-table td[data-label]::before {
+    content: attr(data-label);
+    color: var(--admin-muted);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .staff-table td.col-name { font-size: 1rem; }
+  .staff-table .col-actions { width: 100%; text-align: left; }
+  .staff-row-actions { justify-content: flex-start; padding-top: 6px; }
 }
 
 @media (max-width: 720px) {
@@ -328,3 +384,114 @@
     flex: 1;
   }
 }
+
+/* Every column centred under its header (the phone cards keep their own layout). */
+@media (min-width: 641px) {
+  .staff-table th,
+  .staff-table td { text-align: center; }
+  .staff-row-actions { justify-content: center; }
+}
+
+/* ===== Midnight banner, matching the staff editor ===== */
+.staff-banner {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  border: 1px solid rgba(165, 164, 148, 0.4);
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(165, 164, 148, 0.22), transparent 55%),
+    linear-gradient(135deg, #0e244e 0%, #112e62 55%, #163d7a 100%);
+  box-shadow: 0 24px 50px -30px rgba(13, 32, 64, 0.9);
+}
+.staff-banner-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: #22221e;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  border: 2px solid rgba(237, 237, 235, 0.85);
+  box-shadow: 0 0 0 4px rgba(165, 164, 148, 0.2), 0 10px 22px -8px rgba(181, 180, 168, 0.8);
+}
+.staff-banner-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.staff-banner-text { min-width: 0; flex: 1 1 auto; }
+.staff-banner-eyebrow { margin: 0; color: #b9b8ac; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
+.staff-banner h1 { margin: 2px 0 0; font-size: clamp(1.4rem, 2.2vw, 1.8rem); background: none; -webkit-background-clip: initial; background-clip: initial; color: #f3f3f2; }
+.staff-banner-sub { margin: 2px 0 0; color: rgba(230, 230, 227, 0.78); font-size: 0.9rem; }
+
+.staff-banner-add {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border: 1px solid #8f8d77;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  color: #181816;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 22px -10px rgba(181, 180, 168, 0.9);
+  transition: transform 0.18s ease, box-shadow 0.2s ease;
+}
+.staff-banner-add svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.staff-banner-add:hover { transform: translateY(-1px); box-shadow: 0 14px 26px -10px rgba(181, 180, 168, 1); }
+
+/* Search row: one card, the box takes the room, Refresh sits at the end. */
+.admin-toolbar {
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--admin-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+}
+.admin-toolbar .admin-search { flex: 1 1 auto; max-width: none; box-shadow: none; }
+.staff-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid rgba(165, 164, 148, 0.6);
+  border-radius: 999px;
+  background: #f8f8f7;
+  color: #3f3e36;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.staff-refresh svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.4s ease; }
+.staff-refresh:hover { background: #dededa; border-color: #8f8d77; }
+.staff-refresh:hover svg { transform: rotate(180deg); }
+
+@media (max-width: 640px) {
+  .staff-banner { flex-wrap: wrap; padding: 14px 16px; gap: 12px; }
+  .staff-banner-icon { width: 44px; height: 44px; }
+  .staff-banner-add { width: 100%; justify-content: center; min-height: 46px; }
+  .admin-toolbar { flex-direction: column; align-items: stretch; padding: 10px; }
+  .staff-refresh { justify-content: center; min-height: 44px; }
+}
+
+.staff-banner-add { background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%); border-color: #a40f14; color: #fff; box-shadow: 0 10px 22px -10px rgba(210, 19, 25, 0.75); }
+.staff-banner-add:hover { box-shadow: 0 14px 26px -10px rgba(210, 19, 25, 0.95); }
+
+
+/* LIGHT THEME */
+.staff-banner { background: #fff; border: 1px solid #e7e5df; box-shadow: 0 1px 2px rgba(20,48,95,.04), 0 16px 34px -26px rgba(20,48,95,.3); }
+.staff-banner-icon { color: #14305f; background: #f1efe9; border: 1px solid #e2dfd6; box-shadow: none; }
+.staff-banner-eyebrow { color: #d21319; }
+.staff-banner h1 { color: #14305f; }
+.staff-banner-sub { color: #6b7280; }
+.staff-banner-add { border: 0; background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%); color: #fff; box-shadow: 0 12px 24px -14px rgba(210, 19, 25, .9); }
+.staff-banner-add:hover { box-shadow: 0 16px 28px -12px rgba(210, 19, 25, 1); }

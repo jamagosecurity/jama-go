@@ -1,13 +1,20 @@
 <section class="admin-page dia-page">
-  <header class="admin-page-header">
-    <div>
-      <span class="admin-kicker">DIA operations</span>
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 12l2 2 4-4M9 18h6" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">DIA operations</p>
       <h1>Inspection dashboard</h1>
-      <p>Track active schedules and quarterly inspection progress.</p>
+      @if (state.dashboard(); as totals) {
+        <p class="page-banner-sub"><strong>{{ totals.total }}</strong> DIA {{ totals.total === 1 ? 'record' : 'records' }} · {{ totals.active }} active</p>
+      } @else {
+        <p class="page-banner-sub">Track active schedules and quarterly inspection progress.</p>
+      }
     </div>
-    <div class="dia-header-actions">
-      <a mat-stroked-button routerLink="list">View all inspections</a>
-      <a mat-flat-button routerLink="new">Create DIA</a>
+    <div class="page-banner-actions">
+      <a class="banner-ghost" routerLink="list">View all inspections</a>
+      <a class="banner-gold" routerLink="new">Create DIA</a>
     </div>
   </header>
 
@@ -23,31 +30,33 @@
       />
     </div>
   } @else if (state.dashboard(); as dashboard) {
-    <div class="dia-dashboard-grid">
-      <a class="dia-metric dia-metric--blue" routerLink="list">
-        <span>Total DIA records</span><strong>{{ dashboard.total }}</strong><small>All inspections</small>
-      </a>
-      <a class="dia-metric dia-metric--green" routerLink="list">
-        <span>Active</span><strong>{{ dashboard.active }}</strong><small>Running schedules</small>
-      </a>
-      <a class="dia-metric dia-metric--gray" routerLink="list" [queryParams]="{ status: 'Inactive' }">
-        <span>Inactive</span><strong>{{ dashboard.inactive }}</strong><small>Awaiting activation</small>
-      </a>
-      <a class="dia-metric dia-metric--q1" routerLink="list" [queryParams]="{ status: 'Quarter1' }">
-        <span>Quarter 1</span><strong>{{ dashboard.quarter1 }}</strong><small>25% progress</small>
-      </a>
-      <a class="dia-metric dia-metric--q2" routerLink="list" [queryParams]="{ status: 'Quarter2' }">
-        <span>Quarter 2</span><strong>{{ dashboard.quarter2 }}</strong><small>50% progress</small>
-      </a>
-      <a class="dia-metric dia-metric--q3" routerLink="list" [queryParams]="{ status: 'Quarter3' }">
-        <span>Quarter 3</span><strong>{{ dashboard.quarter3 }}</strong><small>75% progress</small>
-      </a>
-      <a class="dia-metric dia-metric--q4" routerLink="list" [queryParams]="{ status: 'Quarter4' }">
-        <span>Quarter 4</span><strong>{{ dashboard.quarter4 }}</strong><small>100% progress</small>
-      </a>
-      <a class="dia-metric dia-metric--completed" routerLink="list" [queryParams]="{ status: 'Completed' }">
-        <span>Completed</span><strong>{{ dashboard.completed }}</strong><small>Inspection cycles closed</small>
-      </a>
+    <!-- Each count is a shortcut into the list, filtered to that status. -->
+    <div class="admin-panel dia-status-panel">
+      <div class="dia-pill-row" aria-label="Records by state">
+        <a class="dia-pill" routerLink="list"><i class="dia-dot dia-dot--all"></i>Total <b>{{ dashboard.total }}</b></a>
+        <a class="dia-pill" routerLink="list"><i class="dia-dot dia-dot--active"></i>Active <b>{{ dashboard.active }}</b></a>
+        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Inactive' }"><i class="dia-dot dia-dot--inactive"></i>Inactive <b>{{ dashboard.inactive }}</b></a>
+      </div>
+
+      <p class="dia-progress-title">Inspection progress <small>by quarter reached</small></p>
+      <div class="dia-pill-row">
+        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Quarter1' }"><i class="dia-dot dia-dot--q1"></i>Quarter 1 <small>25%</small><b>{{ dashboard.quarter1 }}</b></a>
+        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Quarter2' }"><i class="dia-dot dia-dot--q2"></i>Quarter 2 <small>50%</small><b>{{ dashboard.quarter2 }}</b></a>
+        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Quarter3' }"><i class="dia-dot dia-dot--q3"></i>Quarter 3 <small>75%</small><b>{{ dashboard.quarter3 }}</b></a>
+        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Quarter4' }"><i class="dia-dot dia-dot--q4"></i>Quarter 4 <small>100%</small><b>{{ dashboard.quarter4 }}</b></a>
+        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Completed' }"><i class="dia-dot dia-dot--done"></i>Completed <b>{{ dashboard.completed }}</b></a>
+      </div>
+
+      @let stages = dashboard.quarter1 + dashboard.quarter2 + dashboard.quarter3 + dashboard.quarter4 + dashboard.completed;
+      @if (stages > 0) {
+        <div class="dia-stack" role="img" aria-label="Share of inspections at each stage">
+          <span class="dia-dot--q1" [style.flex-grow]="dashboard.quarter1"></span>
+          <span class="dia-dot--q2" [style.flex-grow]="dashboard.quarter2"></span>
+          <span class="dia-dot--q3" [style.flex-grow]="dashboard.quarter3"></span>
+          <span class="dia-dot--q4" [style.flex-grow]="dashboard.quarter4"></span>
+          <span class="dia-dot--done" [style.flex-grow]="dashboard.completed"></span>
+        </div>
+      }
     </div>
   }
 </section>

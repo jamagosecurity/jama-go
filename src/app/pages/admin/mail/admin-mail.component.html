@@ -1,0 +1,179 @@
+<section class="admin-page mail-page">
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z" /><path d="m4 7 8 6 8-6" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">Company mailboxes</p>
+      <h1>Company mail</h1>
+      <p class="page-banner-sub">
+        {{ total() }} {{ total() === 1 ? 'message' : 'messages' }} across {{ accounts().length }} mailboxes — coming in and going out
+      </p>
+    </div>
+    <div class="page-banner-actions">
+      @if (senders().length) {
+        <button type="button" class="banner-gold" (click)="openNew()">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+          New mail
+        </button>
+      }
+      <button type="button" class="banner-ghost" (click)="load()">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  @if (notice()) { <p class="mail-notice">{{ notice() }}</p> }
+  @if (error()) { <p class="admin-error">{{ error() }}</p> }
+  @if (noneConfigured()) {
+    <p class="admin-error">No mailbox has a password yet. Add them in the private settings file (see appsettings.mail.example.json), then restart the API.</p>
+  }
+  @for (a of failing(); track a.key) {
+    <p class="admin-error"><strong>{{ a.address }}</strong> could not be read: {{ a.lastError }}</p>
+  }
+
+  <div class="mail-chips" role="tablist" aria-label="Mailbox">
+    <button type="button" class="mail-chip" [class.is-on]="!account()" (click)="pickAccount('')">All mailboxes</button>
+    @for (a of accounts(); track a.key) {
+      <button type="button" class="mail-chip" [class.is-on]="account() === a.key" [class.is-off]="!a.configured"
+        (click)="pickAccount(a.key)" [title]="a.address">
+        {{ a.address }}
+        <b>{{ a.inboxCount + a.sentCount }}</b>
+      </button>
+    }
+  </div>
+
+  <div class="admin-toolbar mail-toolbar">
+    <label class="admin-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+      <input type="search" placeholder="Search sender, recipient, subject…" [value]="search()"
+        (input)="onSearch($any($event.target).value)" />
+    </label>
+    <div class="mail-seg" role="group" aria-label="Direction">
+      <button type="button" [class.is-on]="!folder()" (click)="pickFolder('')">All</button>
+      <button type="button" [class.is-on]="folder() === 'Inbox'" (click)="pickFolder('Inbox')">Incoming</button>
+      <button type="button" [class.is-on]="folder() === 'Sent'" (click)="pickFolder('Sent')">Outgoing</button>
+    </div>
+  </div>
+
+  <div class="mail-table-wrap">
+    <table class="mail-table">
+      <thead>
+        <tr><th></th><th>Mailbox</th><th>From / To</th><th>Subject</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        @for (m of items(); track m.id) {
+          <tr (click)="view(m)" [class.is-opening]="opening() === m.id" tabindex="0" (keydown.enter)="view(m)">
+            <td><span class="mail-dir" [class.is-out]="m.folder === 'Sent'">{{ m.folder === 'Sent' ? 'Out' : 'In' }}</span></td>
+            <td class="mail-box">{{ m.accountAddress }}</td>
+            <td class="mail-party">{{ party(m) }}</td>
+            <td class="mail-subject">
+              <strong>{{ m.subject || '(no subject)' }}</strong>
+              <small>{{ m.snippet }}</small>
+            </td>
+            <td class="mail-date">
+              {{ m.sentAt | date: 'd MMM y, HH:mm' }}
+              @if (m.hasAttachments) { <span title="Has attachments">📎</span> }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5" class="mail-empty">{{ loading() ? 'Loading…' : 'No messages yet.' }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (pages() > 1) {
+    <div class="mail-pager">
+      <button type="button" (click)="goto(page() - 1)" [disabled]="page() === 1">Newer</button>
+      <span>Page {{ page() }} of {{ pages() }}</span>
+      <button type="button" (click)="goto(page() + 1)" [disabled]="page() === pages()">Older</button>
+    </div>
+  }
+
+  @if (open(); as m) {
+    <div class="mail-overlay" (click)="close()">
+      <article class="mail-viewer" (click)="$event.stopPropagation()" role="dialog" aria-label="Message">
+        <header>
+          <div>
+            <h2>{{ m.subject || '(no subject)' }}</h2>
+            <p><span class="mail-dir" [class.is-out]="m.folder === 'Sent'">{{ m.folder === 'Sent' ? 'Out' : 'In' }}</span>
+              Mailbox <strong>{{ m.accountAddress }}</strong></p>
+            <p>From <strong>{{ m.fromName }}</strong> &lt;{{ m.fromAddress }}&gt;</p>
+            <p>To {{ m.toAddresses }}</p>
+            <p>{{ m.sentAt | date: 'EEEE d MMM y, HH:mm' }}</p>
+            @if (m.hasAttachments) { <p>📎 {{ m.attachmentNames }} <em>(files are not stored)</em></p> }
+          </div>
+          <button type="button" class="mail-close" (click)="close()" aria-label="Close">×</button>
+        </header>
+        @if (senders().length) {
+          <div class="mail-actions">
+            <button type="button" class="mail-act mail-act--main" (click)="reply(m)">
+              <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 6 6v3" /></svg>Reply
+            </button>
+            <button type="button" class="mail-act" (click)="forward(m)">
+              <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /><path d="M20 9H10a6 6 0 0 0-6 6v3" /></svg>Forward
+            </button>
+          </div>
+        }
+        @if (m.bodyHtml) {
+          <div class="mail-mode">
+            <button type="button" [class.is-on]="showHtml()" (click)="showHtml.set(true)">Formatted</button>
+            <button type="button" [class.is-on]="!showHtml()" (click)="showHtml.set(false)">Plain text</button>
+            <small>Images and links from the sender are blocked for safety.</small>
+          </div>
+        }
+        @if (frame(); as html) {
+          <iframe sandbox="" [srcdoc]="html" title="Message body"></iframe>
+        } @else {
+          <pre class="mail-text">{{ m.bodyText || '(empty)' }}</pre>
+        }
+      </article>
+    </div>
+  }
+
+  @if (compose(); as c) {
+    <div class="mail-overlay mail-overlay--top" (click)="closeCompose()">
+      <form class="mail-compose" (click)="$event.stopPropagation()" (submit)="$event.preventDefault(); send()" role="dialog"
+        [attr.aria-label]="c.mode === 'reply' ? 'Reply' : c.mode === 'forward' ? 'Forward' : 'New mail'">
+        <header>
+          <h2>{{ c.mode === 'reply' ? 'Reply' : c.mode === 'forward' ? 'Forward' : 'New mail' }}</h2>
+          <button type="button" class="mail-close" (click)="closeCompose()" aria-label="Close">×</button>
+        </header>
+
+        <label class="mc-row">
+          <span>From</span>
+          <select [ngModel]="c.account" [ngModelOptions]="{ standalone: true }" (ngModelChange)="changeAccount($event)">
+            @for (a of senders(); track a.key) { <option [value]="a.key">{{ a.address }}</option> }
+          </select>
+        </label>
+        <label class="mc-row">
+          <span>To</span>
+          <input type="text" autocomplete="off" placeholder="name@example.com, another@example.com" [ngModel]="c.to"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('to', $event)" />
+          @if (!showCc() && !c.cc) { <button type="button" class="mc-cc" (click)="showCc.set(true)">Cc</button> }
+        </label>
+        @if (showCc() || c.cc) {
+          <label class="mc-row">
+            <span>Cc</span>
+            <input type="text" autocomplete="off" [ngModel]="c.cc" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('cc', $event)" />
+          </label>
+        }
+        <label class="mc-row">
+          <span>Subject</span>
+          <input type="text" maxlength="300" [ngModel]="c.subject" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('subject', $event)" />
+        </label>
+        <textarea class="mc-body" rows="14" [ngModel]="c.body" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('body', $event)"
+          aria-label="Message"></textarea>
+
+        @if (sendError()) { <p class="mc-error">{{ sendError() }}</p> }
+        <footer>
+          <p class="mc-hint">Sent from the company mailbox you choose. A copy is saved in its Sent folder.</p>
+          <button type="button" class="mc-cancel" (click)="closeCompose()" [disabled]="sending()">Cancel</button>
+          <button type="submit" class="mc-send" [disabled]="sending()">{{ sending() ? 'Sending…' : 'Send' }}</button>
+        </footer>
+      </form>
+    </div>
+  }
+</section>

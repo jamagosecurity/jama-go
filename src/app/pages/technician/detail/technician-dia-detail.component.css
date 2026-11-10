@@ -59,7 +59,7 @@
 .tech-dia-bar {
   height: 8px;
   border-radius: 999px;
-  background: rgba(15, 40, 70, 0.09);
+  background: rgba(26, 55, 103, 0.09);
   overflow: hidden;
 }
 
@@ -127,14 +127,14 @@
   --mdc-filled-button-label-text-color: #fff;
   background: var(--admin-brand-grad-deep) !important;
   background-size: 180% 100% !important;
-  box-shadow: 0 14px 30px -14px rgba(37, 148, 210, 0.75);
+  box-shadow: 0 14px 30px -14px rgba(50, 90, 160, 0.75);
   transition: transform 0.18s ease, box-shadow 0.22s ease, background-position 0.4s ease;
 }
 
 .tech-dia-cta:hover:not(:disabled) {
   transform: translateY(-2px);
   background-position: 100% 0 !important;
-  box-shadow: 0 20px 38px -12px rgba(246, 153, 61, 0.6);
+  box-shadow: 0 20px 38px -12px rgba(163, 161, 144, 0.6);
 }
 
 /* Directions sit beside the primary action, deliberately quieter than it —
@@ -175,4 +175,9 @@
   .tech-dia-actions > * {
     width: 100%;
   }
+}
+
+.tech-dia-cta {
+  background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%) !important;
+  box-shadow: 0 14px 30px -14px rgba(210, 19, 25, 0.8);
 }

@@ -82,3 +82,33 @@ export function fieldErrorMessage(
   }
   return `${label} is not valid.`;
 }
+
+
+/**
+ * Required, but a value made only of spaces counts as empty — Angular's own
+ * `Validators.required` lets "   " through, and the API then rejects it.
+ */
+export function notBlank(control: AbstractControl): ValidationErrors | null {
+  return typeof control.value === 'string' && control.value.trim().length === 0 ? { required: true } : null;
+}
+
+/** At least `min` characters once the spaces at either end are ignored. */
+export function minTrimmed(min: number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = typeof control.value === 'string' ? control.value.trim() : '';
+    return value.length > 0 && value.length < min ? { minlength: { requiredLength: min, actualLength: value.length } } : null;
+  };
+}
+
+/**
+ * A phone number a person could actually dial: an optional leading +, then digits
+ * with spaces, dashes or brackets between them, 6–15 digits in all (the E.164 limit).
+ * Empty passes — pair it with `notBlank` when the field is required.
+ */
+export const PHONE_RULE = /^\+?[0-9\s\-()]+$/;
+export function phoneNumber(control: AbstractControl): ValidationErrors | null {
+  const value = typeof control.value === 'string' ? control.value.trim() : '';
+  if (!value) return null;
+  const digits = value.replace(/\D/g, '').length;
+  return PHONE_RULE.test(value) && digits >= 6 && digits <= 15 ? null : { phone: true };
+}

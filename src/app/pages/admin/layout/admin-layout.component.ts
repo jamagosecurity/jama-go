@@ -1,5 +1,7 @@
-import { Component, ChangeDetectionStrategy, OnInit, computed, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, ChangeDetectionStrategy, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { ApprovalBellComponent } from '../../../components/approval-bell/approval-bell.component';
 import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
@@ -17,9 +19,51 @@ export class AdminLayoutComponent implements OnInit {
   readonly auth = inject(AuthService);
   /** Drives the waiting-count badge on the Client Registrations row. */
   readonly registrations = inject(ClientRegistrationService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** On a phone the sidebar is a drawer behind the menu button; on a desktop
+   *  it is always on screen and this is never set. */
+  readonly menuOpen = signal(false);
+
+  /** Which sidebar groups (Inventory, Quotation, Drawings) show their sub-links.
+   *  The group you are working in opens itself; the arrow opens or closes the rest. */
+  readonly openGroups = signal<ReadonlySet<string>>(new Set());
+  private readonly groupRoutes: Record<string, RegExp> = {
+    inventory: /^\/admin\/(cameras|non-moi)(\/|\?|$)/,
+    quotation: /^\/admin\/boq(\/|\?|$)/,
+    drawings: /^\/admin\/drawings(\/|\?|$)/,
+  };
+
+  isOpen(key: string): boolean {
+    return this.openGroups().has(key);
+  }
+
+  toggleGroup(key: string): void {
+    this.openGroups.update((open) => {
+      const next = new Set(open);
+      if (!next.delete(key)) next.add(key);
+      return next;
+    });
+  }
+
+  private revealCurrentGroup(url: string): void {
+    const current = Object.keys(this.groupRoutes).filter((key) => this.groupRoutes[key].test(url));
+    if (current.length) this.openGroups.update((open) => new Set([...open, ...current]));
+  }
 
   ngOnInit(): void {
     this.registrations.refreshPendingCount();
+
+    // Picking a page in the drawer should land on that page, not leave the
+    // drawer covering it.
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
+      .subscribe((e) => {
+        this.menuOpen.set(false);
+        this.revealCurrentGroup((e as NavigationEnd).urlAfterRedirects);
+      });
+    this.revealCurrentGroup(this.router.url);
   }
 
   /** VIP nav is permission-gated; admins hold vip.manage implicitly. */
@@ -34,6 +78,10 @@ export class AdminLayoutComponent implements OnInit {
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   });
 
+  @HostListener('document:keydown.escape')
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
 
   logout(): void {
     this.auth.logout();

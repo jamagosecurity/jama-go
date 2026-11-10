@@ -1,0 +1,165 @@
+.mnt-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--admin-blue-ink, #27467c);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.mnt-back-link svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mnt-status-badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: rgba(26, 55, 103, 0.08);
+  color: var(--admin-ink);
+  height: fit-content;
+}
+.mnt-status-badge[data-status="Resolved"] { background: rgba(34, 197, 94, 0.14); color: #15803d; }
+.mnt-status-badge[data-status="Cancelled"] { background: rgba(225, 29, 36, 0.12); color: #be1218; }
+.mnt-status-badge[data-status="InProgress"] { background: rgba(50, 90, 160, 0.14); color: #27467c; }
+.mnt-status-badge[data-status="Open"] { background: rgba(163, 161, 144, 0.18); color: #676556; }
+
+.admin-panel { margin-bottom: 18px; }
+
+.mnt-req { color: #e11d24; font-style: normal; }
+.mnt-grid input.ng-invalid.ng-touched {
+  border-color: rgba(225, 29, 36, 0.6);
+  box-shadow: 0 0 0 4px rgba(225, 29, 36, 0.08);
+}
+
+.mnt-message { margin-top: 4px; }
+.mnt-save-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: 18px 0 22px;
+}
+
+.mnt-closed-panel {
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.06);
+}
+.mnt-closed-panel--cancelled {
+  border-color: rgba(225, 29, 36, 0.3);
+  background: rgba(225, 29, 36, 0.06);
+}
+.mnt-closed-panel small { color: var(--admin-muted); }
+
+.mnt-form-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(26, 55, 103, 0.09);
+}
+.mnt-form-heading strong { font-size: 1.02rem; font-weight: 800; color: var(--admin-ink); }
+.mnt-form-heading small { color: var(--admin-muted); }
+
+.mnt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px 20px;
+}
+.mnt-span-2 { grid-column: 1 / -1; }
+.mnt-grid label { display: grid; gap: 6px; font-size: 0.86rem; font-weight: 700; color: #234379; }
+.mnt-grid input,
+.mnt-grid textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid rgba(26, 55, 103, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--admin-ink);
+  font: inherit;
+  font-weight: 500;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.mnt-grid input:focus, .mnt-grid textarea:focus {
+  outline: none;
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
+}
+
+.mnt-readonly-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+.mnt-readonly-grid span { display: block; font-size: 0.74rem; color: var(--admin-muted); font-weight: 700; }
+.mnt-readonly-grid strong { display: block; font-size: 0.92rem; color: var(--admin-ink); margin-top: 2px; }
+
+.mnt-assigned-to { margin: 0 0 12px; color: var(--admin-muted); font-size: 0.88rem; }
+.mnt-assign-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
+.mnt-assign-row app-select { flex: 1 1 240px; }
+
+.mnt-actions-panel { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.mnt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(26, 55, 103, 0.09);
+}
+
+.mnt-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 55, 103, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.mnt-overlay-box { width: 420px; max-width: calc(100vw - 32px); }
+.mnt-overlay-box textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(26, 55, 103, 0.14);
+}
+
+@media (max-width: 640px) {
+  .mnt-form-heading { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .mnt-save-row .btn-admin { width: 100%; }
+  .mnt-readonly-grid { grid-template-columns: 1fr 1fr; }
+
+  .mnt-assign-row { flex-direction: column; align-items: stretch; }
+  .mnt-assign-row app-select { flex: 1 1 auto; }
+  .mnt-assign-row button { width: 100%; }
+
+  /* One full-width action per row beats a cramped button cluster at thumb
+     width, and avoids "Mark resolved" and "Cancel ticket" sitting edge to
+     edge where a mis-tap lands on the wrong one. */
+  .mnt-actions-panel { flex-direction: column; }
+  .mnt-actions-panel .btn-admin { width: 100%; }
+
+  .mnt-actions { flex-direction: column-reverse; }
+  .mnt-actions .btn-admin { width: 100%; }
+
+  .mnt-overlay { padding: 16px; align-items: flex-end; }
+  .mnt-overlay-box { width: 100%; }
+  .mnt-overlay-box .mnt-actions { flex-direction: column-reverse; }
+}

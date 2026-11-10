@@ -55,7 +55,7 @@
   width: 32px;
   height: 32px;
   border-radius: 11px;
-  background: rgba(15, 40, 70, 0.08);
+  background: rgba(26, 55, 103, 0.08);
   color: var(--admin-ink-soft);
   font-size: 0.86rem;
   font-weight: 800;
@@ -142,7 +142,7 @@
   height: 6px;
   margin-bottom: 16px;
   border-radius: 999px;
-  background: rgba(15, 40, 70, 0.08);
+  background: rgba(26, 55, 103, 0.08);
   overflow: hidden;
 }
 
@@ -181,9 +181,9 @@
   padding: 3px 10px;
   margin-bottom: 8px;
   border-radius: 999px;
-  border: 1px solid rgba(79, 70, 229, 0.28);
-  background: linear-gradient(120deg, rgba(37, 148, 210, 0.16), rgba(246, 153, 61, 0.14));
-  color: #3730a3;
+  border: 1px solid rgba(61, 109, 193, 0.28);
+  background: linear-gradient(120deg, rgba(50, 90, 160, 0.16), rgba(163, 161, 144, 0.14));
+  color: #2b4d88;
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -222,9 +222,9 @@
 
 .wiz-empty {
   padding: 22px;
-  border: 1px dashed rgba(15, 40, 70, 0.22);
+  border: 1px dashed rgba(26, 55, 103, 0.22);
   border-radius: 16px;
-  background: rgba(15, 40, 70, 0.02);
+  background: rgba(26, 55, 103, 0.02);
   color: var(--admin-muted);
   text-align: center;
 }
@@ -267,14 +267,14 @@
   --mdc-filled-button-label-text-color: #fff;
   background: var(--admin-brand-grad-deep) !important;
   background-size: 180% 100% !important;
-  box-shadow: 0 14px 30px -14px rgba(37, 148, 210, 0.75);
+  box-shadow: 0 14px 30px -14px rgba(50, 90, 160, 0.75);
   transition: transform 0.18s ease, box-shadow 0.22s ease, background-position 0.4s ease;
 }
 
 .wiz-next:hover:not(:disabled) {
   transform: translateY(-2px);
   background-position: 100% 0 !important;
-  box-shadow: 0 20px 38px -12px rgba(246, 153, 61, 0.6);
+  box-shadow: 0 20px 38px -12px rgba(163, 161, 144, 0.6);
 }
 
 @media (max-width: 1080px) {

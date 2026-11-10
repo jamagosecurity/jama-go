@@ -1,9 +1,4 @@
 <section class="staff-editor-page">
-  <button type="button" class="back-link" (click)="cancel()">
-    <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
-    Back to staff
-  </button>
-
   <header class="editor-header">
     <div class="editor-icon" aria-hidden="true">
       <svg viewBox="0 0 24 24">
@@ -22,6 +17,10 @@
         }}
       </p>
     </div>
+    <button type="button" class="banner-back" (click)="cancel()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+      Back to staff
+    </button>
   </header>
 
   @if (error()) {
@@ -31,7 +30,8 @@
   @if (loading()) {
     <div class="editor-card editor-loading">Loading staff account…</div>
   } @else {
-    <form class="editor-card" [formGroup]="form" (submit)="save($event)">
+    <form class="editor-card se-layout" [formGroup]="form" (submit)="save($event)">
+      <div class="se-account">
       <div class="form-section-heading">
         <span>Account details</span>
         <small>Fields marked required must be completed.</small>
@@ -90,48 +90,29 @@
           }
         </label>
 
-        <label>
+        <label title="Technician opens the technician portal; every other department opens the staff portal.">
           <span>Department</span>
-          <select formControlName="department">
+          <select
+            formControlName="department"
+            [class.has-value]="!!form.controls.department.value"
+            [class.is-technician]="form.controls.department.value === 'Technician'"
+          >
             <option [ngValue]="null">Select department</option>
             @for (department of departments; track department.value) {
               <option [ngValue]="department.value">{{ department.label }}</option>
             }
           </select>
-          <!-- Department silently decides the role, and therefore which portal
-               this person lands in. Leaving that implicit meant accounts meant
-               for the technician portal ended up in the staff portal. -->
-          <small class="field-hint">
-            Decides which portal they land in:
-            <strong>Technician</strong> opens the technician portal,
-            every other department opens the staff portal.
-          </small>
         </label>
       </div>
 
-      <label class="visibility-control">
-        <input type="checkbox" formControlName="canSignIn" />
-        <span class="switch-track"><i></i></span>
-        <span>
+      <div class="visibility-row">
+        <label class="visibility-control" title="Let this person log in to the portal. Turn off to suspend the account without deleting it.">
+          <input type="checkbox" formControlName="canSignIn" />
+          <span class="switch-track"><i></i></span>
           <strong>Allow sign-in</strong>
-          <small>
-            Let this person log in to the portal. Turn off to suspend the account without
-            deleting it.
-          </small>
-        </span>
-      </label>
+        </label>
 
-      <label class="visibility-control">
-        <input type="checkbox" formControlName="isActive" />
-        <span class="switch-track"><i></i></span>
-        <span>
-          <strong>Show on public site</strong>
-          <small>
-            List this team member in the Our Team section on jamago.qa. Internal staff can stay
-            hidden here and still sign in.
-          </small>
-        </span>
-      </label>
+      </div>
 
       @if (!form.controls.canSignIn.value) {
         <p class="access-warning">
@@ -139,6 +120,14 @@
           until you turn it back on.
         </p>
       }
+
+      <footer class="editor-actions">
+        <button type="button" class="btn-admin btn-admin-ghost" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : isEditing ? 'Save changes' : 'Create staff account' }}
+        </button>
+      </footer>
+      </div>
 
       <section class="permission-section">
         <header class="permission-heading">
@@ -154,6 +143,7 @@
             <span class="permission-count">
               {{ selectedCount() }} of {{ permissionCatalogue().length }} selected
             </span>
+            <span class="perm-meter" aria-hidden="true"><i [style.width.%]="permissionCatalogue().length ? (selectedCount() / permissionCatalogue().length) * 100 : 0"></i></span>
             @if (form.controls.department.value && !matchesDepartmentDefaults()) {
               <button type="button" class="permission-link" (click)="resetToDepartmentDefaults()">
                 Reset to department defaults
@@ -173,6 +163,7 @@
           </div>
         </header>
 
+        <div class="permission-areas">
         @for (area of permissionAreas(); track area.label) {
           <div class="permission-area">
             <p class="permission-area-label">{{ area.label }}</p>
@@ -193,7 +184,7 @@
                     </svg>
                   </span>
 
-                  <span class="permission-copy">
+                  <span class="permission-copy" [attr.title]="permission.description">
                     <strong>{{ permission.name }}</strong>
                     <small>{{ permission.description }}</small>
                   </span>
@@ -206,14 +197,10 @@
             </div>
           </div>
         }
+        </div>
       </section>
 
-      <footer class="editor-actions">
-        <button type="button" class="btn-admin btn-admin-ghost" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn-admin btn-admin-primary" [disabled]="saving()">
-          {{ saving() ? 'Saving…' : isEditing ? 'Save changes' : 'Create staff account' }}
-        </button>
-      </footer>
+
     </form>
   }
 </section>

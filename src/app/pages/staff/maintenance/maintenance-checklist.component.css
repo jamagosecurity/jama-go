@@ -1,0 +1,393 @@
+:host { display: block; }
+
+.mck-visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ===== Section — the quotation's numbered panel ===== */
+
+.mck-section {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+/* Every category is on screen at once, so a section in use gets the brand
+   rail and an unused one recedes without disappearing — as in the quotation. */
+.mck-section::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: rgba(26, 55, 103, 0.1);
+}
+.mck-section.is-filled::after { background: linear-gradient(180deg, #4271c3, #2a4c86); }
+
+.mck-section-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.mck-section-lead {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mck-section-meta {
+  grid-column: 3;
+  display: flex;
+  justify-content: flex-end;
+}
+.mck-section-no {
+  display: grid;
+  place-items: center;
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  background: rgba(26, 55, 103, 0.08);
+  color: var(--admin-muted);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+.mck-section.is-filled .mck-section-no {
+  background: linear-gradient(135deg, #3a69b9, #2a4c86);
+  color: #fff;
+}
+.mck-section-title {
+  margin: 0;
+  padding: 9px 16px;
+  border: 1px solid rgba(26, 55, 103, 0.12);
+  border-radius: 11px;
+  background: #fff;
+  font-size: 1rem;
+  font-weight: 750;
+  color: var(--admin-muted);
+  text-align: center;
+}
+.mck-section.is-filled .mck-section-title { color: var(--admin-ink); }
+.mck-section-count {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(50, 90, 160, 0.1);
+  color: #2b56a2;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* ===== Table ===== */
+
+.mck-table-wrap { overflow-x: auto; }
+/* Fixed layout, so every section's columns sit at the same widths whether or
+   not it has ticked rows with inputs in them — the sections stack, and their
+   prices have to line up down the page. */
+.mck-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; table-layout: fixed; }
+
+.mck-table th,
+.mck-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(26, 55, 103, 0.07);
+  vertical-align: middle;
+}
+
+.mck-table thead th {
+  background: linear-gradient(135deg, #0d2040 0%, #143366 55%, #1d4589 100%);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+.mck-table thead th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+.mck-table thead th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+.mck-table thead th.mck-col-issue { text-align: left; }
+
+.mck-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mck-table tbody tr:last-child td { border-bottom: none; }
+
+.mck-col-check { width: 52px; text-align: center !important; }
+.mck-col-qty { width: 112px; }
+.mck-col-price { width: 140px; }
+.mck-col-total { width: 150px; }
+
+.mck-row { transition: background-color 0.15s ease; }
+.mck-row:hover { background: rgba(50, 90, 160, 0.04); }
+.mck-row.is-ticked { background: rgba(50, 90, 160, 0.07); }
+
+.mck-checkbox {
+  width: 19px;
+  height: 19px;
+  margin: 0;
+  accent-color: #2a4c86;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.mck-issue {
+  display: block;
+  color: var(--admin-ink);
+  font-weight: 600;
+  overflow-wrap: break-word;
+  cursor: pointer;
+}
+span.mck-issue { cursor: default; }
+.mck-desc { display: block; margin-top: 2px; color: var(--admin-muted); font-size: 0.78rem; line-height: 1.4; font-weight: 400; }
+.mck-ar { font-size: 0.82rem; }
+.mck-row:not(.is-ticked) .mck-issue { font-weight: 500; color: #3c5788; }
+
+.mck-tick {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #2a4c86;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+}
+
+.mck-dash { color: rgba(26, 55, 103, 0.3); }
+.mck-muted { color: var(--admin-muted); }
+
+.mck-num {
+  width: 84px;
+  padding: 7px 10px;
+  border: 1px solid rgba(26, 55, 103, 0.14);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.mck-num:focus {
+  outline: none;
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 3px rgba(50, 90, 160, 0.12);
+}
+.mck-fee { width: 100px; }
+
+/* A moved-off-standard price is marked on the field itself, the way a
+   repriced quotation line is. */
+.mck-fee.is-repriced {
+  border-color: rgba(163, 161, 144, 0.75);
+  background: rgba(163, 161, 144, 0.08);
+  font-weight: 600;
+}
+.mck-fee-reset {
+  display: block;
+  margin: 4px 0 0 auto;
+  padding: 1px 7px;
+  border: 1px solid rgba(163, 161, 144, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: #5d5c4f;
+  font: inherit;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mck-fee-reset:hover { background: rgba(163, 161, 144, 0.14); }
+
+.mck-typed-row td { background: rgba(26, 55, 103, 0.02); }
+.mck-plus { color: var(--admin-muted); font-size: 1.1rem; font-weight: 700; }
+.mck-typed { display: flex; gap: 10px; align-items: center; }
+.mck-typed input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid rgba(26, 55, 103, 0.14);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+}
+.mck-typed input:focus {
+  outline: none;
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 3px rgba(50, 90, 160, 0.12);
+}
+.mck-typed .btn-admin { padding: 9px 18px; }
+
+.mck-subtotal td {
+  border-top: 1px solid rgba(26, 55, 103, 0.1);
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.mck-subtotal strong { color: var(--admin-ink); font-size: 0.95rem; letter-spacing: 0; }
+
+.mck-empty { color: var(--admin-muted); text-align: center; }
+
+/* ===== Totals — the quotation's money card ===== */
+
+.mck-foot {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  margin-top: 4px;
+}
+.mck-money {
+  display: grid;
+  gap: 2px;
+  min-width: 320px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(26, 55, 103, 0.1);
+}
+.mck-money-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 7px 0;
+}
+.mck-money-row + .mck-money-row { border-top: 1px solid rgba(26, 55, 103, 0.07); }
+.mck-money-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+.mck-money-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--admin-muted);
+  font-size: 0.8rem;
+}
+.mck-money-minus { font-size: 1rem; font-weight: 700; color: #72705f; }
+.mck-discount { width: 116px; }
+.mck-figure {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 750;
+  color: var(--admin-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.mck-figure span { font-size: 0.78rem; color: var(--admin-muted); }
+.mck-figure--discount { color: #72705f; }
+.mck-money-final { padding-top: 9px; }
+.mck-money-final .mck-money-label { color: var(--admin-ink); }
+.mck-money-final .mck-figure { font-size: 1.35rem; }
+
+.mck-warn { margin: 0; color: #9f1217; font-size: 0.8rem; font-weight: 600; }
+.mck-note { margin: 0; color: var(--admin-muted); font-size: 0.76rem; }
+
+/* ===== Phones: each issue becomes a small card ===== */
+
+@media (max-width: 640px) {
+  .mck-section-head { grid-template-columns: 1fr auto; }
+  .mck-section-lead { grid-column: 1; }
+  .mck-section-meta { grid-column: 2; }
+
+  .mck-table thead { display: none; }
+  .mck-table, .mck-table tbody { display: block; width: 100%; }
+
+  /* An unticked row is one line: tick box, name, price. */
+  .mck-row {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 10px;
+    padding: 12px 6px;
+    border-bottom: 1px solid rgba(26, 55, 103, 0.07);
+  }
+  .mck-row td { width: auto; padding: 0; border: none; }
+  .mck-row .mck-col-check { grid-row: 1; grid-column: 1; }
+  .mck-row .mck-col-issue { grid-row: 1; grid-column: 2; }
+  .mck-row:not(.is-ticked) td:nth-child(3),
+  .mck-row:not(.is-ticked) td:nth-child(5) { display: none; }
+  .mck-row:not(.is-ticked) td:nth-child(4) { grid-row: 1; grid-column: 3; }
+
+  /* Ticked, it gains a second line under the name: qty, price and total,
+     each labelled since the column headings are gone at this width. */
+  .mck-row.is-ticked { grid-template-columns: 34px repeat(3, minmax(0, 1fr)); }
+  .mck-row.is-ticked .mck-col-issue { grid-column: 2 / -1; }
+  .mck-row.is-ticked td.num {
+    grid-row: 2;
+    display: grid;
+    gap: 3px;
+    align-content: start;
+    text-align: left;
+  }
+  .mck-row.is-ticked td.num::before {
+    content: attr(data-label);
+    color: #63758a;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .mck-row.is-ticked td:nth-child(3) { grid-column: 2; }
+  .mck-row.is-ticked td:nth-child(4) { grid-column: 3; }
+  .mck-row.is-ticked td:nth-child(5) { grid-column: 4; text-align: right; }
+
+  .mck-num, .mck-fee { width: 100%; min-width: 0; }
+  .mck-fee-reset { margin: 4px 0 0; }
+
+  .mck-typed-row, .mck-subtotal { display: flex; width: 100%; }
+  .mck-typed-row td:first-child { display: none; }
+  .mck-typed-row td { flex: 1 1 auto; padding: 10px 6px; border: none; }
+  .mck-subtotal { justify-content: space-between; padding: 10px 6px; }
+  .mck-subtotal td { border: none; padding: 0; }
+
+  .mck-foot { justify-items: stretch; }
+  .mck-money { min-width: 0; }
+}
+
+/* A service's picture sits beside its name, so what is being ticked is
+   recognisable at a glance. Services without one lay out as before. */
+.mck-issuecell {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+.mck-issuetext { min-width: 0; flex: 1 1 auto; }
+.mck-thumb {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: #f6f8fb;
+  border: 1px solid rgba(26, 55, 103, 0.12);
+}
+
+
+/* ===== Luxe checklist: gold numbered badges, gold ticks, a lit row when chosen ===== */
+.mck-section-lead { gap: 12px; }
+.mck-section-no {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #22221e;
+  font-weight: 800;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%);
+  border: 2px solid rgba(237, 237, 235, 0.85);
+  box-shadow: 0 0 0 3px rgba(165, 164, 148, 0.2);
+}
+.mck-section-title { padding: 0; border: 0; background: none; font-size: 1.05rem; color: var(--admin-ink); }
+.mck-section-count { background: rgba(165, 164, 148, 0.2); color: #3f3e36; border: 1px solid rgba(165, 164, 148, 0.6); }
+.mck-checkbox { accent-color: #8f8d77; width: 20px; height: 20px; }
+.mck-row.is-ticked { background: linear-gradient(90deg, rgba(222, 222, 218, 0.5), rgba(251, 251, 251, 0.6)); }
+.mck-row.is-ticked .mck-issue { color: #2c2b26; font-weight: 700; }
+.mck-section.is-filled { border-color: rgba(143, 141, 119, 0.55); }

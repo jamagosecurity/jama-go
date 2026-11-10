@@ -1,7 +1,7 @@
 <div class="client-shell">
   <header class="client-topbar">
     <div class="client-brand">
-      <img src="/JamaGoLogo-trim.png" alt="Jama Go" width="360" height="108" />
+      <img src="/JamaGoLogo-navy.png" alt="Jama Go" width="360" height="108" />
     </div>
     <div class="client-user">
       <span>{{ auth.currentUser()?.fullName }}</span>
@@ -92,6 +92,87 @@
         </header>
 
         <app-vip-folders [folders]="item.folders" (download)="download($event)" />
+      }
+
+      <header class="admin-page-header">
+        <div>
+          <span class="admin-kicker">Maintenance</span>
+          <h1>Service tickets</h1>
+          <p>Tick every power, connectivity, camera, storage or software issue you have.</p>
+        </div>
+        @if (!showTicketForm()) {
+          <button type="button" class="btn-admin btn-admin-primary" (click)="openTicketForm()">
+            + Report an issue
+          </button>
+        }
+      </header>
+
+      @if (showTicketForm()) {
+        <section class="admin-panel client-ticket-form" [formGroup]="ticketForm">
+          <div class="client-ticket-heading"><strong>Client &amp; site</strong></div>
+          <div class="client-ticket-grid">
+            <label>
+              <span>Client name</span>
+              <input formControlName="clientName" maxlength="200" />
+            </label>
+            <label>
+              <span>Client email <i class="client-req" aria-hidden="true">*</i></span>
+              <input formControlName="clientEmail" type="email" maxlength="256" required autocomplete="email" />
+            </label>
+            <label>
+              <span>Contact number</span>
+              <input formControlName="contactNumber" maxlength="50" />
+            </label>
+            <label>
+              <span>Site location</span>
+              <input formControlName="siteLocation" maxlength="400" />
+            </label>
+            <label class="client-ticket-span-2">
+              <span>Description (optional)</span>
+              <textarea formControlName="description" rows="2" maxlength="2000"
+                placeholder="Anything our technician should know"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <app-maintenance-checklist [catalogue]="issueOptions()" [(lines)]="ticketLines" />
+
+        @if (ticketError()) {
+          <p class="admin-error client-ticket-error">{{ ticketError() }}</p>
+        }
+        <footer class="client-ticket-actions">
+          <button type="button" class="btn-admin btn-admin-ghost" (click)="showTicketForm.set(false)">
+            Cancel
+          </button>
+          <button type="button" class="btn-admin btn-admin-primary" [disabled]="submittingTicket()" (click)="submitTicket()">
+            {{ submittingTicket() ? 'Sending…' : 'Submit ticket' }}
+          </button>
+        </footer>
+      }
+
+      @if (ticketNotice()) {
+        <p class="admin-success">{{ ticketNotice() }}</p>
+      }
+
+      @if (ticketsLoading()) {
+        <div class="admin-panel"><p>Loading your tickets…</p></div>
+      } @else if (tickets().length === 0) {
+        <div class="admin-panel"><p>You haven't reported any issues yet.</p></div>
+      } @else {
+        <div class="admin-panel client-ticket-list">
+          @for (ticket of tickets(); track ticket.id) {
+            <div class="client-ticket-row">
+              <div>
+                <strong>{{ ticket.summary }}</strong>
+                <small>{{ ticket.requestNumber }} · {{ ticket.siteLocation || 'No site recorded' }} · {{ ticket.createdAt | date: 'mediumDate' }}</small>
+              </div>
+              <span class="client-ticket-side">
+                <span class="client-ticket-total">{{ ticket.serviceFee | number: '1.2-2' }} QAR</span>
+                <span class="client-ticket-status" [attr.data-status]="ticket.status">{{ ticket.status }}</span>
+              </span>
+            </div>
+          }
+        </div>
       }
     }
   </main>
