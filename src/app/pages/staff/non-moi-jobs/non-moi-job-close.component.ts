@@ -34,6 +34,8 @@ export class NonMoiJobCloseComponent implements OnInit {
 
   protected readonly job = signal<NonMoiJob | null>(null);
   protected readonly mailboxes = signal<BillMailbox[]>([]);
+  /** False when this server has no WhatsApp set up: the option is then shown as unavailable instead of being offered and refused. */
+  protected readonly whatsAppAvailable = signal(true);
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly error = signal('');
@@ -84,18 +86,48 @@ export class NonMoiJobCloseComponent implements OnInit {
   protected readonly canSubmit = computed(() =>
     this.canClose() && !this.saving() && !this.discountError() && !this.emailError() && !this.channelError() && !this.mailboxError());
 
+  /** The journey of a job, for the progress bar at the top of the page. */
+  protected readonly steps = computed(() => {
+    const status = this.job()?.status;
+    type State = 'done' | 'current' | 'attention' | 'todo';
+    const step = (label: string, sub: string, state: State) => ({ label, sub, state });
+    switch (status) {
+      case 'Assigned':
+        return [step('Issued', 'Given to the technician', 'done'), step('Technician', 'Working on site', 'current'),
+          step('Client', 'Bill not sent yet', 'todo'), step('Approved', 'Deal final', 'todo')];
+      case 'Completed':
+        return [step('Issued', 'Given to the technician', 'done'), step('Technician', 'Work finished', 'done'),
+          step('Client', 'Ready to send the bill', 'current'), step('Approved', 'Deal final', 'todo')];
+      case 'Sent':
+        return [step('Issued', 'Given to the technician', 'done'), step('Technician', 'Work finished', 'done'),
+          step('Client', 'Waiting for their answer', 'current'), step('Approved', 'Deal final', 'todo')];
+      case 'ChangesRequested':
+        return [step('Issued', 'Given to the technician', 'done'), step('Technician', 'Work finished', 'done'),
+          step('Client', 'Asked for changes', 'attention'), step('Approved', 'Deal final', 'todo')];
+      case 'Closed':
+        return [step('Issued', 'Given to the technician', 'done'), step('Technician', 'Work finished', 'done'),
+          step('Client', 'Bill sent', 'done'), step('Approved', 'Deal final', 'done')];
+      default:
+        return [];
+    }
+  });
+
+  /** The figure for the summary card: live while the discount is being worked out, fixed once the bill has gone out. */
+  protected readonly headlineAmount = computed(() => (this.canClose() ? this.payable() : (this.job()?.amountPayable ?? 0)));
+
   ngOnInit(): void {
     this.load();
   }
 
   private load(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    forkJoin({ jobs: this.jobsApi.list(), mailboxes: this.jobsApi.mailboxes() })
+    forkJoin({ jobs: this.jobsApi.list(), options: this.jobsApi.sendOptions() })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: ({ jobs, mailboxes }) => {
+        next: ({ jobs, options }) => {
           const job = jobs.find((j) => j.id === id) ?? null;
-          this.mailboxes.set(mailboxes);
+          this.mailboxes.set(options.mailboxes);
+          this.whatsAppAvailable.set(options.whatsAppAvailable);
           this.apply(job);
           if (!job) this.error.set('This job was not found.');
         },
@@ -113,7 +145,7 @@ export class NonMoiJobCloseComponent implements OnInit {
     // is a channel that already went out left unticked, so the client is never sent the same thing twice.
     const freshRevision = job.status === 'ChangesRequested' && job.clientDecision !== null;
     this.sendEmail.set(freshRevision || !job.emailSentAt);
-    this.sendWhatsApp.set(freshRevision || !job.whatsAppSentAt);
+    this.sendWhatsApp.set(this.whatsAppAvailable() && (freshRevision || !job.whatsAppSentAt));
   }
 
   /** "Sara <sara@example.com>" is how audit names are stored; on screen only the name reads well. */

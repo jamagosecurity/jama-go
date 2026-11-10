@@ -99,6 +99,12 @@ export interface CloseNonMoiJob {
   mailboxKey: string | null;
 }
 
+/** How a bill can be sent from this server: which mailboxes, and whether WhatsApp is set up at all. */
+export interface BillSendOptions {
+  mailboxes: BillMailbox[];
+  whatsAppAvailable: boolean;
+}
+
 /** A company mailbox a bill can be sent from. Never carries a password. */
 export interface BillMailbox {
   key: string;

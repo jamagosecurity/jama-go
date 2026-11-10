@@ -1,4 +1,4 @@
-<section class="admin-page">
+<section class="admin-page jc">
   @if (loading()) {
     <div class="admin-panel"><p>Loading…</p></div>
   } @else if (!job()) {
@@ -23,65 +23,91 @@
       </div>
     </header>
 
+    <!-- The journey of this job, at a glance. -->
+    <ol class="jc-steps" aria-label="Progress">
+      @for (s of steps(); track s.label; let i = $index) {
+        <li [attr.data-state]="s.state">
+          <span class="jc-step-dot" aria-hidden="true">
+            @if (s.state === 'done') { <svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7" /></svg> }
+            @else if (s.state === 'attention') { ! }
+            @else { {{ i + 1 }} }
+          </span>
+          <span class="jc-step-text"><strong>{{ s.label }}</strong><small>{{ s.sub }}</small></span>
+        </li>
+      }
+    </ol>
+
     @if (error()) { <p class="admin-error">{{ error() }}</p> }
 
     @if (j.status === 'Assigned') {
-      <div class="admin-panel"><p>The technician has not completed this job yet, so there is nothing to close.</p></div>
+      <div class="admin-panel"><p>The technician has not completed this job yet, so there is nothing to send.</p></div>
     } @else {
-      <div class="admin-panel jc-grid">
-        <div><span class="jc-label">Customer</span><strong>{{ j.customerName }}</strong></div>
-        <div><span class="jc-label">Phone</span><strong>{{ j.customerNumber }}</strong></div>
-        <div><span class="jc-label">Location</span><strong>{{ j.location }}</strong></div>
-        <div><span class="jc-label">Issued by</span><strong>{{ person(j.assignedByName) || '—' }}</strong></div>
-        <div><span class="jc-label">Technician</span><strong>{{ j.assignedToName }}</strong></div>
-        <div><span class="jc-label">Work finished</span><strong>{{ j.completedAt | date: 'd MMM y, HH:mm' }}</strong></div>
-      </div>
+      <!-- ===== Summary card ===== -->
+      <section class="jc-hero">
+        <div class="jc-hero-main">
+          <p class="jc-hero-eyebrow">{{ j.jobNumber }}{{ j.billRevision > 1 ? ' · Revision ' + j.billRevision : '' }}</p>
+          <h2 class="jc-hero-name">{{ j.customerName }}</h2>
+          <dl class="jc-hero-meta">
+            <div><dt>Phone</dt><dd>{{ j.customerNumber }}</dd></div>
+            <div><dt>Location</dt><dd>{{ j.location }}</dd></div>
+            <div><dt>Technician</dt><dd>{{ j.assignedToName }}</dd></div>
+            <div><dt>Issued by</dt><dd>{{ person(j.assignedByName) || '—' }}</dd></div>
+            <div><dt>Work finished</dt><dd>{{ j.completedAt | date: 'd MMM y, HH:mm' }}</dd></div>
+          </dl>
+        </div>
+        <div class="jc-hero-amount">
+          <span>Amount payable</span>
+          <strong>QAR {{ headlineAmount() | number: '1.2-2' }}</strong>
+          <small>
+            Total {{ j.workTotal | number: '1.2-2' }}
+            @if ((canClose() ? discount() : j.discount) > 0) { · discount {{ (canClose() ? discount() : j.discount) | number: '1.2-2' }} }
+          </small>
+        </div>
+      </section>
 
-      <div class="admin-panel">
+      <!-- ===== Work done ===== -->
+      <section class="jc-card">
         <h2 class="jc-h">Work done</h2>
-        <p class="jc-note">Prices come from the Non-MOI inventory and cannot be changed here. The only adjustment is a discount below.</p>
-        <table class="jc-table">
-          <thead><tr><th>Issue</th><th class="jc-num">Qty</th><th class="jc-num">Price</th><th class="jc-num">Total</th></tr></thead>
-          <tbody>
-            @for (l of j.lines; track $index) {
-              <tr>
-                <td><strong>{{ l.issueType }}</strong><small>{{ categoryLabel(l.category) }}</small></td>
-                <td class="jc-num">{{ l.quantity }}</td>
-                <td class="jc-num">{{ l.unitFee | number: '1.2-2' }}</td>
-                <td class="jc-num">{{ l.lineTotal | number: '1.2-2' }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <p class="jc-note">Prices come from the Non-MOI inventory and cannot be changed here. The only adjustment is a discount.</p>
+        <div class="jc-tablewrap">
+          <table class="jc-table">
+            <thead><tr><th>Issue</th><th class="jc-num">Qty</th><th class="jc-num">Price</th><th class="jc-num">Total</th></tr></thead>
+            <tbody>
+              @for (l of j.lines; track $index) {
+                <tr>
+                  <td><strong>{{ l.issueType }}</strong><small>{{ categoryLabel(l.category) }}</small></td>
+                  <td class="jc-num">{{ l.quantity }}</td>
+                  <td class="jc-num">{{ l.unitFee | number: '1.2-2' }}</td>
+                  <td class="jc-num">{{ l.lineTotal | number: '1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
         @if (j.completionNotes) { <p class="jc-notes"><span class="jc-label">Technician's notes</span>{{ j.completionNotes }}</p> }
-      </div>
+      </section>
 
       @if (j.status === 'ChangesRequested' && j.clientMessage) {
-        <div class="admin-panel jc-changes">
+        <section class="jc-card jc-changes">
           <h2 class="jc-h">{{ j.clientDecision === 'Rejected' ? 'The client rejected the bill' : 'The client left a comment' }}</h2>
           <blockquote>{{ j.clientMessage }}</blockquote>
           <p class="jc-note">— {{ person(j.clientResponderName) }}, {{ j.clientRespondedAt | date: 'd MMM y, HH:mm' }}.
             Adjust the discount below if you wish, then send a new revision.</p>
-        </div>
+        </section>
       }
 
       @if (j.status === 'Closed') {
-        <div class="admin-panel jc-closed">
+        <section class="jc-card jc-closed">
           <h2 class="jc-h">Approved — the deal is final</h2>
-          <dl class="jc-sum">
-            <div><dt>Total</dt><dd>{{ j.workTotal | number: '1.2-2' }} QAR</dd></div>
-            @if (j.discount > 0) { <div><dt>Discount</dt><dd>− {{ j.discount | number: '1.2-2' }} QAR</dd></div> }
-            <div class="jc-sum-pay"><dt>Amount payable</dt><dd>{{ j.amountPayable | number: '1.2-2' }} QAR</dd></div>
-          </dl>
           <ul class="jc-sent">
             <li>✓ Approved by <strong>{{ person(j.closedByName) }}</strong> on {{ j.closedAt | date: 'd MMM y, HH:mm' }}</li>
             @if (j.emailSentAt) { <li>Emailed to <strong>{{ j.customerEmail }}</strong> · {{ j.emailSentAt | date: 'd MMM y, HH:mm' }}</li> }
             @if (j.whatsAppSentAt) { <li>WhatsApp sent to <strong>{{ j.customerNumber }}</strong> · {{ j.whatsAppSentAt | date: 'd MMM y, HH:mm' }}</li> }
           </ul>
           <button type="button" class="jc-btn jc-btn--ghost" (click)="downloadBill()">Download the bill (PDF)</button>
-        </div>
+        </section>
       } @else if (j.status === 'Sent') {
-        <div class="admin-panel jc-closed">
+        <section class="jc-card jc-closed">
           <h2 class="jc-h">Waiting for the client</h2>
           <p class="jc-note">The bill{{ j.billRevision > 1 ? ' (revision ' + j.billRevision + ')' : '' }} was sent for <strong>{{ j.amountPayable | number: '1.2-2' }} QAR</strong>.
             You will see the red number beside Non-MOI Jobs as soon as they answer.</p>
@@ -90,13 +116,13 @@
             @if (j.whatsAppSentAt) { <li>✓ WhatsApp sent to <strong>{{ j.customerNumber }}</strong> · {{ j.whatsAppSentAt | date: 'd MMM y, HH:mm' }}</li> }
           </ul>
           <button type="button" class="jc-btn jc-btn--ghost" (click)="downloadBill()">Download the bill (PDF)</button>
-        </div>
+        </section>
       } @else if (!canClose()) {
-        <div class="admin-panel">
+        <section class="jc-card">
           <p class="jc-note">Only <strong>{{ person(j.assignedByName) || 'an administrator' }}</strong>, who issued this job, or an administrator can add a discount and send the bill.</p>
-        </div>
+        </section>
       } @else {
-        <div class="admin-panel jc-close">
+        <section class="jc-card jc-send">
           <h2 class="jc-h">{{ j.status === 'ChangesRequested' ? 'Send a new revision' : 'Discount & send' }}</h2>
 
           <div class="jc-row">
@@ -106,20 +132,20 @@
                 (ngModelChange)="discountText.set($event); confirming.set(false)" [class.is-invalid]="!!discountError()" />
               @if (discountError()) { <small class="jc-error">{{ discountError() }}</small> }
             </label>
-            <dl class="jc-sum jc-sum--live">
+            <dl class="jc-sum">
               <div><dt>Total</dt><dd>{{ j.workTotal | number: '1.2-2' }}</dd></div>
               @if (discount() > 0) { <div><dt>Discount</dt><dd>− {{ discount() | number: '1.2-2' }}</dd></div> }
               <div class="jc-sum-pay"><dt>Amount payable</dt><dd>{{ payable() | number: '1.2-2' }} QAR</dd></div>
             </dl>
           </div>
 
-          <h3 class="jc-h3">Send the bill to the client</h3>
-          <p class="jc-note">The client gets a page with the bill and three buttons: <strong>Approve</strong>, <strong>Reject</strong> and <strong>Comment</strong>.</p>
+          <h3 class="jc-h3">How should the client get it?</h3>
+          <p class="jc-note">They receive the bill with three buttons: <strong>Approve</strong>, <strong>Reject</strong> and <strong>Comment</strong>.</p>
           <div class="jc-channels">
             <div class="jc-channel" [class.is-on]="sendEmail()">
               <label class="jc-check">
                 <input type="checkbox" [ngModel]="sendEmail()" (ngModelChange)="sendEmail.set($event); confirming.set(false)" />
-                <span><strong>Email</strong> with the bill attached (PDF) and your signature</span>
+                <span><strong>Email</strong><small>The bill as a PDF, with your signature</small></span>
               </label>
               @if (sendEmail()) {
                 <label class="jc-field">
@@ -138,12 +164,17 @@
               }
             </div>
 
-            <div class="jc-channel" [class.is-on]="sendWhatsApp()">
+            <div class="jc-channel" [class.is-on]="sendWhatsApp()" [class.is-off]="!whatsAppAvailable()">
               <label class="jc-check">
-                <input type="checkbox" [ngModel]="sendWhatsApp()" (ngModelChange)="sendWhatsApp.set($event); confirming.set(false)" />
-                <span><strong>WhatsApp</strong> message with a link to the bill</span>
+                <input type="checkbox" [disabled]="!whatsAppAvailable()" [ngModel]="sendWhatsApp()"
+                  (ngModelChange)="sendWhatsApp.set($event); confirming.set(false)" />
+                <span><strong>WhatsApp</strong><small>A message with a link to the bill</small></span>
               </label>
-              @if (sendWhatsApp()) { <small class="jc-note">Goes to {{ j.customerNumber }}</small> }
+              @if (!whatsAppAvailable()) {
+                <small class="jc-unavailable">WhatsApp is not set up on this server yet, so the bill goes by email only.</small>
+              } @else if (sendWhatsApp()) {
+                <small class="jc-note">Goes to {{ j.customerNumber }}</small>
+              }
             </div>
           </div>
           @if (channelError()) { <p class="jc-error">{{ channelError() }}</p> }
@@ -171,11 +202,11 @@
               </div>
             }
           </div>
-        </div>
+        </section>
       }
 
       @if (j.events.length) {
-        <div class="admin-panel">
+        <section class="jc-card">
           <h2 class="jc-h">History</h2>
           <ol class="jc-history">
             @for (e of j.events; track $index) {
@@ -188,7 +219,7 @@
               </li>
             }
           </ol>
-        </div>
+        </section>
       }
     }
   }

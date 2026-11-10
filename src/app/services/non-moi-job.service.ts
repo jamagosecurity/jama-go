@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResult, unwrapApiResult } from '../models/api-result.model';
-import { BillMailbox, ClientDecisionKind, CloseNonMoiJob, CompleteNonMoiJob, JobTechnician, NonMoiJob, PublicJobBill, SaveNonMoiJob } from '../models/non-moi-job.model';
+import { BillSendOptions, ClientDecisionKind, CloseNonMoiJob, CompleteNonMoiJob, JobTechnician, NonMoiJob, PublicJobBill, SaveNonMoiJob } from '../models/non-moi-job.model';
 
 /** Non-MOI jobs: admin issues them, the assigned technician reads them. */
 @Injectable({ providedIn: 'root' })
@@ -48,9 +48,9 @@ export class NonMoiJobService {
     return this.http.get<ApiResult<number>>(`${this.baseUrl}/awaiting-close`).pipe(map(unwrapApiResult));
   }
 
-  /** Company mailboxes the bill can be sent from. */
-  mailboxes(): Observable<BillMailbox[]> {
-    return this.http.get<ApiResult<BillMailbox[]>>(`${this.baseUrl}/mailboxes`).pipe(map(unwrapApiResult));
+  /** Which company mailboxes a bill can be sent from, and whether WhatsApp is set up on this server. */
+  sendOptions(): Observable<BillSendOptions> {
+    return this.http.get<ApiResult<BillSendOptions>>(`${this.baseUrl}/send-options`).pipe(map(unwrapApiResult));
   }
 
   /** The bill as a PDF — a preview before closing, or a copy afterwards. */

@@ -408,10 +408,10 @@ export class BoqEditorComponent implements OnInit {
     projectName: ['', [Validators.required, Validators.maxLength(200)]],
     // Left at 1 the quotation says nothing about revisions; typing another number prints "Rev N" on it.
     revisionNumber: [
-      1,
+      0,
       [
         Validators.required,
-        Validators.min(1),
+        Validators.min(0),
         Validators.max(999),
         (c: AbstractControl) => (Number.isInteger(c.value) ? null : { pattern: true }),
       ],
@@ -674,7 +674,7 @@ export class BoqEditorComponent implements OnInit {
           this.boq.set(boq);
           this.form.reset({
             projectName: boq.projectName,
-            revisionNumber: boq.revisionNumber ?? 1,
+            revisionNumber: boq.revisionNumber ?? 0,
             siteLocation: boq.siteLocation ?? '',
             clientName: boq.clientName ?? '',
             contactNumber: boq.contactNumber ?? '',
