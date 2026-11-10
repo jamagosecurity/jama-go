@@ -50,7 +50,7 @@ function sitePin(group: AbstractControl): ValidationErrors | null {
   return null;
 }
 
-type Field = 'customerName' | 'customerNumber' | 'location' | 'descriptionEn' | 'descriptionAr' | 'assignedToId';
+type Field = 'customerName' | 'customerNumber' | 'customerEmail' | 'location' | 'descriptionEn' | 'descriptionAr' | 'assignedToId';
 
 /** Issues or edits one Non-MOI job: who the customer is, where, what to do (in
  *  English and Arabic), and which technician gets it. */
@@ -95,6 +95,7 @@ export class NonMoiJobEditorComponent implements OnInit {
     {
       customerName: ['', [notBlank, minTrimmed(2), Validators.maxLength(200)]],
       customerNumber: ['', [notBlank, phoneNumber, Validators.maxLength(30)]],
+      customerEmail: ['', [Validators.email, Validators.maxLength(320)]],
       location: ['', [notBlank, minTrimmed(3), Validators.maxLength(300)]],
       latitude: ['', [coordinate(LATITUDE_LIMIT)]],
       longitude: ['', [coordinate(LONGITUDE_LIMIT)]],
@@ -168,6 +169,7 @@ export class NonMoiJobEditorComponent implements OnInit {
           this.form.setValue({
             customerName: job.customerName,
             customerNumber: job.customerNumber,
+            customerEmail: job.customerEmail ?? '',
             location: job.location,
             latitude: job.latitude == null ? '' : String(job.latitude),
             longitude: job.longitude == null ? '' : String(job.longitude),
@@ -288,6 +290,7 @@ export class NonMoiJobEditorComponent implements OnInit {
     const payload = {
       customerName: value.customerName.trim(),
       customerNumber: value.customerNumber.trim(),
+      customerEmail: value.customerEmail.trim() || null,
       location: value.location.trim(),
       latitude: value.latitude.trim() && pin ? pin.latitude : null,
       longitude: value.longitude.trim() && pin ? pin.longitude : null,

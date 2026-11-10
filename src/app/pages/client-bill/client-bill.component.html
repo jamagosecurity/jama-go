@@ -1,0 +1,110 @@
+<div class="cb-page">
+  <header class="cb-top">
+    <div class="cb-brand">JAMA&nbsp;GO</div>
+    <div class="cb-brand-sub">Security Equipment</div>
+  </header>
+  <div class="cb-rule" aria-hidden="true"></div>
+
+  <main class="cb-card">
+    @if (loading()) {
+      <p class="cb-muted">Loading your bill…</p>
+    } @else if (loadError()) {
+      <h1 class="cb-h1">We can’t open this bill</h1>
+      <p>{{ loadError() }}</p>
+    } @else if (bill(); as b) {
+      <p class="cb-eyebrow">
+        {{ b.revision > 1 ? 'Revised bill · revision ' + b.revision : 'Your bill' }} · {{ b.jobNumber }}
+      </p>
+      <h1 class="cb-h1">Dear {{ b.customerName }},</h1>
+      <p class="cb-sub">{{ b.location }}</p>
+
+      <div class="cb-tablewrap">
+        <table class="cb-table">
+          <thead><tr><th>Work done</th><th class="cb-num">Qty</th><th class="cb-num">Price</th><th class="cb-num">Total (QAR)</th></tr></thead>
+          <tbody>
+            @for (l of b.lines; track $index) {
+              <tr>
+                <td><strong>{{ l.issue }}</strong><small>{{ l.category }}</small></td>
+                <td class="cb-num">{{ l.quantity }}</td>
+                <td class="cb-num">{{ l.unitFee | number: '1.2-2' }}</td>
+                <td class="cb-num">{{ l.lineTotal | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <dl class="cb-sum">
+        <div><dt>Total</dt><dd>{{ b.total | number: '1.2-2' }}</dd></div>
+        @if (b.discount > 0) { <div><dt>Discount</dt><dd>− {{ b.discount | number: '1.2-2' }}</dd></div> }
+        <div class="cb-pay"><dt>Amount payable</dt><dd>QAR {{ b.amountPayable | number: '1.2-2' }}</dd></div>
+      </dl>
+
+      <p class="cb-pdf"><a [href]="pdfUrl" target="_blank" rel="noopener">Download this bill as a PDF</a></p>
+
+      <!-- ===== What the client can do ===== -->
+      @if (justDid() === 'approve' || b.status === 'Closed') {
+        <section class="cb-result cb-result--ok" aria-live="polite">
+          <h2>Thank you — your bill is approved</h2>
+          <p>We have let our team know. You can pay using the details below.</p>
+        </section>
+      } @else if (justDid()) {
+        <section class="cb-result" aria-live="polite">
+          <h2>We have received your message</h2>
+          <p>Thank you. We will look at it and send you an updated bill soon.</p>
+        </section>
+      } @else if (b.status === 'ChangesRequested') {
+        <section class="cb-result" aria-live="polite">
+          <h2>We are preparing an updated bill</h2>
+          <p>You asked us for a change{{ b.decisionMessage ? ': “' + b.decisionMessage + '”' : '' }}. We will send you the new bill as soon as it is ready.</p>
+        </section>
+      } @else if (b.canRespond) {
+        <section class="cb-decide">
+          <h2>We would value your decision</h2>
+          <div class="cb-choices">
+            <button type="button" class="cb-choice cb-choice--solid" [class.is-on]="choice() === 'approve'" (click)="pick('approve')">Approve</button>
+            <button type="button" class="cb-choice" [class.is-on]="choice() === 'reject'" (click)="pick('reject')">Reject</button>
+            <button type="button" class="cb-choice" [class.is-on]="choice() === 'comment'" (click)="pick('comment')">Comment</button>
+          </div>
+          <p class="cb-hint">Use <strong>Comment</strong> if you would like something changed.</p>
+
+          @if (choice(); as c) {
+            <div class="cb-form">
+              @if (c === 'approve') {
+                <p>You are approving this bill for <strong>QAR {{ b.amountPayable | number: '1.2-2' }}</strong>.</p>
+              } @else {
+                <label class="cb-field">
+                  <span>{{ c === 'reject' ? 'Why are you rejecting it?' : 'What would you like us to change?' }}</span>
+                  <textarea rows="4" maxlength="1000" [ngModel]="message()" (ngModelChange)="message.set($event)"
+                    [class.is-invalid]="!!message() && !!messageError()"></textarea>
+                  @if (message() && messageError()) { <small class="cb-error">{{ messageError() }}</small> }
+                </label>
+              }
+              <label class="cb-field">
+                <span>Your name <small>(optional)</small></span>
+                <input type="text" maxlength="100" autocomplete="name" [ngModel]="name()" (ngModelChange)="name.set($event)" />
+              </label>
+              @if (error()) { <p class="cb-error cb-error--box" role="alert">{{ error() }}</p> }
+              <div class="cb-send">
+                <button type="button" class="cb-btn" [disabled]="!canSend()" (click)="send()">
+                  {{ saving() ? 'Sending…' : c === 'approve' ? 'Yes, approve this bill' : c === 'reject' ? 'Send my rejection' : 'Send my comment' }}
+                </button>
+                <button type="button" class="cb-btn cb-btn--ghost" [disabled]="saving()" (click)="choice.set(null)">Cancel</button>
+              </div>
+            </div>
+          }
+        </section>
+      }
+
+      <section class="cb-payment">
+        <h2>Payment details</h2>
+        <p><strong>{{ b.paymentAccountName }}</strong><br>CR NO: {{ b.paymentCrNumber }}<br>IBAN: <strong>{{ b.paymentIban }}</strong></p>
+      </section>
+    }
+  </main>
+
+  <footer class="cb-foot">
+    +974 4001 3599 · +974 3064 4006 · info&#64;jamago.com<br>
+    Showroom, Unit 41, Building 349, St 340, Zone 56, Al Ain Complex, Salwa Road
+  </footer>
+</div>

@@ -13,7 +13,7 @@
       </a>
       <strong class="tjd-jobno">{{ j.jobNumber }}</strong>
       <span class="tjd-date">{{ j.createdAt | date: 'd MMM y' }}</span>
-      <span class="tjd-state" [class.is-done]="j.status === 'Completed'">{{ j.status === 'Completed' ? 'Completed' : 'To do' }}</span>
+      <span class="tjd-state" [class.is-done]="j.status === 'Closed'" [attr.data-status]="j.status">{{ statusLabel(j.status) }}</span>
     </div>
 
     <section class="admin-panel tjd-card" aria-label="Job details">
@@ -36,9 +36,19 @@
       </div>
     </section>
 
+    @if (j.status === 'Closed') {
+      <div class="tjd-client tjd-client--ok"><strong>The client approved this bill</strong><span>Amount payable: {{ j.amountPayable | number: '1.2-2' }} QAR. Well done.</span></div>
+    } @else if (j.status === 'ChangesRequested') {
+      <div class="tjd-client"><strong>The client {{ j.clientDecision === 'Rejected' ? 'rejected the bill' : 'asked for a change' }}</strong>
+        @if (j.clientMessage) { <span>“{{ j.clientMessage }}”</span> }
+        <small>It is back with {{ j.assignedByName.replace('<', '(').replace('>', ')') }} to adjust.</small></div>
+    } @else if (j.status === 'Sent') {
+      <div class="tjd-client"><strong>The bill is with the client</strong><span>Waiting for them to approve.</span></div>
+    }
+
     @if (error()) { <p class="admin-error">{{ error() }}</p> }
 
-    @if (j.status === 'Completed') {
+    @if (j.status !== 'Assigned') {
       <div class="admin-panel">
         <h2 class="tjd-h">Work done · {{ j.completedAt | date: 'd MMM y, HH:mm' }}</h2>
         <table class="tjd-table">

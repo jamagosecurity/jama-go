@@ -90,3 +90,10 @@
 /* The card is now just who + Call + Navigate; the details live on the list. */
 .tjd-card { gap: 0; padding: 16px 22px; }
 @media (max-width: 720px) { .tjd-card { padding: 14px; } }
+
+.tjd-state[data-status="Sent"] { background: #e3e8f2; color: #14305f; }
+.tjd-state[data-status="ChangesRequested"] { background: #fdecec; color: #a40f14; }
+.tjd-state[data-status="Completed"] { background: #fff1d6; color: #8a5a00; }
+.tjd-client { display: grid; gap: 4px; margin-bottom: 14px; padding: 12px 16px; border-left: 5px solid #d21319; border-radius: 12px; background: #fdecec; color: #14305f; }
+.tjd-client--ok { border-left-color: #0f6b5f; background: #e6f5ef; }
+.tjd-client small { color: #6b7280; }

@@ -1031,7 +1031,7 @@
   box-shadow: 0 8px 16px -10px rgba(210, 19, 25, 0.8);
   transform: none;
 }
-.nav-count { background: #e8e6df; color: #14305f; box-shadow: none; }
+.nav-count { background: #d21319; color: #fff; box-shadow: none; }
 .staff-nav a.active .nav-count { background: #d21319; color: #fff; }
 
 .staff-nav .nav-label,
@@ -1068,3 +1068,7 @@
 .staff-sidebar .profile-role { background: #e8e6df; color: #14305f; border-color: transparent; }
 .staff-sidebar .profile-logout { color: #14305f; background: #fff; border: 1px solid #d3d0c6; box-shadow: none; }
 .staff-sidebar .profile-logout:hover { background: #fdecec; color: #a40f14; border-color: #d21319; }
+
+/* The red number beside a sidebar link, pinned to the row's right edge. */
+.staff-nav a { position: relative; }
+.staff-nav a .nav-count { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); min-width: 24px; height: 24px; padding: 0 7px; display: grid; place-items: center; border-radius: 999px; background: #d21319; color: #fff; font-size: 0.76rem; font-weight: 900; box-shadow: none; }

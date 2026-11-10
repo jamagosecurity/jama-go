@@ -288,12 +288,12 @@
 
 .nj-table { table-layout: fixed; }
 .nj-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--admin-ink-soft, #204078); }
-.nj-table th:nth-child(1) { width: 17%; }
+.nj-table th:nth-child(1) { width: 15%; }
 .nj-table th:nth-child(2) { width: 12%; }
-.nj-table th:nth-child(4) { width: 15%; }
+.nj-table th:nth-child(4) { width: 13%; }
 .nj-table th:nth-child(5) { width: 112px; }
 .nj-table th:nth-child(6) { width: 120px; }
-.nj-table th.col-actions { width: 170px; }
+.nj-table th.col-actions { width: 250px; }
 .nj-table td.col-actions { overflow: visible; }
 
 .nj-table .col-name { color: var(--admin-ink); font-weight: 750; }
@@ -320,3 +320,25 @@
 
 .nj-table td.nj-amount, .nj-table th.nj-amount { text-align: right; padding-right: 16px; }
 .nj-table td:nth-child(5) { overflow: visible; }
+
+.nj-status.is-closed { background: #e3e8f2; color: #14305f; }
+.nj-status.is-done { background: #fff1d6; color: #8a5a00; }
+.nj-close-btn { background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%) !important; color: #fff !important; border: 0 !important; }
+
+/* Stage filters: the "Done" one lights up red when a job is waiting for the issuer to close it. */
+.nj-stages { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.nj-stage { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1.5px solid #c9ccd6; border-radius: 999px; background: #fff; color: #14305f; font: inherit; font-weight: 700; cursor: pointer; }
+.nj-stage b { min-width: 24px; padding: 1px 8px; border-radius: 999px; background: #e8e6df; color: #14305f; font-size: 0.78rem; text-align: center; }
+.nj-stage.is-on { background: #14305f; border-color: #14305f; color: #fff; }
+.nj-stage.is-on b { background: #fff; color: #14305f; }
+.nj-stage--attn.has-items { border-color: #d21319; color: #a40f14; }
+.nj-stage--attn.has-items b { background: #d21319; color: #fff; }
+.nj-stage--attn.has-items.is-on { background: #d21319; border-color: #d21319; color: #fff; }
+.nj-stage--attn.has-items.is-on b { background: #fff; color: #d21319; }
+@media (max-width: 640px) { .nj-stage { flex: 1 1 calc(50% - 8px); justify-content: space-between; } }
+
+.nj-table td.col-actions .nj-row-actions { justify-content: flex-end; flex-wrap: nowrap; }
+
+.nj-status[data-status="Sent"] { background: #e3e8f2; color: #14305f; }
+.nj-status[data-status="ChangesRequested"] { background: #fdecec; color: #a40f14; }
+.nj-status[data-status="Closed"] { background: #d9f2ea; color: #0f6b5f; }

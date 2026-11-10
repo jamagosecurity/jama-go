@@ -241,6 +241,13 @@ export const routes: Routes = [
       import('./pages/client/client-portal.component').then((m) => m.ClientPortalComponent),
   },
   {
+    // The client's own page for a bill, reached from the link in their email or WhatsApp message. No sign-in: the secret
+    // token in the link is the key. Deliberately outside every layout and guard.
+    path: 'bill/:token',
+    title: 'Your bill — Jama Go Security Equipment',
+    loadComponent: () => import('./pages/client-bill/client-bill.component').then((m) => m.ClientBillComponent),
+  },
+  {
     path: 'technician',
     canActivate: [technicianGuard],
     loadChildren: () =>

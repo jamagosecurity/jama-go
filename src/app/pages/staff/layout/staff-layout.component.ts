@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { ApprovalBellComponent } from '../../../components/approval-bell/approval-bell.component';
 import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
+import { NonMoiJobBadgeService } from '../../../services/non-moi-job-badge.service';
 
 @Component({
   selector: 'app-staff-layout',
@@ -16,6 +17,8 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class StaffLayoutComponent implements OnInit {
   readonly auth = inject(AuthService);
+  /** Finished Non-MOI jobs waiting for this person to close — the red number beside Non-MOI Jobs. */
+  readonly jobBadge = inject(NonMoiJobBadgeService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -50,12 +53,14 @@ export class StaffLayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.canIssueJobs()) this.jobBadge.start();
     // Picking a page in the drawer should land on that page, not leave the
     // drawer covering it.
     this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
       .subscribe((e) => {
         this.menuOpen.set(false);
+        if (this.canIssueJobs()) this.jobBadge.refresh();
         this.revealCurrentGroup((e as NavigationEnd).urlAfterRedirects);
       });
     this.revealCurrentGroup(this.router.url);

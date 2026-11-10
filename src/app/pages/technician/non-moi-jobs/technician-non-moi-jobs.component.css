@@ -78,3 +78,7 @@
 }
 
 .page-banner .banner-ghost svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.tj-status[data-status="Sent"] { background: #e3e8f2; color: #14305f; }
+.tj-status[data-status="ChangesRequested"] { background: #fdecec; color: #a40f14; }
+.tj-status[data-status="Completed"] { background: #fff1d6; color: #8a5a00; }

@@ -1,9 +1,10 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { NonMoiJob } from '../../../models/non-moi-job.model';
+import { jobStatusLabel } from '../../../utils/non-moi-job-status.util';
 import { NonMoiJobService } from '../../../services/non-moi-job.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { toSitePin } from '../../../utils/geo.util';
@@ -18,10 +19,12 @@ const PAGE_SIZE = 20;
  *
  * The list is small, so it is loaded once and searched and paged in the browser.
  */
+type Stage = 'all' | 'todo' | 'done' | 'sent' | 'changes' | 'closed';
+
 @Component({
   selector: 'app-non-moi-job-list',
   standalone: true,
-  imports: [RouterLink, DatePipe, DecimalPipe],
+  imports: [RouterLink, DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './non-moi-job-list.component.html',
   styleUrl: './non-moi-job-list.component.css',
@@ -43,10 +46,42 @@ export class NonMoiJobListComponent implements OnInit {
   protected readonly toast = signal<{ text: string; tone: 'ok' | 'bad' } | null>(null);
   private toastTimer?: ReturnType<typeof setTimeout>;
 
+  /** Which stage to look at. "done" is the one that needs the issuer: the technician has finished and the deal is waiting to be closed. */
+  protected readonly stage = signal<Stage>('all');
+  protected readonly counts = computed(() => {
+    const all = this.jobs();
+    return {
+      all: all.length,
+      todo: all.filter((j) => j.status === 'Assigned').length,
+      done: all.filter((j) => j.status === 'Completed').length,
+      sent: all.filter((j) => j.status === 'Sent').length,
+      changes: all.filter((j) => j.status === 'ChangesRequested').length,
+      closed: all.filter((j) => j.status === 'Closed').length,
+    };
+  });
+
+  protected readonly statusLabel = jobStatusLabel;
+
+  protected setStage(stage: Stage): void {
+    this.stage.set(stage);
+    this.page.set(1);
+  }
+
+  private readonly inStage = computed(() => {
+    const stage = this.stage();
+    const all = this.jobs();
+    if (stage === 'todo') return all.filter((j) => j.status === 'Assigned');
+    if (stage === 'done') return all.filter((j) => j.status === 'Completed');
+    if (stage === 'sent') return all.filter((j) => j.status === 'Sent');
+    if (stage === 'changes') return all.filter((j) => j.status === 'ChangesRequested');
+    if (stage === 'closed') return all.filter((j) => j.status === 'Closed');
+    return all;
+  });
+
   protected readonly filtered = computed(() => {
     const term = this.search().trim().toLowerCase();
-    if (!term) return this.jobs();
-    return this.jobs().filter((j) =>
+    if (!term) return this.inStage();
+    return this.inStage().filter((j) =>
       [j.jobNumber, j.customerName, j.customerNumber, j.location, j.assignedToName, j.descriptionEn]
         .some((text) => text.toLowerCase().includes(term)),
     );

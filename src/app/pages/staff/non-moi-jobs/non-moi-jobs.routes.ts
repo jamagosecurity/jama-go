@@ -14,6 +14,11 @@ export function createNonMoiJobRoutes(basePath: string): Routes {
           loadComponent: () => import('./non-moi-job-editor.component').then((m) => m.NonMoiJobEditorComponent),
         },
         {
+          path: ':id/close',
+          title: 'Review & Close Job — Jama Go',
+          loadComponent: () => import('./non-moi-job-close.component').then((m) => m.NonMoiJobCloseComponent),
+        },
+        {
           path: ':id/edit',
           title: 'Edit Job — Jama Go',
           loadComponent: () => import('./non-moi-job-editor.component').then((m) => m.NonMoiJobEditorComponent),

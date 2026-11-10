@@ -1,0 +1,66 @@
+/* The client's bill page — the same quiet luxury as the email: deep navy, warm stone, serif headings, generous air. */
+:host { display: block; }
+.cb-page { --navy: #14305f; --stone: #afaea2; --warm: #f7f5f0; --hair: #e3e0d8; min-height: 100vh; background: #efece6; color: #000; font-family: "Segoe UI", Helvetica, Arial, sans-serif; padding-bottom: 36px; }
+.cb-top { background: var(--navy); color: #fff; padding: 38px 20px 30px; text-align: center; }
+.cb-brand { font-family: Georgia, "Times New Roman", serif; font-size: 1.9rem; letter-spacing: 0.32em; }
+.cb-brand-sub { margin-top: 10px; color: var(--stone); font-size: 0.66rem; letter-spacing: 0.34em; text-transform: uppercase; }
+.cb-rule { height: 3px; background: var(--stone); }
+.cb-card { width: min(700px, calc(100% - 24px)); margin: 26px auto 0; padding: 44px 44px 40px; background: #fff; border-radius: 3px; box-shadow: 0 30px 60px -40px rgba(20, 48, 95, 0.5); }
+.cb-eyebrow { margin: 0 0 12px; color: #6b7280; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; }
+.cb-h1 { margin: 0 0 8px; color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.9rem; line-height: 1.25; }
+.cb-sub, .cb-muted { margin: 0 0 30px; opacity: 0.7; }
+.cb-tablewrap { overflow-x: auto; }
+.cb-table { width: 100%; border-collapse: collapse; font-size: 0.97rem; }
+.cb-table th { padding: 0 0 10px; border-bottom: 2px solid var(--navy); color: var(--navy); text-align: left; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
+.cb-table td { padding: 15px 0; border-bottom: 1px solid var(--hair); vertical-align: top; }
+.cb-table td strong { display: block; font-weight: 600; }
+.cb-table small { display: block; margin-top: 2px; color: #6b7280; font-size: 0.78rem; letter-spacing: 0.04em; }
+.cb-num { text-align: right !important; white-space: nowrap; font-variant-numeric: tabular-nums; padding-left: 14px !important; }
+.cb-sum { margin: 16px 0 0; display: grid; gap: 0; }
+.cb-sum > div { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; }
+.cb-sum dd { margin: 0; font-variant-numeric: tabular-nums; }
+.cb-sum .cb-pay { margin-top: 14px; padding: 24px 28px; border-radius: 3px; background: var(--navy); color: #fff; align-items: center; }
+.cb-sum .cb-pay dt { color: var(--stone); font-size: 0.7rem; letter-spacing: 0.24em; text-transform: uppercase; }
+.cb-sum .cb-pay dd { font-family: Georgia, "Times New Roman", serif; font-size: 1.9rem; }
+.cb-pdf { margin: 16px 0 34px; font-size: 0.88rem; }
+.cb-pdf a { color: var(--navy); font-weight: 600; }
+
+.cb-decide h2, .cb-payment h2, .cb-result h2 { margin: 0 0 8px; color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.4rem; }
+.cb-choices { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.cb-choice { min-height: 52px; padding: 0 38px; border: 1.5px solid var(--navy); border-radius: 2px; background: #fff; color: var(--navy); font: inherit; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: box-shadow 0.15s; }
+.cb-choice--solid { background: var(--navy); color: #fff; }
+.cb-choice:hover { box-shadow: 0 8px 18px -10px rgba(20, 48, 95, 0.7); }
+.cb-choice.is-on { box-shadow: 0 0 0 4px rgba(20, 48, 95, 0.16); }
+.cb-hint { margin: 12px 0 0; font-size: 0.85rem; opacity: 0.75; }
+.cb-form { margin-top: 20px; padding: 22px; border-left: 3px solid var(--navy); background: var(--warm); }
+.cb-form p { margin: 0 0 12px; }
+.cb-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; font-weight: 600; }
+.cb-field small { font-weight: 400; opacity: 0.7; }
+.cb-field textarea, .cb-field input { padding: 12px 14px; border: 1.5px solid #cfcbc0; border-radius: 2px; background: #fff; font: inherit; font-weight: 400; color: #000; }
+.cb-field textarea:focus, .cb-field input:focus { outline: 0; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(20, 48, 95, 0.14); }
+.is-invalid { border-color: #d21319 !important; }
+.cb-error { color: #b3141b; font-weight: 600; }
+.cb-error--box { padding: 9px 12px; background: #fdecec; }
+.cb-send { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.cb-btn { min-height: 52px; padding: 0 32px; border: 1.5px solid var(--navy); border-radius: 2px; background: var(--navy); color: #fff; font: inherit; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; }
+.cb-btn--ghost { background: #fff; color: var(--navy); }
+.cb-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.cb-result { margin-top: 4px; padding: 24px 26px; border-left: 3px solid var(--navy); background: var(--warm); }
+.cb-result p { margin: 0; line-height: 1.7; }
+.cb-result--ok { border-left-color: #0f6b5f; background: #eef7f3; }
+.cb-result--ok h2 { color: #0f6b5f; }
+.cb-payment { margin-top: 30px; padding: 24px 26px; border-left: 3px solid var(--navy); background: var(--warm); }
+.cb-payment h2 { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; }
+.cb-payment p { margin: 8px 0 0; font-family: Georgia, "Times New Roman", serif; font-size: 1.05rem; line-height: 1.9; }
+.cb-foot { margin: 24px 12px 0; text-align: center; font-size: 0.8rem; line-height: 1.8; color: #4a5567; letter-spacing: 0.04em; }
+
+@media (max-width: 560px) {
+  .cb-card { padding: 28px 20px 28px; }
+  .cb-h1 { font-size: 1.55rem; }
+  .cb-brand { font-size: 1.55rem; letter-spacing: 0.26em; }
+  .cb-choice, .cb-btn { flex: 1 1 100%; min-height: 54px; }
+  .cb-sum .cb-pay { padding: 20px; }
+  .cb-sum .cb-pay dd { font-size: 1.45rem; }
+  .cb-table th:nth-child(3), .cb-table td:nth-child(3) { display: none; }
+}

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { NonMoiJob } from '../../../models/non-moi-job.model';
+import { jobStatusLabel } from '../../../utils/non-moi-job-status.util';
 import { NonMoiJobService } from '../../../services/non-moi-job.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { navigationUrl, toSitePin } from '../../../utils/geo.util';
@@ -29,11 +30,12 @@ export class TechnicianNonMoiJobsComponent implements OnInit {
   protected readonly groups = computed(() => {
     const all = this.jobs();
     return [
-      { key: 'todo', title: 'To do', empty: 'Nothing left to do — all your jobs are completed.', jobs: all.filter((j) => j.status !== 'Completed') },
-      { key: 'done', title: 'Completed', empty: '', jobs: all.filter((j) => j.status === 'Completed') },
+      { key: 'todo', title: 'To do', empty: 'Nothing left to do — all your jobs are completed.', jobs: all.filter((j) => j.status === 'Assigned') },
+      { key: 'done', title: 'Completed', empty: '', jobs: all.filter((j) => j.status !== 'Assigned') },
     ].filter((g) => g.jobs.length || g.key === 'todo');
   });
 
+  protected readonly statusLabel = jobStatusLabel;
   protected readonly loading = signal(true);
   protected readonly error = signal('');
 

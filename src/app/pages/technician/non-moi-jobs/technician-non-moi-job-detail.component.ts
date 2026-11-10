@@ -5,6 +5,7 @@ import { finalize, forkJoin } from 'rxjs';
 import { NonMoiJob } from '../../../models/non-moi-job.model';
 import { MaintenanceIssueOption, maintenanceCategoryLabel } from '../../../models/maintenance.model';
 import { MaintenanceService } from '../../../services/maintenance.service';
+import { jobStatusLabel } from '../../../utils/non-moi-job-status.util';
 import { NonMoiJobService } from '../../../services/non-moi-job.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { navigationUrl, toSitePin } from '../../../utils/geo.util';
@@ -67,6 +68,8 @@ export class TechnicianNonMoiJobDetailComponent implements OnInit {
   }
 
   protected readonly categoryLabel = maintenanceCategoryLabel;
+
+  protected readonly statusLabel = jobStatusLabel;
 
   protected isPicked(i: MaintenanceIssueOption): boolean { return this.picked().has(i.id); }
 

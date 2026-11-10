@@ -27,6 +27,19 @@
     </div>
   </header>
 
+  <div class="nj-stages" role="tablist" aria-label="Job stage">
+    <button type="button" class="nj-stage" [class.is-on]="stage() === 'all'" (click)="setStage('all')">All <b>{{ counts().all }}</b></button>
+    <button type="button" class="nj-stage" [class.is-on]="stage() === 'todo'" (click)="setStage('todo')">To do <b>{{ counts().todo }}</b></button>
+    <button type="button" class="nj-stage nj-stage--attn" [class.is-on]="stage() === 'done'" [class.has-items]="counts().done > 0" (click)="setStage('done')">
+      Done — ready to send <b>{{ counts().done }}</b>
+    </button>
+    <button type="button" class="nj-stage" [class.is-on]="stage() === 'sent'" (click)="setStage('sent')">With client <b>{{ counts().sent }}</b></button>
+    <button type="button" class="nj-stage nj-stage--attn" [class.is-on]="stage() === 'changes'" [class.has-items]="counts().changes > 0" (click)="setStage('changes')">
+      Client asked for changes <b>{{ counts().changes }}</b>
+    </button>
+    <button type="button" class="nj-stage" [class.is-on]="stage() === 'closed'" (click)="setStage('closed')">Approved <b>{{ counts().closed }}</b></button>
+  </div>
+
   <div class="nj-filters">
     <label class="nj-search">
       <span class="nj-search-icon" aria-hidden="true">
@@ -76,13 +89,13 @@
                 </td>
                 <td data-label="Technician" class="col-tech">{{ job.assignedToName }}</td>
                 <td data-label="Status">
-                  <span class="nj-status" [class.is-done]="job.status === 'Completed'"
-                    [attr.title]="job.status === 'Completed' ? ('Completed ' + (job.completedAt | date: 'd MMM y, HH:mm')) : 'Waiting for the technician'">
-                    {{ job.status === 'Completed' ? 'Completed' : 'To do' }}
+                  <span class="nj-status" [attr.data-status]="job.status"
+                    [attr.title]="job.status === 'ChangesRequested' && job.clientMessage ? job.clientMessage : statusLabel(job.status)">
+                    {{ statusLabel(job.status) }}
                   </span>
                 </td>
                 <td data-label="Amount" class="nj-amount">
-                  {{ job.status === 'Completed' ? (job.workTotal | number: '1.2-2') + ' QAR' : '—' }}
+                  {{ job.status === 'Assigned' ? '—' : (job.amountPayable | number: '1.2-2') + ' QAR' }}
                 </td>
                 <td class="col-actions">
                   <div class="nj-row-actions">
@@ -93,7 +106,13 @@
                       </button>
                       <button type="button" class="row-btn"
                         [disabled]="deletingId() === job.id" (click)="pendingDeleteId.set(null)">Keep</button>
+                    } @else if (job.status === 'Closed' || job.status === 'Sent') {
+                      <a class="row-btn" [routerLink]="[base, job.id, 'close']" [attr.aria-label]="'View ' + job.jobNumber">View</a>
                     } @else {
+                      @if (job.status === 'Completed' || job.status === 'ChangesRequested') {
+                        <a class="row-btn nj-close-btn" [routerLink]="[base, job.id, 'close']"
+                          [attr.aria-label]="'Review and send ' + job.jobNumber">{{ job.status === 'ChangesRequested' ? 'Review changes' : 'Review & send' }}</a>
+                      }
                       <a class="row-btn row-btn--edit" [routerLink]="[base, job.id, 'edit']"
                         [attr.aria-label]="'Edit ' + job.jobNumber">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"

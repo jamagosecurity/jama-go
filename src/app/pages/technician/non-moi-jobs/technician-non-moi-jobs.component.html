@@ -53,8 +53,8 @@
                 </td>
                 <td data-label="Customer">
                   <strong>{{ job.customerName }}</strong>
-                  <span class="tj-status tj-mini-status" [class.is-done]="job.status === 'Completed'">
-                    {{ job.status === 'Completed' ? 'Completed' : 'To do' }}
+                  <span class="tj-status tj-mini-status" [class.is-done]="job.status === 'Closed'" [attr.data-status]="job.status">
+                    {{ statusLabel(job.status) }}
                   </span>
                   <a class="tj-call" [href]="callTo(job)" [attr.aria-label]="'Call ' + job.customerName">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
@@ -86,17 +86,17 @@
                   @if (job.descriptionAr) { <span class="tj-ar" dir="rtl" lang="ar">{{ job.descriptionAr }}</span> }
                 </td>
                 <td data-label="Status">
-                  <span class="tj-status" [class.is-done]="job.status === 'Completed'">
-                    {{ job.status === 'Completed' ? 'Completed' : 'To do' }}
+                  <span class="tj-status" [class.is-done]="job.status === 'Closed'" [attr.data-status]="job.status">
+                    {{ statusLabel(job.status) }}
                   </span>
                 </td>
                 <td data-label="Total" class="tj-num" [class.tj-hide-phone]="job.status !== 'Completed'">
-                  {{ job.status === 'Completed' ? (job.workTotal | number: '1.2-2') + ' QAR' : '—' }}
+                  {{ job.status !== 'Assigned' ? (job.workTotal | number: '1.2-2') + ' QAR' : '—' }}
                 </td>
                 <td class="col-actions">
-                  <a class="row-btn" [class.row-btn--done]="job.status === 'Completed'" [routerLink]="['/technician/non-moi-jobs', job.id]"
-                    [attr.aria-label]="(job.status === 'Completed' ? 'View ' : 'Open ') + job.jobNumber">
-                    <span class="tj-btn-text">{{ job.status === 'Completed' ? 'View' : 'Open job' }}</span>
+                  <a class="row-btn" [class.row-btn--done]="job.status !== 'Assigned'" [routerLink]="['/technician/non-moi-jobs', job.id]"
+                    [attr.aria-label]="(job.status !== 'Assigned' ? 'View ' : 'Open ') + job.jobNumber">
+                    <span class="tj-btn-text">{{ job.status !== 'Assigned' ? 'View' : 'Open job' }}</span>
                     <svg class="tj-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
                   </a>
                 </td>

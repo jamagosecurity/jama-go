@@ -37,6 +37,15 @@
             }
           </label>
 
+          <label class="nj-field">
+            <span>Customer email <small class="nj-opt">optional — for sending the bill</small></span>
+            <input type="email" formControlName="customerEmail" maxlength="320" autocomplete="off"
+              placeholder="name@example.com" [class.is-invalid]="showError('customerEmail')" />
+            @if (showError('customerEmail')) {
+              <small class="field-error">Enter a valid email address, like name@example.com.</small>
+            }
+          </label>
+
           <div class="nj-field">
             <span>Technician <i aria-hidden="true">*</i></span>
             <app-select formControlName="assignedToId" [options]="technicianOptions()"
