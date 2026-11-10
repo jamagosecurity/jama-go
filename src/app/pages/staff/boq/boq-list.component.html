@@ -112,6 +112,14 @@
                       <a class="row-btn row-btn--edit" [routerLink]="[basePath, boq.id]">Open</a>
 
                       <button type="button" class="row-btn row-btn--icon" [disabled]="busyId() === boq.id"
+                        title="Preview" aria-label="Preview" (click)="preview(boq)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/>
+                        </svg>
+                      </button>
+
+                      <button type="button" class="row-btn row-btn--icon" [disabled]="busyId() === boq.id"
                         title="Download PDF" (click)="download(boq)">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
                           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -181,3 +189,7 @@
     }
   </div>
 </section>
+
+@if (previewBlob(); as pdf) {
+  <app-pdf-preview [blob]="pdf" [title]="previewTitle()" (closed)="closePreview()" (download)="downloadPreviewed()" />
+}

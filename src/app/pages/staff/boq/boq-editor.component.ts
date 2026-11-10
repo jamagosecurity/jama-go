@@ -28,6 +28,7 @@ import {
 } from '../../../models/camera.model';
 import { PERMISSIONS } from '../../../models/auth.model';
 import { StaffMember } from '../../../models/staff.model';
+import { PdfPreviewComponent } from '../../../components/pdf-preview/pdf-preview.component';
 import { AuthService } from '../../../services/auth.service';
 import { BoqService } from '../../../services/boq.service';
 import { BOQ_BASE_PATH, BOQ_STORAGE_PATH } from './boq-base-path';
@@ -125,7 +126,7 @@ const REASON_REQUIRED_MESSAGE = 'Say why this approved quotation is being change
 @Component({
   selector: 'app-boq-editor',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, DragDropModule, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, DragDropModule, PdfPreviewComponent, ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './boq-editor.component.html',
   styleUrl: './boq.css',
@@ -1798,6 +1799,29 @@ export class BoqEditorComponent implements OnInit {
     if (this.savedNoticeTimer) clearTimeout(this.savedNoticeTimer);
     this.savedNotice.set(message);
     this.savedNoticeTimer = setTimeout(() => this.savedNotice.set(''), 6000);
+  }
+
+  /** The PDF being previewed on screen, if the preview window is open. */
+  protected readonly previewBlob = signal<Blob | null>(null);
+  protected readonly previewing = signal(false);
+
+  /** Shows the quotation as the PDF it will download as — same terms-page and language choices — without saving a file. */
+  protected preview(): void {
+    const boq = this.boq();
+    if (!boq) return;
+    this.downloadMenuOpen.set(false);
+    this.previewing.set(true);
+    this.service
+      .downloadPdf(boq.id, this.includeTermsPage(), this.downloadTermsLanguage())
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.previewing.set(false)))
+      .subscribe({
+        next: (blob) => this.previewBlob.set(blob),
+        error: (err: unknown) => this.formError.set(getApiErrorMessage(err, 'Unable to preview the PDF.')),
+      });
+  }
+
+  protected closePreview(): void {
+    this.previewBlob.set(null);
   }
 
   protected download(): void {

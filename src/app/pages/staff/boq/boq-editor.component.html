@@ -55,6 +55,8 @@
             </button>
             @if (downloadMenuOpen()) {
               <div class="boq-menu-panel">
+                <button type="button" class="boq-menu-item" [disabled]="previewing()"
+                  (click)="preview()">{{ previewing() ? 'Preparing…' : 'Preview' }}</button>
                 <button type="button" class="boq-menu-item" [disabled]="downloading()"
                   (click)="download()">{{ downloading() ? 'Preparing…' : 'Download PDF' }}</button>
                 <label class="boq-menu-check" title="Uncheck to leave out the commercial terms letter (page 2) — for a client who already has terms agreed elsewhere.">
@@ -847,4 +849,9 @@
         [disabled]="saving()" (click)="closeTermsModal()">Cancel</button>
     </div>
   </div>
+}
+
+@if (previewBlob(); as pdf) {
+  <app-pdf-preview [blob]="pdf" [title]="(boq()?.boqNumber ?? 'Quotation') + ' — preview'"
+    (closed)="closePreview()" (download)="download()" />
 }

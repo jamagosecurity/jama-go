@@ -8,6 +8,7 @@ import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { PaginatedData } from '../../../models/api-result.model';
 import { BOQ_STATUSES, BoqListItem, BoqStatus } from '../../../models/boq.model';
+import { PdfPreviewComponent } from '../../../components/pdf-preview/pdf-preview.component';
 import { AuthService } from '../../../services/auth.service';
 import { BoqService } from '../../../services/boq.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
@@ -20,7 +21,7 @@ const PAGE_SIZE = 20;
 @Component({
   selector: 'app-boq-list',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, PdfPreviewComponent, ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './boq-list.component.html',
   styleUrl: './boq.css',
@@ -121,6 +122,36 @@ export class BoqListComponent implements OnInit {
     if (page < 1 || page > total || page === this.page()) return;
     this.page.set(page);
     this.load();
+  }
+
+  protected readonly previewBlob = signal<Blob | null>(null);
+  protected readonly previewTitle = signal('');
+  private previewing: BoqListItem | null = null;
+
+  /** Shows the quotation's PDF on screen instead of saving it. */
+  protected preview(boq: BoqListItem): void {
+    this.busyId.set(boq.id);
+    this.listError.set('');
+    this.service
+      .downloadPdf(boq.id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busyId.set(null)))
+      .subscribe({
+        next: (blob) => {
+          this.previewing = boq;
+          this.previewTitle.set(`${boq.boqNumber} — preview`);
+          this.previewBlob.set(blob);
+        },
+        error: (err: unknown) => this.listError.set(getApiErrorMessage(err, 'Unable to preview the PDF.')),
+      });
+  }
+
+  protected closePreview(): void {
+    this.previewBlob.set(null);
+    this.previewing = null;
+  }
+
+  protected downloadPreviewed(): void {
+    if (this.previewing) this.download(this.previewing);
   }
 
   protected download(boq: BoqListItem): void {
