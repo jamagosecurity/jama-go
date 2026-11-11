@@ -52,6 +52,11 @@ export class BoqService {
       .pipe(map(unwrapApiResult));
   }
 
+  /** A new, separate Draft copy of this quotation — same sections, items, quantities, rates and terms, its own number. */
+  duplicate(id: string): Observable<Boq> {
+    return this.http.post<ApiResult<Boq>>(`${this.baseUrl}/${id}/duplicate`, {}).pipe(map(unwrapApiResult));
+  }
+
   create(request: SaveBoqRequest): Observable<Boq> {
     return this.http.post<ApiResult<Boq>>(this.baseUrl, request).pipe(map(unwrapApiResult));
   }

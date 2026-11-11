@@ -1918,3 +1918,6 @@
 /* The Revision box sits beside the project name and stays small: it is a number. */
 .boq-field--revision input { max-width: 120px; }
 .boq-field--revision .field-hint { max-width: 260px; }
+
+/* Shown on a freshly duplicated quotation so it is always clear which one is being edited. */
+.boq-copied { margin: 0 0 14px; padding: 12px 16px; border-left: 4px solid #14305f; border-radius: 10px; background: #eaf0fa; color: #14305f; line-height: 1.6; }

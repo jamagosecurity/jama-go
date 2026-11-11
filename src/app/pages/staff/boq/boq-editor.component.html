@@ -55,6 +55,11 @@
             </button>
             @if (downloadMenuOpen()) {
               <div class="boq-menu-panel">
+                @if (canDuplicate) {
+                  <button type="button" class="boq-menu-item" [disabled]="duplicating()"
+                    title="Make a separate copy of this quotation to change, leaving this one as it is"
+                    (click)="duplicate()">{{ duplicating() ? 'Copying…' : 'Duplicate' }}</button>
+                }
                 <button type="button" class="boq-menu-item" [disabled]="previewing()"
                   (click)="preview()">{{ previewing() ? 'Preparing…' : 'Preview' }}</button>
                 <button type="button" class="boq-menu-item" [disabled]="downloading()"
@@ -113,6 +118,13 @@
       }
     </div>
   </header>
+
+  @if (copiedFrom() && boq(); as copy) {
+    <p class="boq-copied" role="status">
+      <strong>{{ copy.boqNumber }}</strong> is a separate copy of <strong>{{ copiedFrom() }}</strong>.
+      Change the name, quantities or items as you like — {{ copiedFrom() }} stays exactly as it was.
+    </p>
+  }
 
   @if (loading()) {
     <div class="admin-panel"><p>Loading quotation…</p></div>

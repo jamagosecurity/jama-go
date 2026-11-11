@@ -4,11 +4,12 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { PaginatedData } from '../../../models/api-result.model';
 import { BOQ_STATUSES, BoqListItem, BoqStatus } from '../../../models/boq.model';
 import { PdfPreviewComponent } from '../../../components/pdf-preview/pdf-preview.component';
+import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 import { BoqService } from '../../../services/boq.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
@@ -30,6 +31,7 @@ export class BoqListComponent implements OnInit {
   private readonly service = inject(BoqService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   /** The portal these screens are mounted under — see BOQ_BASE_PATH. */
   protected readonly basePath = inject(BOQ_BASE_PATH);
@@ -122,6 +124,22 @@ export class BoqListComponent implements OnInit {
     if (page < 1 || page > total || page === this.page()) return;
     this.page.set(page);
     this.load();
+  }
+
+  /** Copying needs the same permission as building a quotation; an approver-only account cannot. */
+  protected readonly canDuplicate = this.auth.can(PERMISSIONS.boqManage);
+
+  /** Makes a separate Draft copy of this quotation and opens it, ready to be changed. The original is left exactly as it is. */
+  protected duplicate(boq: BoqListItem): void {
+    this.busyId.set(boq.id);
+    this.listError.set('');
+    this.service
+      .duplicate(boq.id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busyId.set(null)))
+      .subscribe({
+        next: (copy) => void this.router.navigate([this.basePath, copy.id], { queryParams: { copiedFrom: boq.boqNumber } }),
+        error: (err: unknown) => this.listError.set(getApiErrorMessage(err, 'Unable to duplicate the quotation.')),
+      });
   }
 
   protected readonly previewBlob = signal<Blob | null>(null);

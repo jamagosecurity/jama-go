@@ -637,6 +637,7 @@ export class BoqEditorComponent implements OnInit {
     });
 
     const id = this.route.snapshot.paramMap.get('id');
+    this.copiedFrom.set(this.route.snapshot.queryParamMap.get('copiedFrom'));
     if (id && id !== 'new') this.loadBoq(id);
 
     this.pickerControl.valueChanges
@@ -1799,6 +1800,27 @@ export class BoqEditorComponent implements OnInit {
     if (this.savedNoticeTimer) clearTimeout(this.savedNoticeTimer);
     this.savedNotice.set(message);
     this.savedNoticeTimer = setTimeout(() => this.savedNotice.set(''), 6000);
+  }
+
+  protected readonly duplicating = signal(false);
+  protected readonly canDuplicate = this.auth.can(PERMISSIONS.boqManage);
+
+  /** The quotation this one was just copied from, so the page can say so. Set from the address the copy was opened with. */
+  protected readonly copiedFrom = signal<string | null>(null);
+
+  /** A separate Draft copy of this quotation, opened straight away. The original is left exactly as it is. */
+  protected duplicate(): void {
+    const boq = this.boq();
+    if (!boq || this.duplicating()) return;
+    this.downloadMenuOpen.set(false);
+    this.duplicating.set(true);
+    this.service
+      .duplicate(boq.id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.duplicating.set(false)))
+      .subscribe({
+        next: (copy) => void this.router.navigate([this.basePath, copy.id], { queryParams: { copiedFrom: boq.boqNumber } }),
+        error: (err: unknown) => this.formError.set(getApiErrorMessage(err, 'Unable to duplicate the quotation.')),
+      });
   }
 
   /** The PDF being previewed on screen, if the preview window is open. */
