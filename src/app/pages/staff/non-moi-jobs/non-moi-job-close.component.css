@@ -63,7 +63,7 @@
 .jc-sum .jc-sum-pay dt { color: var(--stone); font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; }
 .jc-sum .jc-sum-pay dd { color: #fff; font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.45rem; }
 
-.jc-channels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.jc-channels { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
 .jc-channel { padding: 18px 20px; border: 1.5px solid #dcd9cf; border-radius: 10px; background: #fff; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s, background 0.15s; }
 .jc-channel.is-on { border-color: var(--navy); background: #f6f8fc; }
 .jc-channel.is-off { background: var(--warm); border-style: dashed; }

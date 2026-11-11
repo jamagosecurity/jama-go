@@ -119,7 +119,7 @@
         </section>
       } @else if (!canClose()) {
         <section class="jc-card">
-          <p class="jc-note">Only <strong>{{ person(j.assignedByName) || 'an administrator' }}</strong>, who issued this job, or an administrator can add a discount and send the bill.</p>
+          <p class="jc-note">The technician has not finished this job yet. Once they do, you can add a discount and send the bill here.</p>
         </section>
       } @else {
         <section class="jc-card jc-send">
@@ -139,45 +139,25 @@
             </dl>
           </div>
 
-          <h3 class="jc-h3">How should the client get it?</h3>
-          <p class="jc-note">They receive the bill with three buttons: <strong>Approve</strong>, <strong>Reject</strong> and <strong>Comment</strong>.</p>
+          <h3 class="jc-h3">Where should the bill go?</h3>
+          <p class="jc-note">The client receives the bill by email, as a PDF with your signature and three buttons: <strong>Approve</strong>, <strong>Reject</strong> and <strong>Comment</strong>.</p>
           <div class="jc-channels">
-            <div class="jc-channel" [class.is-on]="sendEmail()">
-              <label class="jc-check">
-                <input type="checkbox" [ngModel]="sendEmail()" (ngModelChange)="sendEmail.set($event); confirming.set(false)" />
-                <span><strong>Email</strong><small>The bill as a PDF, with your signature</small></span>
+            <div class="jc-channel is-on">
+              <label class="jc-field">
+                <span class="jc-label">Client's email <em>required</em></span>
+                <input type="email" placeholder="name@example.com" [ngModel]="email()"
+                  (ngModelChange)="email.set($event); confirming.set(false)" [class.is-invalid]="!!emailError()" />
+                @if (emailError()) { <small class="jc-error">{{ emailError() }}</small> }
               </label>
-              @if (sendEmail()) {
-                <label class="jc-field">
-                  <span class="jc-label">Client's email</span>
-                  <input type="email" placeholder="name@example.com" [ngModel]="email()"
-                    (ngModelChange)="email.set($event); confirming.set(false)" [class.is-invalid]="!!emailError()" />
-                  @if (emailError()) { <small class="jc-error">{{ emailError() }}</small> }
-                </label>
-                <label class="jc-field">
-                  <span class="jc-label">Send from</span>
-                  <select [ngModel]="mailboxKey()" (ngModelChange)="mailboxKey.set($event)">
-                    @for (m of mailboxes(); track m.key) { <option [value]="m.key">{{ m.address }}</option> }
-                  </select>
-                  @if (mailboxError()) { <small class="jc-error">{{ mailboxError() }}</small> }
-                </label>
-              }
-            </div>
-
-            <div class="jc-channel" [class.is-on]="sendWhatsApp()" [class.is-off]="!whatsAppAvailable()">
-              <label class="jc-check">
-                <input type="checkbox" [disabled]="!whatsAppAvailable()" [ngModel]="sendWhatsApp()"
-                  (ngModelChange)="sendWhatsApp.set($event); confirming.set(false)" />
-                <span><strong>WhatsApp</strong><small>A message with a link to the bill</small></span>
+              <label class="jc-field">
+                <span class="jc-label">Send from</span>
+                <select [ngModel]="mailboxKey()" (ngModelChange)="mailboxKey.set($event)">
+                  @for (m of mailboxes(); track m.key) { <option [value]="m.key">{{ m.address }}</option> }
+                </select>
+                @if (mailboxError()) { <small class="jc-error">{{ mailboxError() }}</small> }
               </label>
-              @if (!whatsAppAvailable()) {
-                <small class="jc-unavailable">WhatsApp is not set up on this server yet, so the bill goes by email only.</small>
-              } @else if (sendWhatsApp()) {
-                <small class="jc-note">Goes to {{ j.customerNumber }}</small>
-              }
             </div>
           </div>
-          @if (channelError()) { <p class="jc-error">{{ channelError() }}</p> }
 
           <div class="jc-actions">
             @if (!confirming()) {
@@ -188,9 +168,7 @@
               <div class="jc-confirm">
                 <p>
                   Send the bill for <strong>{{ payable() | number: '1.2-2' }} QAR</strong>
-                  @if (sendEmail() && sendWhatsApp()) { by email and WhatsApp }
-                  @else if (sendEmail()) { by email }
-                  @else { by WhatsApp }
+                  by email to <strong>{{ email().trim() }}</strong>
                   for the client to approve? The job will wait for their answer.
                 </p>
                 <div class="jc-confirm-btns">

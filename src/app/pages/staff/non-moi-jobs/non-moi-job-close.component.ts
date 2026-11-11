@@ -16,7 +16,7 @@ const ADDRESS = /^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/;
 /**
  * The last step of a Non-MOI job. The technician has ticked what he fixed; the person who issued the job reviews it
  * here, may take a discount off the total (nothing else about the prices can change), and closes the deal — which
- * sends the client the bill by email and WhatsApp and locks the job.
+ * sends the client the bill by email and locks the job.
  */
 @Component({
   selector: 'app-non-moi-job-close',
@@ -49,11 +49,10 @@ export class NonMoiJobCloseComponent implements OnInit {
   protected readonly categoryLabel = maintenanceCategoryLabel;
   protected readonly statusLabel = jobStatusLabel;
 
-  /** Only the person who issued the job, or an administrator. The server checks the same rule. */
+  /** Any Non-MOI manager may review and send once the technician has finished (this page is only reachable with that grant). */
   protected readonly canClose = computed(() => {
     const job = this.job();
-    if (!job || (job.status !== 'Completed' && job.status !== 'ChangesRequested')) return false;
-    return this.auth.isAdmin() || (!!job.assignedById && job.assignedById === this.auth.currentUser()?.id);
+    return !!job && (job.status === 'Completed' || job.status === 'ChangesRequested');
   });
 
   protected readonly discountValue = computed(() => {
@@ -76,15 +75,13 @@ export class NonMoiJobCloseComponent implements OnInit {
   protected readonly emailError = computed(() => {
     if (!this.sendEmail()) return '';
     const e = this.email().trim();
-    if (!e) return 'Add the client’s email address, or untick the email.';
+    if (!e) return 'Add the client’s email address — the bill is sent by email.';
     return ADDRESS.test(e) ? '' : 'Enter a valid email address, like name@example.com.';
   });
-  protected readonly channelError = computed(() =>
-    !this.sendEmail() && !this.sendWhatsApp() ? 'Choose at least one way to send the bill.' : '');
   protected readonly mailboxError = computed(() =>
     this.sendEmail() && !this.mailboxKey() ? 'Choose which company mailbox the email is sent from.' : '');
   protected readonly canSubmit = computed(() =>
-    this.canClose() && !this.saving() && !this.discountError() && !this.emailError() && !this.channelError() && !this.mailboxError());
+    this.canClose() && !this.saving() && !this.discountError() && !this.emailError() && !this.mailboxError());
 
   /** The journey of a job, for the progress bar at the top of the page. */
   protected readonly steps = computed(() => {
@@ -141,11 +138,9 @@ export class NonMoiJobCloseComponent implements OnInit {
     this.email.set(job.customerEmail ?? '');
     if (job.discount > 0) this.discountText.set(String(job.discount));
     if (!this.mailboxKey()) this.mailboxKey.set(this.mailboxes()[0]?.key ?? '');
-    // A new revision after the client asked for changes goes out on both channels again. Only after a send that failed halfway
-    // is a channel that already went out left unticked, so the client is never sent the same thing twice.
-    const freshRevision = job.status === 'ChangesRequested' && job.clientDecision !== null;
-    this.sendEmail.set(freshRevision || !job.emailSentAt);
-    this.sendWhatsApp.set(this.whatsAppAvailable() && (freshRevision || !job.whatsAppSentAt));
+    // The bill always goes by email; WhatsApp is not used for bills.
+    this.sendEmail.set(true);
+    this.sendWhatsApp.set(false);
   }
 
   /** "Sara <sara@example.com>" is how audit names are stored; on screen only the name reads well. */
