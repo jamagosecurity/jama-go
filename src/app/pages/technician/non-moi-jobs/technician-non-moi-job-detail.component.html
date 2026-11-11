@@ -85,7 +85,7 @@
       <div class="admin-panel tjd-notes-panel">
         <label class="tjd-notes-in">
           <span>Notes (optional)</span>
-          <textarea rows="2" maxlength="1000" [value]="notes()" (input)="notes.set($any($event.target).value)"></textarea>
+          <textarea rows="2" maxlength="1000" [value]="notes()" (input)="notes.set($any($event.target).value); saveNotes()"></textarea>
         </label>
       </div>
 

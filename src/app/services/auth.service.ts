@@ -33,6 +33,9 @@ const ACTIVITY_KEY = 'jamago_admin_last_activity';
  * silence lets it actually run out.
  */
 const IDLE_LIMIT_MS = 60 * 60 * 1000;
+/** Technicians work on site, phone in a pocket, for hours between taps — the API gives them a working-day token, and the
+ *  idle clock must not be shorter than it. */
+const TECHNICIAN_IDLE_LIMIT_MS = 12 * 60 * 60 * 1000;
 /** How often the idle clock is checked, and — while active — how often the
  *  token gets renewed. Well under IDLE_LIMIT_MS, so a renewal is never missed
  *  by more than this margin. */
@@ -165,10 +168,11 @@ export class AuthService {
       this.currentUser.set(localStorage.getItem(TOKEN_KEY) && user ? user : null);
     });
 
-    setInterval(() => {
+    const check = () => {
       if (!this.isLoggedIn()) return;
 
-      if (Date.now() - this.readLastActivity() >= IDLE_LIMIT_MS) {
+      const limit = this.isTechnician() ? TECHNICIAN_IDLE_LIMIT_MS : IDLE_LIMIT_MS;
+      if (Date.now() - this.readLastActivity() >= limit) {
         this.logout();
         return;
       }
@@ -178,7 +182,15 @@ export class AuthService {
       // interceptor deliberately ignores a 401 from this call for the same
       // reason — a renewal that fails is not proof the session has ended.
       this.refreshToken().subscribe({ error: () => {} });
-    }, IDLE_CHECK_INTERVAL_MS);
+    };
+
+    setInterval(check, IDLE_CHECK_INTERVAL_MS);
+
+    // A phone that slept freezes the timer above, so coming back to the page renews the session straight away
+    // instead of waiting up to a minute — a tap in that gap used to hit an expired token.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') check();
+    });
   }
 
   /** Falls back to "active right now" for a session that predates the shared

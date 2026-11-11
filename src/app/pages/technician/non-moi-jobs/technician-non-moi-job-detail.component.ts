@@ -62,6 +62,7 @@ export class TechnicianNonMoiJobDetailComponent implements OnInit {
           this.job.set(found);
           this.catalogue.set(catalogue);
           if (!found) this.error.set('This job was not found, or it is not assigned to you.');
+          else if (found.status === 'Assigned') this.restoreDraft(found.id);
         },
         error: (err: unknown) => this.error.set(getApiErrorMessage(err, 'Could not load the job.')),
       });
@@ -79,6 +80,32 @@ export class TechnicianNonMoiJobDetailComponent implements OnInit {
       if (!next.delete(i.id)) next.set(i.id, 1);
       return next;
     });
+    this.saveDraft();
+  }
+
+  // What has been ticked is kept on the phone until the job is completed, so a dropped session or a reload
+  // does not cost the technician their selection.
+  private draftKey(id: string): string { return `jamago_nonmoi_draft_${id}`; }
+
+  protected saveNotes(): void { this.saveDraft(); }
+
+  private saveDraft(): void {
+    const job = this.job();
+    if (!job) return;
+    try {
+      localStorage.setItem(this.draftKey(job.id), JSON.stringify({ picked: [...this.picked()], notes: this.notes() }));
+    } catch { /* storage unavailable: the page still works */ }
+  }
+
+  private restoreDraft(id: string): void {
+    try {
+      const raw = localStorage.getItem(this.draftKey(id));
+      if (!raw) return;
+      const draft = JSON.parse(raw) as { picked?: [string, number][]; notes?: string };
+      const known = new Set(this.catalogue().map((i) => i.id));
+      this.picked.set(new Map((draft.picked ?? []).filter(([key]) => known.has(key))));
+      this.notes.set(draft.notes ?? '');
+    } catch { /* a bad draft is ignored */ }
   }
 
   protected complete(): void {
@@ -93,7 +120,10 @@ export class TechnicianNonMoiJobDetailComponent implements OnInit {
       .complete(job.id, { lines, notes: this.notes().trim() || null })
       .pipe(finalize(() => this.saving.set(false)))
       .subscribe({
-        next: (done) => this.job.set(done),
+        next: (done) => {
+          this.job.set(done);
+          try { localStorage.removeItem(this.draftKey(done.id)); } catch { /* ignore */ }
+        },
         error: (err: unknown) => this.error.set(getApiErrorMessage(err, 'Could not complete the job.')),
       });
   }
