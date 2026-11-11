@@ -44,6 +44,8 @@ export const PERMISSIONS = {
   nonMoiJobManage: 'nonmoijob.manage',
   /** Reading the company mailboxes. Read-only: sending stays with administrators. */
   mailRead: 'mail.read',
+  /** Technicians: shows the Non-MOI Jobs section in their portal. */
+  nonMoiJobWork: 'nonmoijob.work',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

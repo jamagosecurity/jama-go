@@ -1,5 +1,20 @@
-import { Routes } from '@angular/router';
-import { createMaintenanceRoutes } from '../staff/maintenance/maintenance.routes';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router, Routes } from '@angular/router';
+import { permissionGuard } from '../../guards/admin.guard';
+import { PERMISSIONS } from '../../models/auth.model';
+import { AuthService } from '../../services/auth.service';
+
+/** The technician's front door: inspections if he has them, otherwise straight to his Non-MOI jobs. */
+const landingGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  if (auth.can(PERMISSIONS.diaInspect) || auth.can(PERMISSIONS.diaView)) return true;
+  return inject(Router).parseUrl(auth.can(PERMISSIONS.nonMoiJobWork) ? '/technician/non-moi-jobs' : '/');
+};
+
+const inspectionGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  return auth.can(PERMISSIONS.diaInspect) || auth.can(PERMISSIONS.diaView) || inject(Router).parseUrl('/technician');
+};
 
 export const TECHNICIAN_ROUTES: Routes = [
   {
@@ -10,43 +25,42 @@ export const TECHNICIAN_ROUTES: Routes = [
       {
         path: '',
         pathMatch: 'full',
+        canActivate: [landingGuard],
         title: 'Technician Dashboard — Jama Go',
         loadComponent: () =>
           import('./dashboard/technician-dashboard.component').then((m) => m.TechnicianDashboardComponent),
       },
       {
         path: 'dia/:id',
+        canActivate: [inspectionGuard],
         title: 'DIA Inspection — Jama Go',
         loadComponent: () =>
           import('./detail/technician-dia-detail.component').then((m) => m.TechnicianDiaDetailComponent),
       },
       {
         path: 'inspection/:id',
+        canActivate: [inspectionGuard],
         title: 'Inspection Form — Jama Go',
         loadComponent: () =>
           import('./form/technician-inspection-form.component').then((m) => m.TechnicianInspectionFormComponent),
       },
       {
         path: 'inspection/:id/review',
+        canActivate: [inspectionGuard],
         title: 'Review Inspection — Jama Go',
         loadComponent: () =>
           import('./review/technician-inspection-review.component').then((m) => m.TechnicianInspectionReviewComponent),
       },
       {
         path: 'dia/:id/summary',
+        canActivate: [inspectionGuard],
         title: 'Final Summary — Jama Go',
         loadComponent: () =>
           import('./summary/technician-final-summary.component').then((m) => m.TechnicianFinalSummaryComponent),
       },
       {
-        // Non-MOI maintenance — the same screens staff use. A technician sees
-        // the jobs assigned to them and files new ones at admin's prices; the
-        // queue, repricing and discounts stay with maintenance.manage.
-        path: 'maintenance',
-        children: createMaintenanceRoutes('/technician/maintenance'),
-      },
-      {
         path: 'non-moi-jobs/:id',
+        canActivate: [permissionGuard(PERMISSIONS.nonMoiJobWork)],
         title: 'Non-MOI Job — Jama Go',
         loadComponent: () =>
           import('./non-moi-jobs/technician-non-moi-job-detail.component').then((m) => m.TechnicianNonMoiJobDetailComponent),
@@ -55,6 +69,7 @@ export const TECHNICIAN_ROUTES: Routes = [
         // Jobs admin issued to this technician — the Non-MOI counterpart of
         // the DIA list, but only their own.
         path: 'non-moi-jobs',
+        canActivate: [permissionGuard(PERMISSIONS.nonMoiJobWork)],
         title: 'Non-MOI Jobs — Jama Go',
         loadComponent: () =>
           import('./non-moi-jobs/technician-non-moi-jobs.component').then((m) => m.TechnicianNonMoiJobsComponent),

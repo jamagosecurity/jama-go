@@ -20,44 +20,38 @@
     </div>
 
     <nav class="staff-nav" aria-label="Technician">
-      <p class="nav-sub nav-sub--moi"><i aria-hidden="true"></i>MOI</p>
-      <a routerLink="/technician" [class.active]="tab() === 'dia'">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M9 3h6l1 2h3v16H5V5h3z" />
-            <path d="M9 12l2 2 4-4M9 18h6" />
-          </svg>
-        </span>
-        <span>
-          <strong>DIA Inspections</strong>
-          <small>Quarterly site visits</small>
-        </span>
-      </a>
+      <!-- Only what this technician has been given access to is shown. -->
+      @if (canInspect()) {
+        <p class="nav-sub nav-sub--moi"><i aria-hidden="true"></i>MOI</p>
+        <a routerLink="/technician" [class.active]="tab() === 'dia'">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 3h6l1 2h3v16H5V5h3z" />
+              <path d="M9 12l2 2 4-4M9 18h6" />
+            </svg>
+          </span>
+          <span>
+            <strong>DIA Inspections</strong>
+            <small>Quarterly site visits</small>
+          </span>
+        </a>
+      }
 
-      <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
-      <a routerLink="/technician/maintenance" [class.active]="tab() === 'maintenance'">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-          </svg>
-        </span>
-        <span>
-          <strong>Maintenance</strong>
-          <small>Report &amp; track issues</small>
-        </span>
-      </a>
-      <a routerLink="/technician/non-moi-jobs" [class.active]="tab() === 'jobs'">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
-            <circle cx="12" cy="10" r="2.6" />
-          </svg>
-        </span>
-        <span>
-          <strong>Non-MOI Jobs</strong>
-          <small>Issued to you</small>
-        </span>
-      </a>
+      @if (canDoJobs()) {
+        <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
+        <a routerLink="/technician/non-moi-jobs" [class.active]="tab() === 'jobs'">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+              <circle cx="12" cy="10" r="2.6" />
+            </svg>
+          </span>
+          <span>
+            <strong>Non-MOI Jobs</strong>
+            <small>Issued to you</small>
+          </span>
+        </a>
+      }
     </nav>
 
     <div class="staff-sidebar-foot">

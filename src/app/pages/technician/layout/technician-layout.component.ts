@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, HostListener, computed, inject, sig
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
+import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 
-const MAINTENANCE_PREFIX = '/technician/maintenance';
 const JOBS_PREFIX = '/technician/non-moi-jobs';
 
 @Component({
@@ -36,6 +36,12 @@ export class TechnicianLayoutComponent {
     { initialValue: this.tabFor(this.router.url) },
   );
 
+  /** The portal shows only what this technician has been given access to. */
+  protected readonly canInspect = computed(
+    () => this.auth.can(PERMISSIONS.diaInspect) || this.auth.can(PERMISSIONS.diaView),
+  );
+  protected readonly canDoJobs = computed(() => this.auth.can(PERMISSIONS.nonMoiJobWork));
+
   protected readonly initials = computed(() => {
     const parts = (this.auth.currentUser()?.fullName?.trim() || 'Technician').split(/\s+/).filter(Boolean);
     return parts.length === 1 ? parts[0].slice(0, 2).toUpperCase() : `${parts[0][0]}${parts[1][0]}`.toUpperCase();
@@ -46,8 +52,7 @@ export class TechnicianLayoutComponent {
     this.menuOpen.set(false);
   }
 
-  private tabFor(url: string): 'dia' | 'maintenance' | 'jobs' {
-    if (url.startsWith(MAINTENANCE_PREFIX)) return 'maintenance';
+  private tabFor(url: string): 'dia' | 'jobs' {
     if (url.startsWith(JOBS_PREFIX)) return 'jobs';
     return 'dia';
   }
