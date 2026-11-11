@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
 const landingGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   if (auth.can(PERMISSIONS.diaInspect) || auth.can(PERMISSIONS.diaView)) return true;
-  return inject(Router).parseUrl(auth.can(PERMISSIONS.nonMoiJobWork) ? '/technician/non-moi-jobs' : '/');
+  return inject(Router).parseUrl(auth.can(PERMISSIONS.nonMoiJobWork) ? '/technician/non-moi-jobs' : '/technician/no-access');
 };
 
 const inspectionGuard: CanActivateFn = () => {
@@ -29,6 +29,12 @@ export const TECHNICIAN_ROUTES: Routes = [
         title: 'Technician Dashboard — Jama Go',
         loadComponent: () =>
           import('./dashboard/technician-dashboard.component').then((m) => m.TechnicianDashboardComponent),
+      },
+      {
+        path: 'no-access',
+        title: 'No access yet — Jama Go',
+        loadComponent: () =>
+          import('./no-access/technician-no-access.component').then((m) => m.TechnicianNoAccessComponent),
       },
       {
         path: 'dia/:id',
