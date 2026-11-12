@@ -35,6 +35,6 @@ export class AppComponent {
   // copy also omitted /client, which would have shown the marketing header on a
   // signed-in client's pages.
   private isPortalRoute(url: string): boolean {
-    return isPortalRoute(url);
+    return isPortalRoute(url) || url.split('?')[0] === '/register';
   }
 }

@@ -31,6 +31,12 @@ export const TECHNICIAN_ROUTES: Routes = [
           import('./dashboard/technician-dashboard.component').then((m) => m.TechnicianDashboardComponent),
       },
       {
+        path: 'profile',
+        title: 'My profile — Jama Go',
+        loadComponent: () =>
+          import('../../components/profile-dialog/profile-dialog.component').then((m) => m.ProfileDialogComponent),
+      },
+      {
         path: 'no-access',
         title: 'No access yet — Jama Go',
         loadComponent: () =>

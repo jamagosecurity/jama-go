@@ -495,3 +495,13 @@
 .staff-banner-sub { color: #6b7280; }
 .staff-banner-add { border: 0; background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%); color: #fff; box-shadow: 0 12px 24px -14px rgba(210, 19, 25, .9); }
 .staff-banner-add:hover { box-shadow: 0 16px 28px -12px rgba(210, 19, 25, 1); }
+
+
+/* Name cell: picture, name and designation — click for the profile card. */
+.staff-who { display: inline-flex; align-items: center; gap: 12px; max-width: 100%; padding: 4px 8px 4px 4px; border: 0; border-radius: 999px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.staff-who:hover { background: rgba(20, 48, 95, 0.06); }
+.staff-who:focus-visible { outline: 2px solid #1d4589; outline-offset: 2px; }
+.staff-who-text { display: grid; min-width: 0; }
+.staff-who-text strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.staff-who-text small { color: #6b7280; font-size: 0.8rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.staff-who-text small.is-empty { color: #9aa1b2; font-style: italic; }

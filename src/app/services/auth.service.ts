@@ -106,6 +106,15 @@ export class AuthService {
     return this.currentUser()?.permissions?.includes(permission) ?? false;
   }
 
+  /** Updates what is shown about the signed-in person (their picture, their designation) without a new login. */
+  updateCurrentUser(patch: Partial<UserSummary>): void {
+    const user = this.currentUser();
+    if (!user) return;
+    const next = { ...user, ...patch };
+    localStorage.setItem(USER_KEY, JSON.stringify(next));
+    this.currentUser.set(next);
+  }
+
   landingRoute(user = this.currentUser()): string {
     if (user?.role === 'Technician') return '/technician';
     if (user?.role === 'Client') return '/client';
@@ -204,6 +213,19 @@ export class AuthService {
   changePassword(request: ChangePasswordRequest): Observable<string> {
     return this.http
       .post<ApiResult<string>>(`${environment.apiUrl}/auth/change-password`, request)
+      .pipe(map((result) => unwrapApiResult(result)));
+  }
+
+  /** Emails a one-time link to set a new password. The answer is the same whether or not the address has an account. */
+  forgotPassword(email: string): Observable<string> {
+    return this.http
+      .post<ApiResult<string>>(`${environment.apiUrl}/auth/forgot-password`, { email })
+      .pipe(map((result) => unwrapApiResult(result)));
+  }
+
+  resetPassword(email: string, token: string, newPassword: string): Observable<string> {
+    return this.http
+      .post<ApiResult<string>>(`${environment.apiUrl}/auth/reset-password`, { email, token, newPassword })
       .pipe(map((result) => unwrapApiResult(result)));
   }
 

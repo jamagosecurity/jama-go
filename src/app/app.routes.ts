@@ -92,6 +92,18 @@ export const routes: Routes = [
     path: 'admin',
     children: [
       {
+        path: 'forgot-password',
+        title: 'Forgot password — Jama Go',
+        loadComponent: () =>
+          import('./pages/admin/password-reset/forgot-password.component').then((m) => m.ForgotPasswordComponent),
+      },
+      {
+        path: 'reset-password',
+        title: 'Set a new password — Jama Go',
+        loadComponent: () =>
+          import('./pages/admin/password-reset/reset-password.component').then((m) => m.ResetPasswordComponent),
+      },
+      {
         path: 'login',
         canActivate: [guestGuard],
         title: 'Secure Login — Jama Go Security',
@@ -182,6 +194,12 @@ export const routes: Routes = [
               import('./pages/admin/client-registrations/client-registrations.component').then(
                 (m) => m.ClientRegistrationsComponent,
               ),
+          },
+          {
+            path: 'profile',
+            title: 'My profile — Jama Go',
+            loadComponent: () =>
+              import('./components/profile-dialog/profile-dialog.component').then((m) => m.ProfileDialogComponent),
           },
           {
             path: 'mail',

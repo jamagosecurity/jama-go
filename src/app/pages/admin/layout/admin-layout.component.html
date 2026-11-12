@@ -236,11 +236,14 @@
 
     <div class="admin-sidebar-foot">
       <div class="admin-user">
-        <div class="admin-avatar" aria-hidden="true">{{ initials() }}</div>
-        <div class="admin-user-meta">
-          <p>{{ auth.currentUser()?.fullName || 'Administrator' }}</p>
-          <small>{{ auth.currentUser()?.email }}</small>
-          <span class="profile-role">Administrator</span>
+<div class="user-profile-btn" role="button" tabindex="0" title="My profile" aria-label="Open my profile"
+             routerLink="/admin/profile" (keydown.enter)="openProfilePage('/admin/profile')">
+          <app-avatar [userId]="auth.currentUser()?.id" [name]="auth.currentUser()?.fullName ?? ''" [version]="auth.currentUser()?.photoVersion" [size]="42" />
+          <div class="admin-user-meta">
+            <p>{{ auth.currentUser()?.fullName || 'Administrator' }}</p>
+            <small>{{ auth.currentUser()?.designation || auth.currentUser()?.email }}</small>
+            <span class="profile-role">Administrator</span>
+          </div>
         </div>
         <button type="button" class="profile-logout" (click)="logout()" aria-label="Sign out" title="Sign out">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /></svg>

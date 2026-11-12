@@ -1,10 +1,9 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
   ElementRef,
-  OnDestroy,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -14,96 +13,118 @@ import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
+import { PrayerTime, formatMinutes, prayerTimes } from '../../../utils/prayer-times.util';
+import { LiveMapComponent } from '../../../components/live-map/live-map.component';
 
+const TIME_ZONE = 'Asia/Qatar';
+
+/** The parts of "now" in Doha, whatever time zone the visitor's computer is in. */
+function dohaNow(at: Date): { year: number; month: number; day: number; minutes: number; seconds: number } {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: TIME_ZONE, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23',
+  }).formatToParts(at);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0);
+  return { year: get('year'), month: get('month'), day: get('day'), minutes: get('hour') * 60 + get('minute'), seconds: get('second') };
+}
+
+/**
+ * The sign-in page: a live Doha panel (time, Hijri and Gregorian dates, today's prayer times and a countdown to the next
+ * one) over an animated map of Qatar, beside the sign-in card. The sign-in itself is unchanged.
+ */
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, LiveMapComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-login.component.html',
   styleUrl: './admin-login.component.css',
 })
-export class AdminLoginComponent implements AfterViewInit, OnDestroy {
+export class AdminLoginComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
-  private introTimer?: ReturnType<typeof setTimeout>;
-  private gsapCleanup?: () => void;
 
   email = '';
   password = '';
-  rememberMe = false;
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly showPassword = signal(false);
-  readonly showCinema = signal(true);
 
-  readonly line1 = ['C', 'o', 'm', 'm', 'a', 'n', 'd', '\u00A0', 'y', 'o', 'u', 'r'];
-  readonly line2 = ['s', 'e', 'c', 'u', 'r', 'i', 't', 'y', '\u00A0', 'f', 'r', 'o', 'm'];
-  readonly line3 = ['o', 'n', 'e', '\u00A0', 'v', 'a', 'u', 'l', 't', '.'];
-  readonly particles = Array.from({ length: 18 }, (_, i) => i);
-  readonly rotatorWords = [
-    'homes & villas.',
-    'offices & retail.',
-    'events & venues.',
-    'what matters most.',
-  ];
+  // ===== The live Doha panel =====
 
-  ngAfterViewInit(): void {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  protected readonly now = signal(new Date());
 
-    if (reduceMotion) {
-      this.showCinema.set(false);
-      void this.enhanceWithGsap();
-      return;
+  private readonly doha = computed(() => dohaNow(this.now()));
+
+  protected readonly clock = computed(() => {
+    const text = new Intl.DateTimeFormat('en-US', { timeZone: TIME_ZONE, hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true }).format(this.now());
+    const [time, period] = text.split(' ');
+    return { time, period };
+  });
+
+  protected readonly gregorian = computed(() =>
+    new Intl.DateTimeFormat('en-GB', { timeZone: TIME_ZONE, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(this.now()));
+
+  protected readonly hijri = computed(() => {
+    try {
+      return new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { timeZone: TIME_ZONE, day: 'numeric', month: 'long', year: 'numeric' }).format(this.now());
+    } catch {
+      return '';
     }
+  });
 
-    // Cinema is CSS-driven so the page is never blank. Auto-dismiss, then enhance with GSAP.
-    this.introTimer = setTimeout(() => {
-      this.showCinema.set(false);
-      void this.enhanceWithGsap();
-    }, 2200);
+  protected readonly prayers = computed<readonly PrayerTime[]>(() => {
+    const { year, month, day } = this.doha();
+    return prayerTimes({ year, month, day });
+  });
+
+  /** The next prayer today, or Fajr tomorrow once Isha has passed. */
+  protected readonly next = computed(() => {
+    const { minutes, seconds, year, month, day } = this.doha();
+    const nowSeconds = minutes * 60 + seconds;
+    const today = this.prayers();
+    let target = today.find((p) => p.minutes * 60 > nowSeconds);
+    let secondsLeft: number;
+    if (target) {
+      secondsLeft = target.minutes * 60 - nowSeconds;
+    } else {
+      const tomorrow = new Date(Date.UTC(year, month - 1, day + 1));
+      target = prayerTimes({ year: tomorrow.getUTCFullYear(), month: tomorrow.getUTCMonth() + 1, day: tomorrow.getUTCDate() })[0];
+      secondsLeft = 24 * 3600 - nowSeconds + target.minutes * 60;
+    }
+    const h = Math.floor(secondsLeft / 3600);
+    const m = Math.floor((secondsLeft % 3600) / 60);
+    const s = secondsLeft % 60;
+    return {
+      prayer: target,
+      at: formatMinutes(target.minutes),
+      countdown: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`,
+    };
+  });
+
+  protected stateOf(prayer: PrayerTime): 'past' | 'next' | 'later' {
+    if (this.next().prayer.key === prayer.key && this.next().prayer.minutes === prayer.minutes) return 'next';
+    const { minutes } = this.doha();
+    return prayer.minutes <= minutes ? 'past' : 'later';
   }
 
-  ngOnDestroy(): void {
-    if (this.introTimer) {
-      clearTimeout(this.introTimer);
-    }
-    this.gsapCleanup?.();
+  protected readonly formatMinutes = formatMinutes;
+
+  constructor() {
+    const timer = setInterval(() => this.now.set(new Date()), 1000);
+    this.destroyRef.onDestroy(() => clearInterval(timer));
   }
 
-  skipIntro(): void {
-    if (this.introTimer) {
-      clearTimeout(this.introTimer);
-    }
-    this.showCinema.set(false);
-    void this.enhanceWithGsap();
-  }
+  // ===== Sign-in (unchanged behaviour) =====
 
   togglePassword(): void {
     this.showPassword.update((v) => !v);
   }
 
   forgotPassword(): void {
-    this.error.set('Contact your administrator to reset access credentials.');
-  }
-
-  spawnRipple(event: MouseEvent): void {
-    const btn = event.currentTarget as HTMLElement | null;
-    if (!btn) {
-      return;
-    }
-    const rect = btn.getBoundingClientRect();
-    const ripple = document.createElement('span');
-    ripple.className = 'ripple';
-    const size = Math.max(rect.width, rect.height) * 2;
-    ripple.style.width = ripple.style.height = `${size}px`;
-    ripple.style.left = `${event.clientX - rect.left - size / 2}px`;
-    ripple.style.top = `${event.clientY - rect.top - size / 2}px`;
-    btn.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 650);
+    void this.router.navigate(['/admin/forgot-password']);
   }
 
   submit(event: Event): void {
@@ -135,186 +156,10 @@ export class AdminLoginComponent implements AfterViewInit, OnDestroy {
         },
         error: (err: unknown) => {
           this.error.set(getApiErrorMessage(err, 'Invalid email or password.'));
-          const panel = this.host.nativeElement.querySelector('.panel-inner');
-          panel?.classList.add('is-shake');
-          setTimeout(() => panel?.classList.remove('is-shake'), 450);
+          const card = this.host.nativeElement.querySelector('.lg-card');
+          card?.classList.add('is-shake');
+          setTimeout(() => card?.classList.remove('is-shake'), 450);
         },
       });
-  }
-
-  private async enhanceWithGsap(): Promise<void> {
-    try {
-      const { gsap } = await import('gsap');
-      const root = this.host.nativeElement;
-      const listeners: Array<() => void> = [];
-
-      const ctx = gsap.context(() => {
-        gsap.from('.login-reveal', {
-          y: 26,
-          opacity: 0,
-          duration: 0.6,
-          stagger: 0.07,
-          ease: 'power3.out',
-        });
-        gsap.from('.brand-logo', {
-          scale: 0.55,
-          rotation: -10,
-          opacity: 0,
-          duration: 0.9,
-          ease: 'back.out(1.8)',
-        });
-        gsap.to('.brand-logo', {
-          y: -5,
-          duration: 2.6,
-          delay: 1,
-          yoyo: true,
-          repeat: -1,
-          ease: 'sine.inOut',
-        });
-        gsap.from('.char', {
-          yPercent: 100,
-          opacity: 0,
-          duration: 0.6,
-          stagger: 0.02,
-          ease: 'power4.out',
-        });
-        gsap.from('.stat-item', {
-          y: 18,
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.09,
-          delay: 0.35,
-          ease: 'power3.out',
-        });
-        gsap.from('.login-shell', {
-          y: 40,
-          opacity: 0,
-          scale: 0.965,
-          duration: 0.9,
-          ease: 'expo.out',
-        });
-        gsap.to('.ring-a', {
-          rotation: 360,
-          duration: 28,
-          repeat: -1,
-          ease: 'none',
-          transformOrigin: '50% 50%',
-        });
-        gsap.to('.ring-b', {
-          rotation: -360,
-          duration: 36,
-          repeat: -1,
-          ease: 'none',
-          transformOrigin: '50% 50%',
-        });
-        gsap.to('.shield', {
-          y: -6,
-          duration: 2.4,
-          yoyo: true,
-          repeat: -1,
-          ease: 'sine.inOut',
-        });
-
-        // Rotating tagline words
-        const words = gsap.utils.toArray<HTMLElement>('.rotator-word');
-        if (words.length > 1) {
-          gsap.set(words, { yPercent: 105, opacity: 0, position: 'absolute' });
-          gsap.set(words[0], { yPercent: 0, opacity: 1 });
-
-          const cycle = gsap.timeline({ repeat: -1, delay: 1.2 });
-          words.forEach((word, i) => {
-            const next = words[(i + 1) % words.length];
-            cycle
-              .to(word, { yPercent: -105, opacity: 0, duration: 0.55, ease: 'power3.in' }, `+=1.9`)
-              .fromTo(
-                next,
-                { yPercent: 105, opacity: 0 },
-                { yPercent: 0, opacity: 1, duration: 0.55, ease: 'power3.out' },
-                '<0.08',
-              );
-          });
-        }
-
-        const card = root.querySelector<HTMLElement>('.login-shell');
-        const visual = root.querySelector<HTMLElement>('.visual-core');
-        const signin = root.querySelector<HTMLElement>('.signin');
-
-        // Subtle 3D tilt on the whole card
-        if (card) {
-          const tiltX = gsap.quickTo(card, 'rotationY', { duration: 0.7, ease: 'power3.out' });
-          const tiltY = gsap.quickTo(card, 'rotationX', { duration: 0.7, ease: 'power3.out' });
-          gsap.set(card, { transformPerspective: 1400 });
-
-          const onCardMove = (e: PointerEvent): void => {
-            if (window.innerWidth < 940) {
-              return;
-            }
-            const r = card.getBoundingClientRect();
-            tiltX(((e.clientX - r.left) / r.width - 0.5) * 3.5);
-            tiltY(((e.clientY - r.top) / r.height - 0.5) * -3.5);
-          };
-          const onCardLeave = (): void => {
-            tiltX(0);
-            tiltY(0);
-          };
-
-          card.addEventListener('pointermove', onCardMove);
-          card.addEventListener('pointerleave', onCardLeave);
-          listeners.push(() => {
-            card.removeEventListener('pointermove', onCardMove);
-            card.removeEventListener('pointerleave', onCardLeave);
-          });
-        }
-
-        // Magnetic sign-in button
-        if (signin) {
-          const magX = gsap.quickTo(signin, 'x', { duration: 0.4, ease: 'power3.out' });
-          const magY = gsap.quickTo(signin, 'y', { duration: 0.4, ease: 'power3.out' });
-
-          const onBtnMove = (e: PointerEvent): void => {
-            if (window.innerWidth < 900) {
-              return;
-            }
-            const r = signin.getBoundingClientRect();
-            magX((e.clientX - (r.left + r.width / 2)) * 0.16);
-            magY((e.clientY - (r.top + r.height / 2)) * 0.16);
-          };
-          const onBtnLeave = (): void => {
-            gsap.to(signin, { x: 0, y: 0, duration: 0.55, ease: 'elastic.out(1, 0.45)' });
-          };
-
-          signin.addEventListener('pointermove', onBtnMove);
-          signin.addEventListener('pointerleave', onBtnLeave);
-          listeners.push(() => {
-            signin.removeEventListener('pointermove', onBtnMove);
-            signin.removeEventListener('pointerleave', onBtnLeave);
-          });
-        }
-
-        // Scene parallax
-        if (visual) {
-          const parX = gsap.quickTo(visual, 'x', { duration: 1, ease: 'power3.out' });
-          const parY = gsap.quickTo(visual, 'y', { duration: 1, ease: 'power3.out' });
-
-          const onSceneMove = (e: PointerEvent): void => {
-            if (window.innerWidth < 960) {
-              return;
-            }
-            parX((e.clientX / window.innerWidth - 0.5) * 22);
-            parY((e.clientY / window.innerHeight - 0.5) * 16);
-          };
-
-          window.addEventListener('pointermove', onSceneMove);
-          listeners.push(() => window.removeEventListener('pointermove', onSceneMove));
-        }
-      }, root);
-
-      this.gsapCleanup = () => {
-        listeners.forEach((off) => off());
-        ctx.revert();
-      };
-    } catch {
-      // UI already visible — GSAP is optional enhancement only.
-    }
   }
 }

@@ -17,6 +17,12 @@ export const STAFF_ROUTES: Routes = [
       import('./layout/staff-layout.component').then((m) => m.StaffLayoutComponent),
     children: [
       {
+        path: 'profile',
+        title: 'My profile — Jama Go',
+        loadComponent: () =>
+          import('../../components/profile-dialog/profile-dialog.component').then((m) => m.ProfileDialogComponent),
+      },
+      {
         path: '',
         pathMatch: 'full',
         title: 'Staff Dashboard — Jama Go',

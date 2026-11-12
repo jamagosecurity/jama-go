@@ -1,3 +1,4 @@
+@import 'leaflet/dist/leaflet.css';
 /* ===== Jama Go Security — Styles ===== */
 /* ===== Brand ramp — the single source of colour =====
    Every other colour token in this file, and the Material theme in
@@ -516,11 +517,11 @@ a { color: inherit; text-decoration: none; }
 }
 @keyframes qh-throb { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
 
-/* Radar, centred on the Doha hub at 82.5% / 52.5% of the viewBox. */
+/* Radar, centred on the Doha hub at 83% / 53.6% of the viewBox (332, 386). */
 .qh-sweep {
   position: absolute;
-  left: 82.5%;
-  top: 52.5%;
+  left: 83%;
+  top: 53.6%;
   width: 170%;
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
@@ -1964,3 +1965,22 @@ table thead { background: #14305f !important; }
 }
 .page-banner h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; letter-spacing: 0; }
 .page-banner-eyebrow { letter-spacing: 0.22em; }
+
+/* ===== The sign-in page shows the home page's Qatar map, placed on the left behind the live panel ===== */
+.lg-qmap .qh-map-wrap { left: -7%; right: auto; height: 94%; opacity: .9; }
+@media (max-width: 1080px) {
+  .lg-qmap .qh-map-wrap { left: 50%; transform: translate(-50%, -50%); height: 100%; opacity: .35; }
+  .lg-qmap .qh-label, .lg-qmap .qh-sweep { display: none; }
+}
+
+
+/* ===== Satellite view under the Qatar map (home hero and sign-in) ===== */
+.qh-sat { filter: brightness(0.62) saturate(0.9) contrast(1.08); }
+/* The photo already shows the land, so the dotted fill and the dashed coastline step back. */
+.qh-map .qh-fill, .qh-map .qh-land { display: none; }
+.qh-map .qh-coast { stroke: rgba(217, 212, 189, 0.35); stroke-dasharray: none; stroke-width: 1; }
+
+/* ===== The profile card (opened from the sidebar and the staff list) ===== */
+.profile-dialog-panel .mat-mdc-dialog-container { --mdc-dialog-container-shape: 26px; --mdc-dialog-container-color: #fff; }
+.profile-dialog-panel .mat-mdc-dialog-surface { border-radius: 26px; overflow: hidden; box-shadow: 0 40px 80px -30px rgba(13, 32, 64, 0.6); }
+.profile-dialog-panel .mdc-dialog__surface { overflow: hidden; }

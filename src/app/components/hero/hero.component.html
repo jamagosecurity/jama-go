@@ -11,11 +11,18 @@
           <pattern id="qhDots" width="11" height="11" patternUnits="userSpaceOnUse">
             <circle cx="2.2" cy="2.2" r="1.5" />
           </pattern>
+          <radialGradient id="qhFadeGrad" cx="52%" cy="50%" r="50%">
+            <stop offset="0.45" stop-color="#fff" /><stop offset="0.98" stop-color="#000" />
+          </radialGradient>
+          <mask id="qhFade"><rect [attr.width]="mapW" [attr.height]="mapH" fill="url(#qhFadeGrad)" /></mask>
           <clipPath id="qhLand">
             <path [attr.d]="qatarPath" />
           </clipPath>
         </defs>
 
+        <!-- Real satellite view of Qatar: NASA MODIS (Terra), 20 Oct 2025, cut to this map's exact frame. -->
+        <image class="qh-sat" href="/maps/qatar-satellite.jpg" x="0" y="0" [attr.width]="mapW" [attr.height]="mapH"
+          preserveAspectRatio="none" mask="url(#qhFade)" />
         <g clip-path="url(#qhLand)">
           <rect class="qh-land" [attr.width]="mapW" [attr.height]="mapH" />
           <rect class="qh-fill" [attr.width]="mapW" [attr.height]="mapH" fill="url(#qhDots)" />
@@ -24,9 +31,9 @@
         <path class="qh-coast" [attr.d]="qatarPath" />
 
         <g class="qh-rings">
-          <circle cx="330" cy="378" r="58" />
-          <circle cx="330" cy="378" r="112" />
-          <circle cx="330" cy="378" r="172" />
+          <circle cx="332" cy="386" r="58" />
+          <circle cx="332" cy="386" r="112" />
+          <circle cx="332" cy="386" r="172" />
         </g>
 
         @for (route of routes; track route) {

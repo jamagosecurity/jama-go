@@ -56,11 +56,14 @@
 
     <div class="staff-sidebar-foot">
       <div class="staff-user">
-        <div class="staff-avatar" aria-hidden="true">{{ initials() }}</div>
-        <div class="staff-user-meta">
-          <p>{{ auth.currentUser()?.fullName || 'Technician' }}</p>
-          <small>{{ auth.currentUser()?.email }}</small>
-          <span class="profile-role">Technician</span>
+<div class="user-profile-btn" role="button" tabindex="0" title="My profile" aria-label="Open my profile"
+             routerLink="/technician/profile" (keydown.enter)="openProfilePage('/technician/profile')">
+          <app-avatar [userId]="auth.currentUser()?.id" [name]="auth.currentUser()?.fullName ?? ''" [version]="auth.currentUser()?.photoVersion" [size]="42" />
+          <div class="staff-user-meta">
+            <p>{{ auth.currentUser()?.fullName || 'Technician' }}</p>
+            <small>{{ auth.currentUser()?.designation || auth.currentUser()?.email }}</small>
+            <span class="profile-role">Technician</span>
+          </div>
         </div>
         <button type="button" class="profile-logout" (click)="auth.logout()" aria-label="Sign out" title="Sign out">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /></svg>
@@ -98,9 +101,9 @@
         <span>Jobs</span>
       </a>
     }
-    <button type="button" (click)="menuOpen.set(true)" aria-label="Account and sign out">
+    <a routerLink="/technician/profile" [class.active]="isProfile()" aria-label="My profile and sign out">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
       <span>Account</span>
-    </button>
+    </a>
   </nav>
 </div>

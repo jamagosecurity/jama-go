@@ -1,0 +1,179 @@
+.pf { background: #fff; color: #14305f; }
+
+/* The cover: deep navy with a fine gold rule, like a letterhead. */
+.pf-cover {
+  position: relative; height: 104px; padding: 14px 18px;
+  background: radial-gradient(120% 160% at 0% 0%, rgba(165, 164, 148, 0.28), transparent 55%), linear-gradient(135deg, #0e244e 0%, #112e62 55%, #163d7a 100%);
+  box-shadow: inset 0 -3px 0 #b5b4a8;
+}
+.pf-cover-label { color: rgba(236, 235, 228, 0.85); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; }
+.pf-x {
+  position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 40px; height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; background: rgba(255, 255, 255, 0.1); color: #fff; cursor: pointer;
+}
+.pf-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+.pf-body { display: grid; justify-items: center; padding: 0 28px 24px; text-align: center; }
+
+.pf-avatar { position: relative; margin-top: -58px; padding: 5px; border-radius: 50%; background: #fff; box-shadow: 0 16px 34px -18px rgba(13, 32, 64, 0.7), 0 0 0 1px rgba(143, 141, 119, 0.45); }
+.pf-camera {
+  position: absolute; right: 0; bottom: 4px; display: grid; place-items: center; width: 40px; height: 40px;
+  border: 3px solid #fff; border-radius: 50%; background: linear-gradient(135deg, #14305f, #1d4589); color: #fff; cursor: pointer;
+  box-shadow: 0 10px 18px -10px rgba(13, 32, 64, 0.9);
+}
+.pf-camera svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-busy { position: absolute; inset: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.7); }
+.pf-busy::after { content: ""; position: absolute; inset: calc(50% - 16px); border: 3px solid rgba(20, 48, 95, 0.2); border-top-color: #14305f; border-radius: 50%; animation: pf-spin 0.8s linear infinite; }
+@keyframes pf-spin { to { transform: rotate(360deg); } }
+
+.pf-name { margin: 14px 0 2px; font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.6rem; line-height: 1.2; overflow-wrap: anywhere; }
+.pf-title { margin: 0; color: #3d4b6b; font-size: 1rem; font-weight: 600; }
+.pf-title.is-empty { color: #8b93a6; font-weight: 500; font-style: italic; }
+.pf-meta { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; margin: 10px 0 0; font-size: 0.86rem; color: #6b7280; }
+.pf-role { padding: 4px 12px; border: 1px solid rgba(143, 141, 119, 0.6); border-radius: 999px; background: #fbfaf5; color: #5b5a4d; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.pf-email { overflow-wrap: anywhere; }
+
+.pf-form { display: grid; gap: 18px; width: 100%; margin-top: 22px; padding-top: 22px; border-top: 1px solid rgba(143, 141, 119, 0.4); text-align: left; }
+.pf-field { display: grid; gap: 6px; }
+.pf-label { display: block; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #5d6b86; }
+.pf-field input[type="text"] {
+  height: 50px; padding: 0 16px; border: 1px solid rgba(26, 55, 103, 0.2); border-radius: 14px; background: #fff;
+  color: #14305f; font: inherit; font-size: 1rem; font-weight: 600;
+}
+.pf-field input[type="text"]:focus { outline: none; border-color: #1d4589; box-shadow: 0 0 0 4px rgba(29, 69, 137, 0.14); }
+.pf-hint { display: block; margin-top: 2px; color: #7a8296; font-size: 0.8rem; line-height: 1.5; }
+.pf-hint b { float: right; margin-left: 10px; color: #5d6b86; font-weight: 700; }
+
+.pf-photo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border: 1px solid rgba(143, 141, 119, 0.35); border-radius: 16px; background: #fbfaf5; }
+.pf-photo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.pf-btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 22px; border-radius: 999px;
+  border: 1px solid transparent; font: inherit; font-size: 0.92rem; font-weight: 800; letter-spacing: 0.02em; cursor: pointer;
+}
+.pf-btn--main { background: linear-gradient(135deg, #14305f, #1d4589); color: #fff; box-shadow: 0 14px 24px -14px rgba(20, 48, 95, 0.9); }
+.pf-btn--main:disabled { background: #cfd3dc; box-shadow: none; cursor: default; }
+.pf-btn--ghost { background: #fff; border-color: rgba(26, 55, 103, 0.3); color: #14305f; }
+.pf-btn--quiet { background: none; color: #9f1217; }
+.pf-btn:disabled { opacity: 0.6; cursor: default; }
+
+.pf-msg { margin: 0; padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; }
+.pf-msg--error { background: #fdecec; color: #9f1217; }
+.pf-msg--ok { background: #e7f5f1; color: #0f6b5f; }
+.pf-foot { display: flex; justify-content: flex-end; gap: 10px; }
+
+@media (max-width: 520px) {
+  .pf-body { padding: 0 18px 20px; }
+  .pf-foot { flex-direction: column-reverse; }
+  .pf-foot .pf-btn { width: 100%; }
+  .pf-photo { flex-direction: column; align-items: stretch; }
+  .pf-photo-actions .pf-btn { flex: 1; }
+}
+.pf-btn { white-space: nowrap; }
+
+/* ===== Layout: one column in the pop-up; on the page, identity on the left and the forms on the right ===== */
+.pf-layout { display: grid; gap: 0; }
+.pf-ident { display: grid; justify-items: center; padding: 0 28px 8px; text-align: center; }
+.pf-main { display: grid; gap: 16px; padding: 18px 28px 26px; }
+.pf-section { padding: 20px 22px; border: 1px solid rgba(143, 141, 119, 0.32); border-radius: 18px; background: #fff; }
+.pf-sec-title { margin: 0 0 14px; font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.2rem; color: #14305f; }
+.pf-form { margin: 0; padding: 0; border: 0; gap: 16px; }
+.pf-grid { display: grid; gap: 16px; }
+.pf-sec-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
+.pf-forgot { margin-right: auto; max-width: 420px; }
+.pf-role { margin-top: 10px; }
+.pf-contact { display: grid; gap: 10px; width: 100%; margin: 18px 0 0; padding: 16px 0 0; border-top: 1px solid rgba(143, 141, 119, 0.35); text-align: left; }
+.pf-contact div { display: flex; justify-content: space-between; gap: 12px; }
+.pf-contact dt { color: #7a8296; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.pf-contact dd { margin: 0; min-width: 0; overflow-wrap: anywhere; text-align: right; font-weight: 600; }
+.pf-contact a { color: #1d4589; text-decoration: none; }
+.pf-contact .is-empty { color: #9aa1b2; font-style: italic; font-weight: 500; }
+.pf-ident-actions { display: flex; gap: 10px; width: 100%; margin-top: 18px; }
+.pf-ident-actions .pf-btn { flex: 1; }
+.pf-field input[type="password"] { height: 50px; padding: 0 16px; border: 1px solid rgba(26, 55, 103, 0.2); border-radius: 14px; background: #fff; color: #14305f; font: inherit; font-size: 1rem; }
+.pf-field input[type="password"]:focus { outline: none; border-color: #1d4589; box-shadow: 0 0 0 4px rgba(29, 69, 137, 0.14); }
+.pf-rules { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pf-rules li { padding: 5px 12px 5px 28px; border-radius: 999px; background: #f2f4f8; color: #7a8296; font-size: 0.8rem; font-weight: 600; position: relative; }
+.pf-rules li::before { content: ""; position: absolute; left: 11px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: #c3c8d3; }
+.pf-rules li.ok { background: #e7f5f1; color: #0f6b5f; }
+.pf-rules li.ok::before { background: #1c8577; }
+.pf-photo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; background: #fbfaf5; }
+.pf-photo .pf-sec-title { margin-bottom: 4px; }
+
+/* ===== As a full page: uses the whole width ===== */
+.pf--page { container-type: inline-size; border: 1px solid rgba(143, 141, 119, 0.35); border-radius: 26px; overflow: hidden; background: #f7f8fb; box-shadow: 0 30px 60px -40px rgba(13, 32, 64, 0.55); }
+.pf--page .pf-cover { height: 120px; }
+.pf--page .pf-ident { background: #fff; }
+@container (min-width: 900px) {
+  .pf--page .pf-layout { grid-template-columns: 330px minmax(0, 1fr); align-items: start; }
+  .pf--page .pf-ident { margin: -64px 0 26px 26px; padding: 0 24px 24px; border: 1px solid rgba(143, 141, 119, 0.32); border-radius: 22px; box-shadow: 0 20px 40px -32px rgba(13, 32, 64, 0.6); }
+  .pf--page .pf-ident .pf-avatar { margin-top: -6px; }
+  .pf--page .pf-main { padding: 26px 26px 26px 22px; }
+  .pf--page .pf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pf--page .pf-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container (max-width: 899px) {
+  .pf--page .pf-ident { padding-bottom: 6px; }
+}
+@media (max-width: 520px) {
+  .pf-ident { padding: 0 18px 6px; }
+  .pf-main { padding: 14px 14px 20px; }
+  .pf-section { padding: 16px; }
+  .pf-sec-foot { flex-direction: column-reverse; align-items: stretch; }
+  .pf-sec-foot .pf-btn { width: 100%; }
+  .pf-forgot { margin-right: 0; }
+  .pf-photo { flex-direction: column; align-items: stretch; }
+  .pf-photo-actions .pf-btn { flex: 1; }
+  .pf--page { border-radius: 20px; }
+}
+
+.pf-field input { box-sizing: border-box; width: 100%; min-width: 0; }
+.pf-field input[type="tel"] { height: 50px; padding: 0 16px; border: 1px solid rgba(26, 55, 103, 0.2); border-radius: 14px; background: #fff; color: #14305f; font: inherit; font-size: 1rem; font-weight: 600; letter-spacing: 0.02em; }
+.pf-field input[type="tel"]:focus { outline: none; border-color: #1d4589; box-shadow: 0 0 0 4px rgba(29, 69, 137, 0.14); }
+.pf-field input.is-invalid { border-color: #c0262d; }
+.pf-hint--error { color: #9f1217; font-weight: 600; }
+.pf-grid > * { min-width: 0; }
+
+/* The picture itself is the button. */
+.pf-avatar { cursor: default; }
+.pf-camera { transition: transform 0.15s ease; }
+.pf-camera:hover { transform: scale(1.08); }
+.pf-avatar-hover {
+  position: absolute; inset: 5px; display: grid; place-items: center; border-radius: 50%;
+  background: rgba(14, 36, 78, 0.55); color: #fff; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.04em;
+  opacity: 0; transition: opacity 0.18s ease;
+}
+.pf-avatar:hover .pf-avatar-hover, .pf-avatar:focus-within .pf-avatar-hover { opacity: 1; }
+.pf-remove { margin-top: 8px; padding: 4px 10px; border: 0; background: none; color: #9f1217; font: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+.pf-remove:hover { text-decoration: underline; }
+.pf-remove:disabled { opacity: 0.5; cursor: default; }
+
+.pf-photo-btn { display: block; padding: 0; border: 0; border-radius: 50%; background: none; cursor: zoom-in; }
+.pf-photo-btn:disabled { cursor: default; }
+.pf-photo-btn:focus-visible { outline: 2px solid #1d4589; outline-offset: 3px; }
+
+/* The photo, large. */
+.pf-lightbox {
+  position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 24px;
+  background: rgba(6, 16, 36, 0.82); backdrop-filter: blur(6px); cursor: zoom-out; animation: pf-fade 0.18s ease;
+}
+.pf-lightbox figure { margin: 0; display: grid; gap: 14px; justify-items: center; cursor: default; }
+.pf-lightbox img {
+  width: min(520px, 86vw, 70vh); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 22px;
+  border: 3px solid #fff; box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.8);
+}
+.pf-lightbox figcaption { color: #f1efe6; font-family: Georgia, "Times New Roman", serif; font-size: 1.15rem; text-align: center; }
+.pf-lightbox-x {
+  position: fixed; top: 18px; right: 18px; display: grid; place-items: center; width: 46px; height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50%; background: rgba(255, 255, 255, 0.12); color: #fff; cursor: pointer;
+}
+.pf-lightbox-x svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+@keyframes pf-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.pf-rules li::before { background: #c0262d; }
+.pf-rules li { background: #fdecec; color: #9f1217; }
+.pf-forgot-link { margin-right: auto; color: #1d4589; font-size: 0.85rem; font-weight: 700; text-decoration: none; }
+.pf-forgot-link:hover { text-decoration: underline; }
+@media (max-width: 520px) { .pf-forgot-link { margin-right: 0; text-align: center; } }
+.pf-forgot-link { padding: 0; border: 0; background: none; font: inherit; font-size: 0.85rem; font-weight: 700; color: #1d4589; cursor: pointer; text-align: left; }
+.pf-forgot-link:disabled { opacity: 0.6; cursor: default; }

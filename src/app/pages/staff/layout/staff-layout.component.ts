@@ -1,3 +1,5 @@
+import { AvatarComponent } from '../../../components/avatar/avatar.component';
+import { ProfileLauncher } from '../../../components/profile-dialog/profile-launcher.service';
 import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -10,13 +12,20 @@ import { NonMoiJobBadgeService } from '../../../services/non-moi-job-badge.servi
 @Component({
   selector: 'app-staff-layout',
   standalone: true,
-  imports: [ApprovalBellComponent, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [ApprovalBellComponent, AvatarComponent, RouterOutlet, RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './staff-layout.component.html',
   styleUrl: './staff-layout.component.css',
 })
 export class StaffLayoutComponent implements OnInit {
   readonly auth = inject(AuthService);
+  readonly profile = inject(ProfileLauncher);
+
+  /** Keyboard users reach the profile page the same way a click does. */
+  openProfilePage(url: string): void {
+    void this.profileRouter.navigateByUrl(url);
+  }
+  private readonly profileRouter = inject(Router);
   /** Finished Non-MOI jobs waiting for this person to close — the red number beside Non-MOI Jobs. */
   readonly jobBadge = inject(NonMoiJobBadgeService);
   private readonly router = inject(Router);

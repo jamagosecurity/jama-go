@@ -11,6 +11,8 @@ import {
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ClientRegistrationService } from '../../../services/client-registration.service';
+import { LiveMapComponent } from '../../../components/live-map/live-map.component';
+import { PrayerPanelComponent } from '../../../components/prayer-panel/prayer-panel.component';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 
 /** Same shape the server checks: digits, spaces, dashes, brackets, an
@@ -56,7 +58,7 @@ const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationErrors |
 @Component({
   selector: 'app-client-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, LiveMapComponent, PrayerPanelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './client-register.component.html',
   styleUrls: ['../../admin/login/admin-login.component.css', './client-register.component.css'],
@@ -89,6 +91,9 @@ export class ClientRegisterComponent {
   private readonly passwordValue = toSignal(this.form.controls.password.valueChanges, {
     initialValue: '',
   });
+
+  /** Only while typing, and only what is still missing — no wall of rules. */
+  protected readonly missingRules = computed(() => this.passwordValue() ? this.passwordRules().filter((r) => !r.ok) : []);
 
   protected readonly passwordRules = computed(() => {
     const password = this.passwordValue();

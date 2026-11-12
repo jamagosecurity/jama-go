@@ -1,3 +1,5 @@
+import { AvatarComponent } from '../../../components/avatar/avatar.component';
+import { ProfileLauncher } from '../../../components/profile-dialog/profile-launcher.service';
 import {
   Component,
   ChangeDetectionStrategy,
@@ -16,12 +18,14 @@ import { getApiErrorMessage } from '../../../utils/api-error.util';
 @Component({
   selector: 'app-admin-staff',
   standalone: true,
+  imports: [AvatarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-staff.component.html',
   styleUrl: './admin-staff.component.css',
 })
 export class AdminStaffComponent {
   private readonly staffService = inject(StaffService);
+  private readonly profiles = inject(ProfileLauncher);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
@@ -71,6 +75,23 @@ export class AdminStaffComponent {
     if (!parts.length) return 'JG';
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  /** Opens the profile card for this person; an administrator may set their photo and designation. */
+  openProfile(member: AdminStaffMember): void {
+    if (!member.accountId) return;
+    this.profiles
+      .open({
+        userId: member.accountId,
+        fullName: member.fullName,
+        email: member.email,
+        roleLabel: member.role || 'Team member',
+        designation: member.designation ?? null,
+        photoVersion: member.photoVersion ?? 0,
+        phone: member.phone ?? null,
+        self: false,
+      })
+      .subscribe(() => this.loadStaff());
   }
 
   loadStaff(): void {

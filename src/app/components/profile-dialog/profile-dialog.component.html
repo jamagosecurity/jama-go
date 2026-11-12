@@ -1,0 +1,136 @@
+<div class="pf" [class.pf--page]="isPage" [attr.role]="isPage ? null : 'dialog'" aria-label="Profile">
+  <header class="pf-cover">
+    @if (!isPage) {
+      <button type="button" class="pf-x" (click)="close()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+    }
+    <span class="pf-cover-label">{{ isPage ? 'My profile' : 'Jama Go · Team profile' }}</span>
+  </header>
+
+  <div class="pf-layout">
+    <!-- Who: picture, name, title, how to reach them. -->
+    <aside class="pf-ident">
+      <!-- Only the camera button changes the picture. -->
+      <div class="pf-avatar">
+        <button type="button" class="pf-photo-btn" (click)="viewPhoto()" [disabled]="!version()" [attr.aria-label]="version() ? 'View photo' : null">
+          <app-avatar [userId]="data.userId" [name]="data.fullName" [version]="version()" [size]="isPage ? 132 : 116" />
+        </button>
+        <label class="pf-camera" [title]="version() ? 'Change photo' : 'Add a photo'" [attr.aria-label]="version() ? 'Change photo' : 'Add a photo'">
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/*" hidden (change)="onFile($event)" />
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.4" /></svg>
+        </label>
+        @if (busyPhoto()) { <span class="pf-busy" aria-label="Working"></span> }
+      </div>
+      @if (version()) {
+        <button type="button" class="pf-remove" (click)="removePhoto()" [disabled]="busyPhoto()">Remove photo</button>
+      }
+
+      <h2 class="pf-name">{{ data.fullName }}</h2>
+      <p class="pf-title" [class.is-empty]="!savedDesignation()">{{ savedDesignation() || (data.self ? 'Add your designation' : 'No designation yet') }}</p>
+      <span class="pf-role">{{ data.roleLabel }}</span>
+
+      <dl class="pf-contact">
+        @if (data.email) {
+          <div><dt>Email</dt><dd><a [href]="'mailto:' + data.email">{{ data.email }}</a></dd></div>
+        }
+        <div><dt>Phone</dt><dd>
+          @if (savedPhone()) { <a [href]="'tel:' + savedPhone().replace(' ', '')">{{ savedPhone() }}</a> } @else { <span class="is-empty">Not added yet</span> }
+        </dd></div>
+      </dl>
+
+      @if (isPage) {
+        <div class="pf-ident-actions">
+          <button type="button" class="pf-btn pf-btn--ghost" (click)="close()">Back</button>
+          <button type="button" class="pf-btn pf-btn--quiet" (click)="signOut()">Sign out</button>
+        </div>
+      }
+    </aside>
+
+    <div class="pf-main">
+      <!-- Personal details -->
+      <section class="pf-section">
+        <h3 class="pf-sec-title">Personal details</h3>
+        <form class="pf-form" (submit)="$event.preventDefault(); save()">
+          <div class="pf-grid">
+            <label class="pf-field">
+              <span class="pf-label">Designation</span>
+              <input type="text" name="designation" autocomplete="organization-title" [maxLength]="designationMax"
+                placeholder="e.g. Senior CCTV Technician" [value]="draft()" (input)="onType($event)" />
+              <span class="pf-hint">Your job title, shown beside your name. <b>{{ draft().length }}/{{ designationMax }}</b></span>
+            </label>
+            <label class="pf-field">
+              <span class="pf-label">Phone number</span>
+              <input type="tel" name="phone" inputmode="tel" autocomplete="tel" maxlength="30"
+                placeholder="e.g. +974 5555 1234" [value]="phoneDraft()" (input)="onPhone($event)" [class.is-invalid]="!!phoneError()" />
+              @if (phoneError()) {
+                <span class="pf-hint pf-hint--error">{{ phoneError() }}</span>
+              } @else {
+                <span class="pf-hint">So colleagues can reach you.</span>
+              }
+            </label>
+          </div>
+          @if (error()) { <p class="pf-msg pf-msg--error" role="alert">{{ error() }}</p> }
+          @if (notice()) { <p class="pf-msg pf-msg--ok" role="status">{{ notice() }}</p> }
+          <div class="pf-sec-foot">
+            @if (!isPage) { <button type="button" class="pf-btn pf-btn--ghost" (click)="close()">Close</button> }
+            <button type="submit" class="pf-btn pf-btn--main" [disabled]="!dirty() || saving() || !!phoneError()">{{ saving() ? 'Saving…' : 'Save changes' }}</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Password: your own account only -->
+      @if (data.self) {
+        <section class="pf-section">
+          <h3 class="pf-sec-title">Change password</h3>
+          <form class="pf-form" (submit)="$event.preventDefault(); changePassword()">
+            <div class="pf-grid pf-grid--3">
+              <label class="pf-field">
+                <span class="pf-label">Current password</span>
+                <input type="password" name="current" autocomplete="current-password" [value]="pwCurrent()" (input)="pwCurrent.set($any($event.target).value); pwNotice.set('')" />
+              </label>
+              <label class="pf-field">
+                <span class="pf-label">New password</span>
+                <input type="password" name="new" autocomplete="new-password" [value]="pwNew()" (input)="pwNew.set($any($event.target).value); pwNotice.set('')" />
+              </label>
+              <label class="pf-field">
+                <span class="pf-label">Confirm new password</span>
+                <input type="password" name="confirm" autocomplete="new-password" [value]="pwConfirm()" (input)="pwConfirm.set($any($event.target).value); pwNotice.set('')" />
+              </label>
+            </div>
+            <!-- Only while typing, and only what is still missing — no wall of rules on a phone. -->
+            @if (pwNew() && !pwReady()) {
+              <ul class="pf-rules" aria-label="Still needed">
+                @if (!pwRules().length) { <li>8+ characters</li> }
+                @if (!pwRules().upper) { <li>Uppercase</li> }
+                @if (!pwRules().lower) { <li>Lowercase</li> }
+                @if (!pwRules().digit) { <li>Number</li> }
+                @if (pwConfirm() && !pwRules().match) { <li>Passwords match</li> }
+              </ul>
+            }
+            @if (pwError()) { <p class="pf-msg pf-msg--error" role="alert">{{ pwError() }}</p> }
+            @if (pwNotice()) { <p class="pf-msg pf-msg--ok" role="status">{{ pwNotice() }}</p> }
+            <div class="pf-sec-foot">
+              <button type="button" class="pf-forgot-link" (click)="emailResetLink()" [disabled]="resetSending()">
+                {{ resetSending() ? 'Sending…' : 'Forgot current password? Email me a reset link' }}
+              </button>
+              <button type="submit" class="pf-btn pf-btn--main" [disabled]="!pwReady() || pwSaving()">{{ pwSaving() ? 'Changing…' : 'Change password' }}</button>
+            </div>
+          </form>
+        </section>
+      }
+    </div>
+  </div>
+
+  @if (viewing(); as url) {
+    <div class="pf-lightbox" role="dialog" aria-label="Profile photo" (click)="closePhoto()">
+      <figure (click)="$event.stopPropagation()">
+        <img [src]="url" [alt]="data.fullName" />
+        <figcaption>{{ data.fullName }}@if (savedDesignation()) { · {{ savedDesignation() }} }</figcaption>
+      </figure>
+      <button type="button" class="pf-lightbox-x" (click)="closePhoto()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+    </div>
+  }
+</div>

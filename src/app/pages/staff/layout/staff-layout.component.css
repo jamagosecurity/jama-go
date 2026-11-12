@@ -1072,3 +1072,12 @@
 /* The red number beside a sidebar link, pinned to the row's right edge. */
 .staff-nav a { position: relative; }
 .staff-nav a .nav-count { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); min-width: 24px; height: 24px; padding: 0 7px; display: grid; place-items: center; border-radius: 999px; background: #d21319; color: #fff; font-size: 0.76rem; font-weight: 900; box-shadow: none; }
+
+/* The signed-in person's card opens their profile: picture, name, designation. */
+.user-profile-btn {
+  display: grid; grid-template-columns: 42px minmax(0, 1fr); grid-column: 1 / span 2; align-items: center; gap: 10px;
+  min-width: 0; border-radius: 12px; cursor: pointer; outline-offset: 3px;
+}
+.user-profile-btn:hover { background: rgba(20, 48, 95, 0.05); }
+.user-profile-btn:focus-visible { outline: 2px solid #1d4589; }
+.user-profile-btn app-avatar { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 0 3px rgba(143, 141, 119, 0.55); border-radius: 50%; }

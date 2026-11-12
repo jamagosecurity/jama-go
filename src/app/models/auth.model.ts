@@ -52,6 +52,12 @@ export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
 export interface UserSummary {
   id: string;
+  /** The job title the person wrote for themselves. */
+  designation?: string | null;
+  /** 0 when there is no profile picture; changes whenever the picture does. */
+  photoVersion?: number;
+  /** The person's own contact number. */
+  phone?: string | null;
   email: string;
   fullName: string;
   role: UserRole;

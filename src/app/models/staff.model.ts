@@ -19,6 +19,11 @@ export interface StaffMember {
 }
 
 export interface AdminStaffMember extends StaffMember {
+  /** The login account behind this member; the profile is addressed by it. */
+  accountId?: string | null;
+  designation?: string | null;
+  photoVersion?: number;
+  phone?: string | null;
   email: string | null;
   hasLoginAccount: boolean;
   /** Login account enabled. Separate from isActive, which is public visibility. */

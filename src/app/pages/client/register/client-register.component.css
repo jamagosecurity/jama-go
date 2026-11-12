@@ -1,218 +1,214 @@
-/* Builds on the sign-in page's stylesheet (loaded first via styleUrls), so
-   this file only holds what registering needs on top of it. */
+/* Builds on the sign-in page's styles (admin-login.component.css). */
+.lg--register { grid-template-columns: minmax(0, 1fr) minmax(420px, 560px); }
 
-/* Six fields do not fit the sign-in page's fixed viewport height on a laptop,
-   so this page scrolls instead of clipping the button off the bottom. */
-.register-page {
-  height: auto;
-  min-height: 100dvh;
-  overflow: auto;
+.rg-steps { gap: 22px; }
+.rg-title { margin: 0; font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(2.2rem, 4vw, 3.4rem); line-height: 1.08; color: #fff; }
+.rg-list { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.rg-list li {
+  display: flex; gap: 16px; align-items: flex-start; padding: 16px 18px; border: 1px solid rgba(217, 212, 189, 0.25); border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)); backdrop-filter: blur(8px);
+}
+.rg-num {
+  display: grid; flex: none; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(145deg, #dededa, #b5b4a8 55%, #8f8d77); color: #14305f; font-weight: 900;
+}
+.rg-list strong { display: block; color: #fff; font-size: 1.05rem; }
+.rg-list span { color: #b9c4dc; font-size: 0.92rem; line-height: 1.5; }
+
+.rg-card { gap: 4px; }
+.rg-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+.lg-input.is-invalid { border-color: #c0262d; }
+.rg-error { color: #9f1217; font-size: 0.8rem; font-weight: 600; }
+.rg-rules { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.rg-rules li { padding: 4px 10px; border-radius: 999px; background: #fdecec; color: #9f1217; font-size: 0.78rem; font-weight: 700; }
+
+.rg-done { display: grid; gap: 12px; justify-items: start; }
+.rg-done-icon { display: grid; place-items: center; width: 56px; height: 56px; margin-top: 10px; border-radius: 50%; background: #e7f5f1; }
+.rg-done-icon svg { width: 28px; height: 28px; fill: none; stroke: #1c8577; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.rg-done .lg-submit { width: 100%; text-decoration: none; }
+
+@media (max-width: 1080px) {
+  .lg--register { grid-template-columns: minmax(0, 1fr); }
+  .rg-card { max-width: 560px; }
+  .rg-title { text-align: center; }
+}
+@media (max-width: 560px) {
+  .rg-grid { grid-template-columns: 1fr; }
+  .rg-list li { padding: 12px 14px; }
 }
 
-.register-page .login-stage {
-  height: auto;
-  min-height: 100dvh;
+/* Narrower steps so the map keeps room for the whole of Qatar. */
+.lg--register .rg-steps { max-width: 440px; }
+.rg-num { text-shadow: none; font-size: 1rem; }
+.rg-grid .lg-eye { margin-right: -4px; }
+@media (max-width: 1080px) { .lg--register .rg-steps { max-width: 560px; } }
+
+/* Just the map and the card: the card sits on the right, Qatar fills the space to its left. */
+.lg--register .rg-card { grid-column: 2; }
+.rg-grid .lg-eye { margin-right: 0; }
+.lg-links-row { row-gap: 8px; }
+@media (max-width: 1080px) { .lg--register .rg-card { grid-column: 1; } }
+
+/* The dark fade only behind the card, so the whole of Qatar shows. */
+.lg--register .lg-shade { background: linear-gradient(90deg, rgba(5, 14, 38, 0) 0%, rgba(5, 14, 38, 0.08) 50%, rgba(5, 14, 38, 0.82) 60%, rgba(5, 14, 38, 0.9) 100%); }
+.rg-grid .lg-input { overflow: hidden; }
+
+/* The credit line, centred at the foot of the page in the logo's red. */
+.rg-made-by {
+  position: absolute; left: 50%; bottom: 18px; z-index: 600; transform: translateX(-50%); margin: 0;
+  color: #e11d24; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap;
+  text-shadow: 0 1px 8px rgba(5, 14, 38, 0.85);
+}
+@media (max-width: 1080px) {
+  .lg--register .lg-shade { background: rgba(5, 14, 38, 0.72); }
+  .rg-made-by { position: static; transform: none; order: 3; text-align: center; white-space: normal; }
 }
 
-.register-page .login-shell {
-  height: auto;
-  min-height: min(760px, calc(100dvh - 56px));
+
+/* ===== Dark glass card: blends with the night satellite map ===== */
+.lg--register .rg-card {
+  background: linear-gradient(160deg, rgba(14, 30, 66, 0.72), rgba(6, 16, 42, 0.62));
+  backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  color: #eef1f8;
+  box-shadow: 0 50px 100px -40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(217, 212, 189, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 3px 0 rgba(217, 212, 189, 0.55);
+}
+.lg--register .rg-card .lg-card-logo img { height: 44px; }
+.lg--register .rg-card h1 { color: #fff; }
+.lg--register .rg-card .lg-sub { color: #a9b4cc; }
+.lg--register .rg-card .lg-label { color: #d9d4bd; }
+.lg--register .rg-card .lg-input { border-color: rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.06); }
+.lg--register .rg-card .lg-input:focus-within { border-color: rgba(217, 212, 189, 0.85); box-shadow: 0 0 0 4px rgba(217, 212, 189, 0.16); background: rgba(255, 255, 255, 0.09); }
+.lg--register .rg-card .lg-input.is-invalid { border-color: rgba(255, 110, 110, 0.85); }
+.lg--register .rg-card .lg-input > svg { stroke: rgba(217, 212, 189, 0.85); }
+.lg--register .rg-card .lg-input input { color: #fff; }
+.lg--register .rg-card .lg-input input::placeholder { color: rgba(222, 228, 242, 0.42); }
+.lg--register .rg-card .lg-input input:-webkit-autofill { -webkit-text-fill-color: #fff; -webkit-box-shadow: 0 0 0 40px #13254f inset; caret-color: #fff; }
+.lg--register .rg-card .lg-eye { color: rgba(217, 212, 189, 0.85); }
+.lg--register .rg-card .lg-eye:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.lg--register .rg-card .rg-error { color: #ff9a9a; }
+.lg--register .rg-card .rg-rules li { background: rgba(225, 29, 36, 0.18); color: #ffb3b3; }
+.lg--register .rg-card .lg-error { background: rgba(225, 29, 36, 0.18); color: #ffc2c2; }
+.lg--register .rg-card .lg-submit {
+  background: linear-gradient(135deg, #f1ead0 0%, #d9d4bd 45%, #b5a978 100%); color: #14213f;
+  box-shadow: 0 20px 34px -18px rgba(217, 212, 189, 0.75);
+}
+.lg--register .rg-card .lg-links-row { border-top-color: rgba(217, 212, 189, 0.22); }
+.lg--register .rg-card .lg-links-row a { color: #a9b4cc; }
+.lg--register .rg-card .lg-links-row a b { color: #f1e7c4; }
+.lg--register .rg-card .lg-links-row a:hover { color: #fff; }
+.lg--register .rg-done-icon { background: rgba(28, 133, 119, 0.25); }
+
+/* ===== "Developed By Jama Go Softwares": a small red spark runs across it ===== */
+.rg-made-by span {
+  position: relative; display: inline-block; overflow: hidden; padding: 2px 2px;
+  background: linear-gradient(100deg, #e11d24 0%, #e11d24 40%, #ffd9da 50%, #e11d24 60%, #e11d24 100%);
+  background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: rg-spark-text 3.2s ease-in-out infinite;
+}
+.rg-made-by span::after {
+  content: ""; position: absolute; top: 50%; left: -10%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%;
+  background: #ff3b42; box-shadow: 0 0 6px 2px rgba(255, 59, 66, 0.9), 0 0 14px 4px rgba(225, 29, 36, 0.55);
+  animation: rg-spark-dot 3.2s ease-in-out infinite;
+}
+@keyframes rg-spark-text { 0% { background-position: 100% 0; } 60%, 100% { background-position: 0 0; } }
+@keyframes rg-spark-dot { 0% { left: -6%; opacity: 0; } 8% { opacity: 1; } 55% { opacity: 1; } 60%, 100% { left: 104%; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .rg-made-by span, .rg-made-by span::after { animation: none; } .rg-made-by span { color: #e11d24; background: none; } .rg-made-by span::after { display: none; } }
+
+
+/* ===== The card and the contact tiles under it, as one column ===== */
+.rg-col { position: relative; z-index: 600; display: grid; gap: 14px; grid-column: 2; width: 100%; }
+.lg--register .rg-col .rg-card { grid-column: auto; }
+.rg-contact { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rg-tile {
+  display: flex; align-items: center; gap: 12px; min-width: 0; padding: 12px 14px; border-radius: 16px; text-decoration: none; color: #eef1f8;
+  background: linear-gradient(160deg, rgba(14, 30, 66, 0.72), rgba(6, 16, 42, 0.62));
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 1px rgba(217, 212, 189, 0.25), 0 20px 40px -30px rgba(0, 0, 0, 0.9);
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+.rg-tile:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(217, 212, 189, 0.6), 0 20px 40px -26px rgba(0, 0, 0, 0.9); }
+.rg-tile svg { flex: none; width: 34px; height: 34px; padding: 8px; border-radius: 50%; background: rgba(217, 212, 189, 0.14); fill: none; stroke: #e4d7a8; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.rg-tile span { display: grid; min-width: 0; }
+.rg-tile b { font-size: 0.86rem; color: #fff; }
+.rg-tile small { overflow: hidden; color: #a9b4cc; font-size: 0.78rem; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 1080px) {
+  .rg-col { grid-column: 1; max-width: 560px; }
+}
+@media (max-width: 380px) { .rg-contact { grid-template-columns: 1fr; } }
+/* On phones too: the card first, the contact tiles under it, one per row so nothing is cut off. */
+@media (max-width: 1080px) {
+  .rg-col .rg-card { order: 0; }
+  .rg-col .rg-contact { order: 1; }
+}
+@media (max-width: 560px) { .rg-contact { grid-template-columns: 1fr; } }
+
+/* ===== Desktop: everything fits on one screen, no scrolling ===== */
+@media (min-width: 1081px) {
+  .lg--register { padding-top: 20px; padding-bottom: 44px; }
+  .lg--register .rg-col { gap: 10px; }
+  .lg--register .rg-card { padding: 22px 28px 18px; }
+  .lg--register .rg-card .lg-card-logo img { height: 34px; }
+  .lg--register .rg-card h1 { margin-top: 8px; font-size: 1.75rem; }
+  .lg--register .rg-card .lg-sub { margin: 0 0 8px; font-size: 0.88rem; }
+  .lg--register .rg-card form { gap: 12px; }
+  .lg--register .rg-grid { gap: 10px 14px; }
+  .lg--register .rg-card .lg-field { gap: 5px; }
+  .lg--register .rg-card .lg-input { height: 46px; }
+  .lg--register .rg-card .lg-submit { height: 50px; margin-top: 2px; }
+  .lg--register .rg-card .lg-links-row { margin-top: 8px; padding-top: 10px; }
+
+  /* The four contact tiles side by side. */
+  .lg--register .rg-contact { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .lg--register .rg-tile { flex-direction: column; justify-content: center; gap: 6px; padding: 10px 6px; text-align: center; }
+  .lg--register .rg-tile svg { width: 30px; height: 30px; padding: 7px; }
+  .lg--register .rg-tile span { justify-items: center; }
+  .lg--register .rg-tile b { font-size: 0.8rem; }
+  .lg--register .rg-tile small { font-size: 0.7rem; white-space: normal; line-height: 1.3; }
+}
+/* Short laptop screens: a little tighter still. */
+@media (min-width: 1081px) and (max-height: 820px) {
+  .lg--register .rg-card .lg-card-logo { display: none; }
+  .lg--register .rg-card h1 { margin-top: 0; }
+  .lg--register .rg-card .lg-input { height: 44px; }
 }
 
-.register-inner {
-  max-width: 560px;
+
+/* ===== The live prayer panel between the map and the card ===== */
+.lg--register .rg-prayer { position: relative; z-index: 600; }
+@media (min-width: 1280px) {
+  .lg--register { grid-template-columns: minmax(0, 1fr) 250px minmax(420px, 560px); }
+  .lg--register .rg-prayer { grid-column: 2; align-self: center; }
+  .lg--register .rg-col { grid-column: 3; }
+  .lg--register .lg-shade { background: linear-gradient(90deg, rgba(5, 14, 38, 0) 0%, rgba(5, 14, 38, 0.08) 38%, rgba(5, 14, 38, 0.8) 47%, rgba(5, 14, 38, 0.9) 100%); }
+}
+/* Mid-size laptops: not enough room beside Qatar, so the panel steps aside. */
+@media (min-width: 1081px) and (max-width: 1279px) { .lg--register .rg-prayer { display: none; } }
+/* Phones and tablets: under the card and the contact tiles. */
+@media (max-width: 1080px) { .lg--register .rg-prayer { order: 3; width: 100%; max-width: 560px; } .lg--register .rg-made-by { order: 4; } }
+
+/* Panel and card both centred on the page, at their natural heights. */
+@media (min-width: 1280px) { .lg--register .rg-prayer, .lg--register .rg-col { align-self: center; } }
+
+
+/* ===== Aligned group: prayer panel and form column share top and bottom ===== */
+.lg--register { grid-template-columns: minmax(0, 1fr) auto; }
+.rg-stage { position: relative; z-index: 600; grid-column: 2; display: flex; align-items: stretch; gap: 18px; }
+.lg--register .rg-stage .rg-col { grid-column: auto; width: 540px; }
+.lg--register .rg-stage .rg-prayer { grid-column: auto; align-self: stretch; display: flex; width: 252px; }
+.lg--register .rg-stage .rg-prayer > * { flex: 1; }
+@media (min-width: 1081px) and (max-width: 1279px) { .lg--register .rg-stage .rg-prayer { display: none; } }
+@media (max-width: 1080px) {
+  .lg--register { grid-template-columns: minmax(0, 1fr); }
+  .rg-stage { grid-column: 1; flex-direction: column; width: 100%; max-width: 560px; }
+  .lg--register .rg-stage .rg-col { width: 100%; order: 0; }
+  .lg--register .rg-stage .rg-prayer { width: 100%; order: 1; }
 }
 
-.register-form {
-  grid-template-columns: 1fr 1fr;
-  gap: 14px 16px;
-  margin-top: 22px;
+/* ===== The credit in a small see-through pill ===== */
+.rg-made-by {
+  padding: 6px 16px; border-radius: 999px;
+  background: rgba(6, 16, 42, 0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 1px rgba(225, 29, 36, 0.35), 0 10px 24px -14px rgba(0, 0, 0, 0.9);
+  font-size: 0.72rem;
 }
-
-.register-form .error,
-.register-form .signin,
-.register-form .password-rules {
-  grid-column: 1 / -1;
-}
-
-.control.is-invalid {
-  border-color: rgba(225, 29, 36, 0.55);
-}
-
-.field-error {
-  margin-top: 6px;
-  color: #9f1217;
-  font-size: 0.76rem;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.password-rules {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  margin: -2px 0 0;
-  padding: 0;
-  list-style: none;
-  color: var(--muted);
-  font-size: 0.76rem;
-  font-weight: 700;
-}
-
-.password-rules li {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.password-rules li::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1.5px solid currentColor;
-}
-
-.password-rules li.is-ok {
-  color: #0f766e;
-}
-
-.password-rules li.is-ok::before {
-  background: currentColor;
-}
-
-.register-switch {
-  margin-top: 18px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-
-.register-switch a {
-  color: var(--accent-ink);
-  font-weight: 800;
-}
-
-.register-switch a:hover {
-  text-decoration: underline;
-}
-
-/* ===== Left panel ===== */
-
-.register-headline {
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-}
-
-.register-steps {
-  display: grid;
-  gap: 12px;
-  width: 100%;
-  max-width: 440px;
-  margin: 28px auto 0;
-  padding: 0;
-  list-style: none;
-  text-align: left;
-}
-
-.register-steps li {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(6px);
-}
-
-.register-step-num {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #a3a190, #bebdb2);
-  color: #122341;
-  font-weight: 900;
-  font-size: 0.86rem;
-}
-
-.register-steps strong {
-  display: block;
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 800;
-}
-
-.register-steps span:not(.register-step-num) {
-  display: block;
-  margin-top: 2px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.84rem;
-  line-height: 1.5;
-}
-
-/* ===== Done ===== */
-
-.register-done {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-  text-align: center;
-}
-
-.register-done-icon {
-  display: grid;
-  place-items: center;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #14b8a6, #325aa0);
-  box-shadow: 0 18px 40px -16px rgba(20, 184, 166, 0.75);
-}
-
-.register-done-icon svg {
-  width: 36px;
-  fill: none;
-  stroke: #fff;
-  stroke-width: 2.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.register-done h1 {
-  font-family: Outfit, Sora, sans-serif;
-  font-size: clamp(1.6rem, 2.6vw, 2rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-}
-
-.register-done p {
-  max-width: 380px;
-  color: var(--muted);
-  font-size: 0.95rem;
-  font-weight: 500;
-  line-height: 1.6;
-}
-
-.register-done-link {
-  display: grid;
-  place-items: center;
-  margin-top: 8px;
-  text-decoration: none;
-}
-
-@media (max-width: 940px) {
-  .register-steps {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .register-form {
-    grid-template-columns: 1fr;
-  }
-}
+@media (max-width: 1080px) { .rg-made-by { justify-self: center; } }

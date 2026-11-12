@@ -1184,3 +1184,12 @@
 .admin-sidebar .profile-role { background: #e8e6df; color: #14305f; border-color: transparent; }
 .admin-sidebar .profile-logout { color: #14305f; background: #fff; border: 1px solid #d3d0c6; box-shadow: none; }
 .admin-sidebar .profile-logout:hover { background: #fdecec; color: #a40f14; border-color: #d21319; }
+
+/* The signed-in person's card opens their profile: picture, name, designation. */
+.user-profile-btn {
+  display: grid; grid-template-columns: 42px minmax(0, 1fr); grid-column: 1 / span 2; align-items: center; gap: 10px;
+  min-width: 0; border-radius: 12px; cursor: pointer; outline-offset: 3px;
+}
+.user-profile-btn:hover { background: rgba(20, 48, 95, 0.05); }
+.user-profile-btn:focus-visible { outline: 2px solid #1d4589; }
+.user-profile-btn app-avatar { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 0 3px rgba(143, 141, 119, 0.55); border-radius: 50%; }

@@ -1,3 +1,5 @@
+import { AvatarComponent } from '../../../components/avatar/avatar.component';
+import { ProfileLauncher } from '../../../components/profile-dialog/profile-launcher.service';
 import { Component, ChangeDetectionStrategy, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -11,13 +13,20 @@ import { ClientRegistrationService } from '../../../services/client-registration
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [ApprovalBellComponent, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [ApprovalBellComponent, AvatarComponent, RouterOutlet, RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.css',
 })
 export class AdminLayoutComponent implements OnInit {
   readonly auth = inject(AuthService);
+  readonly profile = inject(ProfileLauncher);
+
+  /** Keyboard users reach the profile page the same way a click does. */
+  openProfilePage(url: string): void {
+    void this.profileRouter.navigateByUrl(url);
+  }
+  private readonly profileRouter = inject(Router);
   /** Drives the waiting-count badge on the Client Registrations row. */
   readonly registrations = inject(ClientRegistrationService);
   /** Finished Non-MOI jobs waiting for this administrator to close — the red number beside Non-MOI Jobs. */

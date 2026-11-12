@@ -69,7 +69,19 @@
           <tbody>
             @for (member of filteredStaff(); track member.id) {
               <tr>
-                <td data-label="Name" class="col-name">{{ member.fullName }}</td>
+                <td data-label="Name" class="col-name">
+                  @if (member.accountId) {
+                    <button type="button" class="staff-who" (click)="openProfile(member)" title="Open profile — photo and designation">
+                      <app-avatar [userId]="member.accountId" [name]="member.fullName" [version]="member.photoVersion" [size]="40" />
+                      <span class="staff-who-text">
+                        <strong>{{ member.fullName }}</strong>
+                        <small [class.is-empty]="!member.designation">{{ member.designation || 'No designation yet' }}</small>
+                      </span>
+                    </button>
+                  } @else {
+                    {{ member.fullName }}
+                  }
+                </td>
                 <td data-label="Role">{{ member.role }}</td>
                 <td data-label="Login email">
                   @if (member.email) { {{ member.email }} } @else { <span class="staff-none">—</span> }
