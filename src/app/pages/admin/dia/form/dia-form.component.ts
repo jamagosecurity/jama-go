@@ -25,11 +25,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { finalize } from 'rxjs';
 import { DiaWriteRequest } from '../../../../models/dia.model';
 import { DiaService } from '../../../../services/dia.service';
+import { GeoService } from '../../../../services/geo.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
 import {
   LATITUDE_LIMIT,
   LONGITUDE_LIMIT,
   formatCoordinates,
+  isMapsLink,
   looksLikeLink,
   mapPreviewUrl,
   parseCoordinates,
@@ -98,6 +100,7 @@ function sitePin(group: AbstractControl): ValidationErrors | null {
 export class DiaFormComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly service = inject(DiaService);
+  private readonly geo = inject(GeoService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   /** Portal this screen is mounted under — see DIA_BASE_PATH. */
@@ -189,8 +192,12 @@ export class DiaFormComponent implements OnInit {
     const text = event.clipboardData?.getData('text') ?? '';
     const pin = parseCoordinates(text);
     if (!pin) {
-      // A shortened share link resolves to coordinates only once opened, so
-      // dropping it into the box would leave a "not a number" error and no clue.
+      // A phone's short share link holds no coordinates until it is opened: the server opens it for us.
+      if (isMapsLink(text)) {
+        event.preventDefault();
+        this.resolveLink(text);
+        return;
+      }
       if (looksLikeLink(text)) {
         event.preventDefault();
         this.snackBar.open(
@@ -206,6 +213,34 @@ export class DiaFormComponent implements OnInit {
     this.setPin(pin.latitude, pin.longitude);
     this.snackBar.open(`Pin set to ${formatCoordinates(pin.latitude, pin.longitude)}.`, 'Dismiss', {
       duration: 3000,
+    });
+  }
+
+  /** Pasting a maps link into the address box pins the site too, so the link is never left sitting in the address. */
+  protected pasteLocation(event: ClipboardEvent): void {
+    const text = (event.clipboardData?.getData('text') ?? '').trim();
+    if (!looksLikeLink(text)) return;     // ordinary address text pastes as usual
+
+    const pin = parseCoordinates(text);
+    if (pin) {
+      event.preventDefault();
+      this.setPin(pin.latitude, pin.longitude);
+      this.snackBar.open(`Pin set to ${formatCoordinates(pin.latitude, pin.longitude)} from the link.`, 'Dismiss', { duration: 3500 });
+    } else if (isMapsLink(text)) {
+      event.preventDefault();
+      this.resolveLink(text);
+    }
+  }
+
+  private resolveLink(url: string): void {
+    this.snackBar.open('Reading the map link…', undefined, { duration: 2500 });
+    this.geo.resolve(url).subscribe({
+      next: (pin) => {
+        this.setPin(pin.latitude, pin.longitude);
+        this.snackBar.open(`Pin set to ${formatCoordinates(pin.latitude, pin.longitude)}.`, 'Dismiss', { duration: 3500 });
+      },
+      error: (error: unknown) =>
+        this.snackBar.open(getApiErrorMessage(error, 'Could not read that link.'), 'Dismiss', { duration: 6000 }),
     });
   }
 

@@ -79,8 +79,28 @@
       <img class="staff-topbar-logo" src="/JamaGoLogo-navy.png" alt="Jama Go" width="360" height="108" />
     </header>
 
-    <div class="staff-content">
+    <div class="staff-content tech-with-tabbar">
       <router-outlet />
     </div>
   </div>
+
+  <!-- Technicians work from a phone, one-handed: the two places they go sit at the thumb, not behind a menu. -->
+  <nav class="tech-tabbar" aria-label="Technician">
+    @if (canInspect()) {
+      <a routerLink="/technician" [class.active]="tab() === 'dia'">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 12l2 2 4-4M9 18h6" /></svg>
+        <span>DIA</span>
+      </a>
+    }
+    @if (canDoJobs()) {
+      <a routerLink="/technician/non-moi-jobs" [class.active]="tab() === 'jobs'">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><circle cx="12" cy="10" r="2.6" /></svg>
+        <span>Jobs</span>
+      </a>
+    }
+    <button type="button" (click)="menuOpen.set(true)" aria-label="Account and sign out">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
+      <span>Account</span>
+    </button>
+  </nav>
 </div>

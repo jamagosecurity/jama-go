@@ -1921,3 +1921,185 @@
 
 /* Shown on a freshly duplicated quotation so it is always clear which one is being edited. */
 .boq-copied { margin: 0 0 14px; padding: 12px 16px; border-left: 4px solid #14305f; border-radius: 10px; background: #eaf0fa; color: #14305f; line-height: 1.6; }
+
+
+/* ===== The quotations bar: adapts to ITS OWN width (the sidebar takes room, so screen width is the wrong thing to ask) ===== */
+
+.boq-banner {
+  display: block;
+  container-type: inline-size;
+  position: relative;
+  padding: 18px 22px;
+  border-radius: 22px;
+  box-shadow: 0 18px 40px -26px rgba(13, 32, 64, 0.55), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  overflow: hidden;
+}
+.boq-banner::before {            /* thin gold-to-navy accent along the top edge */
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: linear-gradient(90deg, #b5b4a8, #8f8d77 40%, #1a3767);
+}
+
+/* Default (medium widths): title and New quotation on the first line, search and filters on the second. */
+.boq-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "title actions" "filters filters";
+  align-items: center;
+  gap: 16px;
+}
+.boq-bar .page-banner-text { grid-area: title; min-width: 0; }
+.boq-bar .page-banner-text h1 { margin: 0; letter-spacing: -0.01em; }
+.boq-bar .page-banner-actions { grid-area: actions; width: auto; }
+.boq-bar .boq-filters {
+  grid-area: filters;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+.boq-bar .boq-search { flex: 1 1 280px; min-width: 0; }
+.boq-bar .boq-filters-group { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+/* Wide: everything in one row. */
+@container (min-width: 1060px) {
+  .boq-bar { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "title filters actions"; gap: 20px; }
+}
+/* Narrow (phones, small windows): one column, the button full width under the title. */
+@container (max-width: 560px) {
+  .boq-bar { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "actions" "filters"; gap: 14px; }
+  .boq-bar .page-banner-actions { width: 100%; }
+  .boq-bar .page-banner-actions > * { flex: 1 1 100%; }
+  .boq-bar .boq-search { flex-basis: 100%; }
+  .boq-bar .boq-filters-group { width: 100%; }
+  .boq-bar .boq-filters .boq-field { flex: 1 1 100%; }
+  .boq-bar .boq-filters .boq-field select { width: 100%; flex: 1; }
+}
+
+/* Look */
+.boq-bar .boq-search input {
+  height: 48px; padding-left: 46px;
+  border: 1px solid transparent; border-radius: 999px; background: rgba(26, 55, 103, 0.06);
+  transition: background 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.boq-bar .boq-search input:hover { background: rgba(26, 55, 103, 0.09); }
+.boq-bar .boq-search input:focus { background: #fff; border-color: rgba(50, 90, 160, 0.55); box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.13); }
+.boq-bar .boq-search-icon { left: 18px; }
+
+.boq-bar .boq-filters .boq-field { display: flex; align-items: center; gap: 8px; width: auto; }
+.boq-bar .boq-filters .boq-field > span { color: var(--admin-muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.boq-bar .boq-filters .boq-field select {
+  width: 160px; min-height: 48px; padding-left: 18px;
+  border: 1px solid transparent; border-radius: 999px; background-color: rgba(26, 55, 103, 0.06);
+  font-weight: 700; color: #234379; cursor: pointer; transition: background-color 0.18s ease;
+}
+.boq-bar .boq-filters .boq-field select:hover { background-color: rgba(26, 55, 103, 0.1); }
+
+/* "Only mine" as a toggle chip: navy when on. */
+.boq-bar .boq-check {
+  height: 48px; padding: 0 18px 0 14px; white-space: nowrap;
+  border: 1px solid rgba(26, 55, 103, 0.14); border-radius: 999px; background: #fff;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.boq-bar .boq-check:hover { border-color: rgba(26, 55, 103, 0.35); }
+.boq-bar .boq-check:has(input:checked) { background: #1a3767; border-color: #1a3767; color: #fff; }
+.boq-bar .boq-check:has(input:checked) input { accent-color: #fff; }
+
+.boq-bar .banner-gold { min-height: 48px; padding: 0 24px; }
+.boq-plus { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+
+/* ===== The quotations table adapts to ITS OWN width too (the sidebar takes ~300px, so screen width over-promises) ===== */
+
+.boq-table-wrap { container-type: inline-size; container-name: boqtable; }
+
+/* Tighter cells before anything has to scroll. */
+@container boqtable (max-width: 1060px) {
+  .boq-table th, .boq-table td { padding-left: 8px; padding-right: 8px; }
+  .boq-table { font-size: 0.88rem; }
+}
+
+/* Too narrow for seven columns: each row becomes a labelled card (same as the phone layout). */
+@container boqtable (max-width: 1040px) {
+  .boq-table.boq-table.boq-table { min-width: 0; table-layout: auto; }
+  .boq-table.boq-table.boq-table thead { display: none; }
+  .boq-table.boq-table.boq-table,
+  .boq-table.boq-table.boq-table tbody,
+  .boq-table.boq-table.boq-table tr,
+  .boq-table.boq-table.boq-table td { display: block; width: 100%; }
+  .boq-table.boq-table.boq-table tr { padding: 12px 0; border-bottom: 1px solid rgba(18, 60, 112, 0.1); }
+  .boq-table.boq-table.boq-table td {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 5px 4px; border: 0; text-align: right; overflow-wrap: anywhere;
+  }
+  .boq-table.boq-table.boq-table td[data-label]::before {
+    content: attr(data-label); flex: none; color: var(--admin-muted);
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; text-align: left;
+  }
+  .boq-table.boq-table.boq-table td.boq-row-actions { display: flex; justify-content: stretch; padding-top: 10px; }
+}
+
+
+/* ===== Luxury finish: navy, ivory and gold; serif for names and money ===== */
+
+.boq-bar .page-banner-text h1 {
+  font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(1.7rem, 2.4vw, 2.1rem); letter-spacing: 0;
+}
+
+.boq-list-table { border-collapse: separate; border-spacing: 0; }
+.boq-list-table thead th {
+  padding: 15px 12px;
+  font-size: 0.68rem; letter-spacing: 0.16em;
+  border-bottom: 2px solid #b5b4a8;
+}
+.boq-list-table tbody td { padding-top: 17px; padding-bottom: 17px; border-bottom: 1px solid rgba(143, 141, 119, 0.28); }
+.boq-list-table tbody tr { transition: background 0.18s ease; }
+.boq-list-table tbody tr:hover { background: #f8f6ef; }
+
+.boq-list-table .boq-number {
+  display: inline-block; padding: 4px 10px; border: 1px solid rgba(143, 141, 119, 0.55); border-radius: 8px;
+  background: #fbfaf5; color: #14305f; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-decoration: none; white-space: nowrap;
+}
+.boq-list-table .boq-number:hover { background: #14305f; color: #fff; border-color: #14305f; text-decoration: none; }
+
+.boq-list-table .boq-projectcell strong {
+  font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.08rem; line-height: 1.3; color: #14305f;
+}
+.boq-list-table .boq-projectcell small { color: var(--admin-muted); font-size: 0.8rem; }
+.boq-list-table td[data-label="Date"] { color: #3f4a63; white-space: nowrap; }
+
+.boq-list-table .boq-status { padding: 5px 12px; border: 1px solid rgba(26, 55, 103, 0.14); letter-spacing: 0.1em; font-size: 0.68rem; }
+.boq-list-table .boq-status[data-status="Approved"] { border-color: rgba(15, 118, 110, 0.35); }
+.boq-list-table .boq-status[data-status="Rejected"] { border-color: rgba(159, 18, 23, 0.3); }
+
+.boq-list-table td.num strong { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.12rem; color: #14305f; }
+.boq-list-table .boq-was { display: block; color: #9a9887; font-size: 0.78rem; text-decoration: line-through; }
+
+.boq-list-table .row-btn--edit {
+  background: linear-gradient(135deg, #14305f, #1d4589); color: #fff; border-color: #14305f;
+  padding: 7px 18px; border-radius: 999px; font-weight: 800; letter-spacing: 0.04em;
+}
+.boq-list-table .row-btn--edit:hover { box-shadow: 0 10px 20px -10px rgba(20, 48, 95, 0.9); }
+.boq-list-table .row-btn--icon { background: #fff; border: 1px solid rgba(143, 141, 119, 0.5); }
+.boq-list-table .row-btn--icon:hover { border-color: #8f8d77; background: #fbfaf5; box-shadow: 0 0 0 3px rgba(181, 180, 168, 0.3); }
+
+/* A real table cell, so the hairline under it lines up with the rest of the row. */
+.boq-list-table td.boq-row-actions { display: table-cell; text-align: right; white-space: nowrap; }
+.boq-list-table td.boq-row-actions > * { margin-left: 6px; vertical-align: middle; }
+.boq-list-table td.boq-row-actions > *:first-child { margin-left: 0; }
+
+/* Cards, when the table is too narrow: each quotation is its own tidy card. */
+@container boqtable (max-width: 1040px) {
+  .boq-list-table.boq-list-table.boq-list-table tbody tr {
+    margin-bottom: 14px; padding: 16px 18px;
+    border: 1px solid rgba(143, 141, 119, 0.35); border-radius: 18px; background: #fff;
+    box-shadow: 0 14px 30px -24px rgba(13, 32, 64, 0.55);
+  }
+  .boq-list-table.boq-list-table.boq-list-table tbody tr:hover { background: #fbfaf5; }
+  .boq-list-table.boq-list-table.boq-list-table td { border: 0; padding: 6px 0; }
+  .boq-list-table.boq-list-table.boq-list-table td.boq-row-actions {
+    margin-top: 8px; padding-top: 14px; border-top: 1px solid rgba(143, 141, 119, 0.3); flex-wrap: wrap; justify-content: flex-start; gap: 8px;
+  }
+}
+
+/* Mid widths: two cards side by side instead of one long column. */
+@container boqtable (min-width: 700px) and (max-width: 1040px) {
+  .boq-list-table.boq-list-table.boq-list-table tbody { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .boq-list-table.boq-list-table.boq-list-table tbody tr { margin-bottom: 0; }
+}

@@ -1,52 +1,48 @@
 <section class="admin-page boq-page">
-  <header class="page-banner">
-    <span class="page-banner-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 11h6M9 15h6M9 19h3" /></svg>
-    </span>
+  <header class="page-banner boq-banner">
+  <div class="boq-bar">
     <div class="page-banner-text">
-      <p class="page-banner-eyebrow">Quotations</p>
       <h1>Quotations</h1>
     </div>
-    <div class="page-banner-actions">
-    <a class="banner-gold" [routerLink]="[basePath, 'new']">New quotation</a>
+
+    <!-- Title, search, status, "only mine" and the New quotation button in ONE bar. -->
+    <div class="boq-filters">
+      <label class="boq-search">
+        <span class="visually-hidden">Search quotations</span>
+        <span class="boq-search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        </span>
+        <input type="search" [formControl]="searchControl" autocomplete="off"
+          placeholder="Search number, project, client…" />
+      </label>
+
+      <div class="boq-filters-group">
+        <label class="boq-field">
+          <span>Status</span>
+          <select [formControl]="statusControl">
+            <option value="">All statuses</option>
+            @for (option of statuses; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="boq-check">
+          <input type="checkbox" [formControl]="mineControl" />
+          <span>Only mine</span>
+        </label>
+
+        @if (hasFilters()) {
+          <button type="button" class="btn-admin btn-admin-ghost" (click)="clearFilters()">Clear</button>
+        }
+      </div>
     </div>
-  </header>
 
-  <div class="boq-filters">
-    <label class="boq-search">
-      <span class="visually-hidden">Search quotations</span>
-      <span class="boq-search-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-      </span>
-      <input type="search" [formControl]="searchControl" autocomplete="off"
-        placeholder="Search by number, project, site or client…" />
-    </label>
-
-    <!-- One unit, not three: Status, Only mine and Clear used to wrap
-         independently, so a narrower window could drop just the checkbox
-         onto its own line under an otherwise-full row. Grouped so they
-         move to a second line together instead. -->
-    <div class="boq-filters-group">
-      <label class="boq-field">
-        <span>Status</span>
-        <select [formControl]="statusControl">
-          <option value="">All statuses</option>
-          @for (option of statuses; track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
-          }
-        </select>
-      </label>
-
-      <label class="boq-check">
-        <input type="checkbox" [formControl]="mineControl" />
-        <span>Only mine</span>
-      </label>
-
-      @if (hasFilters()) {
-        <button type="button" class="btn-admin btn-admin-ghost" (click)="clearFilters()">Clear</button>
-      }
+    <div class="page-banner-actions">
+      <a class="banner-gold" [routerLink]="[basePath, 'new']"><svg class="boq-plus" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>New quotation</a>
     </div>
   </div>
+  </header>
 
   <div class="admin-panel">
     @if (loading()) {
@@ -57,7 +53,7 @@
     } @else if (result(); as page) {
       @if (page.items.length) {
         <div class="boq-table-wrap">
-          <table class="boq-table">
+          <table class="boq-table boq-list-table">
             <caption class="visually-hidden">Quotations</caption>
             <thead>
               <tr>

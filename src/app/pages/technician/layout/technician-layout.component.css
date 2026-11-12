@@ -1,0 +1,24 @@
+/* The phone bar: DIA, Jobs and Account within thumb reach. Hidden on large screens, where the sidebar does this job. */
+.tech-tabbar { display: none; }
+
+@media (max-width: 900px) {
+  .tech-tabbar {
+    position: fixed; inset: auto 0 0 0; z-index: 30;
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(143, 141, 119, 0.45);
+    background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(14px);
+    box-shadow: 0 -14px 30px -22px rgba(13, 32, 64, 0.5);
+  }
+  .tech-tabbar a, .tech-tabbar button {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    min-height: 56px; border: 0; border-radius: 16px; background: none; color: #5d6b86;
+    font: inherit; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-decoration: none; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tech-tabbar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .tech-tabbar a.active { background: #14305f; color: #fff; box-shadow: 0 10px 20px -12px rgba(20, 48, 95, 0.9); }
+  .tech-tabbar a.active svg { stroke: #e4e2d4; }
+  /* Room for the bar, so the last card is never hidden behind it. */
+  .tech-with-tabbar { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+}

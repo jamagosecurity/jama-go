@@ -13,12 +13,14 @@ import { finalize, map, startWith } from 'rxjs';
 import { AppSelectComponent } from '../../../components/app-select/app-select.component';
 import { JobTechnician, NonMoiJob } from '../../../models/non-moi-job.model';
 import { NonMoiJobService } from '../../../services/non-moi-job.service';
+import { GeoService } from '../../../services/geo.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { minTrimmed, notBlank, phoneNumber } from '../../../utils/form-validators.util';
 import {
   LATITUDE_LIMIT,
   LONGITUDE_LIMIT,
   formatCoordinates,
+  isMapsLink,
   looksLikeLink,
   mapPreviewUrl,
   parseCoordinates,
@@ -64,6 +66,7 @@ type Field = 'customerName' | 'customerNumber' | 'customerEmail' | 'location' | 
 })
 export class NonMoiJobEditorComponent implements OnInit {
   private readonly jobs = inject(NonMoiJobService);
+  private readonly geo = inject(GeoService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -195,6 +198,12 @@ export class NonMoiJobEditorComponent implements OnInit {
     const text = event.clipboardData?.getData('text') ?? '';
     const pin = parseCoordinates(text);
     if (!pin) {
+      // A phone's short share link holds no coordinates until it is opened: the server opens it for us.
+      if (isMapsLink(text)) {
+        event.preventDefault();
+        this.resolveLink(text);
+        return;
+      }
       if (looksLikeLink(text)) {
         event.preventDefault();
         this.pinNote.set('That link carries no coordinates. Open it in Maps, long-press the pin, then copy the numbers.');
@@ -204,6 +213,33 @@ export class NonMoiJobEditorComponent implements OnInit {
     event.preventDefault();
     this.setPin(pin.latitude, pin.longitude);
     this.pinNote.set(`Pin set to ${formatCoordinates(pin.latitude, pin.longitude)}.`);
+  }
+
+  /** Pasting a maps link into the location box pins the site too, so the link is never left sitting in the address. */
+  protected pasteLocation(event: ClipboardEvent): void {
+    const text = (event.clipboardData?.getData('text') ?? '').trim();
+    if (!looksLikeLink(text)) return;     // ordinary address text pastes as usual
+
+    const pin = parseCoordinates(text);
+    if (pin) {
+      event.preventDefault();
+      this.setPin(pin.latitude, pin.longitude);
+      this.pinNote.set(`Pin set to ${formatCoordinates(pin.latitude, pin.longitude)} from the link.`);
+    } else if (isMapsLink(text)) {
+      event.preventDefault();
+      this.resolveLink(text);
+    }
+  }
+
+  private resolveLink(url: string): void {
+    this.pinNote.set('Reading the map link…');
+    this.geo.resolve(url).subscribe({
+      next: (pin) => {
+        this.setPin(pin.latitude, pin.longitude);
+        this.pinNote.set(`Pin set to ${formatCoordinates(pin.latitude, pin.longitude)}.`);
+      },
+      error: (error: unknown) => this.pinNote.set(getApiErrorMessage(error, 'Could not read that link.')),
+    });
   }
 
   protected useCurrentLocation(): void {

@@ -340,3 +340,119 @@
 .tech-summary .is-ok { color: #0f6b5f; font-weight: 700; }
 .tech-summary .is-late { color: #b3141b; font-weight: 700; }
 .tech-summary .is-soon { color: #a65f00; font-weight: 700; }
+
+
+/* ===== Luxury finish ===== */
+
+.tech-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; padding: 12px 14px;
+  border: 1px solid rgba(143, 141, 119, 0.32); border-radius: 20px; background: #fff;
+  box-shadow: 0 16px 34px -28px rgba(13, 32, 64, 0.5);
+}
+.tech-search { position: relative; display: flex; align-items: center; flex: 1 1 280px; min-width: 0; }
+.tech-search svg { position: absolute; left: 16px; width: 18px; height: 18px; fill: none; stroke: #6b7280; stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+.tech-search input {
+  width: 100%; height: 48px; padding: 0 16px 0 44px; border: 1px solid transparent; border-radius: 999px;
+  background: rgba(26, 55, 103, 0.06); font: inherit; font-size: 0.95rem; transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+.tech-search input:focus { outline: none; background: #fff; border-color: rgba(50, 90, 160, 0.55); box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.13); }
+
+.tech-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.tech-filters button {
+  display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border: 1px solid rgba(26, 55, 103, 0.16);
+  border-radius: 999px; background: #fff; color: #234379; font: inherit; font-size: 0.88rem; font-weight: 750; cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.tech-filters button b { min-width: 24px; padding: 2px 8px; border-radius: 999px; background: rgba(26, 55, 103, 0.08); font-size: 0.78rem; text-align: center; }
+.tech-filters button:hover { border-color: rgba(26, 55, 103, 0.4); }
+.tech-filters button.is-late { color: #9f1217; border-color: rgba(159, 18, 23, 0.3); }
+.tech-filters button.is-soon { color: #8a5a00; border-color: rgba(176, 112, 0, 0.35); }
+.tech-filters button.is-current { background: #14305f; border-color: #14305f; color: #fff; }
+.tech-filters button.is-current b { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+/* Cards: tighter, with serif names and a navy action — forty sites should scroll quickly. */
+.tech-site-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.tech-site { gap: 10px; padding: 16px 18px 14px 22px; border-radius: 22px; }
+.tech-site .tech-site-head h2 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.15rem; line-height: 1.3; }
+.tech-site .tech-site-dia { display: inline-block; margin-bottom: 6px; padding: 3px 10px; border: 1px solid rgba(143, 141, 119, 0.55); border-radius: 8px; background: #fbfaf5; color: #14305f; font-size: 0.74rem; letter-spacing: 0.08em; }
+.tech-site .tech-bar { display: none; }
+.tech-site .tech-next { padding: 10px 14px; }
+.tech-site .tech-next-date { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.12rem; }
+.tech-site .tech-site-cta, .tech-site a.tech-site-cta {
+  background: linear-gradient(135deg, #14305f, #1d4589) !important; color: #fff !important; border-radius: 999px;
+  box-shadow: 0 12px 22px -14px rgba(20, 48, 95, 0.9); font-weight: 800; letter-spacing: 0.02em;
+}
+@media (max-width: 620px) {
+  .tech-toolbar { padding: 10px; border-radius: 18px; }
+  .tech-filters { width: 100%; }
+  .tech-filters button { flex: 1 1 auto; justify-content: center; padding: 0 12px; }
+  .tech-site-grid { grid-template-columns: 1fr; }
+}
+.tech-search .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; }
+
+
+/* ===== Phone: the way technicians actually use it ===== */
+@media (max-width: 620px) {
+  /* Search and filters stay put while scrolling forty sites; the chips scroll sideways in ONE row instead of stacking. */
+  .tech-toolbar { position: sticky; top: 6px; z-index: 6; gap: 10px; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(10px); }
+  .tech-search { flex-basis: 100%; }
+  .tech-filters { flex-wrap: nowrap; overflow-x: auto; margin: 0 -2px; padding: 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .tech-filters::-webkit-scrollbar { display: none; }
+  .tech-filters button { flex: 0 0 auto; height: 42px; }
+
+  /* A tighter title card: the stats are what matter. */
+  .dia-page > .page-banner { padding: 14px 16px; margin-bottom: 12px; }
+  .dia-page > .page-banner .page-banner-eyebrow { display: none; }
+  .dia-page > .page-banner .page-banner-actions { width: auto; position: absolute; top: 12px; right: 12px; }
+  .dia-page > .page-banner .page-banner-actions .banner-ghost { min-height: 40px; padding: 0 14px; }
+
+  /* Cards: everything a technician needs at the van — what, where, when, go — in far less height. */
+  .tech-site-grid { gap: 12px; }
+  .tech-site { gap: 8px; padding: 14px 14px 12px 18px; }
+  .tech-site .tech-cycle-count, .tech-site .tech-next-meta, .tech-site .tech-site-meta { display: none; }
+  .tech-site .tech-next { padding: 8px 12px; }
+  .tech-site .tech-next-row { margin-bottom: 2px; }
+  .tech-site .tech-site-foot { padding-top: 0; border-top: 0; }
+  .tech-site .tech-site-cta { min-height: 50px; font-size: 1rem; }
+  .tech-site .tech-site-nav { min-height: 48px; }
+}
+
+
+.tech-count { margin: 0 2px 12px; color: var(--admin-muted); font-size: 0.85rem; }
+.tech-count strong { color: #14305f; }
+.tech-more {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 420px; min-height: 52px; margin: 18px auto 6px;
+  border: 1px solid rgba(26, 55, 103, 0.3); border-radius: 999px; background: #fff; color: #14305f;
+  font: inherit; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 14px 28px -22px rgba(13, 32, 64, 0.6);
+}
+.tech-more span { color: var(--admin-muted); font-weight: 700; }
+.tech-more:active { background: #f3f5fa; }
+
+/* ===== Phone: a SLIM card — what, where, when, go — so a hundred sites do not mean a mile of scrolling ===== */
+@media (max-width: 620px) {
+  .tech-site.tech-site {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "head head" "nav nav" "next foot";
+    gap: 8px 10px; align-items: center; padding: 12px 14px 12px 18px;
+  }
+  .tech-site .tech-site-head { grid-area: head; }
+  .tech-site .tech-site-nav { grid-area: nav; min-height: 44px; }
+  .tech-site .tech-cycle, .tech-site .tech-bar { display: none; }
+  .tech-site .tech-next { grid-area: next; padding: 6px 10px; display: grid; gap: 2px; }
+  .tech-site .tech-next-label { display: none; }
+  .tech-site .tech-next-row { margin: 0; }
+  .tech-site .tech-next-date { font-size: 0.98rem; }
+  .tech-site .tech-site-foot { grid-area: foot; padding: 0; }
+  .tech-site .tech-site-cta { min-height: 52px; padding: 0 18px; font-size: 0.95rem; white-space: nowrap; }
+  .tech-site .tech-site-head h2 { font-size: 1.05rem; }
+  .tech-site .tech-site-sub { font-size: 0.82rem; }
+}
+
+.tech-new { display: inline-block; margin: 0 0 6px 6px; padding: 3px 9px; border-radius: 999px; background: linear-gradient(145deg, #dededa, #b5b4a8 60%, #8f8d77); color: #1f1e19; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; vertical-align: top; }
+.tech-filters button.is-new { color: #5b5a4d; border-color: rgba(143, 141, 119, 0.7); }
+.tech-filters button.is-new.is-current { color: #fff; border-color: #14305f; }
+@media (max-width: 620px) {
+  .tech-site .tech-next { padding: 8px 10px; gap: 4px; }
+  .tech-site .tech-next .status-chip { margin: 0; max-width: 100%; }
+}
+@media (max-width: 620px) { .tech-site .tech-next { padding-top: 14px; } .tech-site .tech-next-row { align-items: flex-start; } }

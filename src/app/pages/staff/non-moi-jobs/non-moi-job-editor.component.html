@@ -62,7 +62,7 @@
 
           <label class="nj-field nj-span-3">
             <span>Customer location <i aria-hidden="true">*</i></span>
-            <input formControlName="location" maxlength="300" autocomplete="off"
+            <input formControlName="location" maxlength="300" autocomplete="off" (paste)="pasteLocation($event)"
               placeholder="Building, street, area" [class.is-invalid]="showError('location')" />
             @if (showError('location')) {
               <small class="field-error">{{ errorFor('location', 'Location') }}</small>
@@ -102,7 +102,7 @@
             } @else if (pinNote()) {
               {{ pinNote() }}
             } @else {
-              Tip: paste a Google Maps link or “25.286106, 51.534817” into either box and both fill in.
+              Tip: paste a Google Maps link (even a short phone share link) or “25.286106, 51.534817” into the location or either box and the pin fills in.
             }
           </p>
         </div>

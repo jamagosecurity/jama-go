@@ -13,7 +13,7 @@ const JOBS_PREFIX = '/technician/non-moi-jobs';
   imports: [RouterOutlet, RouterLink],
   templateUrl: './technician-layout.component.html',
   // Deliberately the staff portal's stylesheet: one sidebar look across every role.
-  styleUrl: '../../staff/layout/staff-layout.component.css',
+  styleUrls: ['../../staff/layout/staff-layout.component.css', './technician-layout.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TechnicianLayoutComponent {

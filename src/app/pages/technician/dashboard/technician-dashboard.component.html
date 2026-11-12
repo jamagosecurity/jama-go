@@ -33,8 +33,45 @@
       <button mat-stroked-button type="button" (click)="load()">Try again</button>
     </div>
   } @else if (items().length) {
+    <!-- Forty-odd sites is too many to scroll: search, filter by state, and the soonest deadline comes first. -->
+    <div class="tech-toolbar">
+      <label class="tech-search">
+        <span class="visually-hidden">Search sites</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>
+        <input type="search" autocomplete="off" placeholder="Search client, DIA number, client no. or place"
+          [value]="query()" (input)="onSearch($event)" />
+      </label>
+      <div class="tech-filters" role="tablist" aria-label="Show sites">
+        <button type="button" role="tab" [class.is-current]="filter() === 'all'" [attr.aria-selected]="filter() === 'all'" (click)="setFilter('all')">All <b>{{ counts().all }}</b></button>
+        @if (counts().new) {
+          <button type="button" role="tab" class="is-new" [class.is-current]="filter() === 'new'" [attr.aria-selected]="filter() === 'new'" (click)="setFilter('new')">New <b>{{ counts().new }}</b></button>
+        }
+        @if (counts().late) {
+          <button type="button" role="tab" class="is-late" [class.is-current]="filter() === 'late'" [attr.aria-selected]="filter() === 'late'" (click)="setFilter('late')">Overdue <b>{{ counts().late }}</b></button>
+        }
+        <button type="button" role="tab" class="is-soon" [class.is-current]="filter() === 'soon'" [attr.aria-selected]="filter() === 'soon'" (click)="setFilter('soon')">Due soon <b>{{ counts().soon }}</b></button>
+        <button type="button" role="tab" [class.is-current]="filter() === 'open'" [attr.aria-selected]="filter() === 'open'" (click)="setFilter('open')">In progress <b>{{ counts().open }}</b></button>
+        @if (counts().done) {
+          <button type="button" role="tab" [class.is-current]="filter() === 'done'" [attr.aria-selected]="filter() === 'done'" (click)="setFilter('done')">Completed <b>{{ counts().done }}</b></button>
+        }
+      </div>
+    </div>
+
+    @if (!visibleItems().length) {
+      <div class="admin-panel">
+        <div class="admin-empty">
+          <strong>No sites match</strong>
+          <p>Try a different search, or choose “All”.</p>
+        </div>
+      </div>
+    }
+
+    @if (visibleItems().length) {
+      <p class="tech-count">Showing <strong>{{ pageItems().length }}</strong> of <strong>{{ visibleItems().length }}</strong> · soonest deadline first</p>
+    }
+
     <div class="tech-site-grid">
-      @for (item of items(); track item.id) {
+      @for (item of pageItems(); track item.id) {
         <!-- statusClass drives the card and every chip in it, so the whole card
              carries one colour and that colour reports the state of the work. -->
         <article
@@ -43,6 +80,7 @@
           <header class="tech-site-head">
             <div>
               <p class="tech-site-dia">{{ item.diaNumber }}</p>
+              @if (isNew(item)) { <span class="tech-new">New</span> }
               <h2><a class="tech-site-open" [routerLink]="actionLink(item)">{{ item.clientName }}</a></h2>
               <p class="tech-site-sub">Client no. {{ item.clientNumber }}</p>
             </div>
@@ -151,6 +189,12 @@
         </article>
       }
     </div>
+
+    @if (remaining()) {
+      <button type="button" class="tech-more" (click)="showMore()">
+        Show {{ nextChunk() }} more <span>· {{ remaining() }} left</span>
+      </button>
+    }
   } @else {
     <div class="admin-panel">
       <div class="admin-empty">

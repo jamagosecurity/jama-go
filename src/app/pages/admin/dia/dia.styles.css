@@ -210,3 +210,109 @@ th.mat-mdc-header-cell{font-size:.7rem;letter-spacing:.04em}
 .mat-column-actions{width:190px;min-width:190px}
 .mat-column-clientLocation .dia-loc{max-width:140px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
 .dia-row-actions{flex-wrap:nowrap}
+
+
+/* ===== Create / edit DIA: luxury finish. Two titled cards, fields that adapt to the card's own width ===== */
+
+.dia-form-page {
+  --mdc-outlined-text-field-container-shape: 14px;
+  --mdc-outlined-text-field-outline-color: rgba(26, 55, 103, 0.18);
+  --mdc-outlined-text-field-hover-outline-color: rgba(26, 55, 103, 0.42);
+  --mdc-outlined-text-field-focus-outline-color: #1d4589;
+}
+.dia-form-page .dia-form { display: flex; flex-direction: column; gap: 22px; padding: 4px 0 0; container-type: inline-size; }
+
+.dia-sec, .dia-pin {
+  margin: 0; padding: 22px 24px 8px;
+  border: 1px solid rgba(143, 141, 119, 0.32); border-radius: 22px;
+  background: #fff; box-shadow: 0 16px 34px -28px rgba(13, 32, 64, 0.5);
+}
+.dia-pin { background: linear-gradient(135deg, #fbfaf5, #fff 70%); padding-bottom: 12px; }
+
+.dia-sec-head { display: flex; align-items: flex-start; gap: 14px; margin: 0 0 18px; }
+.dia-sec-head h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 1.3rem; color: #14305f; }
+.dia-sec-head h2 em { margin-left: 8px; padding: 3px 10px; border: 1px solid rgba(143, 141, 119, 0.5); border-radius: 999px; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 0.66rem; font-weight: 800; line-height: 1; letter-spacing: 0.12em; text-transform: uppercase; color: #6b6a5c; vertical-align: middle; }
+.dia-sec-head p { margin: 4px 0 0; color: var(--admin-muted); font-size: 0.86rem; line-height: 1.5; }
+.dia-step {
+  display: grid; flex: none; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(145deg, #dededa 0%, #b5b4a8 55%, #8f8d77 100%); color: #14305f; font-weight: 800;
+  box-shadow: 0 0 0 4px rgba(165, 164, 148, 0.2);
+}
+
+.dia-sec-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 18px; }
+.dia-sec-grid mat-form-field:nth-of-type(4) { grid-column: 1 / -1; }
+.dia-pin .dia-pin-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dia-pin .dia-pin-actions { padding: 2px 0 8px; gap: 10px; }
+.dia-pin .dia-pin-actions .mat-mdc-outlined-button, .dia-pin .dia-pin-actions .mat-mdc-button { border-radius: 999px; font-weight: 700; }
+.dia-pin .dia-pin-actions .mat-mdc-outlined-button { border-color: rgba(26, 55, 103, 0.3); color: #14305f; }
+
+.dia-form-page .dia-form-actions { margin-top: 0; padding-top: 4px; border-top: 0; }
+.dia-form-page .dia-form-actions .mat-mdc-unelevated-button {
+  height: 48px; padding: 0 28px; border-radius: 999px; font-weight: 800; letter-spacing: 0.03em;
+  background: linear-gradient(135deg, #14305f, #1d4589); color: #fff;
+  box-shadow: 0 14px 26px -14px rgba(20, 48, 95, 0.9);
+}
+.dia-form-page .dia-form-actions .mat-mdc-unelevated-button:disabled { background: #cfd3dc; color: #fff; box-shadow: none; }
+
+@container (max-width: 760px) {
+  .dia-sec-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dia-sec-grid mat-form-field:nth-of-type(3) { grid-column: 1 / -1; }
+}
+@container (max-width: 520px) {
+  .dia-sec, .dia-pin { padding: 18px 16px 6px; border-radius: 18px; }
+  .dia-sec-grid, .dia-pin .dia-pin-fields { grid-template-columns: 1fr; }
+  .dia-form-page .dia-form-actions { flex-direction: column-reverse; align-items: stretch; }
+  .dia-form-page .dia-form-actions > * { width: 100%; justify-content: center; text-align: center; }
+}
+
+/* The fieldset's own legend is kept for screen readers only; the visible heading is the card's title. */
+.dia-form-page .dia-pin > legend { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; }
+@media (max-width: 640px) { .dia-form-page > .admin-panel { padding: 10px; } }
+
+/* One card, not two: the sections share the panel and are only divided by a thin gold line. */
+.dia-form-page .dia-form { gap: 0; }
+.dia-form-page .dia-sec, .dia-form-page .dia-pin {
+  padding: 8px 8px 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+.dia-form-page .dia-pin { margin-top: 10px; padding-top: 26px; border-top: 1px solid rgba(143, 141, 119, 0.4); padding-bottom: 6px; }
+.dia-form-page .dia-form-actions { margin-top: 14px; padding-top: 18px; border-top: 1px solid rgba(143, 141, 119, 0.4); }
+@container (max-width: 520px) {
+  .dia-form-page .dia-sec, .dia-form-page .dia-pin { padding-left: 2px; padding-right: 2px; }
+}
+.dia-form-page .dia-form-actions .mat-mdc-unelevated-button {
+  --mdc-filled-button-container-color: #14305f;
+  --mdc-filled-button-label-text-color: #fff;
+  --mdc-filled-button-disabled-container-color: #cfd3dc;
+  --mdc-filled-button-disabled-label-text-color: #fff;
+  --mat-button-filled-container-color: #14305f;
+  --mat-button-filled-label-text-color: #fff;
+  background-image: linear-gradient(135deg, #14305f, #1d4589);
+  color: #fff;
+}
+.dia-form-page .dia-form-actions button.mat-mdc-unelevated-button:not(:disabled) { background: linear-gradient(135deg, #14305f, #1d4589) !important; color: #fff !important; border-color: #14305f !important; }
+
+
+/* ===== One continuous form: a single grid of boxes, no sections ===== */
+.dia-form-page .dia-form {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 18px; padding: 8px 4px 0;
+}
+/* A container cannot query itself, so the panel around the form is the one whose width decides the columns. */
+.dia-form-page > .admin-panel { container-type: inline-size; }
+.dia-form-page .dia-form textarea { min-height: 24px; resize: vertical; }
+.dia-form-page .dia-form mat-form-field:nth-of-type(4) { grid-column: 1 / -1; }
+.dia-form-page .dia-form .admin-error, .dia-form-page .dia-pin-error, .dia-form-page .dia-hint, .dia-form-page .dia-form-actions { grid-column: 1 / -1; }
+.dia-form-page .dia-pin-actions { align-self: start; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 0 0; }
+.dia-form-page .dia-pin-actions .mat-mdc-outlined-button, .dia-form-page .dia-pin-actions .mat-mdc-button { border-radius: 999px; font-weight: 700; }
+.dia-form-page .dia-pin-actions .mat-mdc-outlined-button { border-color: rgba(26, 55, 103, 0.3); color: #14305f; height: 44px; }
+.dia-form-page .dia-hint { margin: 0 0 4px; padding: 12px 16px; border-left: 3px solid #b5b4a8; border-radius: 10px; background: #fbfaf5; color: var(--admin-muted); font-size: 0.85rem; line-height: 1.6; }
+.dia-form-page .dia-form-actions { margin-top: 10px; padding-top: 18px; border-top: 1px solid rgba(143, 141, 119, 0.4); }
+@container (max-width: 760px) {
+  .dia-form-page .dia-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dia-form-page .dia-form mat-form-field:nth-of-type(3) { grid-column: 1 / -1; }
+  .dia-form-page .dia-pin-actions { grid-column: 1 / -1; padding-top: 0; }
+}
+@container (max-width: 520px) {
+  .dia-form-page .dia-form { grid-template-columns: 1fr; }
+  .dia-form-page .dia-form-actions { flex-direction: column-reverse; align-items: stretch; }
+  .dia-form-page .dia-form-actions > * { width: 100%; justify-content: center; text-align: center; }
+}

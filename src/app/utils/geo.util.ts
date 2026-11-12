@@ -40,8 +40,10 @@ const NUMBER = String.raw`-?\d+(?:\.\d+)?`;
  * tried before anything that looks like a bare pair.
  */
 const URL_PATTERNS: readonly RegExp[] = [
-  new RegExp(String.raw`@(${NUMBER}),(${NUMBER})`), // /maps/@25.286106,51.534817,17z
+  // The exact place marker comes first: "@lat,lng" is only where the map view was centred.
   new RegExp(String.raw`!3d(${NUMBER})!4d(${NUMBER})`), // /maps/place/... place pin
+  new RegExp(String.raw`@(${NUMBER}),(${NUMBER})`), // /maps/@25.286106,51.534817,17z
+  new RegExp(String.raw`/place/(${NUMBER}),(${NUMBER})`), // /maps/place/25.286106,51.534817
   new RegExp(
     String.raw`[?&](?:q|query|ll|sll|center|destination|daddr|mlat)=(${NUMBER})(?:,|%2C)(${NUMBER})`,
     'i',
@@ -133,6 +135,14 @@ export function parseCoordinates(text: string): SiteCoordinates | null {
  */
 export function looksLikeLink(text: string): boolean {
   return /^(?:https?:\/\/|geo:|www\.)/i.test(text.trim());
+}
+
+/**
+ * A Google Maps link, including a phone's short share link (maps.app.goo.gl/…). One of these with no coordinates in it can
+ * still be opened by the server to find the pin, which is what the paste boxes do.
+ */
+export function isMapsLink(text: string): boolean {
+  return /^https?:\/\/(?:maps\.app\.goo\.gl|goo\.gl\/maps|(?:www\.|maps\.)?google\.[a-z.]+\/maps)/i.test(text.trim());
 }
 
 /** "25.286106, 51.534817" — the form that pastes cleanly back into any map. */

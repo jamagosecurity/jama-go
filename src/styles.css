@@ -1955,3 +1955,12 @@ table thead th {
   box-shadow: none !important;
 }
 table thead { background: #14305f !important; }
+
+/* ===== Luxury finish for every page's title card: serif title, a gold line along the top edge, a soft shadow ===== */
+.page-banner {
+  border-radius: 22px;
+  /* The inset shadow follows the rounded corners, so the gold line hugs the top edge without clipping anything inside. */
+  box-shadow: inset 0 3px 0 #b5b4a8, 0 18px 40px -26px rgba(13, 32, 64, 0.55) !important;
+}
+.page-banner h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; letter-spacing: 0; }
+.page-banner-eyebrow { letter-spacing: 0.22em; }

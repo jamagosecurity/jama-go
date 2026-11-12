@@ -10,10 +10,16 @@ import { navigationUrl, toSitePin } from '../../../utils/geo.util';
 
 const QUARTERS_PER_CYCLE = 4;
 const DUE_SOON_DAYS = 14;
+/** How many site cards are drawn at a time. */
+const PAGE_SIZE = 12;
+/** A site counts as new for this many days after it is activated. */
+const NEW_DAYS = 7;
 const MS_PER_DAY = 86_400_000;
 
 /** How a site's deadline should read, and how loudly. */
 type DueTone = 'complete' | 'idle' | 'overdue' | 'soon' | 'ok';
+
+type SiteFilter = 'all' | 'new' | 'late' | 'soon' | 'open' | 'done';
 
 interface DueInfo {
   readonly tone: DueTone;
@@ -49,6 +55,78 @@ export class TechnicianDashboardComponent implements OnInit {
   protected readonly error = signal('');
 
   protected readonly quarterSlots = [1, 2, 3, 4];
+
+  // ===== Finding a site among many: search, a status filter, and the soonest deadline first =====
+
+  protected readonly query = signal('');
+  protected readonly filter = signal<SiteFilter>('all');
+
+  protected readonly counts = computed(() => {
+    const list = this.items();
+    return {
+      all: list.length,
+      new: list.filter((item) => this.isNew(item)).length,
+      late: list.filter((item) => this.dueInfo(item).tone === 'overdue').length,
+      soon: list.filter((item) => this.dueInfo(item).tone === 'soon').length,
+      open: list.filter((item) => item.inspectionStatus !== 'Completed').length,
+      done: list.filter((item) => item.inspectionStatus === 'Completed').length,
+    };
+  });
+
+  protected readonly visibleItems = computed(() => {
+    const text = this.query().trim().toLowerCase();
+    const filter = this.filter();
+
+    const matches = (item: TechnicianDiaListItem): boolean => {
+      const tone = this.dueInfo(item).tone;
+      if (filter === 'new' && !this.isNew(item)) return false;
+      if (filter === 'late' && tone !== 'overdue') return false;
+      if (filter === 'soon' && tone !== 'soon') return false;
+      if (filter === 'open' && item.inspectionStatus === 'Completed') return false;
+      if (filter === 'done' && item.inspectionStatus !== 'Completed') return false;
+      if (!text) return true;
+      return [item.clientName, item.diaNumber, item.clientNumber, item.clientLocation]
+        .some((field) => field.toLowerCase().includes(text));
+    };
+
+    // Whatever is due soonest comes first; finished cycles go to the bottom.
+    const rank = (item: TechnicianDiaListItem): number =>
+      item.inspectionStatus === 'Completed'
+        ? Number.POSITIVE_INFINITY
+        : item.quarterEndDate
+          ? new Date(item.quarterEndDate).getTime()
+          : Number.MAX_SAFE_INTEGER;
+
+    return this.items().filter(matches).sort((a, b) => rank(a) - rank(b));
+  });
+
+  /** With a hundred sites on the list only a page of them is drawn; the rest is one tap away. Search and the filters
+   *  always look through ALL of them. */
+  protected readonly shown = signal(PAGE_SIZE);
+  protected readonly pageItems = computed(() => this.visibleItems().slice(0, this.shown()));
+  protected readonly remaining = computed(() => Math.max(0, this.visibleItems().length - this.shown()));
+  protected readonly nextChunk = computed(() => Math.min(PAGE_SIZE, this.remaining()));
+
+  protected showMore(): void {
+    this.shown.update((count) => count + PAGE_SIZE);
+  }
+
+  /** Activated in the last week — new sites arrive every day, so they are easy to spot and to filter to. */
+  protected isNew(item: TechnicianDiaListItem): boolean {
+    if (!item.activatedDate) return false;
+    const age = Date.now() - new Date(item.activatedDate).getTime();
+    return age >= 0 && age <= NEW_DAYS * MS_PER_DAY;
+  }
+
+  protected onSearch(event: Event): void {
+    this.query.set((event.target as HTMLInputElement).value);
+    this.shown.set(PAGE_SIZE);
+  }
+
+  protected setFilter(filter: SiteFilter): void {
+    this.filter.set(filter);
+    this.shown.set(PAGE_SIZE);
+  }
 
   /** Roll-up across every activated site, for the stat row. */
   protected readonly summary = computed(() => {
