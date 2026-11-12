@@ -97,6 +97,7 @@ export class LiveMapComponent implements OnDestroy {
   private moveTimer?: ReturnType<typeof setInterval>;
   private map?: import('leaflet').Map;
   private resize?: ResizeObserver;
+  private offResize?: () => void;
 
   constructor() {
     afterNextRender(async () => {
@@ -188,11 +189,22 @@ export class LiveMapComponent implements OnDestroy {
         const panel = window.innerWidth >= 1080 ? document.querySelector('[data-map-reserve]') : null;
         const right = panel ? Math.max(20, Math.round(width - panel.getBoundingClientRect().left + 24)) : 20;
         map.fitBounds(QATAR, { paddingTopLeft: [24, 24], paddingBottomRight: [right, 24], animate: false });
+        // Tell the page where the open space ends, so its dark shading starts exactly there — on every screen size.
+        const open = right > 20 ? `${Math.max(0, width - right + 24)}px` : '100%';
+        this.host.nativeElement.parentElement?.style.setProperty('--map-open', open);
       };
       fit();
       showLandmarks();
       this.map = map;
       if (this.flights()) this.startFlights(L, map);
+      // Fonts and the panels beside the map can settle a moment after first paint (another computer, another font
+      // cache) — fit again then, so the map always matches where the panels really ended up.
+      const refit = () => { if (this.map === map) { map.invalidateSize({ animate: false }); fit(); } };
+      void document.fonts?.ready.then(refit);
+      window.addEventListener('load', refit, { once: true });
+      setTimeout(refit, 1500);
+      window.addEventListener('resize', refit);
+      this.offResize = () => window.removeEventListener('resize', refit);
       this.resize = new ResizeObserver(() => { if (this.map !== map) return; map.invalidateSize({ animate: false }); fit(); });
       this.resize.observe(element);
       this.map = map;
@@ -271,6 +283,7 @@ export class LiveMapComponent implements OnDestroy {
     if (this.pollTimer) clearInterval(this.pollTimer);
     if (this.moveTimer) clearInterval(this.moveTimer);
     this.resize?.disconnect();
+    this.offResize?.();
     const map = this.map;
     this.map = undefined;
     if (map) { map.stop(); map.off(); map.remove(); }

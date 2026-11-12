@@ -212,3 +212,5 @@
   font-size: 0.72rem;
 }
 @media (max-width: 1080px) { .rg-made-by { justify-self: center; } }
+
+@media (min-width: 1081px) { .lg--register .lg-shade { background: linear-gradient(90deg, rgba(5, 14, 38, 0) 0%, rgba(5, 14, 38, 0.06) calc(var(--map-open, 40%) - 90px), rgba(5, 14, 38, 0.84) calc(var(--map-open, 40%) + 10px), rgba(5, 14, 38, 0.92) 100%); } }
