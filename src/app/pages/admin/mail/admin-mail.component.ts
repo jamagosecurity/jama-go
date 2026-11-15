@@ -14,7 +14,8 @@ import { getApiErrorMessage } from '../../../utils/api-error.util';
 const FRAME_HEAD =
   `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">` +
   `<base target="_blank"><style>body{font:15px/1.65 -apple-system,"Segoe UI",system-ui,sans-serif;color:#1c2433;margin:0;padding:26px 30px 40px;word-wrap:break-word}` +
-  `img{max-width:100%;height:auto}table{max-width:100%}a{color:#14305f}blockquote{margin:0 0 0 4px;padding-left:12px;border-left:3px solid #e3e0d8;color:#4b5260}</style>`;
+  `img{max-width:100%;height:auto}table{max-width:100%}a{color:#14305f}blockquote{margin:0 0 0 4px;padding-left:12px;border-left:3px solid #e3e0d8;color:#4b5260}` +
+  `@media (max-width:600px){body{padding:16px 12px 32px}td[align=center][style*="padding:34px"]{padding:0!important}.px{padding-left:16px!important;padding-right:16px!important}}</style>`;
 
 /** Pictures from outside are blocked by the frame's rules; drop them so no broken-image icons show. */
 const REMOTE_IMG = /<img\b(?![^>]*\bsrc\s*=\s*["']?(?:data:))[^>]*>/gi;

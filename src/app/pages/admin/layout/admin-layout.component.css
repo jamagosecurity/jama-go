@@ -1193,3 +1193,35 @@
 .user-profile-btn:hover { background: rgba(20, 48, 95, 0.05); }
 .user-profile-btn:focus-visible { outline: 2px solid #1d4589; }
 .user-profile-btn app-avatar { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 0 3px rgba(143, 141, 119, 0.55); border-radius: 50%; }
+
+/* ===== Compact rail, in the Company mail style =====
+   Slim one-line rows, small icon tiles and thin section titles, so every link
+   (down to Public site) fits on a laptop screen without scrolling. */
+.admin-sidebar { gap: 8px; padding: 12px 12px 10px; }
+.admin-brand { padding: 2px 0 0; }
+.admin-sidebar .admin-logo-badge { padding: 0 8px 10px; }
+.admin-sidebar .admin-logo { max-width: 196px; }
+.admin-nav { gap: 1px; padding-bottom: 8px; }
+.admin-nav a { grid-template-columns: 30px 1fr; gap: 10px; min-height: 38px; padding: 4px 10px; border-radius: 10px; }
+.admin-nav a .nav-icon,
+.admin-nav .nav-icon { width: 30px; height: 30px; border-radius: 9px; }
+.admin-nav a .nav-icon svg { width: 16px; height: 16px; stroke-width: 1.8; }
+.admin-nav a strong { font-size: 0.9rem; }
+.admin-nav a.nav-clients, .admin-nav .nav-group > a { padding-right: 44px; }
+.nav-count { min-width: 20px; height: 20px; font-size: 0.7rem; }
+.nav-chevron { top: 6px; right: 8px; width: 26px; height: 26px; }
+.nav-chevron svg { width: 14px; height: 14px; }
+.admin-nav .nav-label,
+.admin-nav .nav-sub,
+.admin-nav .nav-sub--moi,
+.admin-nav .nav-sub--non { margin: 10px 0 4px; font-size: 0.66rem; letter-spacing: 0.14em; }
+.admin-nav .nav-label:first-child { margin-top: 2px; }
+.admin-nav .nav-label::before, .admin-nav .nav-sub::before,
+.admin-nav .nav-label::after,  .admin-nav .nav-sub::after { height: 1px; }
+.admin-nav .nav-subs { margin: 0 0 2px 24px; }
+.admin-nav .nav-subs a { min-height: 30px; padding: 4px 10px 4px 26px; font-size: 0.82rem; }
+.admin-sidebar-foot { margin-top: 4px; }
+.admin-sidebar .admin-user { padding: 7px 8px 7px 9px; border-radius: 12px; }
+.user-profile-btn { grid-template-columns: 34px minmax(0, 1fr); gap: 9px; }
+.admin-sidebar .profile-logout { width: 32px; height: 32px; }
+.admin-nav a.admin-nav-muted { margin-top: 0; }

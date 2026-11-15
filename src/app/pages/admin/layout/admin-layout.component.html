@@ -238,7 +238,7 @@
       <div class="admin-user">
 <div class="user-profile-btn" role="button" tabindex="0" title="My profile" aria-label="Open my profile"
              routerLink="/admin/profile" (keydown.enter)="openProfilePage('/admin/profile')">
-          <app-avatar [userId]="auth.currentUser()?.id" [name]="auth.currentUser()?.fullName ?? ''" [version]="auth.currentUser()?.photoVersion" [size]="42" />
+          <app-avatar [userId]="auth.currentUser()?.id" [name]="auth.currentUser()?.fullName ?? ''" [version]="auth.currentUser()?.photoVersion" [size]="34" />
           <div class="admin-user-meta">
             <p>{{ auth.currentUser()?.fullName || 'Administrator' }}</p>
             <small>{{ auth.currentUser()?.designation || auth.currentUser()?.email }}</small>
