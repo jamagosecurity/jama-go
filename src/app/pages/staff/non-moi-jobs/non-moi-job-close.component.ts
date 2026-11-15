@@ -18,6 +18,8 @@ const ADDRESS = /^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/;
  * here, may take a discount off the total (nothing else about the prices can change), and closes the deal — which
  * sends the client the bill by email and locks the job.
  */
+const qar = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 @Component({
   selector: 'app-non-moi-job-close',
   standalone: true,
@@ -48,6 +50,30 @@ export class NonMoiJobCloseComponent implements OnInit {
   protected readonly confirming = signal(false);
   protected readonly categoryLabel = maintenanceCategoryLabel;
   protected readonly statusLabel = jobStatusLabel;
+
+  /** Every timing on the job, oldest first: issued, the planned visit, completed by the technician, then the bill steps. */
+  protected readonly timeline = computed(() => {
+    const job = this.job();
+    if (!job) return [];
+    const billTitle: Record<string, string> = {
+      Sent: 'Bill sent', Approved: 'Approved by the client', Rejected: 'Rejected by the client', Commented: 'Client commented',
+    };
+    const steps: { kind: string; title: string; detail: string; at: string }[] = [
+      { kind: 'Issued', title: 'Job issued', detail: `By ${this.person(job.assignedByName)} to ${job.assignedToName}`, at: job.createdAt },
+    ];
+    if (job.scheduledAt) {
+      steps.push({ kind: 'Scheduled', title: 'Visit scheduled for', detail: job.assignedToName, at: job.scheduledAt });
+    }
+    if (job.completedAt) {
+      steps.push({ kind: 'Completed', title: 'Completed by the technician', detail: `${job.assignedToName} · ${qar(job.workTotal)} QAR of work`, at: job.completedAt });
+    }
+    for (const e of job.events) {
+      const parts = [`Revision ${e.revision}`, `${qar(e.amountPayable)} QAR`, this.person(e.actorName)];
+      if (e.note) parts.push(e.note);
+      steps.push({ kind: e.action, title: billTitle[e.action] ?? e.action, detail: parts.join(' · '), at: e.at });
+    }
+    return steps;
+  });
 
   /** Any Non-MOI manager may review and send once the technician has finished (this page is only reachable with that grant). */
   protected readonly canClose = computed(() => {

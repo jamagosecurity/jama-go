@@ -140,7 +140,7 @@
           </div>
 
           <h3 class="jc-h3">Where should the bill go?</h3>
-          <p class="jc-note">The client receives the bill by email, as a PDF with your signature and three buttons: <strong>Approve</strong>, <strong>Reject</strong> and <strong>Comment</strong>.</p>
+          <p class="jc-note">The client receives the invoice by email, with the PDF attached and your signature. One <strong>Review &amp; respond</strong> button opens their page, where they <strong>Approve</strong>, <strong>Reject</strong> or <strong>Comment</strong> in one tap.</p>
           <div class="jc-channels">
             <div class="jc-channel is-on">
               <label class="jc-field">
@@ -183,22 +183,20 @@
         </section>
       }
 
-      @if (j.events.length) {
-        <section class="jc-card">
-          <h2 class="jc-h">History</h2>
-          <ol class="jc-history">
-            @for (e of j.events; track $index) {
-              <li [attr.data-action]="e.action">
-                <span class="jc-dot" aria-hidden="true"></span>
-                <div>
-                  <strong>{{ e.action === 'Sent' ? 'Bill sent' : e.action === 'Approved' ? 'Approved by the client' : e.action === 'Rejected' ? 'Rejected by the client' : 'Client commented' }}</strong>
-                  <small>Revision {{ e.revision }} · {{ e.amountPayable | number: '1.2-2' }} QAR · {{ person(e.actorName) }} · {{ e.at | date: 'd MMM y, HH:mm' }}@if (e.note) { · {{ e.note }} }</small>
-                </div>
-              </li>
-            }
-          </ol>
-        </section>
-      }
+      <section class="jc-card">
+        <h2 class="jc-h">History</h2>
+        <ol class="jc-history">
+          @for (e of timeline(); track $index) {
+            <li [attr.data-action]="e.kind">
+              <span class="jc-dot" aria-hidden="true"></span>
+              <div>
+                <strong>{{ e.title }} <time>{{ e.at | date: 'EEE d MMM y, h:mm a' : '+0300' }}</time></strong>
+                <small>{{ e.detail }}</small>
+              </div>
+            </li>
+          }
+        </ol>
+      </section>
     }
   }
 </section>

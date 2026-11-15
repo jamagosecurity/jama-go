@@ -60,6 +60,22 @@
             }
           </div>
 
+          <label class="nj-field">
+            <span>Visit date <i aria-hidden="true">*</i></span>
+            <input type="date" formControlName="visitDate" [class.is-invalid]="showError('visitDate')" />
+            @if (showError('visitDate')) {
+              <small class="field-error">{{ errorFor('visitDate', 'Visit date') }}</small>
+            }
+          </label>
+
+          <label class="nj-field">
+            <span>Visit time <i aria-hidden="true">*</i></span>
+            <input type="time" formControlName="visitTime" [class.is-invalid]="showError('visitTime')" />
+            @if (showError('visitTime')) {
+              <small class="field-error">{{ errorFor('visitTime', 'Visit time') }}</small>
+            }
+          </label>
+
           <label class="nj-field nj-span-3">
             <span>Customer location <i aria-hidden="true">*</i></span>
             <input formControlName="location" maxlength="300" autocomplete="off" (paste)="pasteLocation($event)"

@@ -92,6 +92,9 @@
 .jc-history li[data-action="Approved"] .jc-dot { background: #0f6b5f; }
 .jc-history li[data-action="Rejected"] .jc-dot, .jc-history li[data-action="Commented"] .jc-dot { background: var(--crimson); }
 .jc-history strong { display: block; color: var(--navy); }
+.jc-history strong time { margin-left: 6px; color: #0f6b5f; font-weight: 750; white-space: nowrap; }
+.jc-history li[data-action="Scheduled"] .jc-dot { background: #fff; border: 3px solid #0f6b5f; }
+.jc-history li[data-action="Completed"] .jc-dot { background: #8a5a00; }
 .jc-history small { display: block; margin-top: 2px; color: #6b7280; line-height: 1.5; }
 
 .page-banner .banner-ghost svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }

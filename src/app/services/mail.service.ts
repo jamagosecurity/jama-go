@@ -15,8 +15,9 @@ export class MailService {
     return this.http.get<ApiResult<MailAccount[]>>(`${this.base}/accounts`).pipe(map(unwrapApiResult));
   }
 
-  messages(filter: { account: string; folder: string; search: string; page: number }): Observable<MailPage> {
+  messages(filter: { account: string; folder: string; search: string; page: number; unread?: boolean }): Observable<MailPage> {
     let params = new HttpParams().set('page', filter.page).set('pageSize', 50);
+    if (filter.unread) params = params.set('unread', true);
     if (filter.account) params = params.set('account', filter.account);
     if (filter.folder) params = params.set('folder', filter.folder);
     if (filter.search.trim()) params = params.set('search', filter.search.trim());
@@ -25,6 +26,11 @@ export class MailService {
 
   send(request: SendMailRequest): Observable<MailSent> {
     return this.http.post<ApiResult<MailSent>>(`${this.base}/send`, request).pipe(map(unwrapApiResult));
+  }
+
+  /** Mark read or unread — here and on the mail server. */
+  setRead(id: string, read: boolean): Observable<boolean> {
+    return this.http.post<ApiResult<boolean>>(`${this.base}/messages/${id}/read`, { read }).pipe(map(unwrapApiResult));
   }
 
   message(id: string): Observable<MailDetail> {

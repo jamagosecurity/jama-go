@@ -13,7 +13,11 @@ import { getApiErrorMessage } from '../../../utils/api-error.util';
  *  email can phone home or run code otherwise. Inline styles and data: images only. */
 const FRAME_HEAD =
   `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">` +
-  `<base target="_blank"><style>body{font:14px/1.5 system-ui,sans-serif;color:#1c2433;margin:12px;word-wrap:break-word}</style>`;
+  `<base target="_blank"><style>body{font:15px/1.65 -apple-system,"Segoe UI",system-ui,sans-serif;color:#1c2433;margin:0;padding:26px 30px 40px;word-wrap:break-word}` +
+  `img{max-width:100%;height:auto}table{max-width:100%}a{color:#14305f}blockquote{margin:0 0 0 4px;padding-left:12px;border-left:3px solid #e3e0d8;color:#4b5260}</style>`;
+
+/** Pictures from outside are blocked by the frame's rules; drop them so no broken-image icons show. */
+const REMOTE_IMG = /<img\b(?![^>]*\bsrc\s*=\s*["']?(?:data:))[^>]*>/gi;
 
 type ComposeMode = 'new' | 'reply' | 'forward';
 
@@ -24,6 +28,8 @@ interface Compose {
   cc: string;
   subject: string;
   body: string;
+  /** The original message under a reply or forward. */
+  quoted: string;
   replyToId: string | null;
 }
 
@@ -53,13 +59,56 @@ export class AdminMailComponent {
   readonly account = signal('');
   readonly folder = signal('');
   readonly search = signal('');
+  /** Only messages not read yet. */
+  readonly unreadOnly = signal(false);
   readonly page = signal(1);
 
   readonly open = signal<MailDetail | null>(null);
   readonly opening = signal<string | null>(null);
   readonly showHtml = signal(true);
+  /** The company logo and MOI-SSD badge as data: pictures, for our own emails (cid:…) in the viewer and preview. */
+  private readonly logoData = signal<string | null>(null);
+  private readonly moiData = signal<string | null>(null);
+
+  /** Our own emails name their pictures cid:jamago-logo / cid:jamago-moi; swap in our copies. */
+  private withOwnPictures(html: string): string {
+    const logo = this.logoData();
+    const moi = this.moiData();
+    let out = html;
+    if (logo) out = out.replace(/cid:jamago-logo/g, logo);
+    if (moi) out = out.replace(/cid:jamago-moi/g, moi);
+    return out;
+  }
 
   readonly pages = computed(() => Math.max(1, Math.ceil(this.total() / 50)));
+  readonly boxMenu = signal(false);
+
+  /** The list under day headings: Today, Yesterday, This week, then by month. */
+  readonly groups = computed(() => {
+    const out: { label: string; items: MailListItem[] }[] = [];
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    const day = 86_400_000;
+    for (const m of this.items()) {
+      const t = new Date(m.sentAt).getTime();
+      const label = t >= start.getTime() ? 'Today'
+        : t >= start.getTime() - day ? 'Yesterday'
+        : t >= start.getTime() - 6 * day ? 'This week'
+        : new Date(m.sentAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+      const last = out[out.length - 1];
+      if (last && last.label === label) last.items.push(m); else out.push({ label, items: [m] });
+    }
+    return out;
+  });
+  readonly currentBox = computed(() => this.accounts().find((a) => a.key === this.account()) ?? null);
+  /** Unread in the mailbox being shown (or all of them). */
+  readonly currentUnread = computed(() => this.currentBox()?.unreadCount ?? this.unreadAll());
+  readonly unreadAll = computed(() => this.accounts().reduce((sum, a) => sum + (a.unreadCount ?? 0), 0));
+  readonly allCount = computed(() => this.accounts().reduce((sum, a) => sum + a.inboxCount + a.sentCount, 0));
+  readonly currentLabel = computed(() => {
+    const box = this.accounts().find((a) => a.key === this.account())?.address ?? 'All mailboxes';
+    return this.folder() === 'Inbox' ? `${box} · Incoming` : this.folder() === 'Sent' ? `${box} · Outgoing` : box;
+  });
+  protected readonly Math = Math;
   readonly noneConfigured = computed(() => this.accounts().length > 0 && this.accounts().every((a) => !a.configured));
   readonly failing = computed(() => this.accounts().filter((a) => a.configured && a.lastError));
 
@@ -68,7 +117,10 @@ export class AdminMailComponent {
     if (!m || !m.bodyHtml || !this.showHtml()) return null;
     // Safe to trust here only because the iframe is sandboxed with no permissions
     // and the document carries its own restrictive CSP.
-    return this.sanitizer.bypassSecurityTrustHtml(FRAME_HEAD + m.bodyHtml);
+    // Our own emails carry the company logo inside the message (cid:jamago-logo); show it from our own copy, as a
+    // data: picture the frame allows. Anything else from outside stays blocked.
+    const body = this.withOwnPictures(m.bodyHtml).replace(REMOTE_IMG, '');
+    return this.sanitizer.bypassSecurityTrustHtml(FRAME_HEAD + body);
   });
 
   // ===== Compose / reply / forward =====
@@ -81,14 +133,20 @@ export class AdminMailComponent {
   /** Mailboxes that have a password, i.e. the ones mail can actually be sent from. */
   readonly senders = computed(() => (this.auth.isAdmin() ? this.accounts().filter((a) => a.configured) : []));
 
-  private signatureOf(accountKey: string): string {
-    const sig = this.accounts().find((a) => a.key === accountKey)?.signature?.trim();
-    return sig ? `-- \n${sig}` : '';
-  }
+  /** The From mailbox's signature card, as it will be sent, for the preview under the message. */
+  readonly signaturePreview = computed<SafeHtml | null>(() => {
+    const c = this.compose();
+    const html = c ? this.accounts().find((a) => a.key === c.account)?.signatureHtml : null;
+    if (!html) return null;
+    const body = this.withOwnPictures(html);
+    return this.sanitizer.bypassSecurityTrustHtml(
+      `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">` +
+      `<base target="_blank"><style>body{margin:0;padding:0 4px 8px;font-family:system-ui,sans-serif}</style>` + body);
+  });
 
   openNew(): void {
     const account = this.senders().find((a) => a.key === this.account())?.key ?? this.senders()[0]?.key ?? '';
-    this.startCompose({ mode: 'new', account, to: '', cc: '', subject: '', body: this.withSignature('', account), replyToId: null });
+    this.startCompose({ mode: 'new', account, to: '', cc: '', subject: '', body: '', quoted: '', replyToId: null });
   }
 
   reply(m: MailDetail): void {
@@ -97,7 +155,7 @@ export class AdminMailComponent {
     this.startCompose({
       mode: 'reply', account: m.accountKey, to, cc: '',
       subject: /^re:/i.test(m.subject) ? m.subject : `Re: ${m.subject}`,
-      body: this.withSignature('', m.accountKey) + `\n\n${quoted}`, replyToId: m.id,
+      body: '', quoted, replyToId: m.id,
     });
   }
 
@@ -112,7 +170,7 @@ export class AdminMailComponent {
     this.startCompose({
       mode: 'forward', account: m.accountKey, to: '', cc: '',
       subject: /^fwd?:/i.test(m.subject) ? m.subject : `Fwd: ${m.subject}`,
-      body: this.withSignature('', m.accountKey) + `\n\n${header}\n\n${m.bodyText}`, replyToId: null,
+      body: '', quoted: `${header}\n\n${m.bodyText}`, replyToId: null,
     });
   }
 
@@ -120,11 +178,6 @@ export class AdminMailComponent {
     this.sendError.set(null);
     this.showCc.set(false);
     this.compose.set(c);
-  }
-
-  private withSignature(body: string, account: string): string {
-    const sig = this.signatureOf(account);
-    return sig ? `${body}\n\n${sig}` : body;
   }
 
   private when(m: MailDetail): string {
@@ -139,14 +192,9 @@ export class AdminMailComponent {
     this.compose.update((c) => (c ? { ...c, [key]: value } : c));
   }
 
-  /** Changing the From mailbox swaps its signature for the new one, if it was left untouched. */
+  /** Changing the From mailbox changes whose signature goes under the message. */
   changeAccount(next: string): void {
-    const c = this.compose();
-    if (!c) return;
-    const oldSig = this.signatureOf(c.account);
-    const newSig = this.signatureOf(next);
-    const body = oldSig && c.body.includes(oldSig) ? c.body.replace(oldSig, newSig) : c.body;
-    this.compose.set({ ...c, account: next, body });
+    this.compose.update((c) => (c ? { ...c, account: next } : c));
   }
 
   closeCompose(): void {
@@ -187,6 +235,7 @@ export class AdminMailComponent {
         subject: c.subject.trim(),
         body: c.body,
         replyToMessageId: c.replyToId,
+        quoted: c.quoted.trim() || null,
       })
       .pipe(finalize(() => this.sending.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -210,12 +259,26 @@ export class AdminMailComponent {
       error: (e) => this.error.set(getApiErrorMessage(e)),
     });
     this.load();
+    this.loadPicture('/JamaGoLogo-trim.png', this.logoData);
+    this.loadPicture('/moi-ssd-badge.jpg', this.moiData);
+  }
+
+  private loadPicture(url: string, into: ReturnType<typeof signal<string | null>>): void {
+    fetch(url)
+      .then((r) => (r.ok ? r.blob() : null))
+      .then((blob) => {
+        if (!blob) return;
+        const reader = new FileReader();
+        reader.onload = () => into.set(String(reader.result));
+        reader.readAsDataURL(blob);
+      })
+      .catch(() => undefined);
   }
 
   load(): void {
     this.loading.set(true);
     this.mail
-      .messages({ account: this.account(), folder: this.folder(), search: this.search(), page: this.page() })
+      .messages({ account: this.account(), folder: this.folder(), search: this.search(), page: this.page(), unread: this.unreadOnly() })
       .pipe(finalize(() => this.loading.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (p) => { this.items.set(p.items); this.total.set(p.total); this.error.set(null); },
@@ -223,8 +286,9 @@ export class AdminMailComponent {
       });
   }
 
-  pickAccount(key: string): void { this.account.set(key); this.page.set(1); this.load(); }
-  pickFolder(f: string): void { this.folder.set(f); this.page.set(1); this.load(); }
+  pickAccount(key: string): void { this.account.set(key); this.page.set(1); this.open.set(null); this.load(); }
+  pickFolder(f: string): void { this.folder.set(f); this.unreadOnly.set(false); this.page.set(1); this.load(); }
+  pickUnread(): void { this.unreadOnly.set(true); this.folder.set(''); this.page.set(1); this.load(); }
   goto(p: number): void { this.page.set(Math.min(Math.max(1, p), this.pages())); this.load(); }
 
   onSearch(value: string): void {
@@ -236,12 +300,62 @@ export class AdminMailComponent {
   view(item: MailListItem): void {
     this.opening.set(item.id);
     this.mail.message(item.id).pipe(finalize(() => this.opening.set(null)), takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (m) => { this.open.set(m); this.showHtml.set(!!m.bodyHtml); },
+      next: (m) => {
+        this.open.set(m);
+        this.showHtml.set(!!m.bodyHtml);
+        if (!item.isRead) this.markRead(item.id, item.accountKey, true);
+      },
       error: (e) => this.error.set(getApiErrorMessage(e)),
     });
   }
 
+  /** Read / unread: shown at once, then saved here and on the mail server. */
+  markRead(id: string, accountKey: string, read: boolean): void {
+    const item = this.items().find((x) => x.id === id);
+    if (item && item.isRead === read) return;
+    this.items.update((list) => list.map((x) => (x.id === id ? { ...x, isRead: read } : x)));
+    this.open.update((m) => (m && m.id === id ? { ...m, isRead: read } : m));
+    if (!item || item.folder === 'Inbox') {
+      this.accounts.update((list) => list.map((a) => (a.key === accountKey
+        ? { ...a, unreadCount: Math.max(0, (a.unreadCount ?? 0) + (read ? -1 : 1)) } : a)));
+    }
+    this.mail.setRead(id, read).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      error: (e) => this.error.set(getApiErrorMessage(e, 'Could not change the read mark.')),
+    });
+  }
+
+  /** Mark the open message unread and go back to the list, like a mail app. */
+  markUnread(m: MailDetail): void {
+    this.markRead(m.id, m.accountKey, false);
+    this.open.set(null);
+  }
+
   close(): void { this.open.set(null); }
+
+  /** Two letters for an avatar: "Mail Delivery System" → "MD", "info@jamago.qa" → "IN". */
+  initials(text: string): string {
+    const clean = (text || '?').split('@')[0].replace(/[^\p{L}\p{N}\s._-]/gu, ' ').trim();
+    const words = clean.split(/[\s._-]+/).filter(Boolean);
+    const letters = words.length > 1 ? words[0][0] + words[1][0] : clean.slice(0, 2);
+    return (letters || '?').toUpperCase();
+  }
+
+  /** A steady colour per person, from the brand family. */
+  tone(text: string): string {
+    const palette = ['#14305f', '#2d96d5', '#0f6b5f', '#b86b12', '#7a3e9d', '#a40f14', '#3c5a8a', '#1f7a8c'];
+    let h = 0;
+    for (const ch of (text || '').toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return palette[h % palette.length];
+  }
+
+  /** Today: the time. This year: day and month. Older: the full date. */
+  shortDate(iso: string): string {
+    const d = new Date(iso);
+    const now = new Date();
+    if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true });
+    if (d.getFullYear() === now.getFullYear()) return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
 
   /** Who the row is "about": the sender for received mail, the recipient for sent. */
   party(item: MailListItem): string {

@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -24,7 +24,7 @@ type Stage = 'all' | 'todo' | 'done' | 'sent' | 'changes' | 'closed';
 @Component({
   selector: 'app-non-moi-job-list',
   standalone: true,
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './non-moi-job-list.component.html',
   styleUrl: './non-moi-job-list.component.css',

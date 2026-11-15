@@ -14,6 +14,10 @@
 .tj-table td strong { display: block; font-weight: 700; }
 .tj-table td small { display: block; color: #6b7280; margin-top: 2px; }
 .tj-no { color: #d21319; font-size: 0.78rem; letter-spacing: 0.06em; }
+.tj-when strong { color: #0f6b5f; white-space: nowrap; }
+.tj-when small { white-space: nowrap; }
+.tj-who { display: block; }
+.tj-table td small.tj-visit { display: none; color: #0f6b5f; font-weight: 700; }
 .tj-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .tj-table .row-btn { background: #14305f; color: #fff; border-color: #14305f; }
 .tj-table .row-btn:hover { background: #d21319; border-color: #d21319; }
@@ -41,7 +45,9 @@
   .tj-table tbody tr { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-top: 1px solid #eceae4; }
   .tj-table tbody tr:first-child { border-top: 0; }
   .tj-table td[data-label="Customer"] { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 0; }
-  .tj-table td[data-label="Customer"] strong { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tj-table td[data-label="Customer"] .tj-who { flex: 1 1 auto; min-width: 0; }
+  .tj-table td[data-label="Customer"] strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tj-table td small.tj-visit { display: block; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tj-table td[data-label="Customer"] .tj-mini { margin: 0; flex: none; }
   .tj-table td[data-label="Customer"] .tj-mini-acts { margin: 0; gap: 8px; }
   .tj-table td.col-actions { flex: none; width: auto; padding: 0; }
@@ -49,10 +55,10 @@
   .tj-table { table-layout: fixed; font-size: 0.9rem; }
   .tj-table th { padding: 10px 12px; font-size: 0.66rem; letter-spacing: 0.08em; }
   .tj-table td { padding: 14px 12px; vertical-align: middle; border-top: 0; }
-  .tj-table th:nth-child(7) { width: 64px; }
+  .tj-table th:nth-child(8) { width: 64px; }
 
   /* Location, work column, status column and total are folded into the other cells. */
-  .tj-table th:nth-child(1), .tj-table td[data-label="Job"],
+  .tj-table th:nth-child(1), .tj-table td[data-label="Job"], .tj-table td[data-label="Visit"],
   .tj-table th:nth-child(3), .tj-table td[data-label="Location"],
   .tj-table th:nth-child(4), .tj-table td[data-label="Work to do"],
   .tj-table th:nth-child(5), .tj-table td[data-label="Status"],

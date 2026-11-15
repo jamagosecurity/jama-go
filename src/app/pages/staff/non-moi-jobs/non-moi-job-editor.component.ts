@@ -52,10 +52,20 @@ function sitePin(group: AbstractControl): ValidationErrors | null {
   return null;
 }
 
-type Field = 'customerName' | 'customerNumber' | 'customerEmail' | 'location' | 'descriptionEn' | 'descriptionAr' | 'assignedToId';
+type Field = 'customerName' | 'customerNumber' | 'customerEmail' | 'location' | 'descriptionEn' | 'descriptionAr' | 'assignedToId' | 'visitDate' | 'visitTime';
 
 /** Issues or edits one Non-MOI job: who the customer is, where, what to do (in
  *  English and Arabic), and which technician gets it. */
+/** A stored UTC visit time as the Doha date and time the form shows. */
+function dohaDateTime(utc: string | null): { visitDate: string; visitTime: string } {
+  if (!utc) return { visitDate: '', visitTime: '' };
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Qatar', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date(utc));
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+  return { visitDate: `${get('year')}-${get('month')}-${get('day')}`, visitTime: `${get('hour')}:${get('minute')}` };
+}
+
 @Component({
   selector: 'app-non-moi-job-editor',
   standalone: true,
@@ -105,6 +115,8 @@ export class NonMoiJobEditorComponent implements OnInit {
       descriptionEn: ['', [notBlank, minTrimmed(3), Validators.maxLength(DESCRIPTION_MAX)]],
       descriptionAr: ['', Validators.maxLength(DESCRIPTION_MAX)],
       assignedToId: ['', Validators.required],
+      visitDate: ['', Validators.required],
+      visitTime: ['', Validators.required],
     },
     { validators: sitePin },
   );
@@ -179,6 +191,7 @@ export class NonMoiJobEditorComponent implements OnInit {
             descriptionEn: job.descriptionEn,
             descriptionAr: job.descriptionAr ?? '',
             assignedToId: job.assignedToId,
+            ...dohaDateTime(job.scheduledAt),
           });
         },
         error: (err: unknown) => this.formError.set(getApiErrorMessage(err, 'Could not load this job.')),
@@ -333,6 +346,7 @@ export class NonMoiJobEditorComponent implements OnInit {
       descriptionEn: value.descriptionEn.trim(),
       descriptionAr: value.descriptionAr.trim() || null,
       assignedToId: value.assignedToId,
+      scheduledAt: `${value.visitDate}T${value.visitTime}:00+03:00`,
     };
 
     this.saving.set(true);

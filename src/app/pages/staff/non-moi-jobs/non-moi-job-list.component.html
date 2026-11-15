@@ -87,7 +87,10 @@
                   {{ job.location }}
                   @if (isPinned(job)) { <span class="nj-pinned" title="Has a map pin — Navigate works">●</span> }
                 </td>
-                <td data-label="Technician" class="col-tech">{{ job.assignedToName }}</td>
+                <td data-label="Technician" class="col-tech">
+                  {{ job.assignedToName }}
+                  @if (job.scheduledAt) { <small class="nj-visit">{{ job.scheduledAt | date: 'd MMM, h:mm a' : '+0300' }}</small> }
+                </td>
                 <td data-label="Status">
                   <span class="nj-status" [attr.data-status]="job.status"
                     [attr.title]="job.status === 'ChangesRequested' && job.clientMessage ? job.clientMessage : statusLabel(job.status)">

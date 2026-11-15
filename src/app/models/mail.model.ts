@@ -10,6 +10,7 @@ export interface MailListItem {
   sentAt: string;
   snippet: string;
   hasAttachments: boolean;
+  isRead: boolean;
 }
 
 export interface MailDetail extends Omit<MailListItem, 'snippet'> {
@@ -32,6 +33,13 @@ export interface MailAccount {
   lastSyncAt: string | null;
   lastError: string | null;
   signature: string;
+  /** The signature card as sent; the logo is cid:jamago-logo. */
+  signatureHtml: string;
+  signerName: string;
+  /** Received messages not read yet. */
+  unreadCount: number;
+  /** No password here, but its incoming mail arrives through the copy mailbox. */
+  viaCopy: boolean;
 }
 
 /** What the compose window sends. Prices nothing, trusts nothing: the API checks every field again. */
@@ -42,6 +50,8 @@ export interface SendMailRequest {
   subject: string;
   body: string;
   replyToMessageId: string | null;
+  /** The original under a reply or forward, shown below the signature. */
+  quoted: string | null;
 }
 
 export interface MailSent {

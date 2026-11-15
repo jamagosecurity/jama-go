@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -10,14 +10,14 @@ import { getApiErrorMessage } from '../../utils/api-error.util';
 
 /**
  * The page a client reaches from the link in their bill email or WhatsApp message. No sign-in: the secret in the link is
- * the key. They see the bill and answer it — Approve, Reject (with a reason) or Comment (asking for a change). The email's
- * buttons open this page with the matching choice already picked, but nothing is sent until the client confirms here, so
- * a mail scanner that opens every link can never approve a bill by accident.
+ * the key. They see the invoice and answer it once: Approve is a single tap; Reject and Comment open a box for the reason
+ * and send with one tap. Nothing is decided just by opening the link, so a mail scanner that opens every link can never
+ * answer for the client.
  */
 @Component({
   selector: 'app-client-bill',
   standalone: true,
-  imports: [DecimalPipe, FormsModule],
+  imports: [DatePipe, DecimalPipe, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './client-bill.component.html',
   styleUrl: './client-bill.component.css',
@@ -33,8 +33,8 @@ export class ClientBillComponent implements OnInit {
   protected readonly saving = signal(false);
   protected readonly error = signal('');
 
-  /** Which answer the client is composing, if any. */
-  protected readonly choice = signal<ClientDecisionKind | null>(null);
+  /** Reject or Comment while the client writes the reason. */
+  protected readonly choice = signal<'reject' | 'comment' | null>(null);
   protected readonly message = signal('');
   protected readonly name = signal('');
   /** What they just did in this visit, so the thank-you can say it. */
@@ -42,10 +42,10 @@ export class ClientBillComponent implements OnInit {
 
   protected readonly pdfUrl = `${environment.apiUrl}/nonmoijobs/bill/${this.token}`;
 
-  protected readonly needsMessage = computed(() => this.choice() === 'reject' || this.choice() === 'comment');
   protected readonly messageError = computed(() =>
-    this.needsMessage() && this.message().trim().length < 3 ? 'Please write a few words, so we know what to change.' : '');
-  protected readonly canSend = computed(() => !!this.choice() && !this.messageError() && !this.saving());
+    this.message().trim().length < 3 ? 'Please write a few words, so we know what to change.' : '');
+  /** Which button is working, for its spinner. */
+  protected readonly sending = signal<ClientDecisionKind | null>(null);
 
   ngOnInit(): void {
     this.api
@@ -54,27 +54,44 @@ export class ClientBillComponent implements OnInit {
       .subscribe({
         next: (bill) => {
           this.bill.set(bill);
-          // The buttons in the email arrive here with ?do=approve|reject|comment already chosen.
+          // Older emails had a button per answer (?do=reject|comment): open the reason box for those. Approve is never
+          // done just by opening a link.
           const wanted = this.route.snapshot.queryParamMap.get('do');
-          if (bill.canRespond && (wanted === 'approve' || wanted === 'reject' || wanted === 'comment')) this.choice.set(wanted);
+          if (bill.canRespond && (wanted === 'reject' || wanted === 'comment')) this.choice.set(wanted);
         },
         error: () => this.loadError.set('This link is not valid, or the bill is no longer available. Please contact Jama Go Security Equipment.'),
       });
   }
 
-  protected pick(choice: ClientDecisionKind): void {
+  protected pick(choice: 'reject' | 'comment'): void {
     this.choice.set(this.choice() === choice ? null : choice);
     this.error.set('');
   }
 
-  protected send(): void {
+  /** One tap: approve now. */
+  protected approve(): void {
+    this.send('approve');
+  }
+
+  /** One tap: send the rejection or comment with its reason. */
+  protected sendMessage(): void {
     const choice = this.choice();
-    if (!choice || !this.canSend()) return;
+    if (!choice) return;
+    if (this.messageError()) {
+      this.error.set(this.messageError());
+      return;
+    }
+    this.send(choice);
+  }
+
+  private send(choice: ClientDecisionKind): void {
+    if (this.saving()) return;
     this.saving.set(true);
+    this.sending.set(choice);
     this.error.set('');
     this.api
       .respond(this.token, choice, choice === 'approve' ? null : this.message().trim(), this.name().trim() || null)
-      .pipe(finalize(() => this.saving.set(false)))
+      .pipe(finalize(() => { this.saving.set(false); this.sending.set(null); }))
       .subscribe({
         next: (bill) => {
           this.justDid.set(choice);

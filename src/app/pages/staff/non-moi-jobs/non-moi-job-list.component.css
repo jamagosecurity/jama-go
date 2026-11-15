@@ -342,3 +342,5 @@
 .nj-status[data-status="Sent"] { background: #e3e8f2; color: #14305f; }
 .nj-status[data-status="ChangesRequested"] { background: #fdecec; color: #a40f14; }
 .nj-status[data-status="Closed"] { background: #d9f2ea; color: #0f6b5f; }
+
+.nj-table .col-tech .nj-visit { display: block; margin-top: 2px; color: #6b7280; font-weight: 600; font-size: 0.78rem; white-space: nowrap; }

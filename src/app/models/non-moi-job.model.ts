@@ -28,6 +28,8 @@ export interface NonMoiJob {
   closedAt: string | null;
   closedByName: string | null;
   emailSentAt: string | null;
+  /** When the technician should visit the customer (UTC). */
+  scheduledAt: string | null;
   whatsAppSentAt: string | null;
   /** Which version of the bill the client is looking at; 1 until a change request leads to a new one. */
   billRevision: number;
@@ -88,6 +90,8 @@ export interface SaveNonMoiJob {
   descriptionAr: string | null;
   assignedToId: string;
   customerEmail: string | null;
+  /** The visit, in Doha time with its offset, e.g. 2026-11-20T10:00:00+03:00. */
+  scheduledAt: string;
 }
 
 /** What the person closing the deal sends: a discount, and how the client gets the bill. */
@@ -129,6 +133,10 @@ export interface PublicJobBill {
   decision: 'Approved' | 'Rejected' | 'Commented' | null;
   decisionMessage: string | null;
   decidedAt: string | null;
+  customerNumber: string;
+  completedAt: string | null;
+  /** When this revision was sent: the invoice date. */
+  issuedAt: string | null;
 }
 
 export type ClientDecisionKind = 'approve' | 'reject' | 'comment';

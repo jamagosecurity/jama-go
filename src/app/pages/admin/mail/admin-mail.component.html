@@ -1,26 +1,60 @@
 <section class="admin-page mail-page">
-  <header class="page-banner">
-    <span class="page-banner-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z" /><path d="m4 7 8 6 8-6" /></svg>
-    </span>
-    <div class="page-banner-text">
-      <p class="page-banner-eyebrow">Company mailboxes</p>
-      <h1>Company mail</h1>
-      <p class="page-banner-sub">
-        {{ total() }} {{ total() === 1 ? 'message' : 'messages' }} across {{ accounts().length }} mailboxes — coming in and going out
-      </p>
+  <header class="mx-top">
+    <div class="mx-title">
+      <span class="mx-title-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z" /><path d="m4 7 8 6 8-6" /></svg>
+      </span>
+      <div>
+        <h1>Company mail</h1>
+        <p>
+          @if (unreadAll()) { <b class="mx-unread-total">{{ unreadAll() }} unread</b> · }
+          {{ allCount() }} messages · {{ accounts().length }} mailboxes
+        </p>
+      </div>
     </div>
-    <div class="page-banner-actions">
+    <div class="mx-top-acts">
+      <div class="mx-pick">
+        <button type="button" class="mx-pick-btn" (click)="boxMenu.set(!boxMenu())" [attr.aria-expanded]="boxMenu()" aria-haspopup="listbox">
+          @if (currentBox(); as cb) {
+            <span class="mx-ava mx-ava--sm" [style.background]="tone(cb.address)" aria-hidden="true">{{ initials(cb.key) }}</span>
+            <span class="mx-pick-text"><strong>{{ cb.key }}</strong><small>{{ cb.address }}</small></span>
+            @if (cb.unreadCount) { <b class="mx-new-count">{{ cb.unreadCount }}</b> } @else { <b>{{ cb.inboxCount + cb.sentCount }}</b> }
+          } @else {
+            <span class="mx-ava mx-ava--sm mx-ava--all" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13h4l2 3h4l2-3h4" /><path d="M5 5h14l1 8v6H4v-6z" /></svg></span>
+            <span class="mx-pick-text"><strong>All mailboxes</strong><small>{{ accounts().length }} mailboxes</small></span>
+            @if (unreadAll()) { <b class="mx-new-count">{{ unreadAll() }}</b> } @else { <b>{{ allCount() }}</b> }
+          }
+          <svg class="mx-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+        </button>
+        @if (boxMenu()) {
+          <div class="mx-pick-back" (click)="boxMenu.set(false)"></div>
+          <div class="mx-pick-menu" role="listbox" aria-label="Mailbox">
+            <button type="button" role="option" class="mx-opt" [class.is-on]="!account()" (click)="pickAccount(''); boxMenu.set(false)">
+              <span class="mx-ava mx-ava--sm mx-ava--all" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13h4l2 3h4l2-3h4" /><path d="M5 5h14l1 8v6H4v-6z" /></svg></span>
+              <span class="mx-pick-text"><strong>All mailboxes</strong><small>{{ unreadAll() ? unreadAll() + ' unread · ' : '' }}{{ allCount() }} messages</small></span>
+              @if (unreadAll()) { <b class="mx-new-count">{{ unreadAll() }}</b> }
+            </button>
+            @for (a of accounts(); track a.key) {
+              <button type="button" role="option" class="mx-opt" [class.is-on]="account() === a.key" [class.is-off]="!a.configured && !a.viaCopy"
+                (click)="pickAccount(a.key); boxMenu.set(false)">
+                <span class="mx-ava mx-ava--sm" [style.background]="tone(a.address)" aria-hidden="true">{{ initials(a.key) }}</span>
+                <span class="mx-pick-text"><strong>{{ a.key }}</strong><small>{{ a.address }}{{ a.viaCopy ? ' · via copy' : '' }}</small></span>
+                @if (a.lastError) { <b class="is-bad" title="Could not be read">!</b> }
+                @else if (a.unreadCount) { <b class="mx-new-count" [title]="a.unreadCount + ' unread'">{{ a.unreadCount }}</b> }
+              </button>
+            }
+          </div>
+        }
+      </div>
+      <button type="button" class="mx-refresh" (click)="load()" [class.is-spinning]="loading()" aria-label="Refresh" title="Refresh">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
+      </button>
       @if (senders().length) {
-        <button type="button" class="banner-gold" (click)="openNew()">
+        <button type="button" class="mx-new" (click)="openNew()">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
-          New mail
+          <span class="mx-new-text">New mail</span>
         </button>
       }
-      <button type="button" class="banner-ghost" (click)="load()">
-        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
-        Refresh
-      </button>
     </div>
   </header>
 
@@ -33,105 +67,127 @@
     <p class="admin-error"><strong>{{ a.address }}</strong> could not be read: {{ a.lastError }}</p>
   }
 
-  <div class="mail-chips" role="tablist" aria-label="Mailbox">
-    <button type="button" class="mail-chip" [class.is-on]="!account()" (click)="pickAccount('')">All mailboxes</button>
-    @for (a of accounts(); track a.key) {
-      <button type="button" class="mail-chip" [class.is-on]="account() === a.key" [class.is-off]="!a.configured"
-        (click)="pickAccount(a.key)" [title]="a.address">
-        {{ a.address }}
-        <b>{{ a.inboxCount + a.sentCount }}</b>
-      </button>
-    }
-  </div>
+  <div class="mx" [class.is-reading]="!!open()">
+    <!-- ===== Messages ===== -->
+    <section class="mx-list" aria-label="Messages">
+      <div class="mx-list-head">
+        <label class="mx-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          <input type="search" placeholder="Search mail" [value]="search()" (input)="onSearch($any($event.target).value)" />
+        </label>
+        <div class="mx-seg" role="group" aria-label="Direction">
+          <button type="button" [class.is-on]="!folder() && !unreadOnly()" (click)="pickFolder('')">All</button>
+          <button type="button" [class.is-on]="unreadOnly()" (click)="pickUnread()">
+            Unread @if (currentUnread()) { <b>{{ currentUnread() }}</b> }
+          </button>
+          <button type="button" [class.is-on]="folder() === 'Inbox'" (click)="pickFolder('Inbox')">Incoming</button>
+          <button type="button" [class.is-on]="folder() === 'Sent'" (click)="pickFolder('Sent')">Outgoing</button>
+        </div>
+        <p class="mx-count">{{ currentLabel() }} · {{ total() }} {{ total() === 1 ? 'message' : 'messages' }}</p>
+      </div>
 
-  <div class="admin-toolbar mail-toolbar">
-    <label class="admin-search">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-      <input type="search" placeholder="Search sender, recipient, subject…" [value]="search()"
-        (input)="onSearch($any($event.target).value)" />
-    </label>
-    <div class="mail-seg" role="group" aria-label="Direction">
-      <button type="button" [class.is-on]="!folder()" (click)="pickFolder('')">All</button>
-      <button type="button" [class.is-on]="folder() === 'Inbox'" (click)="pickFolder('Inbox')">Incoming</button>
-      <button type="button" [class.is-on]="folder() === 'Sent'" (click)="pickFolder('Sent')">Outgoing</button>
-    </div>
-  </div>
-
-  <div class="mail-table-wrap">
-    <table class="mail-table">
-      <thead>
-        <tr><th></th><th>Mailbox</th><th>From / To</th><th>Subject</th><th>Date</th></tr>
-      </thead>
-      <tbody>
-        @for (m of items(); track m.id) {
-          <tr (click)="view(m)" [class.is-opening]="opening() === m.id" tabindex="0" (keydown.enter)="view(m)">
-            <td><span class="mail-dir" [class.is-out]="m.folder === 'Sent'">{{ m.folder === 'Sent' ? 'Out' : 'In' }}</span></td>
-            <td class="mail-box">{{ m.accountAddress }}</td>
-            <td class="mail-party">{{ party(m) }}</td>
-            <td class="mail-subject">
-              <strong>{{ m.subject || '(no subject)' }}</strong>
-              <small>{{ m.snippet }}</small>
-            </td>
-            <td class="mail-date">
-              {{ m.sentAt | date: 'd MMM y, HH:mm' }}
-              @if (m.hasAttachments) { <span title="Has attachments">📎</span> }
-            </td>
-          </tr>
+      <div class="mx-rows" [class.is-loading]="loading()">
+        @for (g of groups(); track g.label) {
+          <p class="mx-day">{{ g.label }}</p>
+          @for (m of g.items; track m.id) {
+            <button type="button" class="mx-row" [class.is-on]="open()?.id === m.id" [class.is-unread]="!m.isRead"
+              [class.is-opening]="opening() === m.id" (click)="view(m)">
+              @if (!m.isRead) { <span class="mx-dot" aria-label="Unread"></span> }
+              <span class="mx-ava" [style.background]="tone(party(m))" aria-hidden="true">{{ initials(party(m)) }}</span>
+              <span class="mx-row-main">
+                <span class="mx-row-top">
+                  <strong class="mx-who">
+                    @if (m.folder === 'Sent') { <em class="mx-to">To</em> }
+                    {{ party(m) }}
+                  </strong>
+                  <time>{{ shortDate(m.sentAt) }}</time>
+                </span>
+                <span class="mx-subj">
+                  {{ m.subject || '(no subject)' }}
+                  @if (m.hasAttachments) {
+                    <svg class="mx-clip" viewBox="0 0 24 24" aria-label="Has attachments"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7" /></svg>
+                  }
+                </span>
+                <span class="mx-snip">{{ m.snippet }}</span>
+                @if (!account()) { <span class="mx-via">{{ m.accountAddress }}</span> }
+              </span>
+            </button>
+          }
         } @empty {
-          <tr><td colspan="5" class="mail-empty">{{ loading() ? 'Loading…' : 'No messages yet.' }}</td></tr>
+          <p class="mx-empty">{{ loading() ? 'Loading…' : 'No messages here yet.' }}</p>
         }
-      </tbody>
-    </table>
-  </div>
+      </div>
 
-  @if (pages() > 1) {
-    <div class="mail-pager">
-      <button type="button" (click)="goto(page() - 1)" [disabled]="page() === 1">Newer</button>
-      <span>Page {{ page() }} of {{ pages() }}</span>
-      <button type="button" (click)="goto(page() + 1)" [disabled]="page() === pages()">Older</button>
-    </div>
-  }
+      @if (pages() > 1) {
+        <div class="mx-pager">
+          <button type="button" (click)="goto(page() - 1)" [disabled]="page() === 1" aria-label="Newer">‹</button>
+          <span>{{ (page() - 1) * 50 + 1 }}–{{ Math.min(page() * 50, total()) }} of {{ total() }}</span>
+          <button type="button" (click)="goto(page() + 1)" [disabled]="page() === pages()" aria-label="Older">›</button>
+        </div>
+      }
+    </section>
 
-  @if (open(); as m) {
-    <div class="mail-overlay" (click)="close()">
-      <article class="mail-viewer" (click)="$event.stopPropagation()" role="dialog" aria-label="Message">
-        <header>
-          <div>
-            <h2>{{ m.subject || '(no subject)' }}</h2>
-            <p><span class="mail-dir" [class.is-out]="m.folder === 'Sent'">{{ m.folder === 'Sent' ? 'Out' : 'In' }}</span>
-              Mailbox <strong>{{ m.accountAddress }}</strong></p>
-            <p>From <strong>{{ m.fromName }}</strong> &lt;{{ m.fromAddress }}&gt;</p>
-            <p>To {{ m.toAddresses }}</p>
-            <p>{{ m.sentAt | date: 'EEEE d MMM y, HH:mm' }}</p>
-            @if (m.hasAttachments) { <p>📎 {{ m.attachmentNames }} <em>(files are not stored)</em></p> }
+    <!-- ===== Reading pane ===== -->
+    <section class="mx-read" aria-label="Message">
+      @if (open(); as m) {
+        <header class="mx-read-head">
+          <button type="button" class="mx-back" (click)="close()" aria-label="Back to messages">
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <h2>{{ m.subject || '(no subject)' }}</h2>
+          <div class="mx-from">
+            <span class="mx-ava mx-ava--lg" [style.background]="tone(m.fromName || m.fromAddress)" aria-hidden="true">{{ initials(m.fromName || m.fromAddress) }}</span>
+            <div class="mx-from-text">
+              <strong>{{ m.fromName || m.fromAddress }}</strong>
+              @if (m.fromName) { <span>&lt;{{ m.fromAddress }}&gt;</span> }
+              <small>To {{ m.toAddresses }}</small>
+            </div>
+            <time>{{ m.sentAt | date: 'EEE d MMM y, h:mm a' }}</time>
           </div>
-          <button type="button" class="mail-close" (click)="close()" aria-label="Close">×</button>
+          <div class="mx-tags">
+            <span class="mx-dir" [class.is-out]="m.folder === 'Sent'">{{ m.folder === 'Sent' ? 'Sent' : 'Received' }}</span>
+            <span class="mx-tag">{{ m.accountAddress }}</span>
+            @if (m.hasAttachments) { <span class="mx-tag">📎 {{ m.attachmentNames }} <em>(files not stored)</em></span> }
+          </div>
+          <div class="mx-acts">
+            @if (senders().length) {
+              <button type="button" class="mx-act mx-act--main" (click)="reply(m)">
+                <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 6 6v3" /></svg>Reply
+              </button>
+              <button type="button" class="mx-act" (click)="forward(m)">
+                <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /><path d="M20 9H10a6 6 0 0 0-6 6v3" /></svg>Forward
+              </button>
+            }
+            @if (m.folder === 'Inbox') {
+              <button type="button" class="mx-act" (click)="markUnread(m)" title="Mark as unread">
+                <svg viewBox="0 0 24 24"><path d="M4 6h11M4 6v12h16v-7" /><path d="m4 7 8 6 4-3" /><circle cx="19" cy="6" r="2.6" /></svg>Mark as unread
+              </button>
+            }
+            @if (m.bodyHtml) {
+              <div class="mx-mode" role="group" aria-label="Show as">
+                <button type="button" [class.is-on]="showHtml()" (click)="showHtml.set(true)">Formatted</button>
+                <button type="button" [class.is-on]="!showHtml()" (click)="showHtml.set(false)">Plain text</button>
+              </div>
+            }
+          </div>
         </header>
-        @if (senders().length) {
-          <div class="mail-actions">
-            <button type="button" class="mail-act mail-act--main" (click)="reply(m)">
-              <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 6 6v3" /></svg>Reply
-            </button>
-            <button type="button" class="mail-act" (click)="forward(m)">
-              <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /><path d="M20 9H10a6 6 0 0 0-6 6v3" /></svg>Forward
-            </button>
-          </div>
-        }
-        @if (m.bodyHtml) {
-          <div class="mail-mode">
-            <button type="button" [class.is-on]="showHtml()" (click)="showHtml.set(true)">Formatted</button>
-            <button type="button" [class.is-on]="!showHtml()" (click)="showHtml.set(false)">Plain text</button>
-            <small>Images and links from the sender are blocked for safety.</small>
-          </div>
-        }
-        @if (frame(); as html) {
-          <iframe sandbox="" [srcdoc]="html" title="Message body"></iframe>
-        } @else {
-          <pre class="mail-text">{{ m.bodyText || '(empty)' }}</pre>
-        }
-      </article>
-    </div>
-  }
+        <div class="mx-body">
+          @if (frame(); as html) {
+            <iframe sandbox="" [srcdoc]="html" title="Message body"></iframe>
+            <p class="mx-safe">Pictures and links from outside are blocked for safety.</p>
+          } @else {
+            <pre class="mx-text">{{ m.bodyText || '(empty)' }}</pre>
+          }
+        </div>
+      } @else {
+        <div class="mx-blank">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z" /><path d="m4 7 8 6 8-6" /></svg>
+          <strong>Select a message to read</strong>
+          <span>{{ opening() ? 'Opening…' : 'It opens here, with Reply and Forward.' }}</span>
+        </div>
+      }
+    </section>
+  </div>
 
   @if (compose(); as c) {
     <div class="mail-overlay mail-overlay--top" (click)="closeCompose()">
@@ -164,8 +220,21 @@
           <span>Subject</span>
           <input type="text" maxlength="300" [ngModel]="c.subject" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('subject', $event)" />
         </label>
-        <textarea class="mc-body" rows="14" [ngModel]="c.body" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('body', $event)"
-          aria-label="Message"></textarea>
+        <div class="mc-scroll">
+          <textarea class="mc-body" rows="9" [ngModel]="c.body" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('body', $event)"
+            aria-label="Message" placeholder="Write your message…"></textarea>
+          @if (signaturePreview(); as sig) {
+            <div class="mc-sig">
+              <iframe sandbox="" [srcdoc]="sig" title="Signature" scrolling="no"></iframe>
+            </div>
+          }
+          @if (c.quoted) {
+            <details class="mc-quote">
+              <summary>{{ c.mode === 'forward' ? 'Forwarded message' : 'Original message' }} · included below your signature</summary>
+              <pre>{{ c.quoted }}</pre>
+            </details>
+          }
+        </div>
 
         @if (sendError()) { <p class="mc-error">{{ sendError() }}</p> }
         <footer>

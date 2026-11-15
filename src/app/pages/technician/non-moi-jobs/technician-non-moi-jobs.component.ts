@@ -14,6 +14,11 @@ import { navigationUrl, toSitePin } from '../../../utils/geo.util';
  * customer, what to do (in English and Arabic) and a Navigate button that routes
  * to the pin, or searches the address when the job has none.
  */
+/** Soonest visit first; jobs without a visit time go last. */
+function byVisit(a: NonMoiJob, b: NonMoiJob): number {
+  return (a.scheduledAt ? Date.parse(a.scheduledAt) : Infinity) - (b.scheduledAt ? Date.parse(b.scheduledAt) : Infinity);
+}
+
 @Component({
   selector: 'app-technician-non-moi-jobs',
   standalone: true,
@@ -30,7 +35,7 @@ export class TechnicianNonMoiJobsComponent implements OnInit {
   protected readonly groups = computed(() => {
     const all = this.jobs();
     return [
-      { key: 'todo', title: 'To do', empty: 'Nothing left to do — all your jobs are completed.', jobs: all.filter((j) => j.status === 'Assigned') },
+      { key: 'todo', title: 'To do', empty: 'Nothing left to do — all your jobs are completed.', jobs: all.filter((j) => j.status === 'Assigned').sort(byVisit) },
       { key: 'done', title: 'Completed', empty: '', jobs: all.filter((j) => j.status !== 'Assigned') },
     ].filter((g) => g.jobs.length || g.key === 'todo');
   });

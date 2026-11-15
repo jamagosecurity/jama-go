@@ -12,7 +12,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>Jobs
       </a>
       <strong class="tjd-jobno">{{ j.jobNumber }}</strong>
-      <span class="tjd-date">{{ j.createdAt | date: 'd MMM y' }}</span>
+      <span class="tjd-date">@if (j.scheduledAt) {Visit · {{ j.scheduledAt | date: 'EEE d MMM, h:mm a' : '+0300' }}} @else {{{ j.createdAt | date: 'd MMM y' }}}</span>
       <span class="tjd-state" [class.is-done]="j.status === 'Closed'" [attr.data-status]="j.status">{{ statusLabel(j.status) }}</span>
     </div>
 
