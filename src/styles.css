@@ -1984,3 +1984,278 @@ table thead { background: #14305f !important; }
 .profile-dialog-panel .mat-mdc-dialog-container { --mdc-dialog-container-shape: 26px; --mdc-dialog-container-color: #fff; }
 .profile-dialog-panel .mat-mdc-dialog-surface { border-radius: 26px; overflow: hidden; box-shadow: 0 40px 80px -30px rgba(13, 32, 64, 0.6); }
 .profile-dialog-panel .mdc-dialog__surface { overflow: hidden; }
+
+/* ===== Compact page headings (admin) =====
+   Like a plain document heading: title on the left, the page's search and main button on the right, all in
+   one row — no card, icon or small label above it, so the page content starts higher. */
+.admin-content .page-banner,
+.admin-content .staff-banner {
+  min-height: 46px; margin: 0 0 16px !important; padding: 0 !important; gap: 12px 14px;
+  background: none !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+}
+.admin-content .page-banner::before, .admin-content .page-banner::after,
+.admin-content .staff-banner::before, .admin-content .staff-banner::after { display: none !important; }
+.admin-content .page-banner-icon, .admin-content .page-banner-eyebrow,
+.admin-content .staff-banner-icon, .admin-content .staff-banner-eyebrow { display: none !important; }
+.admin-content .page-banner-text, .admin-content .staff-banner-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; min-width: 0; }
+.admin-content .page-banner h1, .admin-content .staff-banner h1 {
+  margin: 0 !important; color: #0b1730 !important; font-family: Georgia, "Times New Roman", serif; font-weight: 400;
+  font-size: clamp(1.45rem, 2vw, 1.75rem) !important; line-height: 1.15; letter-spacing: 0;
+}
+.admin-content .page-banner-sub, .admin-content .staff-banner-sub { margin: 0 !important; font-size: 0.84rem; color: #6b7280 !important; }
+/* The page's own search sits in the heading row, just before its main button. */
+.admin-content .page-banner .head-search,
+.admin-content .staff-banner .head-search { flex: 0 1 340px !important; width: auto !important; min-width: 200px; max-width: 360px; margin: 0 0 0 auto !important; }
+.admin-content .page-banner .page-banner-text, .admin-content .staff-banner .staff-banner-text { flex: 1 1 auto; }
+@media (max-width: 760px) {
+  .admin-content .page-banner, .admin-content .staff-banner { flex-wrap: wrap; }
+  .admin-content .page-banner .head-search, .admin-content .staff-banner .head-search { order: 5; flex: 1 1 100% !important; max-width: none; margin: 0 !important; }
+}
+/* Filters under the heading: plain dropdowns in one row, no box around them, no label above each one
+   (the dropdown's first choice — "All categories", "All statuses" — already says what it filters). */
+.admin-content :is(.camera-filters, .nm-filters, .boq-filters, .dia-filters) {
+  display: flex !important; flex-wrap: wrap; align-items: center; gap: 10px !important;
+  margin: 0 0 14px !important; padding: 0 !important;
+  background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
+}
+.admin-content :is(.camera-filters, .nm-filters, .boq-filters, .dia-filters)::before,
+.admin-content :is(.camera-filters, .nm-filters, .boq-filters, .dia-filters)::after { display: none !important; }
+.admin-content :is(.camera-filters-group, .nm-filters-group) { display: flex !important; flex-wrap: wrap; align-items: center; gap: 10px !important; margin: 0 !important; padding: 0 !important; }
+.admin-content :is(.camera-field, .nm-field, .boq-field, .dia-status-filter) { display: block !important; margin: 0 !important; min-width: 190px; }
+.admin-content :is(.camera-field, .nm-field, .boq-field, .dia-status-filter) > span:first-child {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.admin-content :is(.camera-filters, .boq-filters) select { min-height: 44px; }
+.admin-content :is(.camera-filters, .nm-filters, .boq-filters, .dia-filters) :is(.boq-check, label:has(> input[type="checkbox"])) { align-self: center; margin: 0 !important; padding: 0 6px; }
+
+/* ===== Row actions: round tinted icon buttons =====
+   Edit green, View blue, Delete red, anything else soft grey-blue. The word stays for screen readers and as
+   the hover tooltip. Confirm steps ("Delete?" / "Keep") stay as words on purpose. */
+.admin-content .row-btn.act {
+  display: inline-grid !important; place-items: center; flex: none;
+  width: 36px !important; height: 36px !important; min-width: 0 !important; min-height: 0 !important; padding: 0 !important;
+  border: 0 !important; border-radius: 50% !important; box-shadow: none !important;
+  background: #eef1f6 !important; color: #14305f !important;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.admin-content .row-btn.act:hover:not(:disabled) { transform: translateY(-1px); background: #dfe5ef !important; }
+.admin-content .row-btn.act svg { width: 17px !important; height: 17px !important; margin: 0 !important; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.admin-content .row-btn.act--edit { background: #e4f4ee !important; color: #0f7a5f !important; }
+.admin-content .row-btn.act--edit:hover:not(:disabled) { background: #cfeadf !important; }
+.admin-content .row-btn.act--view { background: #e6f0fa !important; color: #1f6fb8 !important; }
+.admin-content .row-btn.act--view:hover:not(:disabled) { background: #d2e4f6 !important; }
+.admin-content .row-btn.act--delete { background: #fdeaea !important; color: #d21319 !important; }
+.admin-content .row-btn.act--delete:hover:not(:disabled) { background: #f9d4d5 !important; }
+.admin-content .row-btn.act .act-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.admin-content :is(.col-actions, .boq-row-actions, .ct-col-actions) :is(.staff-row-actions, .nj-row-actions, .ct-actions, .creg-row-actions, .dia-row-actions),
+.admin-content td.boq-row-actions, .admin-content td.camera-row-actions, .admin-content td.nm-row-actions { gap: 8px !important; }
+
+/* ===== Table header: a light tint of the page background instead of a heavy navy bar ===== */
+.admin-content table thead,
+.admin-content table thead tr { background: transparent !important; }
+.admin-content table thead th {
+  background: #e9eef6 !important; color: #3a4a66 !important;
+  font-size: 0.7rem !important; font-weight: 800 !important; letter-spacing: 0.1em !important;
+}
+.admin-content table thead th:first-child { border-radius: 12px 0 0 12px; }
+.admin-content table thead th:last-child { border-radius: 0 12px 12px 0; }
+/* Clean white table card, no coloured line across its top. */
+.admin-content .admin-panel::before { display: none !important; }
+.admin-content .page-banner .head-search,
+.admin-content .staff-banner .head-search { flex-basis: 400px !important; max-width: 420px; }
+@media (max-width: 760px) {
+  .admin-content .page-banner, .admin-content .staff-banner { flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; text-align: left; }
+  .admin-content .page-banner-text, .admin-content .staff-banner-text { flex: 1 1 100% !important; }
+  .admin-content .page-banner .head-search, .admin-content .staff-banner .head-search { position: relative !important; display: block; height: auto !important; order: 2; flex: 1 1 100% !important; max-width: none !important; }
+  .admin-content .staff-banner > button { order: 3; flex: 1 1 0 !important; width: auto !important; }
+  .admin-content .page-banner-actions { order: 3; }
+}
+/* Service tickets filters: flat, like the other pages. */
+.admin-content .mnt-filters { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 14px !important; }
+/* Row actions start from the left, so the buttons every row has (Open, Preview, PDF, Delete) sit in the same
+   place on every row and the extra share buttons simply follow. */
+@media (min-width: 761px) {
+  .admin-content .boq-list-table td.boq-row-actions { text-align: left !important; }
+  .admin-content .boq-list-table td.boq-row-actions > * { margin-left: 0 !important; margin-right: 8px; }
+  .admin-content .boq-list-table th:last-child { text-align: left !important; padding-left: 14px; }
+}
+/* Share and download get their own colours too: WhatsApp green, Email amber, PDF indigo. */
+.admin-content .row-btn.act.row-btn--whatsapp { background: #e3f7ea !important; color: #1a9e4b !important; }
+.admin-content .row-btn.act.row-btn--whatsapp:hover:not(:disabled) { background: #ccefd9 !important; }
+.admin-content .row-btn.act.row-btn--whatsapp svg { fill: currentColor !important; stroke: none !important; }
+.admin-content .row-btn.act.row-btn--email { background: #fff1e2 !important; color: #c8690a !important; }
+.admin-content .row-btn.act.row-btn--email:hover:not(:disabled) { background: #ffe3c4 !important; }
+.admin-content .row-btn.act[title="Download PDF"] { background: #eceafc !important; color: #4f46c8 !important; }
+.admin-content .row-btn.act[title="Download PDF"]:hover:not(:disabled) { background: #dddafa !important; }
+
+/* ===== Tables: every heading and cell centred, columns sized by their content ===== */
+@media (min-width: 761px) {
+  .admin-content table { table-layout: auto !important; }
+  .admin-content table th, .admin-content table td { text-align: center !important; vertical-align: middle !important; }
+  .admin-content table td > :is(strong, small, span, a, div):not(.act):not(.row-btn) { margin-left: auto; margin-right: auto; }
+  /* Actions: the column is exactly as wide as its buttons and the heading sits over its middle. Buttons start
+     from the same edge on every row, so rows with fewer buttons still line up with the rest. */
+  .admin-content table th:last-child, .admin-content table td:last-child { width: 1%; white-space: nowrap; }
+  .admin-content .boq-list-table th:last-child { text-align: center !important; padding-left: 14px; }
+  .admin-content .boq-list-table td.boq-row-actions { text-align: left !important; }
+  .admin-content :is(.staff-row-actions, .nj-row-actions, .ct-actions, .creg-row-actions, .dia-row-actions) { justify-content: center !important; }
+  .admin-content :is(td.camera-row-actions, td.nm-row-actions) { text-align: center !important; justify-content: center !important; }
+}
+@media (min-width: 761px) {
+  /* Headings and short values (numbers, money, dates, badges) stay on one line; only long text wraps. */
+  .admin-content table th { white-space: nowrap !important; }
+  .admin-content table td:is(.mnt-number, [data-label="Total"], [data-label="Reported"], [data-label="Date"], [data-label="Amount"], [data-label="Status"], [data-label="Number"]) { white-space: nowrap !important; }
+  /* Photo + name cells sit in the middle of their column too. */
+  .admin-content :is(.camera-itemcell, .nm-itemcell) { justify-content: center !important; margin: 0 auto; text-align: left; }
+}
+
+/* ===== One type scale for every admin page, matched to the sidebar =====
+   Text 14–15px, small uppercase labels 11px, buttons and inputs 42px tall, card titles a modest serif. */
+.admin-content { font-size: 0.92rem; }
+.admin-content :is(.banner-gold, .banner-ghost, .staff-banner-add, .staff-refresh, .btn-admin) {
+  min-height: 42px !important; padding: 0 20px !important; font-size: 0.88rem !important; border-radius: 999px;
+  display: inline-flex !important; align-items: center; justify-content: center; gap: 7px;
+}
+.admin-content .head-search input, .admin-content .head-search { font-size: 0.9rem !important; }
+.admin-content .head-search input { min-height: 42px !important; height: 42px !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+.admin-content :is(.camera-filters, .nm-filters, .boq-filters, .dia-filters, .mnt-filters) :is(select, input:not([type="checkbox"]), .app-select-trigger, button[role="combobox"]) {
+  min-height: 42px !important; font-size: 0.88rem !important;
+}
+.admin-content table { font-size: 0.9rem !important; }
+.admin-content table th { font-size: 0.68rem !important; padding-top: 12px !important; padding-bottom: 12px !important; }
+.admin-content table td { padding-top: 11px !important; padding-bottom: 11px !important; }
+.admin-content table td strong { font-size: 0.9rem; }
+.admin-content table td small { font-size: 0.76rem; }
+.admin-content .admin-panel { padding: 16px 18px !important; }
+.admin-content .admin-panel h2, .admin-content .admin-panel-title h2 { font-size: 1.15rem !important; }
+.admin-content :is(.nj-stage, .creg-tab, .creg-tabs button) { min-height: 38px !important; font-size: 0.86rem !important; }
+
+/* ===== The remaining page headings in the same plain style ===== */
+/* Editors (Issue job, Edit job, New / Edit staff member) and the storage reference page. */
+.admin-content :is(.admin-page-header, .editor-header, .plan-head):has(> div > h1, > h1) { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; margin: 0 0 16px !important; min-height: 46px; }
+.admin-content :is(.admin-page-header, .editor-header, .plan-head)::before { display: none !important; }
+.admin-content :is(.admin-kicker, .editor-eyebrow, .editor-icon, .plan-kicker) { display: none !important; }
+.admin-content :is(.admin-page-header, .editor-header, .plan-head) h1 {
+  margin: 0 !important; color: #0b1730 !important; font-family: Georgia, "Times New Roman", serif !important; font-weight: 400 !important;
+  font-size: clamp(1.45rem, 2vw, 1.75rem) !important; line-height: 1.15; letter-spacing: 0 !important;
+}
+.admin-content :is(.editor-header, .plan-head) p:not(.editor-eyebrow):not(.plan-kicker) { font-size: 0.86rem !important; color: #6b7280 !important; margin: 4px 0 0 !important; }
+.admin-content .nj-back { font-size: 0.82rem; }
+/* Dashboard and Company mail: same title look, without the icon tile. */
+.admin-content :is(.db-title-icon, .mx-title-icon) { display: none !important; }
+.admin-content :is(.db-title h1, .mx-title h1) { font-size: clamp(1.45rem, 2vw, 1.75rem) !important; color: #0b1730 !important; }
+/* Photo + name cells: left-aligned so the photos line up row under row. */
+@media (min-width: 761px) {
+  .admin-content table :is(th, td):has(.camera-itemcell, .nm-itemcell) { text-align: left !important; }
+  .admin-content :is(.camera-itemcell, .nm-itemcell) { justify-content: flex-start !important; margin: 0 !important; }
+  .admin-content table th:is(.col-item) { text-align: left !important; padding-left: 16px !important; }
+}
+/* Exact sizes: table text 14.4px like the menu, and every button in a page heading 14.1px. */
+.admin-content table td, .admin-content table td :is(strong, a, span:not(.act-label)):not(small):not([class*="badge"]):not([class*="chip"]):not([class*="status"]):not([class*="pill"]) { font-size: 0.9rem !important; }
+.admin-content :is(header, .page-banner, .staff-banner, .db-top, .mx-top) :is(a, button):not(.act):not(.mx-refresh):not(.db-refresh) { font-size: 0.88rem !important; }
+.admin-content :is(header, .page-banner, .staff-banner) input { font-size: 0.9rem !important; }
+.admin-content .boq-bar .boq-search input, .admin-content .boq-bar input { font-size: 0.9rem !important; }
+
+/* The page name now shows in the top bar, so on desktop the heading in the page is kept only for screen
+   readers; its short description and the page's search / buttons stay in the row. */
+@media (min-width: 981px) {
+  .admin-content :is(.page-banner, .staff-banner, .admin-page-header, .editor-header, .plan-head, .db-title, .mx-title) h1 {
+    position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important;
+  }
+}
+
+/* ===== Filters in the heading row: dropdowns and checkboxes first, then search and the main button ===== */
+.admin-content .head-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-width: 0; }
+.admin-content .head-filters :is(.camera-filters-group, .nm-filters-group) { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.admin-content .head-filters :is(.camera-field, .nm-field, .boq-field, .dia-status-filter) { display: block !important; margin: 0 !important; min-width: 0 !important; width: auto !important; }
+.admin-content .head-filters :is(.camera-field, .nm-field, .boq-field, .dia-status-filter) > span:first-child {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.admin-content .head-filters select {
+  width: 170px !important; height: 42px !important; min-height: 42px !important; padding: 0 34px 0 14px !important;
+  border: 1px solid #d9dbe2 !important; border-radius: 12px !important; background-color: #fff !important;
+  color: #0b1730 !important; font: inherit; font-size: 0.88rem !important; font-weight: 600 !important; cursor: pointer;
+}
+.admin-content .head-filters app-select { display: block; width: 170px; }
+.admin-content .head-filters label:has(> input[type="checkbox"]) {
+  display: inline-flex !important; align-items: center; gap: 8px; height: 42px; margin: 0 !important; padding: 0 14px !important;
+  border: 1px solid #d9dbe2 !important; border-radius: 12px !important; background: #fff !important;
+  color: #14305f; font-size: 0.86rem !important; font-weight: 700; white-space: nowrap; cursor: pointer;
+}
+.admin-content .head-filters :is(.btn-admin, .dia-clear) { min-height: 42px !important; }
+@media (min-width: 981px) {
+  /* With the title in the top bar, the description (if any) leads the row and filters follow it. */
+  .admin-content .page-banner .page-banner-text:not(:has(.page-banner-sub)) { display: none; }
+  .admin-content .page-banner .page-banner-text { flex: 0 1 auto !important; }
+}
+/* Our own dropdown arrow: the browser's sat jammed against the right edge. */
+.admin-content :is(.head-filters, .camera-filters, .nm-filters, .boq-filters, .dia-filters) select {
+  -webkit-appearance: none !important; appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2314305f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important; background-position: right 14px center !important; background-size: 16px 16px !important;
+  padding-right: 40px !important;
+}
+/* Buttons that follow the description directly (no search in between) sit on the right like every page. */
+.admin-content .page-banner .page-banner-text + .page-banner-actions { margin-left: auto; }
+
+/* ===== DIA records table: same look as the other tables, and nothing cut off ===== */
+@media (min-width: 761px) {
+  .admin-content .dia-table-wrap { overflow-x: auto; }
+  .admin-content .dia-table-wrap table { min-width: 0 !important; width: 100%; }
+  .admin-content .dia-table-wrap th.mat-mdc-header-cell { font-size: 0.68rem !important; letter-spacing: 0.1em !important; text-transform: uppercase; white-space: nowrap; text-align: center !important; padding: 12px 8px !important; }
+  .admin-content .dia-table-wrap th.mat-mdc-header-cell .mat-sort-header-container { justify-content: center; }
+  .admin-content .dia-table-wrap td.mat-mdc-cell { padding: 10px 8px !important; font-size: 0.88rem !important; }
+  .admin-content .dia-table-wrap :is(.mat-column-diaNumber, .mat-column-clientNumber, .mat-column-currentQuarter, .mat-column-activatedDate, .mat-column-nextInspectionDate, .mat-column-status) { white-space: nowrap; }
+  .admin-content .dia-table-wrap .mat-column-actions { width: auto !important; min-width: 0 !important; white-space: nowrap; }
+  .admin-content .dia-table-wrap .dia-row-actions { display: inline-flex !important; gap: 6px !important; flex-wrap: nowrap; }
+  .admin-content .dia-table-wrap .dia-row-actions .row-btn.act { width: 32px !important; height: 32px !important; }
+  .admin-content .dia-table-wrap .dia-num { font-size: 0.86rem; letter-spacing: 0.02em; }
+}
+@media (min-width: 761px) {
+  .admin-content .dia-list-panel { padding: 12px !important; }
+  .admin-content .dia-table-wrap td.mat-mdc-cell { padding: 10px 6px !important; }
+  .admin-content .dia-table-wrap th.mat-mdc-header-cell { padding: 12px 6px !important; }
+  .admin-content .dia-table-wrap .dia-num { letter-spacing: 0 !important; }
+  .admin-content .dia-table-wrap .mat-column-status :is(span, .dia-status) { padding-left: 10px !important; padding-right: 10px !important; }
+  .admin-content .dia-table-wrap .mat-column-clientLocation { max-width: 160px; }
+}
+/* Deactivate (power off): amber, like a pause. */
+.admin-content .row-btn.act.act--power-off { background: #fff1e2 !important; color: #c8690a !important; }
+.admin-content .row-btn.act.act--power-off:hover:not(:disabled) { background: #ffe3c4 !important; }
+
+/* ===== DIA stage colours — defined ONCE here and reused everywhere =====
+   The status chips in the list, the dashboard's progress bar, dots and small bars all read these variables,
+   so changing a colour here changes it on every page. None of them repeats an action-button colour. */
+:root {
+  --dia-q1: #0b7f86;   --dia-q1-bg: #e0f5f5;   --dia-q1-line: #b3e3e4;   --dia-q1-bar: #14a3ab;   /* teal   */
+  --dia-q2: #5b45c9;   --dia-q2-bg: #eeeafd;   --dia-q2-line: #d3cbf7;   --dia-q2-bar: #6d55d8;   /* violet */
+  --dia-q3: #8a6a00;   --dia-q3-bg: #fdf6d6;   --dia-q3-line: #f0e09a;   --dia-q3-bar: #d4a514;   /* gold   */
+  --dia-q4: #b3245f;   --dia-q4-bg: #fdebf2;   --dia-q4-line: #f5c6d8;   --dia-q4-bar: #d0457e;   /* rose   */
+  --dia-done: #0f7a5f; --dia-done-bg: #e4f4ee; --dia-done-line: #bfe3d7; --dia-done-bar: #0f7a5f; /* green  */
+}
+.status-chip.is-q1 { background: var(--dia-q1-bg) !important; color: var(--dia-q1) !important; border-color: var(--dia-q1-line) !important; }
+.status-chip.is-q2 { background: var(--dia-q2-bg) !important; color: var(--dia-q2) !important; border-color: var(--dia-q2-line) !important; }
+.status-chip.is-q3 { background: var(--dia-q3-bg) !important; color: var(--dia-q3) !important; border-color: var(--dia-q3-line) !important; }
+.status-chip.is-q4 { background: var(--dia-q4-bg) !important; color: var(--dia-q4) !important; border-color: var(--dia-q4-line) !important; }
+.status-chip.is-done { background: var(--dia-done-bg) !important; color: var(--dia-done) !important; border-color: var(--dia-done-line) !important; }
+/* Heading row with filters: keep it to one line on a laptop (dropdowns a little narrower). */
+@media (min-width: 981px) {
+  .admin-content .page-banner { flex-wrap: nowrap; }
+  .admin-content .head-filters { flex-wrap: nowrap; }
+  .admin-content .head-filters :is(.camera-filters-group, .nm-filters-group) { flex-wrap: nowrap; }
+  .admin-content .head-filters select { width: 160px !important; }
+}
+/* Every table heading centred, including Item / Service over the photo + name column. */
+@media (min-width: 761px) {
+  .admin-content table th:is(.col-item), .admin-content table th:has(+ th):first-child { text-align: center !important; padding-left: 14px !important; }
+}
+
+/* Quotation / drawing numbers: plain bold navy text like the DIA numbers — no box, no typewriter font. */
+.admin-content a.boq-number {
+  display: inline !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important;
+  color: #14305f !important; font-family: inherit !important; font-size: 0.9rem !important; font-weight: 800 !important;
+  letter-spacing: 0.02em !important; white-space: nowrap; text-decoration: none; font-variant-numeric: tabular-nums;
+}
+.admin-content a.boq-number:hover { color: #d21319 !important; text-decoration: underline; text-underline-offset: 3px; }
+/* Number only (00001) in normal weight — the page already says Quotations / Drawings. Full number on hover. */
+.admin-content a.boq-number { font-weight: 600 !important; letter-spacing: 0.04em !important; }

@@ -1642,3 +1642,22 @@
 .page-banner .camera-summary strong { color: #b9b8ac; font-weight: 800; }
 .page-banner .camera-summary-low { color: #7be0c8; }
 .page-banner .camera-summary-low.is-warn { background: rgba(225, 29, 36, 0.28); color: #fcd3d4; }
+
+/* Stock figures as small stat cards under the heading row. */
+.stock-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 14px; }
+.stock-stat { display: grid; gap: 2px; padding: 12px 16px; border: 1px solid #e6e3dc; border-radius: 14px; background: #fff; text-align: left; font: inherit; color: #0b1730; }
+.stock-stat span { color: #6b7280; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.stock-stat strong { color: #14305f; font-family: Georgia, "Times New Roman", serif; font-size: 1.45rem; font-weight: 400; line-height: 1.2; white-space: nowrap; }
+.stock-stat small { color: #6b7280; font-size: 0.74rem; }
+.stock-stat--value { background: linear-gradient(145deg, #1d3f78, #0b1730); border-color: transparent; }
+.stock-stat--value span { color: #9fb0cf; }
+.stock-stat--value strong { color: #fff; }
+.stock-stat--low { cursor: pointer; }
+.stock-stat--low strong { color: #0f7a5f; }
+.stock-stat--low.is-warn { border-color: #f5c6c8; background: #fff8f8; }
+.stock-stat--low.is-warn strong { color: #d21319; }
+.stock-stat--low[aria-pressed="true"] { box-shadow: 0 0 0 2px #d21319 inset; }
+@media (max-width: 760px) { .stock-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Compact rows: smaller photo box, less padding — more items on screen. */
+.camera-thumb { width: 38px !important; height: 38px !important; border-radius: 10px !important; }
+:host ::ng-deep .admin-content table td { padding-top: 8px !important; padding-bottom: 8px !important; }

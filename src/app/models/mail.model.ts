@@ -52,6 +52,11 @@ export interface SendMailRequest {
   replyToMessageId: string | null;
   /** The original under a reply or forward, shown below the signature. */
   quoted: string | null;
+  /** Hidden recipients. */
+  bcc?: string[];
+  /** The formatted message from the editor (bold, lists, links); cleaned by the server. */
+  bodyHtml?: string | null;
+  attachments?: { fileName: string; contentType: string; base64: string }[];
 }
 
 export interface MailSent {

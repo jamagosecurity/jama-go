@@ -1,0 +1,61 @@
+/* Create / Edit DIA — two clear sections on the left, "what happens next" and the buttons on the right. */
+.df { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.df-main { display: grid; gap: 16px; min-width: 0; }
+.df-card { padding: 20px 22px; border: 1px solid #e6e3dc; border-radius: 16px; background: #fff; box-shadow: 0 30px 60px -50px rgba(11, 23, 48, 0.55); }
+.df-h { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; color: #14305f; font-family: Georgia, "Times New Roman", serif; font-size: 1.12rem; font-weight: 400; }
+.df-h-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: #e9eef6; color: #14305f; }
+.df-h-icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.df-h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.df-h-row .df-h { margin-bottom: 16px; }
+.df-pin-state { margin-bottom: 16px; padding: 3px 10px; border-radius: 999px; background: #eef0f4; color: #6b7280; font-size: 0.74rem; font-weight: 800; white-space: nowrap; }
+.df-pin-state.is-on { background: #e4f4ee; color: #0f7a5f; }
+
+.df-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+.df-field--wide { grid-column: 1 / -1; }
+.df-grid--pin { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; margin-top: 14px; }
+.df-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.df-field > span { color: #3a4a66; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.df-field > span i { color: #d21319; font-style: normal; }
+.df-field > span em { margin-left: 4px; color: #9aa3b5; font-style: normal; font-weight: 700; letter-spacing: 0; text-transform: none; }
+.df-field :is(input, textarea) {
+  width: 100%; box-sizing: border-box; min-height: 42px; padding: 0 14px; border: 1px solid #d9dbe2; border-radius: 12px;
+  background: #fff; color: #0b1730; font: inherit; font-size: 0.9rem; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.df-field textarea { padding: 11px 14px; min-height: 64px; resize: vertical; line-height: 1.5; }
+.df-field :is(input, textarea)::placeholder { color: #9aa3b5; }
+.df-field :is(input, textarea):focus { outline: none; border-color: #14305f; box-shadow: 0 0 0 3px rgba(20, 48, 95, 0.12); }
+.df-field :is(input, textarea).is-invalid { border-color: #d21319; }
+.df-err { color: #b3141b; font-size: 0.78rem; font-weight: 700; }
+.df-err--block { display: block; margin: 10px 0 0; }
+
+.df-pin-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.df-chip { display: inline-flex; align-items: center; gap: 7px; height: 42px; padding: 0 14px; border: 1px solid #d9dbe2; border-radius: 12px; background: #f3f6fb; color: #14305f; font: inherit; font-size: 0.84rem; font-weight: 700; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.df-chip:hover:not(:disabled) { border-color: #14305f; }
+.df-chip:disabled { opacity: 0.6; cursor: default; }
+.df-chip svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.df-chip--ghost { background: #fff; color: #a40f14; }
+
+.df-tip { display: flex; gap: 10px; margin: 16px 0 0; padding: 12px 14px; border-radius: 12px; background: #f7f5f0; color: #4b5260; font-size: 0.82rem; line-height: 1.55; }
+.df-tip svg { flex: none; width: 18px; height: 18px; margin-top: 1px; fill: none; stroke: #14305f; stroke-width: 2; stroke-linecap: round; }
+
+.df-side { position: sticky; top: 90px; display: grid; gap: 14px; }
+.df-next ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+.df-next li { display: flex; gap: 12px; }
+.df-next li b { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #14305f; color: #fff; font-size: 0.8rem; }
+.df-next li span { display: grid; gap: 2px; }
+.df-next li strong { color: #0b1730; font-size: 0.9rem; }
+.df-next li small { color: #6b7280; font-size: 0.78rem; line-height: 1.45; }
+.df-actions { display: grid; gap: 8px; }
+.df-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border: 0; border-radius: 999px; background: linear-gradient(145deg, #e8383f 0%, #d21319 55%, #a40f14 100%); color: #fff; font: inherit; font-size: 0.92rem; font-weight: 800; cursor: pointer; box-shadow: 0 12px 24px -14px rgba(210, 19, 25, 0.9); }
+.df-save:disabled { opacity: 0.6; cursor: wait; }
+.df-cancel { display: grid; place-items: center; height: 42px; border: 1px solid #d9dbe2; border-radius: 999px; background: #fff; color: #14305f; font-size: 0.88rem; font-weight: 700; text-decoration: none; }
+.df-cancel:hover { border-color: #14305f; }
+
+@media (max-width: 1080px) {
+  .df { grid-template-columns: minmax(0, 1fr); }
+  .df-side { position: static; }
+}
+@media (max-width: 640px) {
+  .df-grid, .df-grid--pin { grid-template-columns: minmax(0, 1fr); }
+  .df-card { padding: 16px; }
+}

@@ -344,3 +344,8 @@
 .nj-status[data-status="Closed"] { background: #d9f2ea; color: #0f6b5f; }
 
 .nj-table .col-tech .nj-visit { display: block; margin-top: 2px; color: #6b7280; font-weight: 600; font-size: 0.78rem; white-space: nowrap; }
+
+/* Payment state under the amount: Unpaid red, Part-paid amber, Paid green. */
+.nj-paid { display: block; width: fit-content; margin: 3px auto 0; padding: 1px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 800; background: #fdecec; color: #a40f14; }
+.nj-paid[data-state="part"] { background: #fff1e2; color: #b35c06; }
+.nj-paid[data-state="paid"] { background: #e4f4ee; color: #0f7a5f; }

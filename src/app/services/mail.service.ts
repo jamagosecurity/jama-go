@@ -29,6 +29,11 @@ export class MailService {
   }
 
   /** Mark read or unread — here and on the mail server. */
+  /** Removes messages here and moves them to the mailbox's Trash on the mail server (restorable from webmail). */
+  delete(ids: string[]): Observable<number> {
+    return this.http.post<ApiResult<number>>(`${this.base}/messages/delete`, { ids }).pipe(map(unwrapApiResult));
+  }
+
   setRead(id: string, read: boolean): Observable<boolean> {
     return this.http.post<ApiResult<boolean>>(`${this.base}/messages/${id}/read`, { read }).pipe(map(unwrapApiResult));
   }

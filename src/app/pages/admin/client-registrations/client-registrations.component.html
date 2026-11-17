@@ -113,7 +113,7 @@
                       <span class="creg-done">{{ item.reviewedAt | date: 'd MMM y' }}</span>
                     }
                     @if (item.status === 'Pending') {
-                      <button type="button" class="row-btn row-btn--icon row-btn--delete" title="Reject"
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete act act--delete" title="Reject"
                         [attr.aria-label]="'Reject ' + item.fullName" (click)="openReject(item)">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
                           stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>

@@ -11,6 +11,19 @@
       <h1>Staff management</h1>
       <p class="staff-banner-sub">{{ staff().length }} {{ staff().length === 1 ? 'member' : 'members' }}</p>
     </div>
+    <label class="head-search admin-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+      <input
+        type="search"
+        [value]="query()"
+        (input)="onSearch($any($event.target).value)"
+        placeholder="Search name, email, role, department…"
+      />
+    </label>
+    <button type="button" class="staff-refresh" (click)="loadStaff()" aria-label="Refresh the list">
+      <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
+      Refresh
+    </button>
     <button type="button" class="staff-banner-add" (click)="startCreate()">
       <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
       Add staff
@@ -25,21 +38,6 @@
     <p class="admin-success staff-feedback">{{ success() }}</p>
   }
 
-  <div class="admin-toolbar">
-    <label class="admin-search">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-      <input
-        type="search"
-        [value]="query()"
-        (input)="onSearch($any($event.target).value)"
-        placeholder="Search name, email, role, department…"
-      />
-    </label>
-    <button type="button" class="staff-refresh" (click)="loadStaff()" aria-label="Refresh the list">
-      <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
-      Refresh
-    </button>
-  </div>
 
   <div class="admin-panel">
     @if (loading()) {
@@ -101,15 +99,15 @@
                       <button type="button" class="row-btn" [disabled]="deletingId() === member.id"
                         (click)="pendingDeleteId.set(null)">Keep</button>
                     } @else {
-                      <button type="button" class="row-btn row-btn--edit"
-                        (click)="startEdit(member); $event.stopPropagation()">
+                      <button type="button" class="row-btn row-btn--edit act act--edit"
+                        (click)="startEdit(member); $event.stopPropagation()" title="Edit">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
                           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
                         </svg>
-                        Edit
+                        <span class="act-label">Edit</span>
                       </button>
-                      <button type="button" class="row-btn row-btn--icon row-btn--delete" title="Delete"
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete act act--delete" title="Delete"
                         [attr.aria-label]="'Delete ' + member.fullName" (click)="pendingDeleteId.set(member.id)">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
                           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

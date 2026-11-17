@@ -60,7 +60,7 @@
             @for (boq of result()!.items; track boq.id) {
               <tr>
                 <td data-label="Quotation">
-                  <a class="boq-number" [routerLink]="[basePath, boq.id]">{{ boq.boqNumber }}</a>
+                  <a class="boq-number" [routerLink]="[basePath, boq.id]" [title]="boq.boqNumber" [attr.aria-label]="boq.boqNumber">{{ boq.boqNumber.slice(boq.boqNumber.indexOf('-') + 1) }}</a>
                   <span class="boq-projectcell"><small>{{ boq.projectName }}</small></span>
                 </td>
                 <td data-label="Customer">

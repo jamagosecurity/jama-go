@@ -39,7 +39,42 @@ export interface NonMoiJob {
   clientResponderName: string | null;
   clientRespondedAt: string | null;
   events: NonMoiJobEvent[];
+  /** Money received so far (cash + online). */
+  amountPaid: number;
+  payments: NonMoiJobPayment[];
 }
+
+/** One payment received for a job. Cash: who collected it. Online: a bank transfer with its receipt. */
+export interface NonMoiJobPayment {
+  id: string;
+  method: 'Cash' | 'Online';
+  amount: number;
+  /** The day the money came in, yyyy-MM-dd (Doha). */
+  receivedOn: string;
+  collectedByName: string | null;
+  note: string | null;
+  hasReceipt: boolean;
+  receiptFileName: string | null;
+  recordedByName: string;
+  recordedAt: string;
+}
+
+export interface AddNonMoiJobPayment {
+  method: 'Cash' | 'Online';
+  amount: number;
+  receivedOn: string;
+  collectedById: string | null;
+  note: string | null;
+  receipt: File | null;
+}
+
+export interface CollectionRow {
+  paymentId: string; jobId: string; jobNumber: string; customerName: string; method: 'Cash' | 'Online'; amount: number;
+  receivedOn: string; collectedByName: string | null; technicianName: string; note: string | null; hasReceipt: boolean;
+  recordedByName: string; recordedAt: string;
+}
+
+export interface Collections { from: string; to: string; cash: number; online: number; total: number; rows: CollectionRow[]; }
 
 /**
  * Where a job is. Assigned: with the technician. Completed: he has finished, waiting for the issuer to send the bill.

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -20,15 +20,22 @@ const FRAME_HEAD =
 /** Pictures from outside are blocked by the frame's rules; drop them so no broken-image icons show. */
 const REMOTE_IMG = /<img\b(?![^>]*\bsrc\s*=\s*["']?(?:data:))[^>]*>/gi;
 
-type ComposeMode = 'new' | 'reply' | 'forward';
+type ComposeMode = 'new' | 'reply' | 'replyAll' | 'forward';
+
+type RecipientField = 'to' | 'cc' | 'bcc';
 
 interface Compose {
   mode: ComposeMode;
   account: string;
-  to: string;
-  cc: string;
+  to: string[];
+  cc: string[];
+  bcc: string[];
   subject: string;
+  /** Plain-text version of what is in the editor. */
   body: string;
+  /** The editor's formatted HTML (bold, lists, links). */
+  html: string;
+  attachments: File[];
   /** The original message under a reply or forward. */
   quoted: string;
   replyToId: string | null;
@@ -147,17 +154,24 @@ export class AdminMailComponent {
 
   openNew(): void {
     const account = this.senders().find((a) => a.key === this.account())?.key ?? this.senders()[0]?.key ?? '';
-    this.startCompose({ mode: 'new', account, to: '', cc: '', subject: '', body: '', quoted: '', replyToId: null });
+    this.startCompose({ mode: 'new', account, to: [], cc: [], bcc: [], subject: '', body: '', html: '', attachments: [], quoted: '', replyToId: null });
   }
 
-  reply(m: MailDetail): void {
-    const to = m.folder === 'Sent' ? m.toAddresses : m.fromAddress;
+  reply(m: MailDetail, all = false): void {
+    const own = new Set(this.accounts().map((a) => a.address.toLowerCase()));
+    const list = (text: string) => this.recipients(text).filter((a) => ADDRESS.test(a));
+    const to = m.folder === 'Sent' ? list(m.toAddresses) : [m.fromAddress];
+    // Reply all: everyone else who got it goes in Cc — never our own mailboxes.
+    const cc = all
+      ? list(m.toAddresses).filter((a) => !own.has(a.toLowerCase()) && !to.some((t) => t.toLowerCase() === a.toLowerCase()))
+      : [];
     const quoted = this.quote(m, `On ${this.when(m)}, ${m.fromName || m.fromAddress} wrote:`);
     this.startCompose({
-      mode: 'reply', account: m.accountKey, to, cc: '',
+      mode: all ? 'replyAll' : 'reply', account: m.accountKey, to, cc, bcc: [],
       subject: /^re:/i.test(m.subject) ? m.subject : `Re: ${m.subject}`,
-      body: '', quoted, replyToId: m.id,
+      body: '', html: '', attachments: [], quoted, replyToId: m.id,
     });
+    if (cc.length) this.showCc.set(true);
   }
 
   forward(m: MailDetail): void {
@@ -169,16 +183,138 @@ export class AdminMailComponent {
       `To: ${m.toAddresses}`,
     ].join('\n');
     this.startCompose({
-      mode: 'forward', account: m.accountKey, to: '', cc: '',
+      mode: 'forward', account: m.accountKey, to: [], cc: [], bcc: [],
       subject: /^fwd?:/i.test(m.subject) ? m.subject : `Fwd: ${m.subject}`,
-      body: '', quoted: `${header}\n\n${m.bodyText}`, replyToId: null,
+      body: '', html: '', attachments: [], quoted: `${header}\n\n${m.bodyText}`, replyToId: null,
     });
   }
 
   private startCompose(c: Compose): void {
     this.sendError.set(null);
     this.showCc.set(false);
+    this.showBcc.set(false);
+    this.drafts.set({ to: '', cc: '', bcc: '' });
     this.compose.set(c);
+    // The editor is plain contenteditable: start it empty and put the cursor in it.
+    setTimeout(() => {
+      const ed = this.editor()?.nativeElement;
+      if (ed) { ed.innerHTML = ''; (c.to.length ? ed : document.querySelector<HTMLInputElement>('.mc-chips input'))?.focus(); }
+    });
+  }
+
+  // ===== Recipients as chips =====
+  readonly showBcc = signal(false);
+  protected readonly recipientFields: RecipientField[] = ['to', 'cc', 'bcc'];
+  readonly drafts = signal<Record<RecipientField, string>>({ to: '', cc: '', bcc: '' });
+  protected readonly isAddress = (a: string) => ADDRESS.test(a);
+
+  setDraft(field: RecipientField, input: HTMLInputElement): void {
+    const value = input.value;
+    // Typing or pasting a comma, semicolon or space finishes the address.
+    if (/[\s,;]/.test(value)) {
+      const parts = value.split(SPLIT);
+      const rest = parts.pop() ?? '';
+      parts.filter(Boolean).forEach((p) => this.addRecipient(field, p));
+      input.value = rest;
+      this.drafts.update((d) => ({ ...d, [field]: rest }));
+      return;
+    }
+    this.drafts.update((d) => ({ ...d, [field]: value }));
+  }
+
+  commitDraft(field: RecipientField, input?: HTMLInputElement): void {
+    const v = (input?.value ?? this.drafts()[field]).trim();
+    if (v) this.addRecipient(field, v);
+    if (input) input.value = '';
+    else document.querySelectorAll<HTMLInputElement>(`.mc-chips input[aria-label="${field}"]`).forEach((el) => (el.value = ''));
+    this.drafts.update((d) => ({ ...d, [field]: '' }));
+  }
+
+  onRecipientKey(field: RecipientField, e: KeyboardEvent): void {
+    if (e.key === 'Enter' || e.key === 'Tab' && this.drafts()[field].trim()) { e.preventDefault(); this.commitDraft(field, e.target as HTMLInputElement); }
+    else if (e.key === 'Backspace' && !this.drafts()[field]) {
+      const list = this.compose()?.[field] ?? [];
+      if (list.length) this.removeRecipient(field, list.length - 1);
+    }
+  }
+
+  private addRecipient(field: RecipientField, address: string): void {
+    const a = address.trim().replace(/^<|>$/g, '');
+    if (!a) return;
+    this.compose.update((c) => (c && !c[field].some((x) => x.toLowerCase() === a.toLowerCase()) ? { ...c, [field]: [...c[field], a] } : c));
+  }
+
+  removeRecipient(field: RecipientField, index: number): void {
+    if (this.errorField() === field) { this.errorField.set(null); this.sendError.set(null); }
+    this.compose.update((c) => (c ? { ...c, [field]: c[field].filter((_, i) => i !== index) } : c));
+  }
+
+  // ===== Formatting =====
+  private readonly editor = viewChild<ElementRef<HTMLDivElement>>('editor');
+
+  format(command: 'bold' | 'italic' | 'underline' | 'insertUnorderedList' | 'insertOrderedList' | 'removeFormat'): void {
+    this.editor()?.nativeElement.focus();
+    document.execCommand(command);
+    if (command === 'removeFormat') document.execCommand('unlink');
+    this.syncEditor();
+  }
+
+  addLink(): void {
+    const url = prompt('Link address (https://…)', 'https://');
+    if (!url || !/^(https?:\/\/|mailto:)/i.test(url.trim())) return;
+    this.editor()?.nativeElement.focus();
+    document.execCommand('createLink', false, url.trim());
+    this.syncEditor();
+  }
+
+  syncEditor(): void {
+    const ed = this.editor()?.nativeElement;
+    if (!ed) return;
+    if (this.errorField() === 'body' && ed.innerText.trim()) { this.errorField.set(null); this.sendError.set(null); }
+    this.compose.update((c) => (c ? { ...c, body: ed.innerText.replace(/\n{3,}/g, '\n\n'), html: ed.innerHTML } : c));
+  }
+
+  // ===== Attachments =====
+  protected readonly maxAttachBytes = 20 * 1024 * 1024;
+  readonly dragging = signal(false);
+  protected readonly attachTotal = computed(() => (this.compose()?.attachments ?? []).reduce((n, f) => n + f.size, 0));
+
+  addFiles(list: FileList | null | undefined): void {
+    const files = Array.from(list ?? []);
+    if (!files.length) return;
+    const blocked = files.find((f) => /\.(exe|bat|cmd|com|scr|js|vbs|ps1|msi|jar|reg|hta)$/i.test(f.name));
+    if (blocked) { this.errorField.set('files'); this.sendError.set(`“${blocked.name}” is a program or script — mail servers block those. Zip it or send a link instead.`); return; }
+    const c = this.compose();
+    if (!c) return;
+    const next = [...c.attachments, ...files];
+    if (next.length > 10) { this.errorField.set('files'); this.sendError.set('That’s more than 10 files. Send the rest in a second email.'); return; }
+    if (next.reduce((n, f) => n + f.size, 0) > this.maxAttachBytes) { this.errorField.set('files'); this.sendError.set(`Too big — attachments can be 20 MB in total (these would be ${this.size(next.reduce((n, f) => n + f.size, 0))}).`); return; }
+    this.sendError.set(null);
+    this.errorField.set(null);
+    this.compose.set({ ...c, attachments: next });
+  }
+
+  removeFile(index: number): void {
+    this.compose.update((c) => (c ? { ...c, attachments: c.attachments.filter((_, i) => i !== index) } : c));
+  }
+
+  onDrop(e: DragEvent): void {
+    e.preventDefault();
+    this.dragging.set(false);
+    this.addFiles(e.dataTransfer?.files);
+  }
+
+  protected size(bytes: number): string {
+    return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  }
+
+  private readBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result).split(',')[1] ?? '');
+      r.onerror = () => reject(r.error);
+      r.readAsDataURL(file);
+    });
   }
 
   private when(m: MailDetail): string {
@@ -190,6 +326,7 @@ export class AdminMailComponent {
   }
 
   setField<K extends keyof Compose>(key: K, value: Compose[K]): void {
+    if (this.errorField() === key) { this.errorField.set(null); this.sendError.set(null); }
     this.compose.update((c) => (c ? { ...c, [key]: value } : c));
   }
 
@@ -207,48 +344,87 @@ export class AdminMailComponent {
     return text.split(SPLIT).map((x) => x.trim()).filter(Boolean);
   }
 
-  /** The same checks the API makes, so mistakes show here first. */
+  /** Which part of the form the current problem is in — that row turns red and gets the cursor. */
+  readonly errorField = signal<'from' | 'to' | 'cc' | 'bcc' | 'subject' | 'body' | 'files' | null>(null);
+
+  /** The same checks the API makes, so mistakes show here first — in plain words, pointing at the field. */
   private composeError(c: Compose): string | null {
-    if (!c.account) return 'Choose which mailbox to send from.';
-    const to = this.recipients(c.to);
-    if (!to.length) return 'Add at least one recipient.';
-    const bad = [...to, ...this.recipients(c.cc)].find((a) => !ADDRESS.test(a));
-    if (bad) return `"${bad}" is not a valid email address.`;
-    if (to.length > 20) return 'At most 20 recipients.';
-    if (!c.subject.trim()) return 'Write a subject.';
-    if (c.subject.length > 300) return 'The subject must be 300 characters or fewer.';
-    if (!c.body.trim()) return 'Write a message.';
+    const fail = (field: Exclude<ReturnType<typeof this.errorField>, null>, message: string) => { this.errorField.set(field); return message; };
+    this.errorField.set(null);
+    if (!c.account) return fail('from', 'Choose which mailbox this goes from.');
+    if (!c.to.length) return fail('to', 'Who is it for? Add at least one address in To.');
+    for (const f of this.recipientFields) {
+      const bad = c[f].find((a) => !ADDRESS.test(a));
+      if (bad) return fail(f, `“${bad}” doesn’t look like an email address. Check it or remove it (×).`);
+    }
+    if (c.to.length > 20) return fail('to', 'Too many people in To — 20 at most. Put the rest in Cc or Bcc.');
+    if (!c.subject.trim()) return fail('subject', 'Add a subject so they know what it is about.');
+    if (c.subject.length > 300) return fail('subject', 'The subject is too long — keep it under 300 characters.');
+    if (!c.body.trim()) return fail('body', 'The message is empty. Write something before sending.');
     return null;
   }
 
-  send(): void {
+  /** Puts the cursor where the problem is. */
+  private focusError(): void {
+    const f = this.errorField();
+    setTimeout(() => {
+      if (f === 'body') this.editor()?.nativeElement.focus();
+      else if (f === 'subject') document.querySelector<HTMLInputElement>('.mc-row input[maxlength="300"]')?.focus();
+      else if (f === 'to' || f === 'cc' || f === 'bcc') document.querySelector<HTMLInputElement>(`.mc-chips input[aria-label="${f}"]`)?.focus();
+    });
+  }
+
+  async send(): Promise<void> {
+    (['to', 'cc', 'bcc'] as const).forEach((f) => this.commitDraft(f));
+    this.syncEditor();
     const c = this.compose();
     if (!c || this.sending()) return;
     const problem = this.composeError(c);
-    if (problem) { this.sendError.set(problem); return; }
+    if (problem) { this.sendError.set(problem); this.focusError(); return; }
     this.sending.set(true);
     this.sendError.set(null);
+    let attachments: { fileName: string; contentType: string; base64: string }[] = [];
+    try {
+      attachments = await Promise.all(c.attachments.map(async (f) => ({
+        fileName: f.name, contentType: f.type || 'application/octet-stream', base64: await this.readBase64(f),
+      })));
+    } catch {
+      this.sending.set(false);
+      this.sendError.set('An attachment could not be read. Remove it and add it again.');
+      return;
+    }
+    // Close straight away — the mail goes out while you carry on. If it fails, the draft comes back with the reason.
+    const draftHtml = this.editor()?.nativeElement.innerHTML ?? c.html;
+    const from = this.accounts().find((a) => a.key === c.account)?.address ?? c.account;
+    this.compose.set(null);
+    this.sending.set(false);
+    this.notice.set(`Sending from ${from}…`);
     this.mail
       .send({
         accountKey: c.account,
-        to: this.recipients(c.to),
-        cc: this.recipients(c.cc),
+        to: c.to,
+        cc: c.cc,
+        bcc: c.bcc,
         subject: c.subject.trim(),
         body: c.body,
+        bodyHtml: c.html.trim() || null,
+        attachments,
         replyToMessageId: c.replyToId,
         quoted: c.quoted.trim() || null,
       })
-      .pipe(finalize(() => this.sending.set(false)), takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) => {
-          const from = this.accounts().find((a) => a.key === c.account)?.address ?? c.account;
-          this.compose.set(null);
-          this.open.set(null);
-          this.notice.set(`Sent from ${from}.` + (res.copySavedToSent ? '' : ' (A copy could not be saved to its Sent folder.)'));
-          setTimeout(() => this.notice.set(null), 6000);
+        next: () => {
+          this.notice.set(`✓ Sent from ${from}.`);
+          setTimeout(() => this.notice.set(null), 5000);
           this.load();
         },
-        error: (e) => this.sendError.set(getApiErrorMessage(e, 'The message could not be sent.')),
+        error: (e) => {
+          this.notice.set(null);
+          this.compose.set(c);
+          this.sendError.set(getApiErrorMessage(e, 'The message could not be sent.'));
+          setTimeout(() => { const ed = this.editor()?.nativeElement; if (ed) ed.innerHTML = draftHtml; });
+        },
       });
   }
 
@@ -332,6 +508,35 @@ export class AdminMailComponent {
   }
 
   close(): void { this.open.set(null); }
+
+  /** Delete: gone from the list at once; on the server it moves to the mailbox's Trash, so it can be restored there. */
+  readonly confirmDelete = signal<MailDetail | null>(null);
+
+  deleteMessage(m: MailDetail): void {
+    this.confirmDelete.set(m);
+  }
+
+  doDelete(): void {
+    const m = this.confirmDelete();
+    if (!m) return;
+    this.confirmDelete.set(null);
+    const before = this.items();
+    this.items.set(before.filter((x) => x.id !== m.id));
+    this.total.update((n) => Math.max(0, n - 1));
+    this.open.set(null);
+    this.mail.delete([m.id]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.notice.set('Message deleted — moved to Trash.');
+        setTimeout(() => this.notice.set(null), 4000);
+        if (!m.isRead) this.mail.accounts().subscribe((a) => this.accounts.set(a));
+      },
+      error: (e) => {
+        this.items.set(before);
+        this.total.update((n) => n + 1);
+        this.error.set(getApiErrorMessage(e, 'The message could not be deleted.'));
+      },
+    });
+  }
 
   /** Two letters for an avatar: "Mail Delivery System" → "MD", "info@jamago.qa" → "IN". */
   initials(text: string): string {

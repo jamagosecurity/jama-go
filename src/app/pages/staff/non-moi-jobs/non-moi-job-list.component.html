@@ -22,7 +22,18 @@
       <h1>Non-MOI Admin</h1>
       <p class="page-banner-sub">Jobs issued to technicians</p>
     </div>
+    <label class="head-search nj-search">
+      <span class="nj-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>
+      </span>
+      <input type="search" autocomplete="off" placeholder="Search by customer, number, location or technician…"
+        [value]="search()" (input)="onSearch($any($event.target).value)" />
+      @if (search()) {
+        <button type="button" class="nj-search-clear" aria-label="Clear search" (click)="onSearch('')">×</button>
+      }
+    </label>
     <div class="page-banner-actions">
+    <a class="banner-ghost" [routerLink]="[base, 'collections']">Collections</a>
     <a class="banner-gold" [routerLink]="[base, 'new']">Issue job</a>
     </div>
   </header>
@@ -40,18 +51,6 @@
     <button type="button" class="nj-stage" [class.is-on]="stage() === 'closed'" (click)="setStage('closed')">Approved <b>{{ counts().closed }}</b></button>
   </div>
 
-  <div class="nj-filters">
-    <label class="nj-search">
-      <span class="nj-search-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>
-      </span>
-      <input type="search" autocomplete="off" placeholder="Search by customer, number, location or technician…"
-        [value]="search()" (input)="onSearch($any($event.target).value)" />
-      @if (search()) {
-        <button type="button" class="nj-search-clear" aria-label="Clear search" (click)="onSearch('')">×</button>
-      }
-    </label>
-  </div>
 
   <div class="admin-panel">
     @if (loading()) {
@@ -99,6 +98,11 @@
                 </td>
                 <td data-label="Amount" class="nj-amount">
                   {{ job.status === 'Assigned' ? '—' : (job.amountPayable | number: '1.2-2') + ' QAR' }}
+                  @if (job.status !== 'Assigned') {
+                    <small class="nj-paid" [attr.data-state]="job.amountPaid <= 0 ? 'unpaid' : job.amountPaid >= job.amountPayable ? 'paid' : 'part'">
+                      {{ job.amountPaid <= 0 ? 'Unpaid' : job.amountPaid >= job.amountPayable ? 'Paid' : 'Paid ' + (job.amountPaid | number: '1.0-0') }}
+                    </small>
+                  }
                 </td>
                 <td class="col-actions">
                   <div class="nj-row-actions">
@@ -110,21 +114,21 @@
                       <button type="button" class="row-btn"
                         [disabled]="deletingId() === job.id" (click)="pendingDeleteId.set(null)">Keep</button>
                     } @else if (job.status === 'Closed' || job.status === 'Sent') {
-                      <a class="row-btn" [routerLink]="[base, job.id, 'close']" [attr.aria-label]="'View ' + job.jobNumber">View</a>
+                      <a class="row-btn act act--view" [routerLink]="[base, job.id, 'close']" [attr.aria-label]="'View ' + job.jobNumber" title="View"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="act-label">View</span></a>
                     } @else {
                       @if (job.status === 'Completed' || job.status === 'ChangesRequested') {
                         <a class="row-btn nj-close-btn" [routerLink]="[base, job.id, 'close']"
                           [attr.aria-label]="'Review and send ' + job.jobNumber">{{ job.status === 'ChangesRequested' ? 'Review changes' : 'Review & send' }}</a>
                       }
-                      <a class="row-btn row-btn--edit" [routerLink]="[base, job.id, 'edit']"
-                        [attr.aria-label]="'Edit ' + job.jobNumber">
+                      <a class="row-btn row-btn--edit act act--edit" [routerLink]="[base, job.id, 'edit']"
+                        [attr.aria-label]="'Edit ' + job.jobNumber" title="Edit">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
                           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
                         </svg>
-                        Edit
+                        <span class="act-label">Edit</span>
                       </a>
-                      <button type="button" class="row-btn row-btn--icon row-btn--delete" title="Delete"
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete act act--delete" title="Delete"
                         [attr.aria-label]="'Delete ' + job.jobNumber" (click)="askDelete(job)">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
                           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

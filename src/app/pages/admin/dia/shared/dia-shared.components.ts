@@ -60,6 +60,14 @@ export class DiaStatusChipComponent {
         return 'is-done';
       case 'Inactive':
         return 'is-off';
+      case 'Quarter1':
+        return 'is-active is-q1';
+      case 'Quarter2':
+        return 'is-active is-q2';
+      case 'Quarter3':
+        return 'is-active is-q3';
+      case 'Quarter4':
+        return 'is-active is-q4';
       default:
         return 'is-active';
     }

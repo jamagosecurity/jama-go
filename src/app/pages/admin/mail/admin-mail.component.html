@@ -67,7 +67,7 @@
     <p class="admin-error"><strong>{{ a.address }}</strong> could not be read: {{ a.lastError }}</p>
   }
 
-  <div class="mx" [class.is-reading]="!!open()">
+  <div class="mx" [class.is-reading]="!!open() || !!compose()">
     <!-- ===== Messages ===== -->
     <section class="mx-list" aria-label="Messages">
       <div class="mx-list-head">
@@ -129,7 +129,124 @@
 
     <!-- ===== Reading pane ===== -->
     <section class="mx-read" aria-label="Message">
-      @if (open(); as m) {
+      @if (compose(); as c) {
+        <form class="mail-compose mail-compose--inline" [class.is-drag]="dragging()" (submit)="$event.preventDefault(); send()" role="dialog"
+          [attr.aria-label]="c.mode === 'reply' ? 'Reply' : c.mode === 'replyAll' ? 'Reply all' : c.mode === 'forward' ? 'Forward' : 'New mail'"
+          (dragover)="$event.preventDefault(); dragging.set(true)" (dragleave)="dragging.set(false)" (drop)="onDrop($event)">
+          <header>
+            <h2>{{ c.mode === 'reply' ? 'Reply' : c.mode === 'replyAll' ? 'Reply all' : c.mode === 'forward' ? 'Forward' : 'New message' }}</h2>
+            <button type="button" class="mail-close" (click)="closeCompose()" aria-label="Close" title="Close (keeps nothing)">×</button>
+          </header>
+          @if (sendError()) {
+            <div class="mc-alert" role="alert">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" /><path d="M12 7.5v5.5M12 16.5h.01" /></svg>
+              <span>{{ sendError() }}</span>
+              <button type="button" (click)="sendError.set(null); errorField.set(null)" aria-label="Dismiss">×</button>
+            </div>
+          }
+
+          <label class="mc-row">
+            <span>From</span>
+            <select [ngModel]="c.account" [ngModelOptions]="{ standalone: true }" (ngModelChange)="changeAccount($event)">
+              @for (a of senders(); track a.key) { <option [value]="a.key">{{ a.address }}</option> }
+            </select>
+          </label>
+
+          @for (field of recipientFields; track field) {
+            @let f = field;
+            @if (f === 'to' || (f === 'cc' && (showCc() || c.cc.length)) || (f === 'bcc' && (showBcc() || c.bcc.length))) {
+              <div class="mc-row mc-chips-row" [class.is-invalid]="errorField() === field">
+                <span>{{ f === 'to' ? 'To' : f === 'cc' ? 'Cc' : 'Bcc' }}</span>
+                <div class="mc-chips" (click)="$any($event.currentTarget).querySelector('input')?.focus()">
+                  @for (r of c[field]; track r; let i = $index) {
+                    <span class="mc-chip" [class.is-bad]="!isAddress(r)" [title]="isAddress(r) ? r : 'Not a valid email address'">
+                      {{ r }}<button type="button" (click)="removeRecipient(field, i); $event.stopPropagation()" [attr.aria-label]="'Remove ' + r">×</button>
+                    </span>
+                  }
+                  <input type="email" autocomplete="off" [attr.aria-label]="f" [placeholder]="c[field].length ? '' : (f === 'bcc' ? 'Hidden recipients' : 'name@example.com')"  (input)="setDraft(field, $any($event.target))" (keydown)="onRecipientKey(field, $event)" (blur)="commitDraft(field, $any($event.target))" />
+                </div>
+                @if (f === 'to') {
+                  <span class="mc-toggles">
+                    @if (!showCc() && !c.cc.length) { <button type="button" (click)="showCc.set(true)">Cc</button> }
+                    @if (!showBcc() && !c.bcc.length) { <button type="button" (click)="showBcc.set(true)">Bcc</button> }
+                  </span>
+                }
+              </div>
+            }
+          }
+
+          <label class="mc-row" [class.is-invalid]="errorField() === 'subject'">
+            <span>Subject</span>
+            <input type="text" maxlength="300" [ngModel]="c.subject" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('subject', $event)" />
+          </label>
+
+          <div class="mc-toolbar" role="toolbar" aria-label="Formatting">
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="format('bold')" title="Bold (Ctrl B)" aria-label="Bold"><b>B</b></button>
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="format('italic')" title="Italic (Ctrl I)" aria-label="Italic"><i>I</i></button>
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="format('underline')" title="Underline (Ctrl U)" aria-label="Underline"><u>U</u></button>
+            <i class="mc-sep" aria-hidden="true"></i>
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="format('insertUnorderedList')" title="Bulleted list" aria-label="Bulleted list">
+              <svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" /><circle cx="4.5" cy="6" r="1.2" /><circle cx="4.5" cy="12" r="1.2" /><circle cx="4.5" cy="18" r="1.2" /></svg>
+            </button>
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="format('insertOrderedList')" title="Numbered list" aria-label="Numbered list">
+              <svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10" /><path d="M4 5h1.5v4M4 9h3M4 15h3l-3 3.5h3" /></svg>
+            </button>
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="addLink()" title="Insert link" aria-label="Insert link">
+              <svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1" /><path d="M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1" /></svg>
+            </button>
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="format('removeFormat')" title="Clear formatting" aria-label="Clear formatting">
+              <svg viewBox="0 0 24 24"><path d="M6 5h12M12 5l-3 14M4 20l16-16" /></svg>
+            </button>
+            <i class="mc-sep" aria-hidden="true"></i>
+            <label class="mc-attach" [class.is-invalid]="errorField() === 'files'" title="Attach files (or drag them here)">
+              <input type="file" multiple (change)="addFiles($any($event.target).files); $any($event.target).value = ''" />
+              <svg viewBox="0 0 24 24"><path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10.5 18a2 2 0 0 1-3-3l7.5-7.5" /></svg>
+              Attach
+            </label>
+          </div>
+
+          <div class="mc-scroll">
+            <div #editor class="mc-editor" [class.is-invalid]="errorField() === 'body'" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Message"
+              data-placeholder="Write your message…" (input)="syncEditor()" (blur)="syncEditor()"></div>
+
+            @if (c.attachments.length) {
+              <ul class="mc-files">
+                @for (f of c.attachments; track $index; let i = $index) {
+                  <li>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /></svg>
+                    <span>{{ f.name }}</span><small>{{ size(f.size) }}</small>
+                    <button type="button" (click)="removeFile(i)" [attr.aria-label]="'Remove ' + f.name">×</button>
+                  </li>
+                }
+                <li class="mc-files-total">{{ c.attachments.length }} {{ c.attachments.length === 1 ? 'file' : 'files' }} · {{ size(attachTotal()) }} of 20 MB</li>
+              </ul>
+            }
+
+            @if (signaturePreview(); as sig) {
+              <div class="mc-sig">
+                <iframe sandbox="" [srcdoc]="sig" title="Signature" scrolling="no"></iframe>
+              </div>
+            }
+            @if (c.quoted) {
+              <details class="mc-quote">
+                <summary>{{ c.mode === 'forward' ? 'Forwarded message' : 'Original message' }} · included below your signature</summary>
+                <pre>{{ c.quoted }}</pre>
+              </details>
+            }
+            @if (dragging()) { <div class="mc-drop" aria-hidden="true">Drop files to attach</div> }
+          </div>
+
+  
+          <footer>
+            <button type="submit" class="mc-send" [disabled]="sending()">
+              @if (!sending()) { <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4 20-7z" /></svg> }
+              {{ sending() ? 'Sending…' : 'Send' }}
+            </button>
+            <p class="mc-hint">From the mailbox above · a copy goes to its Sent folder@if (c.bcc.length) { · Bcc is hidden from other recipients }</p>
+            <button type="button" class="mc-cancel" (click)="closeCompose()" [disabled]="sending()" title="Discard">Discard</button>
+          </footer>
+        </form>
+      } @else if (open(); as m) {
         <header class="mx-read-head">
           <button type="button" class="mx-back" (click)="close()" aria-label="Back to messages">
             <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
@@ -154,6 +271,9 @@
               <button type="button" class="mx-act mx-act--main" (click)="reply(m)">
                 <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 6 6v3" /></svg>Reply
               </button>
+              <button type="button" class="mx-act" (click)="reply(m, true)">
+                <svg viewBox="0 0 24 24"><path d="M7 14 2 9l5-5" /><path d="M12 14 7 9l5-5" /><path d="M7 9h8a6 6 0 0 1 6 6v3" /></svg>Reply all
+              </button>
               <button type="button" class="mx-act" (click)="forward(m)">
                 <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /><path d="M20 9H10a6 6 0 0 0-6 6v3" /></svg>Forward
               </button>
@@ -161,6 +281,11 @@
             @if (m.folder === 'Inbox') {
               <button type="button" class="mx-act" (click)="markUnread(m)" title="Mark as unread">
                 <svg viewBox="0 0 24 24"><path d="M4 6h11M4 6v12h16v-7" /><path d="m4 7 8 6 4-3" /><circle cx="19" cy="6" r="2.6" /></svg>Mark as unread
+              </button>
+            }
+            @if (senders().length) {
+              <button type="button" class="mx-act mx-act--delete" (click)="deleteMessage(m)" title="Delete (moves to Trash)">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6M14 11v6" /><path d="M5 7l1 13h12l1-13" /><path d="M9 7V4h6v3" /></svg>Delete
               </button>
             }
             @if (m.bodyHtml) {
@@ -189,60 +314,18 @@
     </section>
   </div>
 
-  @if (compose(); as c) {
-    <div class="mail-overlay mail-overlay--top" (click)="closeCompose()">
-      <form class="mail-compose" (click)="$event.stopPropagation()" (submit)="$event.preventDefault(); send()" role="dialog"
-        [attr.aria-label]="c.mode === 'reply' ? 'Reply' : c.mode === 'forward' ? 'Forward' : 'New mail'">
-        <header>
-          <h2>{{ c.mode === 'reply' ? 'Reply' : c.mode === 'forward' ? 'Forward' : 'New mail' }}</h2>
-          <button type="button" class="mail-close" (click)="closeCompose()" aria-label="Close">×</button>
-        </header>
-
-        <label class="mc-row">
-          <span>From</span>
-          <select [ngModel]="c.account" [ngModelOptions]="{ standalone: true }" (ngModelChange)="changeAccount($event)">
-            @for (a of senders(); track a.key) { <option [value]="a.key">{{ a.address }}</option> }
-          </select>
-        </label>
-        <label class="mc-row">
-          <span>To</span>
-          <input type="text" autocomplete="off" placeholder="name@example.com, another@example.com" [ngModel]="c.to"
-            [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('to', $event)" />
-          @if (!showCc() && !c.cc) { <button type="button" class="mc-cc" (click)="showCc.set(true)">Cc</button> }
-        </label>
-        @if (showCc() || c.cc) {
-          <label class="mc-row">
-            <span>Cc</span>
-            <input type="text" autocomplete="off" [ngModel]="c.cc" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('cc', $event)" />
-          </label>
-        }
-        <label class="mc-row">
-          <span>Subject</span>
-          <input type="text" maxlength="300" [ngModel]="c.subject" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('subject', $event)" />
-        </label>
-        <div class="mc-scroll">
-          <textarea class="mc-body" rows="9" [ngModel]="c.body" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setField('body', $event)"
-            aria-label="Message" placeholder="Write your message…"></textarea>
-          @if (signaturePreview(); as sig) {
-            <div class="mc-sig">
-              <iframe sandbox="" [srcdoc]="sig" title="Signature" scrolling="no"></iframe>
-            </div>
-          }
-          @if (c.quoted) {
-            <details class="mc-quote">
-              <summary>{{ c.mode === 'forward' ? 'Forwarded message' : 'Original message' }} · included below your signature</summary>
-              <pre>{{ c.quoted }}</pre>
-            </details>
-          }
+  @if (confirmDelete(); as m) {
+    <div class="mx-confirm-back" (click)="confirmDelete.set(null)">
+      <div class="mx-confirm" role="alertdialog" aria-modal="true" aria-labelledby="mx-confirm-h" (click)="$event.stopPropagation()" (keydown.escape)="confirmDelete.set(null)">
+        <span class="mx-confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6M14 11v6" /><path d="M5 7l1 13h12l1-13" /><path d="M9 7V4h6v3" /></svg></span>
+        <h3 id="mx-confirm-h">Delete this message?</h3>
+        <p class="mx-confirm-subject">{{ m.subject || '(no subject)' }}</p>
+        <p class="mx-confirm-note">It moves to the <b>Trash</b> of {{ m.accountAddress }}. You can still restore it from webmail.</p>
+        <div class="mx-confirm-btns">
+          <button type="button" class="mx-confirm-cancel" (click)="confirmDelete.set(null)">Keep it</button>
+          <button type="button" class="mx-confirm-ok" (click)="doDelete()" #delOk>Delete</button>
         </div>
-
-        @if (sendError()) { <p class="mc-error">{{ sendError() }}</p> }
-        <footer>
-          <p class="mc-hint">Sent from the company mailbox you choose. A copy is saved in its Sent folder.</p>
-          <button type="button" class="mc-cancel" (click)="closeCompose()" [disabled]="sending()">Cancel</button>
-          <button type="submit" class="mc-send" [disabled]="sending()">{{ sending() ? 'Sending…' : 'Send' }}</button>
-        </footer>
-      </form>
+      </div>
     </div>
   }
 </section>

@@ -115,3 +115,101 @@
   .jc-table { font-size: 0.88rem; }
   .jc-hero-amount strong { font-size: 1.75rem; }
 }
+
+/* ----- payments ----- */
+.jc-pay-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.jc-pay-state { padding: 4px 12px; border-radius: 999px; font-size: 0.74rem; font-weight: 800; background: #fdecec; color: #a40f14; }
+.jc-pay-state[data-state="Paid"] { background: #e4f4ee; color: #0f7a5f; }
+.jc-pay-state[data-state="Part-paid"] { background: #fff1e2; color: #b35c06; }
+.jc-pay-sum { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 14px 0 18px; }
+.jc-pay-sum > div { padding: 12px 14px; border-radius: 10px; background: var(--warm); }
+.jc-pay-sum dt { color: #6b7280; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.jc-pay-sum dd { margin: 4px 0 0; color: var(--navy); font-size: 1.1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.jc-pay-sum dd.is-paid { color: #0f7a5f; }
+.jc-pay-sum dd.is-due { color: var(--crimson); }
+.jc-pay-list { margin: 0 0 16px; padding: 0; list-style: none; border-top: 1px solid var(--hair); }
+.jc-pay-list li { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.jc-pay-method { flex: none; min-width: 64px; padding: 4px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 800; text-align: center; background: #e4f4ee; color: #0f7a5f; }
+.jc-pay-method[data-method="Online"] { background: #e6f0fa; color: #1f6fb8; }
+.jc-pay-main { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.jc-pay-main strong { color: var(--navy); font-variant-numeric: tabular-nums; }
+.jc-pay-main small { color: #6b7280; }
+.jc-pay-main em { color: #4a5567; font-style: normal; font-size: 0.86rem; }
+.jc-pay-acts { flex: none; display: flex; align-items: center; gap: 8px; }
+.jc-btn--sm { min-height: 36px; padding: 0 16px; font-size: 0.82rem; }
+.jc-pay-del { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: #fdeaea; color: var(--crimson); cursor: pointer; }
+.jc-pay-del svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.jc-pay-form { margin-top: 6px; padding: 18px; border: 1px solid var(--hair); border-radius: 12px; background: #fcfbf8; }
+.jc-pay-methods { display: flex; flex-wrap: wrap; gap: 8px; }
+.jc-pay-methods button, .jc-pay-days button { min-height: 42px; padding: 0 16px; border: 1.5px solid #cfcbc0; border-radius: 999px; background: #fff; color: var(--navy); font: inherit; font-weight: 700; cursor: pointer; }
+.jc-pay-methods button.is-on, .jc-pay-days button.is-on { border-color: var(--navy); background: var(--navy); color: #fff; }
+.jc-pay-days { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.jc-pay-days input { flex: 1; min-width: 150px; }
+.jc-field input[type="file"] { padding: 10px; min-height: 0; }
+.jc-pay-actions { display: flex; gap: 10px; margin-top: 16px; }
+@media (max-width: 640px) {
+  .jc-pay-sum { grid-template-columns: 1fr; }
+  .jc-pay-list li { flex-wrap: wrap; }
+}
+
+/* ===== One type scale with the sidebar =====
+   Body 14–15px like the menu, card titles a modest serif, buttons 42px — nothing shouts louder than the rest. */
+.jc { font-size: 0.92rem; }
+.jc-steps { padding: 14px 18px; margin-bottom: 14px; }
+.jc-step-dot { width: 28px; height: 28px; font-size: 0.82rem; }
+.jc-steps li:not(:last-child)::after { left: 40px; }
+.jc-step-text strong { font-size: 0.88rem; }
+.jc-step-text small { font-size: 0.72rem; }
+.jc-hero { padding: 22px 26px; margin-bottom: 14px; gap: 20px; }
+.jc-hero-eyebrow { margin-bottom: 6px; font-size: 0.66rem; }
+.jc-hero-name { margin-bottom: 14px; font-size: 1.45rem; }
+.jc-hero-meta { gap: 12px 22px; }
+.jc-hero-meta dd { font-size: 0.92rem; }
+.jc-hero-amount { min-width: 200px; padding: 12px 20px; }
+.jc-hero-amount strong { font-size: 1.75rem; }
+.jc-hero-amount small { font-size: 0.8rem; }
+.jc-card { padding: 20px 22px; margin-bottom: 14px; }
+.jc-h { margin-bottom: 6px; font-size: 1.15rem; }
+.jc-note { font-size: 0.86rem; margin-bottom: 10px; }
+.jc-closed .jc-sent { font-size: 0.9rem; gap: 6px; margin: 4px 0 14px; }
+.jc-btn { min-height: 42px; padding: 0 22px; font-size: 0.88rem; }
+.jc-btn--sm { min-height: 34px; padding: 0 14px; font-size: 0.8rem; }
+
+/* Work done: issue on the left, the three figures in equal, centred columns. */
+.jc .jc-table { table-layout: fixed; font-size: 0.9rem; }
+.jc .jc-table th, .jc .jc-table td { text-align: center !important; padding-left: 10px !important; padding-right: 10px !important; }
+.jc .jc-table th { padding-top: 10px !important; padding-bottom: 10px !important; font-size: 0.68rem; letter-spacing: 0.12em; }
+.jc .jc-table th:first-child, .jc .jc-table td:first-child { width: 52%; }
+.jc .jc-table td { padding-top: 11px !important; padding-bottom: 11px !important; vertical-align: middle !important; }
+.jc .jc-table td strong { font-size: 0.9rem; }
+.jc .jc-table small { font-size: 0.76rem; }
+
+/* Payments: same scale */
+.jc-pay-sum { margin: 10px 0 14px; gap: 10px; }
+.jc-pay-sum > div { padding: 10px 12px; }
+.jc-pay-sum dt { font-size: 0.64rem; }
+.jc-pay-sum dd { font-size: 0.98rem; }
+.jc-pay-list li { padding: 10px 0; gap: 12px; }
+.jc-pay-main strong { font-size: 0.92rem; }
+.jc-pay-main small { font-size: 0.78rem; }
+.jc-pay-form { padding: 16px; }
+.jc-pay-methods button, .jc-pay-days button { min-height: 38px; padding: 0 14px; font-size: 0.84rem; }
+.jc-pay-form .jc-field { margin-top: 10px; gap: 5px; }
+.jc-pay-form .jc-label { font-size: 0.66rem; }
+.jc-pay-form .jc-field input, .jc-pay-form .jc-field select { min-height: 40px; font-size: 0.9rem; }
+.jc-pay-actions { margin-top: 14px; }
+
+/* Receipt upload: a proper button instead of the browser's plain one. */
+.jc-file { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.jc-file input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.jc-file-btn { flex: none; display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border: 1.5px dashed #9fb0cf; border-radius: 10px; background: #f3f6fb; color: var(--navy); font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+.jc-file-btn:hover { border-color: var(--navy); background: #e9eef6; }
+.jc-file input:focus-visible + .jc-file-btn { outline: 2px solid var(--navy); outline-offset: 2px; }
+.jc-file-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.jc-file-name { min-width: 0; overflow: hidden; color: #6b7280; font-size: 0.82rem; text-overflow: ellipsis; white-space: nowrap; }
+
+/* History */
+.jc-history li { padding-bottom: 14px; gap: 14px; }
+.jc-history strong { font-size: 0.88rem; }
+.jc-history strong time { font-size: 0.84rem; }
+.jc-history small { font-size: 0.78rem; }

@@ -1,4 +1,4 @@
-<div class="admin-shell" [class.is-menu-open]="menuOpen()">
+<div class="admin-shell" [class.is-menu-open]="menuOpen()" [class.is-collapsed]="collapsed()">
   <!-- Phones only: dims the page behind the open drawer, and closes it on tap. -->
   @if (menuOpen()) {
     <div class="admin-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
@@ -19,6 +19,14 @@
     </div>
 
     <nav class="admin-nav" aria-label="Admin">
+        @if (auth.isSuperAdmin()) {
+          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-dashboard">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></svg>
+            </span>
+            <span><strong>Dashboard</strong></span>
+          </a>
+        }
         <p class="nav-label">People</p>
         <a routerLink="/admin/staff" routerLinkActive="active" class="nav-staff">
           <span class="nav-icon" aria-hidden="true">
@@ -94,7 +102,7 @@
 
         <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
 
-        <a routerLink="/admin/non-moi-jobs" routerLinkActive="active">
+        <a routerLink="/admin/non-moi-jobs" routerLinkActive #jobsLink="routerLinkActive" [class.active]="jobsLink.isActive && !collectionsLink.isActive">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
@@ -121,6 +129,15 @@
           <span>
             <strong>Non-MOI Inventory</strong>
             <small>Services &amp; prices</small>
+          </span>
+        </a>
+        <a routerLink="/admin/non-moi-jobs/collections" routerLinkActive="active" #collectionsLink="routerLinkActive">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2" /><circle cx="12" cy="12" r="2.6" /><path d="M6 9.5v5M18 9.5v5" /></svg>
+          </span>
+          <span>
+            <strong>Collections</strong>
+            <small>Cash &amp; online received</small>
           </span>
         </a>
 
@@ -258,14 +275,46 @@
          strip — the heavy top bar this replaces was removed because it competed
          with those headers. -->
     <header class="admin-topbar">
+      <!-- Desktop: fold the sidebar down to its icons, or open it again. -->
+      <button type="button" class="admin-collapse-btn" (click)="toggleCollapsed()" [attr.aria-pressed]="collapsed()"
+        [attr.aria-label]="collapsed() ? 'Open sidebar' : 'Collapse sidebar'" [title]="collapsed() ? 'Open sidebar' : 'Collapse sidebar'">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6h8M8 12h8M4 18h8" /></svg>
+      </button>
       <!-- Phones only — on a desktop the sidebar is always there. -->
       <button type="button" class="admin-menu-btn" (click)="menuOpen.set(!menuOpen())"
         [attr.aria-expanded]="menuOpen()" aria-controls="admin-sidebar" aria-label="Open menu">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6h8M8 12h8M4 18h8" /></svg>
         <span>Menu</span>
       </button>
       <img class="admin-topbar-logo" src="/JamaGoLogo-navy.png" alt="Jama Go" width="360" height="108" />
+      <!-- Search screens: type a page name, Enter opens it. Ctrl K (⌘K on Mac) jumps here from anywhere. -->
+      <div class="admin-screen-search" role="combobox" [attr.aria-expanded]="screenOpen()" aria-haspopup="listbox">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        <input type="search" placeholder="Search screens…" aria-label="Search screens" autocomplete="off"
+          [value]="screenQuery()" (input)="screenQuery.set($any($event.target).value); screenActive.set(0); screenOpen.set(true)"
+          (focus)="screenOpen.set(true)" (blur)="closeScreensSoon()" (keydown)="onScreenKey($event)" />
+        <kbd>Ctrl K</kbd>
+        @if (screenOpen()) {
+          <ul class="admin-screen-list" role="listbox">
+            @for (s of screenMatches(); track s.label; let i = $index) {
+              <li role="option" [attr.aria-selected]="i === screenActive()">
+                <button type="button" [class.is-active]="i === screenActive()" (mousedown)="$event.preventDefault()" (click)="goScreen(s)"
+                  (mouseenter)="screenActive.set(i)">
+                  <span>{{ s.label }}</span><small>{{ s.group }}</small>
+                </button>
+              </li>
+            } @empty {
+              <li class="admin-screen-none">No screen called “{{ screenQuery() }}”</li>
+            }
+          </ul>
+        }
+      </div>
+      @if (pageTitle()) { <span class="admin-topbar-title" aria-hidden="true">{{ pageTitle() }}</span> }
+      <span class="admin-topbar-gap"></span>
       <app-approval-bell basePath="/admin/boq" />
+      <a class="admin-topbar-me" routerLink="/admin/profile" [title]="auth.currentUser()?.fullName || 'My profile'" aria-label="My profile">
+        <app-avatar [userId]="auth.currentUser()?.id" [name]="auth.currentUser()?.fullName ?? ''" [version]="auth.currentUser()?.photoVersion" [size]="40" />
+      </a>
     </header>
 
     <div class="admin-content">

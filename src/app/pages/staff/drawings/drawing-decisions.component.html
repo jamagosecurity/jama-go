@@ -59,7 +59,7 @@
             @for (drawing of result()!.items; track drawing.id) {
               <tr>
                 <td data-label="Drawing">
-                  <a class="boq-number" [routerLink]="[basePath, drawing.id]">{{ drawing.drawingNumber }}</a>
+                  <a class="boq-number" [routerLink]="[basePath, drawing.id]" [title]="drawing.drawingNumber" [attr.aria-label]="drawing.drawingNumber">{{ drawing.drawingNumber.slice(drawing.drawingNumber.indexOf('-') + 1) }}</a>
                   <span class="boq-projectcell"><small>{{ drawing.projectName }}</small></span>
                 </td>
                 <td data-label="Client">

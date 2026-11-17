@@ -51,7 +51,7 @@
             <div><dt>Phone</dt><dd>{{ j.customerNumber }}</dd></div>
             <div><dt>Location</dt><dd>{{ j.location }}</dd></div>
             <div><dt>Technician</dt><dd>{{ j.assignedToName }}</dd></div>
-            <div><dt>Issued by</dt><dd>{{ person(j.assignedByName) || '—' }}</dd></div>
+            @if (person(j.assignedByName)) { <div><dt>Issued by</dt><dd>{{ person(j.assignedByName) }}</dd></div> }
             <div><dt>Work finished</dt><dd>{{ j.completedAt | date: 'd MMM y, HH:mm' }}</dd></div>
           </dl>
         </div>
@@ -180,6 +180,112 @@
               </div>
             }
           </div>
+        </section>
+      }
+
+      @if (showPayments()) {
+        <section class="jc-card jc-pay" aria-labelledby="jc-pay-h">
+          <div class="jc-pay-head">
+            <h2 class="jc-h" id="jc-pay-h">Payments</h2>
+            <span class="jc-pay-state" [attr.data-state]="payState()">{{ payState() }}</span>
+          </div>
+          <dl class="jc-pay-sum">
+            <div><dt>Bill</dt><dd>{{ billed() | number: '1.2-2' }} QAR</dd></div>
+            <div><dt>Received</dt><dd class="is-paid">{{ paid() | number: '1.2-2' }} QAR</dd></div>
+            <div><dt>Balance</dt><dd [class.is-due]="balance() > 0">{{ balance() | number: '1.2-2' }} QAR</dd></div>
+          </dl>
+
+          @if (j.payments.length) {
+            <ul class="jc-pay-list">
+              @for (p of j.payments; track p.id) {
+                <li>
+                  <span class="jc-pay-method" [attr.data-method]="p.method">{{ p.method === 'Cash' ? 'Cash' : 'Online' }}</span>
+                  <div class="jc-pay-main">
+                    <strong>{{ p.amount | number: '1.2-2' }} QAR</strong>
+                    <small>
+                      {{ p.receivedOn | date: 'EEE d MMM y' }}
+                      @if (p.method === 'Cash') { · {{ p.collectedByName ? 'collected by ' + p.collectedByName : 'received at the office' }} }
+                      · recorded by {{ person(p.recordedByName) }}
+                    </small>
+                    @if (p.note) { <em>{{ p.note }}</em> }
+                  </div>
+                  <div class="jc-pay-acts">
+                    @if (p.hasReceipt) {
+                      <button type="button" class="jc-btn jc-btn--ghost jc-btn--sm" (click)="openReceipt(p)">View receipt</button>
+                    }
+                    @if (isSuper) {
+                      <button type="button" class="jc-pay-del" [disabled]="payDeleting() === p.id" (click)="deletePayment(p)"
+                        title="Remove payment (super admin)" aria-label="Remove payment">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 13h12l1-13"/><path d="M9 7V4h6v3"/></svg>
+                      </button>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="jc-note">No payment recorded yet.</p>
+          }
+
+          @if (canPay() && !payOpen()) {
+            <button type="button" class="jc-btn jc-btn--main" (click)="openPay()">+ Add payment</button>
+          }
+
+          @if (payOpen()) {
+            <div class="jc-pay-form">
+              <div class="jc-pay-methods" role="radiogroup" aria-label="How was it paid?">
+                <button type="button" role="radio" [attr.aria-checked]="payMethod() === 'Cash'" [class.is-on]="payMethod() === 'Cash'"
+                  (click)="payMethod.set('Cash'); payError.set('')">💵 Cash</button>
+                <button type="button" role="radio" [attr.aria-checked]="payMethod() === 'Online'" [class.is-on]="payMethod() === 'Online'"
+                  (click)="payMethod.set('Online'); payError.set('')">🏦 Online (bank transfer)</button>
+              </div>
+              <div class="jc-row">
+                <label class="jc-field">
+                  <span class="jc-label">Amount (QAR)</span>
+                  <input type="text" inputmode="decimal" [ngModel]="payAmount()" (ngModelChange)="payAmount.set($event); payError.set('')" />
+                </label>
+                <div class="jc-field">
+                  <span class="jc-label">Date received</span>
+                  <div class="jc-pay-days">
+                    <button type="button" [class.is-on]="payDate() === today" (click)="payDate.set(today)">Today</button>
+                    <button type="button" [class.is-on]="payDate() === yesterday" (click)="payDate.set(yesterday)">Yesterday</button>
+                    <input type="date" [max]="today" [ngModel]="payDate()" (ngModelChange)="payDate.set($event); payError.set('')" aria-label="Other date" />
+                  </div>
+                </div>
+              </div>
+              <div class="jc-row">
+                @if (payMethod() === 'Cash') {
+                  <label class="jc-field">
+                    <span class="jc-label">Collected by</span>
+                    <select [ngModel]="payCollector()" (ngModelChange)="payCollector.set($event)">
+                      @for (t of technicians(); track t.adminUserId) { <option [value]="t.adminUserId">{{ t.fullName }}</option> }
+                      <option value="">Office (paid at the office)</option>
+                    </select>
+                  </label>
+                }
+                <div class="jc-field">
+                  <span class="jc-label">Receipt {{ payMethod() === 'Online' ? '(required)' : '(optional)' }} <small>photo or PDF, up to 10 MB</small></span>
+                  <span class="jc-file">
+                    <input type="file" id="jc-receipt" accept="image/*,.heic,application/pdf" (change)="onReceipt($event)" />
+                    <label for="jc-receipt" class="jc-file-btn">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+                      {{ payReceipt() ? 'Change file' : 'Upload receipt' }}
+                    </label>
+                    <span class="jc-file-name">{{ payReceipt()?.name || 'No file yet' }}</span>
+                  </span>
+                </div>
+              </div>
+              <label class="jc-field">
+                <span class="jc-label">Note <small>(optional)</small></span>
+                <input type="text" maxlength="500" placeholder="e.g. bank reference, part payment…" [ngModel]="payNote()" (ngModelChange)="payNote.set($event)" />
+              </label>
+              @if (payError()) { <p class="jc-error" role="alert">{{ payError() }}</p> }
+              <div class="jc-pay-actions">
+                <button type="button" class="jc-btn jc-btn--main" [disabled]="paySaving()" (click)="savePayment()">{{ paySaving() ? 'Saving…' : 'Save payment' }}</button>
+                <button type="button" class="jc-btn jc-btn--ghost" [disabled]="paySaving()" (click)="payOpen.set(false)">Cancel</button>
+              </div>
+            </div>
+          }
         </section>
       }
 

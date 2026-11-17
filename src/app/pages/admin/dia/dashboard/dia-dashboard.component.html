@@ -1,16 +1,8 @@
 <section class="admin-page dia-page">
   <header class="page-banner">
-    <span class="page-banner-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 12l2 2 4-4M9 18h6" /></svg>
-    </span>
     <div class="page-banner-text">
-      <p class="page-banner-eyebrow">DIA operations</p>
       <h1>Inspection dashboard</h1>
-      @if (state.dashboard(); as totals) {
-        <p class="page-banner-sub"><strong>{{ totals.total }}</strong> DIA {{ totals.total === 1 ? 'record' : 'records' }} · {{ totals.active }} active</p>
-      } @else {
-        <p class="page-banner-sub">Track active schedules and quarterly inspection progress.</p>
-      }
+      <p class="page-banner-sub">Quarterly DIA inspections — four per site each year</p>
     </div>
     <div class="page-banner-actions">
       <a class="banner-ghost" routerLink="list">View all inspections</a>
@@ -22,41 +14,102 @@
     <app-dia-skeleton />
   } @else if (state.dashboardError()) {
     <div class="admin-panel">
-      <app-dia-empty-state
-        title="Dashboard unavailable"
-        [message]="state.dashboardError()"
-        actionLabel="Try again"
-        (action)="state.loadDashboard()"
-      />
+      <app-dia-empty-state title="Dashboard unavailable" [message]="state.dashboardError()" actionLabel="Try again" (action)="state.loadDashboard()" />
     </div>
-  } @else if (state.dashboard(); as dashboard) {
-    <!-- Each count is a shortcut into the list, filtered to that status. -->
-    <div class="admin-panel dia-status-panel">
-      <div class="dia-pill-row" aria-label="Records by state">
-        <a class="dia-pill" routerLink="list"><i class="dia-dot dia-dot--all"></i>Total <b>{{ dashboard.total }}</b></a>
-        <a class="dia-pill" routerLink="list"><i class="dia-dot dia-dot--active"></i>Active <b>{{ dashboard.active }}</b></a>
-        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Inactive' }"><i class="dia-dot dia-dot--inactive"></i>Inactive <b>{{ dashboard.inactive }}</b></a>
-      </div>
-
-      <p class="dia-progress-title">Inspection progress <small>by quarter reached</small></p>
-      <div class="dia-pill-row">
-        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Quarter1' }"><i class="dia-dot dia-dot--q1"></i>Quarter 1 <small>25%</small><b>{{ dashboard.quarter1 }}</b></a>
-        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Quarter2' }"><i class="dia-dot dia-dot--q2"></i>Quarter 2 <small>50%</small><b>{{ dashboard.quarter2 }}</b></a>
-        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Quarter3' }"><i class="dia-dot dia-dot--q3"></i>Quarter 3 <small>75%</small><b>{{ dashboard.quarter3 }}</b></a>
-        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Quarter4' }"><i class="dia-dot dia-dot--q4"></i>Quarter 4 <small>100%</small><b>{{ dashboard.quarter4 }}</b></a>
-        <a class="dia-pill" routerLink="list" [queryParams]="{ status: 'Completed' }"><i class="dia-dot dia-dot--done"></i>Completed <b>{{ dashboard.completed }}</b></a>
-      </div>
-
-      @let stages = dashboard.quarter1 + dashboard.quarter2 + dashboard.quarter3 + dashboard.quarter4 + dashboard.completed;
-      @if (stages > 0) {
-        <div class="dia-stack" role="img" aria-label="Share of inspections at each stage">
-          <span class="dia-dot--q1" [style.flex-grow]="dashboard.quarter1"></span>
-          <span class="dia-dot--q2" [style.flex-grow]="dashboard.quarter2"></span>
-          <span class="dia-dot--q3" [style.flex-grow]="dashboard.quarter3"></span>
-          <span class="dia-dot--q4" [style.flex-grow]="dashboard.quarter4"></span>
-          <span class="dia-dot--done" [style.flex-grow]="dashboard.completed"></span>
-        </div>
-      }
+  } @else if (state.dashboard(); as d) {
+    <!-- Big numbers: each opens the list filtered to it. -->
+    <div class="dd-kpis">
+      <a class="dd-kpi dd-kpi--main" routerLink="list">
+        <span class="dd-k">DIA records</span>
+        <strong>{{ d.total }}</strong>
+        <span class="dd-s">{{ d.active }} active · {{ d.inactive }} not started</span>
+        <span class="dd-meter" aria-hidden="true"><i [style.width.%]="activeShare()"></i></span>
+      </a>
+      <a class="dd-kpi" routerLink="list">
+        <span class="dd-k"><i class="dd-dot dd-dot--active"></i>Active</span>
+        <strong class="is-green">{{ d.active }}</strong>
+        <span class="dd-s">Inspections running this year</span>
+      </a>
+      <a class="dd-kpi" routerLink="list" [queryParams]="{ status: 'Inactive' }">
+        <span class="dd-k"><i class="dd-dot dd-dot--inactive"></i>Inactive</span>
+        <strong>{{ d.inactive }}</strong>
+        <span class="dd-s">Created, not activated yet</span>
+      </a>
+      <a class="dd-kpi" routerLink="list" [queryParams]="{ status: 'Completed' }">
+        <span class="dd-k"><i class="dd-dot dd-dot--done"></i>Completed</span>
+        <strong class="is-navy">{{ d.completed }}</strong>
+        <span class="dd-s">All four inspections done</span>
+      </a>
     </div>
+
+    @if (d.total === 0) {
+      <div class="admin-panel dd-empty">
+        <span class="dd-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 12l2 2 4-4M9 18h6" /></svg></span>
+        <h2>No DIA records yet</h2>
+        <p>Create the first DIA. Once it is activated, its four quarterly inspections are scheduled and tracked here.</p>
+        <a class="banner-gold" routerLink="new">Create DIA</a>
+      </div>
+    } @else {
+      <div class="dd-grid">
+        <!-- Where the year's inspections stand -->
+        <section class="dd-card">
+          <header class="dd-card-h">
+            <h2>Inspection progress</h2>
+            <span class="dd-pill">{{ d.active }} active</span>
+          </header>
+          <div class="dd-stack" role="img" aria-label="Share of DIA records at each stage">
+            @for (s of stages(); track s.key) {
+              @if (s.count) { <span [attr.data-tone]="s.tone" [style.flex-grow]="s.count"></span> }
+            }
+          </div>
+          <ul class="dd-stages">
+            @for (s of stages(); track s.key) {
+              <li>
+                <a [routerLink]="'list'" [queryParams]="{ status: s.key }">
+                  <span class="dd-stage-dot" [attr.data-tone]="s.tone"></span>
+                  <span class="dd-stage-text"><strong>{{ s.label }}</strong><small>{{ s.sub }}</small></span>
+                  <span class="dd-stage-bar"><i [attr.data-tone]="s.tone" [style.width.%]="s.share"></i></span>
+                  <b>{{ s.count }}</b>
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <!-- Which sites are due next -->
+        <section class="dd-card">
+          <header class="dd-card-h">
+            <h2>Next inspections</h2>
+            <a class="dd-link" routerLink="list">View all</a>
+          </header>
+          @if (upcomingLoading()) {
+            <p class="dd-muted">Loading…</p>
+          } @else if (!upcoming().length) {
+            <p class="dd-muted">No inspection is scheduled. Activate a DIA to start its quarterly schedule.</p>
+          } @else {
+            <ul class="dd-due">
+              @for (x of upcoming(); track x.id) {
+                <li>
+                  <a [routerLink]="[x.id]">
+                    <span class="dd-due-date">
+                      <b>{{ x.nextInspectionDate | date: 'd' }}</b><small>{{ x.nextInspectionDate | date: 'MMM' }}</small>
+                    </span>
+                    <span class="dd-due-main">
+                      <strong>{{ x.clientName }}</strong>
+                      <small>{{ x.diaNumber }} · {{ x.clientLocation }}</small>
+                      <span class="dd-due-progress" aria-hidden="true"><i [attr.data-tone]="'q' + (x.currentQuarter ?? 1)" [style.width.%]="x.progressPercent"></i></span>
+                    </span>
+                    <span class="dd-due-side">
+                      <span class="dd-chip" [attr.data-tone]="dueTone(x.remainingDays)">{{ dueLabel(x.remainingDays) }}</span>
+                      <small><i class="dd-qdot" [attr.data-tone]="'q' + (x.currentQuarter ?? 1)"></i>Quarter {{ x.currentQuarter ?? '—' }} · {{ x.progressPercent }}%</small>
+                    </span>
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+    }
   }
 </section>

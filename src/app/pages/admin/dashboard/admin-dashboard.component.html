@@ -1,0 +1,182 @@
+<section class="db">
+  <header class="db-top">
+    <div class="db-title">
+      <span class="db-title-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></svg>
+      </span>
+      <div>
+        <h1>Dashboard</h1>
+        @if (data(); as d) {
+          <p>{{ d.now | date: 'EEEE d MMMM · h:mm a' : '+0300' }} · Doha</p>
+        } @else {
+          <p>Today at a glance</p>
+        }
+      </div>
+    </div>
+    <button type="button" class="db-refresh" [class.is-spinning]="refreshing()" (click)="load()" aria-label="Refresh" title="Refresh">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" /></svg>
+    </button>
+  </header>
+
+  @if (error()) { <p class="db-error" role="alert">{{ error() }}</p> }
+
+  @if (loading()) {
+    <div class="db-loading"><span class="db-spin" aria-hidden="true"></span>Loading dashboard…</div>
+  } @else if (data(); as d) {
+    <!-- Big numbers -->
+    <div class="db-kpis">
+      <a class="db-kpi db-kpi--rev" routerLink="/admin/non-moi-jobs/collections">
+        <span class="db-kpi-k">Received · {{ d.now | date: 'MMMM' : '+0300' }}</span>
+        <strong>QAR {{ d.revenueThisMonth | number: '1.0-0' }}</strong>
+        <span class="db-kpi-s">
+          @if (change(); as c) {
+            <b [class.up]="c >= 0" [class.down]="c < 0">{{ c >= 0 ? '▲' : '▼' }} {{ c >= 0 ? c : -c }}%</b> vs last month ·
+          }
+          Cash {{ d.cashThisMonth | number: '1.0-0' }} · Online {{ d.onlineThisMonth | number: '1.0-0' }}
+        </span>
+        @if (d.quotationsApprovedCount > 0) {
+          <span class="db-kpi-x">Quotations approved: QAR {{ d.quotationsApprovedThisMonth | number: '1.0-0' }} ({{ d.quotationsApprovedCount }})</span>
+        }
+      </a>
+      <a class="db-kpi" routerLink="/admin/non-moi-jobs">
+        <span class="db-kpi-k">Open invoices</span>
+        <strong>{{ d.openInvoices.length }}</strong>
+        <span class="db-kpi-s">QAR {{ d.openInvoicesTotal | number: '1.0-0' }} waiting on clients</span>
+      </a>
+      <a class="db-kpi" routerLink="/admin/mail">
+        <span class="db-kpi-k">Unread mail</span>
+        <strong>{{ d.unreadMail }}</strong>
+        <span class="db-kpi-s">
+          @if (topMailbox(); as t) { Most in {{ t.address }} ({{ t.unread }}) } @else { All caught up }
+        </span>
+      </a>
+      <a class="db-kpi" [class.is-hot]="d.approvals.total > 0" routerLink="/admin/boq">
+        <span class="db-kpi-k">Waiting for you</span>
+        <strong>{{ d.approvals.total }}</strong>
+        <span class="db-kpi-s">{{ d.approvals.total === 0 ? 'Nothing to approve' : 'Approvals & jobs to close' }}</span>
+      </a>
+    </div>
+
+    <div class="db-grid">
+      <!-- Today's jobs -->
+      <section class="db-card">
+        <header class="db-card-h">
+          <h2>Today's jobs</h2>
+          <span class="db-pill">{{ doneToday() }} / {{ d.todayJobs.length }} done</span>
+        </header>
+        @if (d.overdueJobs > 0) {
+          <a class="db-warn" routerLink="/admin/non-moi-jobs">{{ d.overdueJobs }} {{ d.overdueJobs === 1 ? 'job is' : 'jobs are' }} past the visit date and still not done</a>
+        }
+        @if (d.todayJobs.length === 0) {
+          <p class="db-empty">No visits scheduled for today.</p>
+        } @else {
+          <ul class="db-list">
+            @for (j of d.todayJobs; track j.id) {
+              <li>
+                <a class="db-job" [routerLink]="jobLink(j)">
+                  <span class="db-time">{{ j.scheduledAt ? (j.scheduledAt | date: 'h:mm a' : '+0300') : '—' }}</span>
+                  <span class="db-main">
+                    <strong>{{ j.customerName }}</strong>
+                    <small>{{ j.jobNumber }} · {{ j.location }}</small>
+                  </span>
+                  <span class="db-side">
+                    <span class="db-chip" [attr.data-tone]="jobTone(j.status)">{{ jobStatus(j) }}</span>
+                    <small>{{ j.technicianName }}</small>
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <!-- Technicians -->
+      <section class="db-card">
+        <header class="db-card-h">
+          <h2>Technicians</h2>
+          <span class="db-pill">{{ d.technicians.length }}</span>
+        </header>
+        @if (d.technicians.length === 0) {
+          <p class="db-empty">No technicians yet.</p>
+        } @else {
+          <ul class="db-list">
+            @for (t of d.technicians; track t.id) {
+              <li class="db-tech">
+                <span class="db-ava" [attr.data-tone]="techTone(t)">{{ initials(t.name) }}</span>
+                <span class="db-main">
+                  <strong>{{ t.name }}</strong>
+                  <small>
+                    @if (t.jobNumber) {
+                      {{ t.jobNumber }} · {{ t.location }}@if (t.at) { · {{ t.at | date: (t.state === 'Overdue' ? 'd MMM' : 'h:mm a') : '+0300' }} }
+                    } @else { No open job }
+                  </small>
+                </span>
+                <span class="db-side">
+                  <span class="db-chip" [attr.data-tone]="techTone(t)">{{ t.state }}</span>
+                  <small>{{ t.doneToday }} / {{ t.jobsToday }} today</small>
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <!-- Open invoices -->
+      <section class="db-card">
+        <header class="db-card-h">
+          <h2>Open invoices</h2>
+          <span class="db-pill">QAR {{ d.openInvoicesTotal | number: '1.0-0' }}</span>
+        </header>
+        @if (d.openInvoices.length === 0) {
+          <p class="db-empty">No invoices waiting on clients.</p>
+        } @else {
+          <ul class="db-list">
+            @for (i of d.openInvoices; track i.id) {
+              <li>
+                <a class="db-job" [routerLink]="['/admin/non-moi-jobs', i.id, 'close']">
+                  <span class="db-main">
+                    <strong>{{ i.customerName }}</strong>
+                    <small>{{ i.jobNumber }}@if (i.sentAt) { · sent {{ i.sentAt | date: 'd MMM' : '+0300' }} }</small>
+                    @if (i.status === 'ChangesRequested' && i.clientMessage) { <em>“{{ i.clientMessage }}”</em> }
+                  </span>
+                  <span class="db-side">
+                    <b class="db-amt">QAR {{ i.amountPayable | number: '1.2-2' }}</b>
+                    <span class="db-chip" [attr.data-tone]="i.status === 'Sent' ? 'blue' : 'red'">{{ i.status === 'Sent' ? 'Waiting' : 'Change asked' }}</span>
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <!-- Approvals + mail -->
+      <section class="db-card">
+        <header class="db-card-h">
+          <h2>Waiting for you</h2>
+          <span class="db-pill">{{ d.approvals.total }}</span>
+        </header>
+        <ul class="db-list db-appr">
+          <li><a routerLink="/admin/boq"><span>Quotations to approve</span><b [class.on]="d.approvals.quotations > 0">{{ d.approvals.quotations }}</b></a></li>
+          <li><a routerLink="/admin/drawings"><span>Drawings to approve</span><b [class.on]="d.approvals.drawings > 0">{{ d.approvals.drawings }}</b></a></li>
+          <li><a routerLink="/admin/client-registrations"><span>Client registrations</span><b [class.on]="d.approvals.clientRegistrations > 0">{{ d.approvals.clientRegistrations }}</b></a></li>
+          <li><a routerLink="/admin/non-moi-jobs"><span>Finished jobs to bill</span><b [class.on]="d.approvals.jobsToClose > 0">{{ d.approvals.jobsToClose }}</b></a></li>
+        </ul>
+
+        <header class="db-card-h db-card-h--sub">
+          <h2>Unread mail</h2>
+          <span class="db-pill">{{ d.unreadMail }}</span>
+        </header>
+        @if (d.mailboxes.length === 0) {
+          <p class="db-empty">All mail read.</p>
+        } @else {
+          <ul class="db-list db-appr">
+            @for (m of d.mailboxes; track m.key) {
+              <li><a routerLink="/admin/mail"><span>{{ m.address }}</span><b class="on blue">{{ m.unread }}</b></a></li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  }
+</section>

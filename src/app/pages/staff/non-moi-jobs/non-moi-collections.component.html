@@ -1,0 +1,95 @@
+<section class="admin-page">
+  <header class="page-banner">
+    <div class="page-banner-text">
+      <h1>Collections</h1>
+      <p class="page-banner-sub">Money received for Non-MOI jobs — cash and online</p>
+    </div>
+    <div class="page-banner-actions">
+      <a class="banner-ghost" [routerLink]="base">Back to jobs</a>
+    </div>
+  </header>
+
+  <div class="col-filters">
+    <div class="col-presets" role="group" aria-label="Period">
+      <button type="button" [class.is-on]="preset() === 'today'" (click)="pick('today')">Today</button>
+      <button type="button" [class.is-on]="preset() === 'yesterday'" (click)="pick('yesterday')">Yesterday</button>
+      <button type="button" [class.is-on]="preset() === 'week'" (click)="pick('week')">Last 7 days</button>
+      <button type="button" [class.is-on]="preset() === 'month'" (click)="pick('month')">This month</button>
+    </div>
+    <label class="col-date"><span>From</span>
+      <input type="date" [max]="today" [ngModel]="from()" (ngModelChange)="setRange($event, to())" />
+    </label>
+    <label class="col-date"><span>To</span>
+      <input type="date" [max]="today" [ngModel]="to()" (ngModelChange)="setRange(from(), $event)" />
+    </label>
+    <div class="col-presets" role="group" aria-label="Payment method">
+      <button type="button" [class.is-on]="method() === ''" (click)="method.set('')">All</button>
+      <button type="button" [class.is-on]="method() === 'Cash'" (click)="method.set('Cash')">Cash</button>
+      <button type="button" [class.is-on]="method() === 'Online'" (click)="method.set('Online')">Online</button>
+    </div>
+  </div>
+
+  @if (error()) { <p class="admin-error" role="alert">{{ error() }}</p> }
+
+  @if (data(); as d) {
+    <div class="col-kpis">
+      <div class="col-kpi col-kpi--total"><span>Total received</span><strong>{{ d.total | number: '1.2-2' }} QAR</strong>
+        <small>{{ d.rows.length }} {{ d.rows.length === 1 ? 'payment' : 'payments' }} · {{ d.from === d.to ? (d.from | date: 'EEE d MMM y') : (d.from | date: 'd MMM') + ' – ' + (d.to | date: 'd MMM y') }}</small></div>
+      <div class="col-kpi col-kpi--cash"><span>Cash</span><strong>{{ d.cash | number: '1.2-2' }} QAR</strong>
+        <small>
+          @for (c of byCollector(); track c.name; let last = $last) { {{ c.name }} {{ c.amount | number: '1.0-0' }}@if (!last) { · } }
+          @empty { No cash }
+        </small></div>
+      <div class="col-kpi col-kpi--online"><span>Online</span><strong>{{ d.online | number: '1.2-2' }} QAR</strong>
+        <small>Bank transfers with receipts</small></div>
+    </div>
+  }
+
+  <div class="admin-panel">
+    @if (loading()) {
+      <p class="col-empty">Loading…</p>
+    } @else if (!rows().length) {
+      <p class="col-empty">No payments in this period.</p>
+    } @else {
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Job</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Method</th>
+              <th scope="col">Collected by</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Recorded by</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of rows(); track r.paymentId) {
+              <tr>
+                <td data-label="Date">{{ r.receivedOn | date: 'd MMM y' }}</td>
+                <td data-label="Number"><a class="col-job" [routerLink]="[base, r.jobId, 'close']">{{ r.jobNumber }}</a></td>
+                <td data-label="Customer">{{ r.customerName }}@if (r.note) { <small class="col-note">{{ r.note }}</small> }</td>
+                <td data-label="Status"><span class="col-method" [attr.data-method]="r.method">{{ r.method }}</span></td>
+                <td data-label="Collected by">{{ r.method === 'Cash' ? (r.collectedByName || 'Office') : '—' }}</td>
+                <td data-label="Amount" class="col-amt">{{ r.amount | number: '1.2-2' }} QAR</td>
+                <td data-label="Recorded by">{{ person(r.recordedByName) }}<small class="col-note">{{ r.recordedAt | date: 'd MMM, h:mm a' : '+0300' }}</small></td>
+                <td data-label="Actions" class="col-actions">
+                  <a class="row-btn act act--view" [routerLink]="[base, r.jobId, 'close']" title="Open job">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="act-label">Open job</span>
+                  </a>
+                  @if (r.hasReceipt) {
+                    <button type="button" class="row-btn act" title="View receipt" (click)="openReceipt(r)">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="act-label">View receipt</span>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>

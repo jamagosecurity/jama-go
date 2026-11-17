@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import {
   adminGuard,
+  superAdminGuard,
   anyPermissionGuard,
   clientGuard,
   guestGuard,
@@ -117,6 +118,13 @@ export const routes: Routes = [
           import('./pages/admin/layout/admin-layout.component').then((m) => m.AdminLayoutComponent),
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'staff' },
+          {
+            path: 'dashboard',
+            canActivate: [superAdminGuard],
+            title: 'Dashboard — Jama Go Admin',
+            loadComponent: () =>
+              import('./pages/admin/dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
+          },
           {
             path: 'dia',
             loadChildren: () =>

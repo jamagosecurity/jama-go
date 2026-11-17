@@ -13,7 +13,7 @@
     </div>
   </header>
 
-  <div class="admin-panel">
+  <div class="df-wrap">
     @if (loading()) {
       <app-dia-skeleton />
     } @else if (loadError()) {
@@ -24,99 +24,94 @@
         (action)="retry()"
       />
     } @else {
-      <form class="dia-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-        @if (saveError()) {
-          <div class="admin-error" role="alert">{{ saveError() }}</div>
-        }
+      <form class="df" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="df-main">
+          @if (saveError()) { <div class="admin-error" role="alert">{{ saveError() }}</div> }
 
-        <mat-form-field appearance="outline">
-          <mat-label>DIA Number</mat-label>
-          <input matInput formControlName="diaNumber" autocomplete="off" maxlength="100" />
-          @if (hasError('diaNumber')) { <mat-error>DIA Number is required.</mat-error> }
-        </mat-form-field>
+          <section class="df-card">
+            <h2 class="df-h"><span class="df-h-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 12l2 2 4-4" /></svg></span>DIA &amp; client</h2>
+            <div class="df-grid">
+              <label class="df-field">
+                <span>DIA number <i aria-hidden="true">*</i></span>
+                <input formControlName="diaNumber" autocomplete="off" maxlength="100" placeholder="e.g. DIA-2026-0142" [class.is-invalid]="hasError('diaNumber')" />
+                @if (hasError('diaNumber')) { <small class="df-err">Enter the DIA number.</small> }
+              </label>
+              <label class="df-field">
+                <span>Client number <i aria-hidden="true">*</i></span>
+                <input formControlName="clientNumber" autocomplete="off" maxlength="100" placeholder="e.g. +974 5555 0000" [class.is-invalid]="hasError('clientNumber')" />
+                @if (hasError('clientNumber')) { <small class="df-err">Enter the client number.</small> }
+              </label>
+              <label class="df-field df-field--wide">
+                <span>Client name <i aria-hidden="true">*</i></span>
+                <input formControlName="clientName" autocomplete="organization" maxlength="200" placeholder="Company or person" [class.is-invalid]="hasError('clientName')" />
+                @if (hasError('clientName')) { <small class="df-err">Enter the client name.</small> }
+              </label>
+            </div>
+          </section>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Client Number</mat-label>
-          <input matInput formControlName="clientNumber" autocomplete="off" maxlength="100" />
-          @if (hasError('clientNumber')) { <mat-error>Client Number is required.</mat-error> }
-        </mat-form-field>
+          <section class="df-card">
+            <div class="df-h-row">
+              <h2 class="df-h"><span class="df-h-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><circle cx="12" cy="10" r="2.6" /></svg></span>Site location</h2>
+              <span class="df-pin-state" [class.is-on]="!!previewUrl()">{{ previewUrl() ? '✓ Site pinned' : 'No pin yet' }}</span>
+            </div>
+            <label class="df-field">
+              <span>Address <i aria-hidden="true">*</i></span>
+              <textarea formControlName="clientLocation" rows="2" autocomplete="street-address" maxlength="300"
+                placeholder="Building, street, zone — or paste a Google Maps link" (paste)="pasteLocation($event)" [class.is-invalid]="hasError('clientLocation')"></textarea>
+              @if (hasError('clientLocation')) { <small class="df-err">Enter the site location.</small> }
+            </label>
+            <div class="df-grid df-grid--pin">
+              <label class="df-field">
+                <span>Latitude <em>optional</em></span>
+                <input formControlName="latitude" inputmode="decimal" autocomplete="off" placeholder="25.286106" (paste)="pasteCoordinates($event)" [class.is-invalid]="!!coordinateError('latitude')" />
+                @if (coordinateError('latitude'); as message) { <small class="df-err">{{ message }}</small> }
+              </label>
+              <label class="df-field">
+                <span>Longitude <em>optional</em></span>
+                <input formControlName="longitude" inputmode="decimal" autocomplete="off" placeholder="51.534817" (paste)="pasteCoordinates($event)" [class.is-invalid]="!!coordinateError('longitude')" />
+                @if (coordinateError('longitude'); as message) { <small class="df-err">{{ message }}</small> }
+              </label>
+              <div class="df-pin-acts">
+                @if (canLocate) {
+                  <button type="button" class="df-chip" [disabled]="locating() || saving()" (click)="useCurrentLocation()">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></svg>
+                    {{ locating() ? 'Locating…' : 'Use my location' }}
+                  </button>
+                }
+                @if (previewUrl(); as url) {
+                  <a class="df-chip" [href]="url" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" /><path d="M9 4v14M15 6v14" /></svg>
+                    Preview on map
+                  </a>
+                  <button type="button" class="df-chip df-chip--ghost" (click)="clearPin()">Clear pin</button>
+                }
+              </div>
+            </div>
+            @if (pinError(); as message) { <p class="df-err df-err--block" role="alert">{{ message }}</p> }
+            <p class="df-tip">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></svg>
+              <span>Paste a Google Maps link (even a short phone share link) or “25.286106, 51.534817” into any of these boxes and the pin fills in. A pinned site gives the technician one-tap directions.</span>
+            </p>
+          </section>
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Client Name</mat-label>
-          <input matInput formControlName="clientName" autocomplete="organization" maxlength="200" />
-          @if (hasError('clientName')) { <mat-error>Client Name is required.</mat-error> }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Client Location</mat-label>
-          <textarea matInput formControlName="clientLocation" rows="1" autocomplete="street-address" maxlength="300"
-            (paste)="pasteLocation($event)"></textarea>
-          @if (hasError('clientLocation')) { <mat-error>Client Location is required.</mat-error> }
-        </mat-form-field>
-
-        <!-- The pin turns the address above into a one-tap Navigate button on the technician's card. One form, one set of
-             boxes: the pin boxes simply follow the location. -->
-        <mat-form-field appearance="outline">
-          <mat-label>Latitude (optional)</mat-label>
-          <input
-            matInput
-            formControlName="latitude"
-            inputmode="decimal"
-            autocomplete="off"
-            placeholder="25.286106"
-            (paste)="pasteCoordinates($event)"
-          />
-          @if (coordinateError('latitude'); as message) { <mat-error>{{ message }}</mat-error> }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Longitude (optional)</mat-label>
-          <input
-            matInput
-            formControlName="longitude"
-            inputmode="decimal"
-            autocomplete="off"
-            placeholder="51.534817"
-            (paste)="pasteCoordinates($event)"
-          />
-          @if (coordinateError('longitude'); as message) { <mat-error>{{ message }}</mat-error> }
-        </mat-form-field>
-
-        <div class="dia-pin-actions">
-          @if (canLocate) {
-            <button
-              mat-stroked-button
-              type="button"
-              [disabled]="locating() || saving()"
-              matTooltip="Pin the site to where this device is right now"
-              (click)="useCurrentLocation()"
-            >
-              {{ locating() ? 'Locating…' : 'Use my location' }}
+        <aside class="df-side">
+          <section class="df-card df-next">
+            <h2 class="df-h">What happens next</h2>
+            <ol>
+              <li><b>1</b><span><strong>{{ isEdit ? 'Save the changes' : 'Create the record' }}</strong><small>It starts as Inactive — nothing is scheduled yet.</small></span></li>
+              <li><b>2</b><span><strong>Activate it</strong><small>From the list, when the client is ready. That starts the year.</small></span></li>
+              <li><b>3</b><span><strong>Four quarterly inspections</strong><small>One every 3 months; the technician sees each one when it is due.</small></span></li>
+            </ol>
+          </section>
+          <div class="df-actions">
+            <button type="submit" class="df-save" [disabled]="saving()">
+              @if (saving()) { <mat-spinner diameter="18" /> }
+              {{ saving() ? 'Saving…' : (isEdit ? 'Save changes' : 'Create DIA') }}
             </button>
-          }
-          @if (previewUrl(); as url) {
-            <a mat-button [href]="url" target="_blank" rel="noopener noreferrer">Preview on map</a>
-            <button mat-button type="button" (click)="clearPin()">Clear pin</button>
-          }
-        </div>
-
-        @if (pinError(); as message) {
-          <p class="dia-pin-error" role="alert">{{ message }}</p>
-        }
-
-        <p class="dia-hint">
-          Site pin is optional: paste a Google Maps link (even a short phone share link) or “25.286106, 51.534817” into the
-          location, latitude or longitude box and everything fills in. Pinned sites give the technician turn-by-turn directions
-          instead of an address to retype.
-        </p>
-
-        <div class="dia-form-actions">
-          <a mat-button [routerLink]="[base, 'list']">Cancel</a>
-          <button mat-flat-button type="submit" [disabled]="saving()">
-            @if (saving()) { <mat-spinner diameter="20" /> }
-            {{ saving() ? 'Saving…' : (isEdit ? 'Save changes' : 'Create DIA') }}
-          </button>
-        </div>
+            <a class="df-cancel" [routerLink]="[base, 'list']">Cancel</a>
+          </div>
+        </aside>
       </form>
     }
   </div>

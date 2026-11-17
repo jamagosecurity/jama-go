@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
-import { BillMailbox, NonMoiJob } from '../../../models/non-moi-job.model';
+import { BillMailbox, JobTechnician, NonMoiJob, NonMoiJobPayment } from '../../../models/non-moi-job.model';
 import { maintenanceCategoryLabel } from '../../../models/maintenance.model';
 import { AuthService } from '../../../services/auth.service';
 import { jobStatusLabel } from '../../../utils/non-moi-job-status.util';
@@ -18,6 +18,10 @@ const ADDRESS = /^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/;
  * here, may take a discount off the total (nothing else about the prices can change), and closes the deal — which
  * sends the client the bill by email and locks the job.
  */
+/** Today in Doha as yyyy-MM-dd, or a number of days from it. */
+const dohaToday = (offsetDays = 0): string =>
+  new Date(Date.now() + 3 * 3600_000 + offsetDays * 86_400_000).toISOString().slice(0, 10);
+
 const qar = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 @Component({
@@ -57,9 +61,10 @@ export class NonMoiJobCloseComponent implements OnInit {
     if (!job) return [];
     const billTitle: Record<string, string> = {
       Sent: 'Bill sent', Approved: 'Approved by the client', Rejected: 'Rejected by the client', Commented: 'Client commented',
+      Payment: 'Payment received', PaymentRemoved: 'Payment removed',
     };
     const steps: { kind: string; title: string; detail: string; at: string }[] = [
-      { kind: 'Issued', title: 'Job issued', detail: `By ${this.person(job.assignedByName)} to ${job.assignedToName}`, at: job.createdAt },
+      { kind: 'Issued', title: 'Job issued', detail: this.person(job.assignedByName) ? `By ${this.person(job.assignedByName)} to ${job.assignedToName}` : `Given to ${job.assignedToName}`, at: job.createdAt },
     ];
     if (job.scheduledAt) {
       steps.push({ kind: 'Scheduled', title: 'Visit scheduled for', detail: job.assignedToName, at: job.scheduledAt });
@@ -68,7 +73,9 @@ export class NonMoiJobCloseComponent implements OnInit {
       steps.push({ kind: 'Completed', title: 'Completed by the technician', detail: `${job.assignedToName} · ${qar(job.workTotal)} QAR of work`, at: job.completedAt });
     }
     for (const e of job.events) {
-      const parts = [`Revision ${e.revision}`, `${qar(e.amountPayable)} QAR`, this.person(e.actorName)];
+      const parts = e.action.startsWith('Payment')
+        ? [`Recorded by ${this.person(e.actorName)}`]
+        : [`Revision ${e.revision}`, `${qar(e.amountPayable)} QAR`, this.person(e.actorName)];
       if (e.note) parts.push(e.note);
       steps.push({ kind: e.action, title: billTitle[e.action] ?? e.action, detail: parts.join(' · '), at: e.at });
     }
@@ -136,6 +143,102 @@ export class NonMoiJobCloseComponent implements OnInit {
   });
 
   /** The figure for the summary card: live while the discount is being worked out, fixed once the bill has gone out. */
+  // ===== Payments: cash collected or an online transfer with its receipt =====
+  protected readonly technicians = signal<JobTechnician[]>([]);
+  protected readonly isSuper = this.auth.isSuperAdmin();
+  protected readonly payOpen = signal(false);
+  protected readonly payMethod = signal<'Cash' | 'Online'>('Cash');
+  protected readonly payAmount = signal('');
+  protected readonly payDate = signal(dohaToday());
+  protected readonly payCollector = signal('');
+  protected readonly payNote = signal('');
+  protected readonly payReceipt = signal<File | null>(null);
+  protected readonly paySaving = signal(false);
+  protected readonly payError = signal('');
+  protected readonly payDeleting = signal<string | null>(null);
+  protected readonly today = dohaToday();
+  protected readonly yesterday = dohaToday(-1);
+
+  /** What the client owes: the sent bill, or until then the total less the discount. */
+  protected readonly billed = computed(() => {
+    const j = this.job();
+    if (!j) return 0;
+    return j.status === 'Completed' || j.status === 'Assigned' ? Math.round((j.workTotal - j.discount) * 100) / 100 : j.amountPayable;
+  });
+  protected readonly paid = computed(() => this.job()?.amountPaid ?? 0);
+  protected readonly balance = computed(() => Math.max(0, Math.round((this.billed() - this.paid()) * 100) / 100));
+  protected readonly payState = computed(() => (this.paid() <= 0 ? 'Unpaid' : this.balance() <= 0 ? 'Paid' : 'Part-paid'));
+  protected readonly showPayments = computed(() => !!this.job() && this.job()!.status !== 'Assigned');
+  protected readonly canPay = computed(() => {
+    const j = this.job();
+    return !!j && j.status !== 'Assigned' && this.balance() > 0;
+  });
+
+  protected openPay(): void {
+    const j = this.job();
+    this.payMethod.set('Cash');
+    this.payAmount.set(String(this.balance()));
+    this.payDate.set(this.today);
+    this.payCollector.set(j?.assignedToId ?? '');
+    this.payNote.set('');
+    this.payReceipt.set(null);
+    this.payError.set('');
+    this.payOpen.set(true);
+  }
+
+  protected onReceipt(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    this.payReceipt.set(file);
+    this.payError.set('');
+  }
+
+  protected savePayment(): void {
+    const j = this.job();
+    if (!j || this.paySaving()) return;
+    const amount = Number(this.payAmount().replace(/,/g, ''));
+    if (!Number.isFinite(amount) || amount <= 0) return this.payError.set('Enter the amount received.');
+    if (amount > this.balance()) return this.payError.set(`That is more than the balance (${qar(this.balance())} QAR).`);
+    if (!this.payDate() || this.payDate() > this.today) return this.payError.set('Pick the day the money came in (not a future day).');
+    if (this.payMethod() === 'Online' && !this.payReceipt()) return this.payError.set('Upload the transaction receipt for an online payment.');
+    this.paySaving.set(true);
+    this.payError.set('');
+    this.jobsApi.addPayment(j.id, {
+      method: this.payMethod(), amount, receivedOn: this.payDate(),
+      collectedById: this.payMethod() === 'Cash' ? this.payCollector() || null : null,
+      note: this.payNote().trim() || null, receipt: this.payReceipt(),
+    }).pipe(finalize(() => this.paySaving.set(false))).subscribe({
+      next: () => { this.payOpen.set(false); this.reload(j.id); },
+      error: (err: unknown) => this.payError.set(getApiErrorMessage(err, 'The payment could not be saved.')),
+    });
+  }
+
+  protected deletePayment(p: NonMoiJobPayment): void {
+    const j = this.job();
+    if (!j || !confirm(`Remove this ${p.method.toLowerCase()} payment of ${qar(p.amount)} QAR? It stays in the history.`)) return;
+    this.payDeleting.set(p.id);
+    this.jobsApi.deletePayment(p.id).pipe(finalize(() => this.payDeleting.set(null))).subscribe({
+      next: () => this.reload(j.id),
+      error: (err: unknown) => this.error.set(getApiErrorMessage(err, 'The payment could not be removed.')),
+    });
+  }
+
+  protected openReceipt(p: NonMoiJobPayment): void {
+    // Opened first, filled in after the download: a tab opened later is blocked as a pop-up.
+    const tab = window.open('', '_blank');
+    this.jobsApi.receipt(p.id).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        if (tab) tab.location.href = url; else window.location.href = url;
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      },
+      error: (err: unknown) => { tab?.close(); this.error.set(getApiErrorMessage(err, 'Could not open the receipt.')); },
+    });
+  }
+
+  private reload(id: string): void {
+    this.jobsApi.list().subscribe((jobs) => this.apply(jobs.find((x) => x.id === id) ?? this.job()));
+  }
+
   protected readonly headlineAmount = computed(() => (this.canClose() ? this.payable() : (this.job()?.amountPayable ?? 0)));
 
   ngOnInit(): void {
@@ -144,10 +247,11 @@ export class NonMoiJobCloseComponent implements OnInit {
 
   private load(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    forkJoin({ jobs: this.jobsApi.list(), options: this.jobsApi.sendOptions() })
+    forkJoin({ jobs: this.jobsApi.list(), options: this.jobsApi.sendOptions(), techs: this.jobsApi.technicians() })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: ({ jobs, options }) => {
+        next: ({ jobs, options, techs }) => {
+          this.technicians.set(techs);
           const job = jobs.find((j) => j.id === id) ?? null;
           this.mailboxes.set(options.mailboxes);
           this.whatsAppAvailable.set(options.whatsAppAvailable);

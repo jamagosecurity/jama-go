@@ -1,0 +1,47 @@
+/* Collections: the day's money at a glance — totals on top, every payment below. */
+:host { display: block; }
+.col-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0 0 16px; }
+.col-presets { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px; border-radius: 999px; background: #e9eef6; }
+.col-presets button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: #14305f; font: inherit; font-size: 0.86rem; font-weight: 700; cursor: pointer; }
+.col-presets button.is-on { background: #14305f; color: #fff; }
+.col-date { display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 0.8rem; font-weight: 700; }
+.col-date input { min-height: 40px; padding: 0 10px; border: 1px solid #d9dbe2; border-radius: 10px; background: #fff; color: #0b1730; font: inherit; }
+
+.col-kpis { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 14px; margin: 0 0 16px; }
+.col-kpi { display: grid; gap: 4px; padding: 16px 18px; border: 1px solid #e6e3dc; border-radius: 16px; background: #fff; }
+.col-kpi span { color: #6b7280; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.col-kpi strong { color: #14305f; font-family: Georgia, "Times New Roman", serif; font-size: 1.7rem; font-weight: 400; white-space: nowrap; }
+.col-kpi small { color: #4b5260; font-size: 0.8rem; }
+.col-kpi--total { background: linear-gradient(145deg, #1d3f78, #0b1730); border-color: transparent; }
+.col-kpi--total span { color: #9fb0cf; }
+.col-kpi--total strong { color: #fff; }
+.col-kpi--total small { color: #c9d2e3; }
+.col-kpi--cash strong { color: #0f7a5f; }
+.col-kpi--online strong { color: #1f6fb8; }
+
+.col-empty { margin: 0; padding: 30px; color: #6b7280; text-align: center; }
+.col-job { color: #14305f; font-weight: 800; text-decoration: none; }
+.col-job:hover { color: #d21319; }
+.col-note { display: block; color: #6b7280; font-size: 0.76rem; }
+.col-method { padding: 3px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 800; background: #e4f4ee; color: #0f7a5f; }
+.col-method[data-method="Online"] { background: #e6f0fa; color: #1f6fb8; }
+.col-amt { font-weight: 800; color: #0b1730; font-variant-numeric: tabular-nums; }
+.col-actions { white-space: nowrap; }
+.col-actions .row-btn + .row-btn { margin-left: 8px; }
+
+@media (max-width: 760px) {
+  .col-kpis { grid-template-columns: 1fr; }
+}
+.admin-table-wrap { overflow-x: auto; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.admin-table th { padding: 12px 14px; }
+.admin-table td { padding: 12px 14px; border-bottom: 1px solid #f0eee8; color: #0b1730; }
+.admin-table tbody tr:last-child td { border-bottom: 0; }
+.admin-table tbody tr:hover { background: rgba(50, 90, 160, 0.045); }
+@media (max-width: 760px) {
+  .admin-table thead { display: none; }
+  .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+  .admin-table tr { padding: 10px 0; border-bottom: 1px solid #e6e3dc; }
+  .admin-table td { display: flex; justify-content: space-between; gap: 12px; padding: 6px 4px; border: 0; text-align: right; }
+  .admin-table td::before { content: attr(data-label); color: #6b7280; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; text-align: left; }
+}

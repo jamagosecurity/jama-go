@@ -11,6 +11,15 @@
         · {{ recentCount() }} in the last 7 days
       </p>
     </div>
+    <label class="head-search admin-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+      <input
+        type="search"
+        [value]="query()"
+        (input)="onSearch($any($event.target).value)"
+        placeholder="Search name, email, service, message…"
+      />
+    </label>
     <div class="page-banner-actions">
     <button type="button" class="banner-ghost" (click)="reload()">
       <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
@@ -23,17 +32,6 @@
     <p class="admin-error">{{ error() }}</p>
   }
 
-  <div class="admin-toolbar">
-    <label class="admin-search">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-      <input
-        type="search"
-        [value]="query()"
-        (input)="onSearch($any($event.target).value)"
-        placeholder="Search name, email, service, message…"
-      />
-    </label>
-  </div>
 
   <div class="admin-panel">
     @if (loading()) {
@@ -90,14 +88,14 @@
                       <button type="button" class="row-btn" [disabled]="deletingId() === item.id"
                         (click)="pendingDeleteId.set(null)">Keep</button>
                     } @else {
-                      <a class="row-btn row-btn--edit" [href]="'mailto:' + item.email">
+                      <a class="row-btn row-btn--edit act act--view" [href]="'mailto:' + item.email" title="Reply">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
                           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M4 5h16v14H4z" /><path d="m4 7 8 6 8-6" />
                         </svg>
-                        Reply
+                        <span class="act-label">Reply</span>
                       </a>
-                      <button type="button" class="row-btn row-btn--icon row-btn--delete" title="Delete"
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete act act--delete" title="Delete"
                         [attr.aria-label]="'Delete enquiry from ' + item.fullName"
                         (click)="pendingDeleteId.set(item.id)">
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"

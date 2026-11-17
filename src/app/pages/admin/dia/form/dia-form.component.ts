@@ -94,7 +94,7 @@ function sitePin(group: AbstractControl): ValidationErrors | null {
     DiaSkeletonComponent,
   ],
   templateUrl: './dia-form.component.html',
-  styleUrl: '../dia.styles.css',
+  styleUrls: ['../dia.styles.css', './dia-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiaFormComponent implements OnInit {

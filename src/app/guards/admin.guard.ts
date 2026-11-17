@@ -97,3 +97,11 @@ export const guestGuard: CanActivateFn = () => {
 
   return router.createUrlTree([auth.landingRoute()]);
 };
+
+/** Only the root administrator (AdminSeed:Email). Mirrors AuthorizationPolicies.SuperAdmin on the API. */
+export const superAdminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.isSuperAdmin() ? true : router.createUrlTree([auth.landingRoute()]);
+};
