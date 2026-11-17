@@ -1,4 +1,4 @@
-<div class="staff-shell" [class.is-menu-open]="menuOpen()">
+<div class="staff-shell" [class.is-menu-open]="menuOpen()" [class.is-collapsed]="collapsed()">
   <!-- Phones only: dims the page behind the open drawer, and closes it on tap. -->
   @if (menuOpen()) {
     <div class="staff-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
@@ -64,7 +64,7 @@
       <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
 
       @if (canIssueJobs()) {
-        <a routerLink="/staff/non-moi-jobs" routerLinkActive="active">
+        <a routerLink="/staff/non-moi-jobs" routerLinkActive #jobsLink="routerLinkActive" [class.active]="jobsLink.isActive && !onCollections()">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
@@ -93,6 +93,17 @@
           <span>
             <strong>Non-MOI Inventory</strong>
             <small>Services &amp; prices</small>
+          </span>
+        </a>
+      }
+      @if (canIssueJobs()) {
+        <a routerLink="/staff/non-moi-jobs/collections" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2" /><circle cx="12" cy="12" r="2.6" /><path d="M6 9.5v5M18 9.5v5" /></svg>
+          </span>
+          <span>
+            <strong>Collections</strong>
+            <small>Cash &amp; online received</small>
           </span>
         </a>
       }
@@ -246,18 +257,48 @@
     <!-- Always rendered for the phone menu button; on a desktop it is hidden
          again for accounts without the bell, so their layout is unchanged. -->
     <header class="staff-topbar" [class.has-bell]="canSeeBoq()">
+      <button type="button" class="staff-collapse-btn" (click)="toggleCollapsed()" [attr.aria-pressed]="collapsed()"
+        [attr.aria-label]="collapsed() ? 'Open sidebar' : 'Collapse sidebar'" [title]="collapsed() ? 'Open sidebar' : 'Collapse sidebar'">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6h8M8 12h8M4 18h8" /></svg>
+      </button>
       <button type="button" class="staff-menu-btn" (click)="menuOpen.set(!menuOpen())"
         [attr.aria-expanded]="menuOpen()" aria-controls="staff-sidebar" aria-label="Open menu">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6h8M8 12h8M4 18h8" /></svg>
         <span>Menu</span>
       </button>
       <img class="staff-topbar-logo" src="/JamaGoLogo-navy.png" alt="Jama Go" width="360" height="108" />
+      <div class="staff-screen-search" role="combobox" [attr.aria-expanded]="screenOpen()" aria-haspopup="listbox">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        <input type="search" placeholder="Search screens…" aria-label="Search screens" autocomplete="off"
+          [value]="screenQuery()" (input)="screenQuery.set($any($event.target).value); screenActive.set(0); screenOpen.set(true)"
+          (focus)="screenOpen.set(true)" (blur)="closeScreensSoon()" (keydown)="onScreenKey($event)" />
+        <kbd>Ctrl K</kbd>
+        @if (screenOpen()) {
+          <ul class="staff-screen-list" role="listbox">
+            @for (s of screenMatches(); track s.label; let i = $index) {
+              <li role="option" [attr.aria-selected]="i === screenActive()">
+                <button type="button" [class.is-active]="i === screenActive()" (mousedown)="$event.preventDefault()" (click)="goScreen(s)"
+                  (mouseenter)="screenActive.set(i)">
+                  <span>{{ s.label }}</span><small>{{ s.group }}</small>
+                </button>
+              </li>
+            } @empty {
+              <li class="staff-screen-none">No screen called “{{ screenQuery() }}”</li>
+            }
+          </ul>
+        }
+      </div>
+      @if (pageTitle()) { <span class="staff-topbar-title" aria-hidden="true">{{ pageTitle() }}</span> }
+      <span class="staff-topbar-gap"></span>
       @if (canSeeBoq()) {
         <app-approval-bell basePath="/staff/boq" />
       }
+      <a class="staff-topbar-me" routerLink="/staff/profile" [title]="auth.currentUser()?.fullName || 'My profile'" aria-label="My profile">
+        <app-avatar [userId]="auth.currentUser()?.id" [name]="auth.currentUser()?.fullName ?? ''" [version]="auth.currentUser()?.photoVersion" [size]="40" />
+      </a>
     </header>
 
-    <div class="staff-content">
+    <div class="staff-content admin-content">
       <router-outlet />
     </div>
   </div>

@@ -1081,3 +1081,110 @@
 .user-profile-btn:hover { background: rgba(20, 48, 95, 0.05); }
 .user-profile-btn:focus-visible { outline: 2px solid #1d4589; }
 .user-profile-btn app-avatar { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 0 3px rgba(143, 141, 119, 0.55); border-radius: 50%; }
+
+
+/* ===================================================================
+   Same frame as the admin console (copied from admin-layout, renamed):
+   compact rail, collapse button, full top bar with Search screens,
+   page name and picture.
+   =================================================================== */
+/* ===== Compact rail, in the Company mail style =====
+   Slim one-line rows, small icon tiles and thin section titles, so every link
+   (down to Public site) fits on a laptop screen without scrolling. */
+.staff-sidebar { gap: 8px; padding: 12px 12px 10px; }
+.staff-brand { padding: 2px 0 0; }
+.staff-sidebar .staff-logo-badge { padding: 0 8px 10px; }
+.staff-sidebar .staff-logo { max-width: 196px; }
+.staff-nav { gap: 1px; padding-bottom: 8px; }
+.staff-nav a { grid-template-columns: 30px 1fr; gap: 10px; min-height: 38px; padding: 4px 10px; border-radius: 10px; }
+.staff-nav a .nav-icon,
+.staff-nav .nav-icon { width: 30px; height: 30px; border-radius: 9px; }
+.staff-nav a .nav-icon svg { width: 16px; height: 16px; stroke-width: 1.8; }
+.staff-nav a strong { font-size: 0.9rem; }
+.staff-nav a.nav-clients, .staff-nav .nav-group > a { padding-right: 44px; }
+.nav-count { min-width: 20px; height: 20px; font-size: 0.7rem; }
+.nav-chevron { top: 6px; right: 8px; width: 26px; height: 26px; }
+.nav-chevron svg { width: 14px; height: 14px; }
+.staff-nav .nav-label,
+.staff-nav .nav-sub,
+.staff-nav .nav-sub--moi,
+.staff-nav .nav-sub--non { margin: 10px 0 4px; font-size: 0.66rem; letter-spacing: 0.14em; }
+.staff-nav .nav-label:first-child { margin-top: 2px; }
+.staff-nav .nav-label::before, .staff-nav .nav-sub::before,
+.staff-nav .nav-label::after,  .staff-nav .nav-sub::after { height: 1px; }
+.staff-nav .nav-subs { margin: 0 0 2px 24px; }
+.staff-nav .nav-subs a { min-height: 30px; padding: 4px 10px 4px 26px; font-size: 0.82rem; }
+.staff-sidebar-foot { margin-top: 4px; }
+.staff-sidebar .staff-user { padding: 7px 8px 7px 9px; border-radius: 12px; }
+.user-profile-btn { grid-template-columns: 34px minmax(0, 1fr); gap: 9px; }
+.staff-sidebar .profile-logout { width: 32px; height: 32px; }
+.staff-nav a.staff-nav-muted { margin-top: 0; }
+
+/* ===== Collapse button (desktop) =====
+   Three staggered lines on a soft tile at the top left. One click hides the sidebar so the page gets the
+   full width; another brings it back. */
+.staff-collapse-btn {
+  display: grid; place-items: center; width: 46px; height: 46px; padding: 0; flex: none;
+  border: 0; border-radius: 14px; background: #e9eef6; color: #14305f; cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.staff-collapse-btn:hover { background: #dbe3f0; }
+.staff-collapse-btn[aria-pressed="true"] { background: #14305f; color: #fff; }
+.staff-collapse-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+@media (max-width: 980px) { .staff-collapse-btn { display: none; } }
+
+/* ===== Collapsed: no sidebar at all, the page takes the whole width ===== */
+@media (min-width: 981px) {
+  .staff-shell { transition: grid-template-columns 0.25s ease; }
+  .staff-shell.is-collapsed { --sidebar: 0px; }
+  .is-collapsed .staff-sidebar { visibility: hidden; padding: 0; border: 0; box-shadow: none; }
+}
+
+/* ===== Top bar: one full row of tools =====
+   Menu button, Search screens, then the approvals bell and your picture on the right — the whole row is
+   used, and the page title starts right under it. */
+@media (min-width: 981px) {
+  .staff-topbar {
+    position: sticky; top: 0; z-index: 40; justify-content: flex-start; gap: 12px;
+    padding: 12px 28px; background: rgba(255, 255, 255, 0.86); border-bottom: 1px solid #e7e5df;
+    backdrop-filter: blur(10px);
+  }
+  .staff-main .staff-content { padding-top: 22px; }
+}
+.staff-topbar-gap { flex: 1; }
+.staff-topbar-me { display: block; flex: none; border-radius: 50%; box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d9dbe2; }
+.staff-topbar-me:hover { box-shadow: 0 0 0 2px #fff, 0 0 0 3px #14305f; }
+
+.staff-screen-search { position: relative; display: flex; align-items: center; gap: 9px; width: min(360px, 34vw); height: 46px; padding: 0 10px 0 14px; border: 1px solid #e2dfd6; border-radius: 14px; background: #fff; color: #6b7280; }
+.staff-screen-search:focus-within { border-color: #14305f; box-shadow: 0 0 0 3px rgba(20, 48, 95, 0.1); }
+.staff-screen-search > svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.staff-screen-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; color: #0b1730; font: inherit; font-size: 0.92rem; }
+.staff-screen-search input::-webkit-search-cancel-button { display: none; }
+.staff-screen-search kbd { flex: none; padding: 3px 7px; border: 1px solid #d9dbe2; border-radius: 7px; background: #f7f5f0; color: #6b7280; font: 600 0.7rem ui-monospace, Menlo, monospace; }
+.staff-screen-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 50; max-height: min(420px, 70vh); margin: 0; padding: 6px; overflow: auto; list-style: none; background: #fff; border: 1px solid #e2dfd6; border-radius: 14px; box-shadow: 0 24px 50px -20px rgba(11, 23, 48, 0.45); }
+.staff-screen-list button { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 9px 10px; border: 0; border-radius: 9px; background: transparent; color: #0b1730; font: inherit; font-size: 0.9rem; font-weight: 600; text-align: left; cursor: pointer; }
+.staff-screen-list button small { color: #6b7280; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+.staff-screen-list button.is-active { background: #fdecec; color: #a40f14; }
+.staff-screen-none { padding: 10px; color: #6b7280; font-size: 0.86rem; }
+@media (max-width: 980px) {
+  .staff-screen-search, .staff-topbar-gap, .staff-topbar-me { display: none; }
+}
+/* Room for Collections: every link down to Public site still fits a laptop screen. */
+.staff-nav a { min-height: 36px; padding-top: 3px; padding-bottom: 3px; }
+.staff-nav .nav-label, .staff-nav .nav-sub, .staff-nav .nav-sub--moi, .staff-nav .nav-sub--non { margin: 8px 0 3px; }
+
+/* ===== Page name in the top bar, right of Search screens ===== */
+.staff-topbar-title { display: none; }
+@media (min-width: 981px) {
+  .staff-topbar-title {
+    display: block; min-width: 0; margin-left: 10px; padding-left: 18px; border-left: 1px solid #e2dfd6;
+    color: #0b1730; font-family: Georgia, "Times New Roman", serif; font-size: 1.45rem; line-height: 1.2;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+
+/* The staff rail has a small "Staff Portal" line under the logo; keep it tight. */
+.staff-sidebar .staff-brand-copy { display: none; }
+@media (min-width: 981px) {
+  .staff-topbar { display: flex !important; }
+}
