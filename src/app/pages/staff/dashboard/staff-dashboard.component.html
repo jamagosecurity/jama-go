@@ -1,62 +1,142 @@
-<section class="admin-page">
-  <header class="admin-page-header">
-    <div>
-      <h1>Your workspace</h1>
-      <p>Everything assigned to your Jama Go staff account.</p>
+<section class="admin-page sd">
+  <header class="page-banner">
+    <div class="page-banner-text">
+      <h1>My dashboard</h1>
+      <p class="page-banner-sub">{{ now | date: 'EEEE d MMMM' : '+0300' }}</p>
     </div>
   </header>
 
-  @if (error()) {
-    <div class="staff-alert staff-alert-error" role="alert">{{ error() }}</div>
+  <!-- Who I am and what I work on -->
+  <div class="sd-me">
+    <app-avatar [userId]="auth.currentUser()?.id" [name]="auth.currentUser()?.fullName ?? ''" [version]="auth.currentUser()?.photoVersion" [size]="56" />
+    <div class="sd-me-text">
+      <h2>{{ greeting }}, {{ firstName() }}</h2>
+      <p>{{ auth.currentUser()?.designation || profile()?.designation || 'Staff member' }} · {{ auth.currentUser()?.email }}</p>
+      <div class="sd-areas">
+        @for (a of areas(); track a) { <span>{{ a }}</span> } @empty { <span class="is-none">No areas yet — ask your administrator</span> }
+      </div>
+    </div>
+    <div class="sd-me-links">
+      <a routerLink="/staff/profile">My profile</a>
+      <a routerLink="/staff/password">Change password</a>
+    </div>
+  </div>
+
+  @if (canJobs) {
+    <!-- Non-MOI: what needs me today -->
+    <div class="sd-kpis">
+      <a class="sd-kpi sd-kpi--main" routerLink="/staff/non-moi-jobs/collections">
+        <span>Collected today</span>
+        <strong>QAR {{ (today()?.total ?? 0) | number: '1.0-0' }}</strong>
+        <small>Cash {{ (today()?.cash ?? 0) | number: '1.0-0' }} · Online {{ (today()?.online ?? 0) | number: '1.0-0' }}</small>
+      </a>
+      <a class="sd-kpi" [class.is-hot]="toBill().length > 0" routerLink="/staff/non-moi-jobs">
+        <span>To bill</span>
+        <strong>{{ toBill().length }}</strong>
+        <small>{{ toBill().length ? 'Finished jobs waiting for you' : 'Nothing waiting' }}</small>
+      </a>
+      <a class="sd-kpi" routerLink="/staff/non-moi-jobs">
+        <span>With clients</span>
+        <strong>{{ withClient().length }}</strong>
+        <small>Invoices sent, waiting for an answer</small>
+      </a>
+      <a class="sd-kpi" routerLink="/staff/non-moi-jobs">
+        <span>Unpaid</span>
+        <strong class="is-red">QAR {{ unpaidTotal() | number: '1.0-0' }}</strong>
+        <small>{{ unpaid().length }} {{ unpaid().length === 1 ? 'invoice' : 'invoices' }} with a balance</small>
+      </a>
+    </div>
+
+    <div class="sd-grid">
+      <section class="sd-card">
+        <header><h2>Waiting for you</h2><span class="sd-pill">{{ toBill().length }}</span></header>
+        @if (jobs() === null) { <p class="sd-muted">Loading…</p> }
+        @else if (!toBill().length) { <p class="sd-muted">All caught up — no finished job is waiting to be billed.</p> }
+        @else {
+          <ul class="sd-list">
+            @for (j of toBill().slice(0, 6); track j.id) {
+              <li><a [routerLink]="['/staff/non-moi-jobs', j.id, 'close']">
+                <span class="sd-main"><strong>{{ j.customerName }}</strong><small>{{ j.jobNumber }} · {{ j.location }} · {{ j.assignedToName }}</small></span>
+                <span class="sd-chip" [attr.data-tone]="j.status === 'ChangesRequested' ? 'red' : 'amber'">{{ jobStatus(j.status) }}</span>
+              </a></li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="sd-card">
+        <header><h2>Today's visits</h2><span class="sd-pill">{{ todayJobs().length }}</span></header>
+        @if (jobs() === null) { <p class="sd-muted">Loading…</p> }
+        @else if (!todayJobs().length) { <p class="sd-muted">No technician visit is scheduled for today.</p> }
+        @else {
+          <ul class="sd-list">
+            @for (j of todayJobs(); track j.id) {
+              <li><a [routerLink]="j.status === 'Assigned' ? ['/staff/non-moi-jobs', j.id, 'edit'] : ['/staff/non-moi-jobs', j.id, 'close']">
+                <span class="sd-time">{{ j.scheduledAt | date: 'h:mm a' : '+0300' }}</span>
+                <span class="sd-main"><strong>{{ j.customerName }}</strong><small>{{ j.location }} · {{ j.assignedToName }}</small></span>
+                <span class="sd-chip" [attr.data-tone]="j.status === 'Assigned' ? 'blue' : 'green'">{{ jobStatus(j.status) }}</span>
+              </a></li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="sd-card">
+        <header><h2>Unpaid invoices</h2><a routerLink="/staff/non-moi-jobs">All jobs</a></header>
+        @if (!unpaid().length) { <p class="sd-muted">{{ jobs() === null ? 'Loading…' : 'Every invoice is paid.' }}</p> }
+        @else {
+          <ul class="sd-list">
+            @for (u of unpaid().slice(0, 6); track u.job.id) {
+              <li><a [routerLink]="['/staff/non-moi-jobs', u.job.id, 'close']">
+                <span class="sd-main"><strong>{{ u.job.customerName }}</strong><small>{{ u.job.jobNumber }} · paid {{ (u.job.amountPaid ?? 0) | number: '1.0-0' }} of {{ u.job.amountPayable | number: '1.0-0' }}</small></span>
+                <b class="sd-amt">QAR {{ u.balance | number: '1.2-2' }}</b>
+              </a></li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="sd-card">
+        <header><h2>Collected today</h2><a routerLink="/staff/non-moi-jobs/collections">Collections</a></header>
+        @if (!(today()?.rows?.length)) { <p class="sd-muted">No money recorded yet today.</p> }
+        @else {
+          <ul class="sd-list">
+            @for (r of today()!.rows.slice(0, 6); track r.paymentId) {
+              <li><a [routerLink]="['/staff/non-moi-jobs', r.jobId, 'close']">
+                <span class="sd-chip" [attr.data-tone]="r.method === 'Cash' ? 'green' : 'blue'">{{ r.method }}</span>
+                <span class="sd-main"><strong>{{ r.customerName }}</strong><small>{{ r.jobNumber }}@if (r.collectedByName) { · by {{ r.collectedByName }} }</small></span>
+                <b class="sd-amt">QAR {{ r.amount | number: '1.2-2' }}</b>
+              </a></li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
   }
 
-  <div class="staff-grid">
-    <div class="staff-tile">
-      <p>Role</p>
-      <strong>{{ loading() ? '—' : (profile()?.role || 'Staff Member') }}</strong>
-      <small>Assigned by your administrator.</small>
+  @if (canBoq || canDia || canMail) {
+    <div class="sd-kpis sd-kpis--small">
+      @if (canBoq) {
+        <a class="sd-kpi" routerLink="/staff/boq">
+          <span>My quotations</span>
+          <strong>{{ (quotes() ?? []).length }}</strong>
+          <small>{{ quoteCounts().draft }} draft · {{ quoteCounts().waiting }} waiting · {{ quoteCounts().approved }} approved@if (quoteCounts().rejected) { · {{ quoteCounts().rejected }} sent back }</small>
+        </a>
+      }
+      @if (canDia && dia(); as d) {
+        <a class="sd-kpi" routerLink="/staff/dia">
+          <span>DIA inspections</span>
+          <strong>{{ d.active }}</strong>
+          <small>active · {{ d.inactive }} not started · {{ d.completed }} completed</small>
+        </a>
+      }
+      @if (canMail) {
+        <a class="sd-kpi" routerLink="/staff/mail">
+          <span>Unread mail</span>
+          <strong>{{ unread() ?? '—' }}</strong>
+          <small>Company mailboxes</small>
+        </a>
+      }
     </div>
-
-    <div class="staff-tile staff-tile--orange">
-      <p>Department</p>
-      <strong>{{ loading() ? '—' : (profile()?.department || 'Not assigned') }}</strong>
-      <small>Determines which areas you can access.</small>
-    </div>
-
-    <div class="staff-tile staff-tile--teal">
-      <p>Account status</p>
-      <strong>{{ loading() ? '—' : (profile()?.isActive ? 'Active' : 'Disabled') }}</strong>
-      <small>{{ auth.currentUser()?.email }}</small>
-    </div>
-  </div>
-
-  <div class="admin-panel">
-    <div class="admin-panel-title">
-      <h2>Quick actions</h2>
-    </div>
-
-    <div class="staff-quick">
-      <a routerLink="/staff/profile">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
-        </svg>
-        <span>
-          My Profile
-          <small>Review and update your details</small>
-        </span>
-      </a>
-
-      <a routerLink="/staff/password">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="5" y="10" width="14" height="11" rx="2" />
-          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-        </svg>
-        <span>
-          Change Password
-          <small>Replace the password you were given</small>
-        </span>
-      </a>
-    </div>
-  </div>
+  }
 </section>
