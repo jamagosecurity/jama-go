@@ -14,6 +14,8 @@ export const PORTAL_PREFIXES = [
   // A client's own bill, reached from the link in their email. Not behind a sign-in but private all the same: the secret in
   // the address is the key, so it must neither wear the marketing header and footer nor ever be reported to analytics.
   '/bill',
+  // The same for an MOI bill.
+  '/moi-bill',
 ] as const;
 
 /** The path with any query string and fragment removed. */
