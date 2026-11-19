@@ -2,9 +2,12 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { CollectionRow, Collections } from '../../../models/non-moi-job.model';
 import { NonMoiJobService } from '../../../services/non-moi-job.service';
+import { MoiJobService } from '../../../services/moi-job.service';
+import { AuthService } from '../../../services/auth.service';
+import { PERMISSIONS } from '../../../models/auth.model';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 import { NON_MOI_JOBS_BASE_PATH } from './non-moi-jobs-base-path';
 
@@ -27,6 +30,14 @@ const dohaDay = (offsetDays = 0): string =>
 export class NonMoiCollectionsComponent implements OnInit {
   private readonly api = inject(NonMoiJobService);
   protected readonly base = inject(NON_MOI_JOBS_BASE_PATH);
+  private readonly moiApi = inject(MoiJobService);
+  private readonly auth = inject(AuthService);
+  /** MOI jobs live next to Non-MOI jobs in the same portal. */
+  protected readonly moiBase = this.base.replace(/non-moi-jobs$/, 'moi-jobs');
+  /** Each person sees the money for the jobs they handle: Non-MOI, MOI, or both. */
+  protected readonly canNonMoi = this.auth.can(PERMISSIONS.nonMoiJobManage);
+  protected readonly canMoi = this.auth.can(PERMISSIONS.moiJobManage);
+  protected readonly source = signal<'' | 'MOI' | 'Non-MOI'>('');
 
   protected readonly today = dohaDay();
   protected readonly yesterday = dohaDay(-1);
@@ -45,14 +56,26 @@ export class NonMoiCollectionsComponent implements OnInit {
     if (t === this.today && f === this.today.slice(0, 8) + '01') return 'month';
     return 'custom';
   });
+  /** Every payment in the period, from the lists this person can see, newest first. */
+  protected readonly allRows = computed(() => (this.data()?.rows ?? []) as (CollectionRow & { source: 'MOI' | 'Non-MOI' })[]);
+  protected readonly bySource = computed(() => {
+    const s = this.source();
+    return this.allRows().filter((r) => !s || r.source === s);
+  });
   protected readonly rows = computed(() => {
     const m = this.method();
-    return (this.data()?.rows ?? []).filter((r) => !m || r.method === m);
+    return this.bySource().filter((r) => !m || r.method === m);
+  });
+  protected readonly totals = computed(() => {
+    const list = this.bySource();
+    const cash = list.filter((r) => r.method === 'Cash').reduce((n, r) => n + r.amount, 0);
+    const online = list.filter((r) => r.method === 'Online').reduce((n, r) => n + r.amount, 0);
+    return { cash, online, total: cash + online, count: list.length };
   });
   /** Cash per person who collected it — what each technician should hand over. */
   protected readonly byCollector = computed(() => {
     const totals = new Map<string, number>();
-    for (const r of this.data()?.rows ?? []) {
+    for (const r of this.bySource()) {
       if (r.method !== 'Cash') continue;
       const who = r.collectedByName || 'Office';
       totals.set(who, (totals.get(who) ?? 0) + r.amount);
@@ -82,15 +105,29 @@ export class NonMoiCollectionsComponent implements OnInit {
   protected load(): void {
     this.loading.set(true);
     this.error.set('');
-    this.api.collections(this.from(), this.to()).pipe(finalize(() => this.loading.set(false))).subscribe({
-      next: (d) => this.data.set(d),
+    const empty = (): Collections => ({ from: this.from(), to: this.to(), cash: 0, online: 0, total: 0, rows: [] });
+    const non = this.canNonMoi ? this.api.collections(this.from(), this.to()).pipe(catchError(() => of(empty()))) : of(empty());
+    const moi = this.canMoi ? this.moiApi.collections(this.from(), this.to()).pipe(catchError(() => of(empty()))) : of(empty());
+    forkJoin({ non, moi }).pipe(finalize(() => this.loading.set(false))).subscribe({
+      next: ({ non, moi }) => {
+        const rows = [
+          ...non.rows.map((r) => ({ ...r, source: 'Non-MOI' as const })),
+          ...moi.rows.map((r) => ({ ...r, source: 'MOI' as const })),
+        ].sort((a, b) => (b.receivedOn + b.recordedAt).localeCompare(a.receivedOn + a.recordedAt));
+        this.data.set({ from: this.from(), to: this.to(), cash: non.cash + moi.cash, online: non.online + moi.online, total: non.total + moi.total, rows });
+      },
       error: (err: unknown) => this.error.set(getApiErrorMessage(err, 'Could not load the collections.')),
     });
   }
 
+  protected jobLink(r: CollectionRow & { source?: string }): string[] {
+    return [r.source === 'MOI' ? this.moiBase : this.base, r.jobId, 'close'];
+  }
+
   protected openReceipt(r: CollectionRow): void {
     const tab = window.open('', '_blank');
-    this.api.receipt(r.paymentId).subscribe({
+    const api = (r as CollectionRow & { source?: string }).source === 'MOI' ? this.moiApi : this.api;
+    api.receipt(r.paymentId).subscribe({
       next: (blob) => {
         const url = URL.createObjectURL(blob);
         if (tab) tab.location.href = url; else window.location.href = url;

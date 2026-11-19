@@ -1188,3 +1188,10 @@
 @media (min-width: 981px) {
   .staff-topbar { display: flex !important; }
 }
+
+/* Room for MOI Jobs and MOI Services: every link still fits a laptop screen. */
+.staff-nav { gap: 0; }
+.staff-nav a { min-height: 34px; padding-top: 2px; padding-bottom: 2px; }
+.staff-nav a .nav-icon, .staff-nav .nav-icon { width: 28px; height: 28px; }
+.staff-nav .nav-label, .staff-nav .nav-sub, .staff-nav .nav-sub--moi, .staff-nav .nav-sub--non { margin: 6px 0 2px; }
+.staff-sidebar .staff-logo { max-width: 180px; }

@@ -46,6 +46,10 @@ export const PERMISSIONS = {
   mailRead: 'mail.read',
   /** Technicians: shows the Non-MOI Jobs section in their portal. */
   nonMoiJobWork: 'nonmoijob.work',
+  /** MOI jobs: issue, bill, payments, and the MOI services price list. Separate from Non-MOI. */
+  moiJobManage: 'moijob.manage',
+  /** Technicians: shows the MOI Jobs section in their portal. */
+  moiJobWork: 'moijob.work',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

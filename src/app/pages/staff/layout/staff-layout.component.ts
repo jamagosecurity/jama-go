@@ -8,6 +8,7 @@ import { ApprovalBellComponent } from '../../../components/approval-bell/approva
 import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 import { NonMoiJobBadgeService } from '../../../services/non-moi-job-badge.service';
+import { MoiJobBadgeService } from '../../../services/moi-job-badge.service';
 
 @Component({
   selector: 'app-staff-layout',
@@ -28,6 +29,8 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
   private readonly profileRouter = inject(Router);
   /** Finished Non-MOI jobs waiting for this person to close — the red number beside Non-MOI Jobs. */
   readonly jobBadge = inject(NonMoiJobBadgeService);
+  /** Finished MOI jobs waiting to be billed — the red number beside MOI Jobs. */
+  readonly moiJobBadge = inject(MoiJobBadgeService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -74,11 +77,17 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
     const list: { label: string; group: string; url: string; query?: Record<string, string> }[] = [];
     if (this.canUploadDia()) list.push({ label: 'DIA Inspection', group: 'MOI', url: '/staff/dia' });
     if (this.canManageCameras()) list.push({ label: 'Moi Inventory', group: 'MOI', url: '/staff/cameras' });
+    if (this.canMoiJobs()) list.push(
+      { label: 'MOI Jobs', group: 'MOI', url: '/staff/moi-jobs' },
+      { label: 'Issue an MOI job', group: 'MOI', url: '/staff/moi-jobs/new' },
+      { label: 'MOI Services (price list)', group: 'MOI', url: '/staff/moi-services' },
+    );
+    if (this.canMoiJobs() && !this.canIssueJobs()) list.push({ label: 'Collections (cash & online)', group: 'MOI', url: '/staff/collections' });
     if (this.canIssueJobs()) list.push(
       { label: 'Non-MOI Jobs', group: 'Non-MOI', url: '/staff/non-moi-jobs' },
       { label: 'Issue a Non-MOI job', group: 'Non-MOI', url: '/staff/non-moi-jobs/new' },
       { label: 'Non-MOI Inventory', group: 'Non-MOI', url: '/staff/non-moi' },
-      { label: 'Collections (cash & online)', group: 'Non-MOI', url: '/staff/non-moi-jobs/collections' },
+      { label: 'Collections (cash & online)', group: 'Non-MOI', url: '/staff/collections' },
     );
     if (this.canSeeBoq()) list.push({ label: 'Quotation', group: 'Quotations & documents', url: '/staff/boq' });
     if (this.canSeeDrawings()) list.push({ label: 'Drawings', group: 'Quotations & documents', url: '/staff/drawings' });
@@ -150,6 +159,7 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     if (this.canIssueJobs()) this.jobBadge.start();
+    if (this.canMoiJobs()) this.moiJobBadge.start();
     // Picking a page in the drawer should land on that page, not leave the
     // drawer covering it.
     this.router.events
@@ -157,6 +167,7 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
       .subscribe((e) => {
         this.menuOpen.set(false);
         if (this.canIssueJobs()) this.jobBadge.refresh();
+        if (this.canMoiJobs()) this.moiJobBadge.refresh();
         this.revealCurrentGroup((e as NavigationEnd).urlAfterRedirects);
         this.onCollections.set((e as NavigationEnd).urlAfterRedirects.startsWith('/staff/non-moi-jobs/collections'));
       });
@@ -207,6 +218,7 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
 
   /** The Non-MOI Jobs link: its own grant now, which maintenance.manage implies. */
   readonly canIssueJobs = computed(() => this.auth.can(PERMISSIONS.nonMoiJobManage));
+  readonly canMoiJobs = computed(() => this.auth.can(PERMISSIONS.moiJobManage));
 
   /** The Company mail link — read-only for staff. */
   readonly canReadMail = computed(() => this.auth.can(PERMISSIONS.mailRead));

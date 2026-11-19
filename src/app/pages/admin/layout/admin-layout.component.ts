@@ -8,6 +8,7 @@ import { ApprovalBellComponent } from '../../../components/approval-bell/approva
 import { PERMISSIONS } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 import { NonMoiJobBadgeService } from '../../../services/non-moi-job-badge.service';
+import { MoiJobBadgeService } from '../../../services/moi-job-badge.service';
 import { ClientRegistrationService } from '../../../services/client-registration.service';
 
 @Component({
@@ -31,6 +32,9 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
   readonly registrations = inject(ClientRegistrationService);
   /** Finished Non-MOI jobs waiting for this administrator to close — the red number beside Non-MOI Jobs. */
   readonly jobBadge = inject(NonMoiJobBadgeService);
+  /** Finished MOI jobs waiting to be billed — the red number beside MOI Jobs. */
+  readonly moiJobBadge = inject(MoiJobBadgeService);
+  readonly canMoiJobs = computed(() => this.auth.can(PERMISSIONS.moiJobManage));
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -102,6 +106,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.registrations.refreshPendingCount();
     this.jobBadge.start();
+    if (this.canMoiJobs()) this.moiJobBadge.start();
 
     // Picking a page in the drawer should land on that page, not leave the
     // drawer covering it.
@@ -110,6 +115,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       .subscribe((e) => {
         this.menuOpen.set(false);
         this.jobBadge.refresh();
+        if (this.canMoiJobs()) this.moiJobBadge.refresh();
         this.revealCurrentGroup((e as NavigationEnd).urlAfterRedirects);
       });
     this.revealCurrentGroup(this.router.url);
@@ -131,9 +137,12 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       { label: 'Client Registrations', group: 'People', url: '/admin/client-registrations' },
       { label: 'DIA Inspection', group: 'MOI', url: '/admin/dia' },
       { label: 'Moi Inventory', group: 'MOI', url: '/admin/cameras' },
+      { label: 'MOI Jobs', group: 'MOI', url: '/admin/moi-jobs' },
+      { label: 'Issue an MOI job', group: 'MOI', url: '/admin/moi-jobs/new' },
+      { label: 'MOI Services (price list)', group: 'MOI', url: '/admin/moi-services' },
       { label: 'Non-MOI Jobs', group: 'Non-MOI', url: '/admin/non-moi-jobs' },
       { label: 'Issue a Non-MOI job', group: 'Non-MOI', url: '/admin/non-moi-jobs/new' },
-      { label: 'Collections (cash & online)', group: 'Non-MOI', url: '/admin/non-moi-jobs/collections' },
+      { label: 'Collections (cash & online)', group: 'Non-MOI', url: '/admin/collections' },
       { label: 'Non-MOI Inventory', group: 'Non-MOI', url: '/admin/non-moi' },
       { label: 'Quotation', group: 'Quotations & documents', url: '/admin/boq' },
       { label: 'Quotations approved', group: 'Quotations & documents', url: '/admin/boq/decisions', query: { status: 'Approved' } },

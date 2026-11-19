@@ -25,7 +25,7 @@
   } @else if (data(); as d) {
     <!-- Big numbers -->
     <div class="db-kpis">
-      <a class="db-kpi db-kpi--rev" routerLink="/admin/non-moi-jobs/collections">
+      <a class="db-kpi db-kpi--rev" routerLink="/admin/collections">
         <span class="db-kpi-k">Received · {{ d.now | date: 'MMMM' : '+0300' }}</span>
         <strong>QAR {{ d.revenueThisMonth | number: '1.0-0' }}</strong>
         <span class="db-kpi-s">

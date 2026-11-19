@@ -17,6 +17,9 @@ import { createDrawingRoutes } from './pages/staff/drawings/drawing.routes';
 import { createMaintenanceRoutes } from './pages/staff/maintenance/maintenance.routes';
 import { createNonMoiRoutes } from './pages/staff/maintenance/non-moi/non-moi.routes';
 import { createNonMoiJobRoutes } from './pages/staff/non-moi-jobs/non-moi-jobs.routes';
+import { NON_MOI_JOBS_BASE_PATH } from './pages/staff/non-moi-jobs/non-moi-jobs-base-path';
+import { createMoiJobRoutes } from './pages/staff/moi-jobs/moi-jobs.routes';
+import { createMoiServiceRoutes } from './pages/staff/moi-services/moi-services.routes';
 import { PERMISSIONS } from './models/auth.model';
 
 /**
@@ -255,6 +258,27 @@ export const routes: Routes = [
             canActivate: [permissionGuard(PERMISSIONS.nonMoiJobManage)],
             children: createNonMoiJobRoutes('/admin/non-moi-jobs'),
           },
+          {
+            // MOI jobs: the same flow as Non-MOI (issue, technician completes, invoice, client answer, payments),
+            // with its own MOI services price list. Separate from the MOI stock inventory.
+            path: 'moi-jobs',
+            canActivate: [permissionGuard(PERMISSIONS.moiJobManage)],
+            children: createMoiJobRoutes('/admin/moi-jobs'),
+          },
+          {
+            path: 'moi-services',
+            canActivate: [permissionGuard(PERMISSIONS.moiJobManage)],
+            children: createMoiServiceRoutes('/admin/moi-services'),
+          },
+          {
+            // One Collections page for MOI and Non-MOI money.
+            path: 'collections',
+            canActivate: [anyPermissionGuard(PERMISSIONS.nonMoiJobManage, PERMISSIONS.moiJobManage)],
+            title: 'Collections — Jama Go',
+            providers: [{ provide: NON_MOI_JOBS_BASE_PATH, useValue: '/admin/non-moi-jobs' }],
+            loadComponent: () =>
+              import('./pages/staff/non-moi-jobs/non-moi-collections.component').then((m) => m.NonMoiCollectionsComponent),
+          },
         ],
       },
     ],
@@ -272,6 +296,12 @@ export const routes: Routes = [
     path: 'bill/:token',
     title: 'Your bill — Jama Go Security Equipment',
     loadComponent: () => import('./pages/client-bill/client-bill.component').then((m) => m.ClientBillComponent),
+  },
+  {
+    // The client's page for an MOI bill — same page, MOI jobs behind it.
+    path: 'moi-bill/:token',
+    title: 'Your bill — Jama Go Security Equipment',
+    loadComponent: () => import('./pages/client-moi-bill/client-moi-bill.component').then((m) => m.ClientMoiBillComponent),
   },
   {
     path: 'technician',

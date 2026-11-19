@@ -45,3 +45,7 @@
   .admin-table td { display: flex; justify-content: space-between; gap: 12px; padding: 6px 4px; border: 0; text-align: right; }
   .admin-table td::before { content: attr(data-label); color: #6b7280; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; text-align: left; }
 }
+
+/* MOI or Non-MOI job */
+.col-type { padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; background: #eef0f4; color: #14305f; }
+.col-type[data-type="MOI"] { background: #eeeafd; color: #5b45c9; }

@@ -1,0 +1,158 @@
+<div class="cb-page">
+  <main class="cb-sheet">
+    @if (loading()) {
+      <div class="cb-state"><span class="cb-spin" aria-hidden="true"></span>Loading your invoice…</div>
+    } @else if (loadError()) {
+      <header class="cb-head"><img class="cb-logo" src="/JamaGoLogo-trim.png" alt="Jama Go Security Equipment" /></header>
+      <div class="cb-rule" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="cb-body">
+        <h1 class="cb-h1">We can’t open this invoice</h1>
+        <p class="cb-lead">{{ loadError() }}</p>
+      </div>
+    } @else if (bill(); as b) {
+      <!-- Letterhead -->
+      <header class="cb-head">
+        <img class="cb-logo" src="/JamaGoLogo-trim.png" alt="Jama Go Security Equipment" />
+        <div class="cb-title">
+          <span class="cb-word">Invoice</span>
+          <span class="cb-meta">No. <b>{{ b.jobNumber }}</b>@if (b.revision > 1) { · Rev. {{ b.revision }} }</span>
+          @if (b.issuedAt) { <span class="cb-meta">{{ b.issuedAt | date: 'd MMMM y' : '+0300' }}</span> }
+        </div>
+      </header>
+      <div class="cb-rule" aria-hidden="true"><i></i><i></i><i></i></div>
+
+      <div class="cb-body">
+        <!-- Where the bill stands -->
+        @if (b.status === 'Closed') {
+          <div class="cb-banner cb-banner--ok" aria-live="polite">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m7.5 12.5 3 3 6-6.5" /></svg>
+            <div>
+              <strong>{{ justDid() === 'approve' ? 'Thank you — your invoice is approved' : 'This invoice is approved' }}</strong>
+              <span>
+                @if (b.decidedAt) { Approved {{ b.decidedAt | date: 'd MMM y, h:mm a' : '+0300' }}. }
+                You can pay using the details below.
+              </span>
+            </div>
+          </div>
+        } @else if (b.status === 'ChangesRequested') {
+          <div class="cb-banner" aria-live="polite">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 7v5l3 2" /></svg>
+            <div>
+              <strong>{{ justDid() ? 'Thank you — we have received your message' : 'We are preparing an updated invoice' }}</strong>
+              <span>
+                {{ b.decision === 'Rejected' ? 'You rejected this invoice' : 'You asked us for a change' }}{{ b.decisionMessage ? ': “' + b.decisionMessage + '”' : '' }}.
+                We will email you the updated invoice soon.
+              </span>
+            </div>
+          </div>
+        }
+
+        <p class="cb-hello">Dear {{ b.customerName }},</p>
+
+        <div class="cb-facts">
+          <div>
+            <span class="cb-k">Billed to</span>
+            <strong>{{ b.customerName }}</strong>
+            @if (b.customerNumber) { <span>{{ b.customerNumber }}</span> }
+          </div>
+          <div>
+            <span class="cb-k">Site</span>
+            <span>{{ b.location }}</span>
+            @if (b.completedAt) {
+              <span class="cb-k cb-k--gap">Work completed</span>
+              <span>{{ b.completedAt | date: 'd MMM y' : '+0300' }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="cb-tablewrap">
+          <table class="cb-table">
+            <thead>
+              <tr><th class="cb-idx">#</th><th>Description</th><th class="cb-c">Qty</th><th class="cb-num">Unit</th><th class="cb-num">Amount</th></tr>
+            </thead>
+            <tbody>
+              @for (l of b.lines; track $index) {
+                <tr>
+                  <td class="cb-idx">{{ ($index + 1).toString().padStart(2, '0') }}</td>
+                  <td><strong>{{ l.issue }}</strong><small>{{ l.category }}</small></td>
+                  <td class="cb-c">{{ l.quantity }}</td>
+                  <td class="cb-num">{{ l.unitFee | number: '1.2-2' }}</td>
+                  <td class="cb-num cb-amt">{{ l.lineTotal | number: '1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cb-totals">
+          <div class="cb-sum">
+            <div><span>Subtotal</span><span>QAR {{ b.total | number: '1.2-2' }}</span></div>
+            @if (b.discount > 0) { <div><span>Discount</span><span>− QAR {{ b.discount | number: '1.2-2' }}</span></div> }
+          </div>
+          <div class="cb-due" [class.is-paid]="b.status === 'Closed'">
+            <span>{{ b.status === 'Closed' ? 'Approved amount' : 'Amount due' }}</span>
+            <strong>QAR {{ b.amountPayable | number: '1.2-2' }}</strong>
+          </div>
+        </div>
+
+        <!-- The client's answer: one tap each -->
+        @if (b.canRespond && !justDid()) {
+          <section class="cb-decide" aria-label="Your decision">
+            <h2>Your decision</h2>
+            <p>Approve the invoice, or tell us what you would like changed.</p>
+
+            <div class="cb-actions">
+              <button type="button" class="cb-approve" [disabled]="saving()" (click)="approve()">
+                @if (sending() === 'approve') { <span class="cb-spin" aria-hidden="true"></span> Approving… }
+                @else {
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+                  Approve · QAR {{ b.amountPayable | number: '1.2-2' }}
+                }
+              </button>
+              <div class="cb-alt">
+                <button type="button" class="cb-ghost" [class.is-on]="choice() === 'reject'" [disabled]="saving()" (click)="pick('reject')">Reject</button>
+                <button type="button" class="cb-ghost" [class.is-on]="choice() === 'comment'" [disabled]="saving()" (click)="pick('comment')">Comment</button>
+              </div>
+            </div>
+
+            @if (choice(); as c) {
+              <div class="cb-form">
+                <label class="cb-field">
+                  <span>{{ c === 'reject' ? 'Why are you rejecting it?' : 'What would you like us to change?' }}</span>
+                  <textarea rows="4" maxlength="1000" [ngModel]="message()" (ngModelChange)="message.set($event); error.set('')"
+                    [placeholder]="c === 'reject' ? 'Tell us the reason…' : 'Tell us what to change…'"></textarea>
+                </label>
+                <label class="cb-field">
+                  <span>Your name <small>(optional)</small></span>
+                  <input type="text" maxlength="100" autocomplete="name" [ngModel]="name()" (ngModelChange)="name.set($event)" />
+                </label>
+                <button type="button" class="cb-send" [disabled]="saving()" (click)="sendMessage()">
+                  @if (sending() === c) { <span class="cb-spin" aria-hidden="true"></span> Sending… }
+                  @else { {{ c === 'reject' ? 'Send rejection' : 'Send comment' }} }
+                </button>
+              </div>
+            }
+            @if (error()) { <p class="cb-error" role="alert">{{ error() }}</p> }
+          </section>
+        }
+
+        <div class="cb-pay">
+          <span class="cb-k">Payment details</span>
+          <p><strong>{{ b.paymentAccountName }}</strong><br>CR NO: {{ b.paymentCrNumber }}<br>IBAN: <strong>{{ b.paymentIban }}</strong></p>
+          <a class="cb-pdf" [href]="pdfUrl" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14" /></svg>
+            Download PDF
+          </a>
+        </div>
+
+        <p class="cb-thanks">Thank you for your business.</p>
+      </div>
+
+      <footer class="cb-foot">
+        <strong>JAMA GO SECURITY EQUIPMENT</strong>
+        <span>+974 4001 3599 · +974 3064 4006 · info&#64;jamago.com</span>
+        <span class="cb-foot-dim">Showroom · Al Ain Complex, Salwa Road, Doha, Qatar</span>
+      </footer>
+    }
+  </main>
+</div>

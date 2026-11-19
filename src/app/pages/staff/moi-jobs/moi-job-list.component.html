@@ -1,0 +1,166 @@
+<section class="admin-page">
+  @if (toast(); as note) {
+    <div class="nj-toast" [class.is-bad]="note.tone === 'bad'" role="status" aria-live="polite">
+      <span class="nj-toast-icon" aria-hidden="true">
+        @if (note.tone === 'bad') {
+          <svg viewBox="0 0 24 24"><path d="M12 8v5M12 16h.01" /></svg>
+        } @else {
+          <svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7" /></svg>
+        }
+      </span>
+      <span>{{ note.text }}</span>
+      <button type="button" (click)="dismissToast()" aria-label="Dismiss">×</button>
+    </div>
+  }
+
+  <header class="page-banner">
+    <span class="page-banner-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><circle cx="12" cy="10" r="2.6" /></svg>
+    </span>
+    <div class="page-banner-text">
+      <p class="page-banner-eyebrow">MOI Jobs</p>
+      <h1>MOI Jobs</h1>
+      <p class="page-banner-sub">Jobs issued to technicians</p>
+    </div>
+    <label class="head-search nj-search">
+      <span class="nj-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>
+      </span>
+      <input type="search" autocomplete="off" placeholder="Search by customer, number, location or technician…"
+        [value]="search()" (input)="onSearch($any($event.target).value)" />
+      @if (search()) {
+        <button type="button" class="nj-search-clear" aria-label="Clear search" (click)="onSearch('')">×</button>
+      }
+    </label>
+    <div class="page-banner-actions">
+    <a class="banner-ghost" [routerLink]="collectionsUrl">Collections</a>
+    <a class="banner-gold" [routerLink]="[base, 'new']">Issue job</a>
+    </div>
+  </header>
+
+  <div class="nj-stages" role="tablist" aria-label="Job stage">
+    <button type="button" class="nj-stage" [class.is-on]="stage() === 'all'" (click)="setStage('all')">All <b>{{ counts().all }}</b></button>
+    <button type="button" class="nj-stage" [class.is-on]="stage() === 'todo'" (click)="setStage('todo')">To do <b>{{ counts().todo }}</b></button>
+    <button type="button" class="nj-stage nj-stage--attn" [class.is-on]="stage() === 'done'" [class.has-items]="counts().done > 0" (click)="setStage('done')">
+      Done — ready to send <b>{{ counts().done }}</b>
+    </button>
+    <button type="button" class="nj-stage" [class.is-on]="stage() === 'sent'" (click)="setStage('sent')">With client <b>{{ counts().sent }}</b></button>
+    <button type="button" class="nj-stage nj-stage--attn" [class.is-on]="stage() === 'changes'" [class.has-items]="counts().changes > 0" (click)="setStage('changes')">
+      Client asked for changes <b>{{ counts().changes }}</b>
+    </button>
+    <button type="button" class="nj-stage" [class.is-on]="stage() === 'closed'" (click)="setStage('closed')">Approved <b>{{ counts().closed }}</b></button>
+  </div>
+
+
+  <div class="admin-panel">
+    @if (loading()) {
+      <p>Loading the jobs…</p>
+    } @else if (listError()) {
+      <p class="admin-error" role="alert">{{ listError() }}</p>
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="load()">Try again</button>
+    } @else if (!filtered().length) {
+      <div class="nj-empty">
+        <strong>{{ jobs().length ? 'No jobs match this search.' : 'No jobs yet.' }}</strong>
+        <span>{{ jobs().length ? 'Try another name, number or location.' : 'Issue the first one — the technician you pick sees it straight away.' }}</span>
+      </div>
+    } @else {
+      <div class="nj-table-wrap">
+        <table class="nj-table">
+          <thead>
+            <tr>
+              <th scope="col">Customer</th>
+              <th scope="col">Number</th>
+              <th scope="col">Location</th>
+              <th scope="col">Technician</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="nj-amount">Amount</th>
+              <th scope="col" class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (job of pageItems(); track job.id) {
+              <tr [class.is-saved]="justSavedId() === job.id">
+                <td data-label="Customer" class="col-name" [attr.title]="job.customerName">{{ job.customerName }}</td>
+                <td data-label="Number">{{ job.customerNumber }}</td>
+                <td data-label="Location" [attr.title]="job.location">
+                  {{ job.location }}
+                  @if (isPinned(job)) { <span class="nj-pinned" title="Has a map pin — Navigate works">●</span> }
+                </td>
+                <td data-label="Technician" class="col-tech">
+                  {{ job.assignedToName }}
+                  @if (job.scheduledAt) { <small class="nj-visit">{{ job.scheduledAt | date: 'd MMM, h:mm a' : '+0300' }}</small> }
+                </td>
+                <td data-label="Status">
+                  <span class="nj-status" [attr.data-status]="job.status"
+                    [attr.title]="job.status === 'ChangesRequested' && job.clientMessage ? job.clientMessage : statusLabel(job.status)">
+                    {{ statusLabel(job.status) }}
+                  </span>
+                </td>
+                <td data-label="Amount" class="nj-amount">
+                  {{ job.status === 'Assigned' ? '—' : (job.amountPayable | number: '1.2-2') + ' QAR' }}
+                  @if (job.status !== 'Assigned') {
+                    <small class="nj-paid" [attr.data-state]="job.amountPaid <= 0 ? 'unpaid' : job.amountPaid >= job.amountPayable ? 'paid' : 'part'">
+                      {{ job.amountPaid <= 0 ? 'Unpaid' : job.amountPaid >= job.amountPayable ? 'Paid' : 'Paid ' + (job.amountPaid | number: '1.0-0') }}
+                    </small>
+                  }
+                </td>
+                <td class="col-actions">
+                  <div class="nj-row-actions">
+                    @if (pendingDeleteId() === job.id) {
+                      <button type="button" class="row-btn row-btn--danger"
+                        [disabled]="deletingId() === job.id" (click)="confirmDelete(job)">
+                        {{ deletingId() === job.id ? 'Deleting…' : 'Delete' }}
+                      </button>
+                      <button type="button" class="row-btn"
+                        [disabled]="deletingId() === job.id" (click)="pendingDeleteId.set(null)">Keep</button>
+                    } @else if (job.status === 'Closed' || job.status === 'Sent') {
+                      <a class="row-btn act act--view" [routerLink]="[base, job.id, 'close']" [attr.aria-label]="'View ' + job.jobNumber" title="View"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="act-label">View</span></a>
+                    } @else {
+                      @if (job.status === 'Completed' || job.status === 'ChangesRequested') {
+                        <a class="row-btn nj-close-btn" [routerLink]="[base, job.id, 'close']"
+                          [attr.aria-label]="'Review and send ' + job.jobNumber">{{ job.status === 'ChangesRequested' ? 'Review changes' : 'Review & send' }}</a>
+                      }
+                      <a class="row-btn row-btn--edit act act--edit" [routerLink]="[base, job.id, 'edit']"
+                        [attr.aria-label]="'Edit ' + job.jobNumber" title="Edit">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                        </svg>
+                        <span class="act-label">Edit</span>
+                      </a>
+                      <button type="button" class="row-btn row-btn--icon row-btn--delete act act--delete" title="Delete"
+                        [attr.aria-label]="'Delete ' + job.jobNumber" (click)="askDelete(job)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="nj-foot">
+        <p class="nj-count">
+          Showing {{ rangeStart() }}–{{ rangeEnd() }} of {{ filtered().length }}
+          {{ filtered().length === 1 ? 'job' : 'jobs' }}
+        </p>
+        @if (totalPages() > 1) {
+          <nav class="nj-pager" aria-label="Job pages">
+            <button type="button" class="btn-admin btn-admin-ghost" [disabled]="page() <= 1"
+              (click)="goToPage(page() - 1)">Previous</button>
+            <span>Page {{ page() }} of {{ totalPages() }}</span>
+            <button type="button" class="btn-admin btn-admin-ghost" [disabled]="page() >= totalPages()"
+              (click)="goToPage(page() + 1)">Next</button>
+          </nav>
+        }
+      </div>
+    }
+  </div>
+</section>

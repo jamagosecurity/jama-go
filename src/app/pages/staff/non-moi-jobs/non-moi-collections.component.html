@@ -2,10 +2,10 @@
   <header class="page-banner">
     <div class="page-banner-text">
       <h1>Collections</h1>
-      <p class="page-banner-sub">Money received for Non-MOI jobs — cash and online</p>
+      <p class="page-banner-sub">Money received for MOI and Non-MOI jobs — cash and online</p>
     </div>
     <div class="page-banner-actions">
-      <a class="banner-ghost" [routerLink]="base">Back to jobs</a>
+      
     </div>
   </header>
 
@@ -22,6 +22,13 @@
     <label class="col-date"><span>To</span>
       <input type="date" [max]="today" [ngModel]="to()" (ngModelChange)="setRange(from(), $event)" />
     </label>
+    @if (canMoi && canNonMoi) {
+      <div class="col-presets" role="group" aria-label="Job type">
+        <button type="button" [class.is-on]="source() === ''" (click)="source.set('')">All jobs</button>
+        <button type="button" [class.is-on]="source() === 'MOI'" (click)="source.set('MOI')">MOI</button>
+        <button type="button" [class.is-on]="source() === 'Non-MOI'" (click)="source.set('Non-MOI')">Non-MOI</button>
+      </div>
+    }
     <div class="col-presets" role="group" aria-label="Payment method">
       <button type="button" [class.is-on]="method() === ''" (click)="method.set('')">All</button>
       <button type="button" [class.is-on]="method() === 'Cash'" (click)="method.set('Cash')">Cash</button>
@@ -33,14 +40,14 @@
 
   @if (data(); as d) {
     <div class="col-kpis">
-      <div class="col-kpi col-kpi--total"><span>Total received</span><strong>{{ d.total | number: '1.2-2' }} QAR</strong>
-        <small>{{ d.rows.length }} {{ d.rows.length === 1 ? 'payment' : 'payments' }} · {{ d.from === d.to ? (d.from | date: 'EEE d MMM y') : (d.from | date: 'd MMM') + ' – ' + (d.to | date: 'd MMM y') }}</small></div>
-      <div class="col-kpi col-kpi--cash"><span>Cash</span><strong>{{ d.cash | number: '1.2-2' }} QAR</strong>
+      <div class="col-kpi col-kpi--total"><span>Total received</span><strong>{{ totals().total | number: '1.2-2' }} QAR</strong>
+        <small>{{ totals().count }} {{ totals().count === 1 ? 'payment' : 'payments' }} · {{ d.from === d.to ? (d.from | date: 'EEE d MMM y') : (d.from | date: 'd MMM') + ' – ' + (d.to | date: 'd MMM y') }}</small></div>
+      <div class="col-kpi col-kpi--cash"><span>Cash</span><strong>{{ totals().cash | number: '1.2-2' }} QAR</strong>
         <small>
           @for (c of byCollector(); track c.name; let last = $last) { {{ c.name }} {{ c.amount | number: '1.0-0' }}@if (!last) { · } }
           @empty { No cash }
         </small></div>
-      <div class="col-kpi col-kpi--online"><span>Online</span><strong>{{ d.online | number: '1.2-2' }} QAR</strong>
+      <div class="col-kpi col-kpi--online"><span>Online</span><strong>{{ totals().online | number: '1.2-2' }} QAR</strong>
         <small>Bank transfers with receipts</small></div>
     </div>
   }
@@ -57,6 +64,7 @@
             <tr>
               <th scope="col">Date</th>
               <th scope="col">Job</th>
+              <th scope="col">Type</th>
               <th scope="col">Customer</th>
               <th scope="col">Method</th>
               <th scope="col">Collected by</th>
@@ -69,14 +77,15 @@
             @for (r of rows(); track r.paymentId) {
               <tr>
                 <td data-label="Date">{{ r.receivedOn | date: 'd MMM y' }}</td>
-                <td data-label="Number"><a class="col-job" [routerLink]="[base, r.jobId, 'close']">{{ r.jobNumber }}</a></td>
+                <td data-label="Number"><a class="col-job" [routerLink]="jobLink(r)">{{ r.jobNumber }}</a></td>
+                <td data-label="Type"><span class="col-type" [attr.data-type]="r.source">{{ r.source }}</span></td>
                 <td data-label="Customer">{{ r.customerName }}@if (r.note) { <small class="col-note">{{ r.note }}</small> }</td>
                 <td data-label="Status"><span class="col-method" [attr.data-method]="r.method">{{ r.method }}</span></td>
                 <td data-label="Collected by">{{ r.method === 'Cash' ? (r.collectedByName || 'Office') : '—' }}</td>
                 <td data-label="Amount" class="col-amt">{{ r.amount | number: '1.2-2' }} QAR</td>
                 <td data-label="Recorded by">{{ person(r.recordedByName) }}<small class="col-note">{{ r.recordedAt | date: 'd MMM, h:mm a' : '+0300' }}</small></td>
                 <td data-label="Actions" class="col-actions">
-                  <a class="row-btn act act--view" [routerLink]="[base, r.jobId, 'close']" title="Open job">
+                  <a class="row-btn act act--view" [routerLink]="jobLink(r)" title="Open job">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="act-label">Open job</span>
                   </a>
                   @if (r.hasReceipt) {

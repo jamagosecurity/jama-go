@@ -9,6 +9,9 @@ import { createDrawingRoutes } from './drawings/drawing.routes';
 import { createMaintenanceRoutes } from './maintenance/maintenance.routes';
 import { createNonMoiRoutes } from './maintenance/non-moi/non-moi.routes';
 import { createNonMoiJobRoutes } from './non-moi-jobs/non-moi-jobs.routes';
+import { NON_MOI_JOBS_BASE_PATH } from './non-moi-jobs/non-moi-jobs-base-path';
+import { createMoiJobRoutes } from './moi-jobs/moi-jobs.routes';
+import { createMoiServiceRoutes } from './moi-services/moi-services.routes';
 
 export const STAFF_ROUTES: Routes = [
   {
@@ -118,6 +121,27 @@ export const STAFF_ROUTES: Routes = [
         path: 'non-moi-jobs',
         canActivate: [permissionGuard(PERMISSIONS.nonMoiJobManage)],
         children: createNonMoiJobRoutes('/staff/non-moi-jobs'),
+      },
+      {
+        // MOI jobs: the same flow as Non-MOI (issue, technician completes, invoice, client answer, payments),
+        // with its own MOI services price list. Separate from the MOI stock inventory.
+        path: 'moi-jobs',
+        canActivate: [permissionGuard(PERMISSIONS.moiJobManage)],
+        children: createMoiJobRoutes('/staff/moi-jobs'),
+      },
+      {
+        path: 'moi-services',
+        canActivate: [permissionGuard(PERMISSIONS.moiJobManage)],
+        children: createMoiServiceRoutes('/staff/moi-services'),
+      },
+      {
+        // One Collections page for MOI and Non-MOI money.
+        path: 'collections',
+        canActivate: [anyPermissionGuard(PERMISSIONS.nonMoiJobManage, PERMISSIONS.moiJobManage)],
+        title: 'Collections — Jama Go',
+        providers: [{ provide: NON_MOI_JOBS_BASE_PATH, useValue: '/staff/non-moi-jobs' }],
+        loadComponent: () =>
+          import('./non-moi-jobs/non-moi-collections.component').then((m) => m.NonMoiCollectionsComponent),
       },
       {
         // The company mailboxes, read-only for staff an admin granted mail.read.

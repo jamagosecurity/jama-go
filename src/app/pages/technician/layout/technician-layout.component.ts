@@ -50,6 +50,7 @@ export class TechnicianLayoutComponent {
     () => this.auth.can(PERMISSIONS.diaInspect) || this.auth.can(PERMISSIONS.diaView),
   );
   protected readonly canDoJobs = computed(() => this.auth.can(PERMISSIONS.nonMoiJobWork));
+  protected readonly canDoMoiJobs = computed(() => this.auth.can(PERMISSIONS.moiJobWork));
   protected readonly isProfile = toSignal(
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd), map(() => this.router.url.startsWith('/technician/profile'))),
     { initialValue: this.router.url.startsWith('/technician/profile') },
@@ -65,8 +66,9 @@ export class TechnicianLayoutComponent {
     this.menuOpen.set(false);
   }
 
-  private tabFor(url: string): 'dia' | 'jobs' {
+  private tabFor(url: string): 'dia' | 'jobs' | 'moi' {
     if (url.startsWith(JOBS_PREFIX)) return 'jobs';
+    if (url.startsWith('/technician/moi-jobs')) return 'moi';
     return 'dia';
   }
 }

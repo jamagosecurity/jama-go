@@ -1,0 +1,231 @@
+/* Mirrors the stock inventory's item page (camera-editor, styled from
+   camera-list.component.css) — restated rather than referenced. */
+
+.nm-back {
+  display: block;
+  width: fit-content;
+  margin-bottom: 8px;
+  color: var(--admin-blue-ink);
+  font-size: 0.86rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+.nm-back:hover { text-decoration: underline; }
+
+.nm-form-panel { margin-bottom: 22px; padding-bottom: 4px; }
+
+.nm-section:first-of-type { margin-top: 8px; }
+.nm-section-head h3 {
+  position: relative;
+  margin: 0;
+  padding-left: 12px;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--admin-ink);
+}
+.nm-section-head h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--admin-orange), var(--admin-blue-deep));
+}
+.nm-section-head p {
+  margin: 4px 0 0;
+  padding-left: 12px;
+  color: var(--admin-muted);
+  font-size: 0.88rem;
+}
+
+.nm-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+  align-items: start;
+  margin-top: 16px;
+}
+.nm-field--wide { grid-column: 1 / -1; }
+
+.nm-field {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: #234379;
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+.nm-field > span i { color: #e11d24; font-style: normal; }
+.nm-field input,
+.nm-field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid rgba(26, 55, 103, 0.12);
+  border-radius: 13px;
+  color: var(--admin-ink);
+  background: #fff;
+  font: inherit;
+  font-weight: 500;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.nm-field textarea { resize: vertical; line-height: 1.5; }
+.nm-field input:focus,
+.nm-field textarea:focus {
+  outline: none;
+  border-color: rgba(50, 90, 160, 0.55);
+  box-shadow: 0 0 0 4px rgba(50, 90, 160, 0.12);
+}
+.nm-field .is-invalid {
+  border-color: rgba(225, 29, 36, 0.6);
+  background: rgba(225, 29, 36, 0.03);
+}
+.field-error { color: #be1218; font-size: 0.78rem; font-weight: 650; }
+
+.nm-lang,
+.nm-unit {
+  margin-left: 6px;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.nm-unit { margin-left: 2px; }
+
+/* The Arabic field's label and box read right-to-left. */
+.nm-field--ar > span {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.nm-field--ar .nm-lang { margin-left: 0; }
+.nm-field--ar textarea { line-height: 1.7; }
+
+.nm-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--admin-line);
+}
+.nm-form-error { margin-top: 14px; }
+
+/* ===== Creating a category ===== */
+
+.nm-newcat {
+  display: flex;
+  gap: 10px;
+}
+.nm-newcat input { flex: 1 1 auto; min-width: 0; }
+.nm-newcat .btn-admin { flex: 0 0 auto; }
+.nm-hint {
+  color: var(--admin-muted);
+  font-size: 0.8rem;
+}
+
+/* ===== Images ===== */
+
+.nm-section + .nm-section { margin-top: 26px; }
+
+.nm-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.nm-shot {
+  position: relative;
+  margin: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+.nm-shot img {
+  display: block;
+  width: 100%;
+  height: 112px;
+  object-fit: contain;
+  background: #f6f8fb;
+}
+.nm-shot figcaption {
+  padding: 8px 10px;
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  /* File names run long and must not stretch the tile. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nm-shot-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(16, 34, 64, 0.62);
+  color: #fff;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.nm-shot-remove:hover { background: var(--jama-rose, #e11d24); }
+.nm-shot.is-pending { border-style: dashed; }
+.nm-shot-flag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(163, 161, 144, 0.92);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.nm-drop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  min-height: 148px;
+  padding: 12px;
+  border: 1.5px dashed rgba(50, 90, 160, 0.4);
+  border-radius: 14px;
+  background: rgba(50, 90, 160, 0.04);
+  color: var(--admin-blue-ink);
+  font-size: 0.86rem;
+  font-weight: 750;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+.nm-drop:hover {
+  border-color: var(--admin-blue-deep);
+  background: rgba(50, 90, 160, 0.09);
+}
+.nm-drop input {
+  /* Off-screen rather than display:none so the label stays a real control. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.nm-drop-plus { font-size: 1.7rem; line-height: 1; }
+
+@media (max-width: 720px) {
+  .nm-form { grid-template-columns: 1fr; }
+  .nm-gallery { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
+  .nm-form-actions { flex-direction: column-reverse; }
+  .nm-form-actions .btn-admin { width: 100%; text-align: center; }
+}

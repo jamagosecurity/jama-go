@@ -8,7 +8,8 @@ import { AuthService } from '../../services/auth.service';
 const landingGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   if (auth.can(PERMISSIONS.diaInspect) || auth.can(PERMISSIONS.diaView)) return true;
-  return inject(Router).parseUrl(auth.can(PERMISSIONS.nonMoiJobWork) ? '/technician/non-moi-jobs' : '/technician/no-access');
+  return inject(Router).parseUrl(auth.can(PERMISSIONS.nonMoiJobWork) ? '/technician/non-moi-jobs'
+    : auth.can(PERMISSIONS.moiJobWork) ? '/technician/moi-jobs' : '/technician/no-access');
 };
 
 const inspectionGuard: CanActivateFn = () => {
@@ -85,6 +86,21 @@ export const TECHNICIAN_ROUTES: Routes = [
         title: 'Non-MOI Jobs — Jama Go',
         loadComponent: () =>
           import('./non-moi-jobs/technician-non-moi-jobs.component').then((m) => m.TechnicianNonMoiJobsComponent),
+      },
+      {
+        path: 'moi-jobs/:id',
+        canActivate: [permissionGuard(PERMISSIONS.moiJobWork)],
+        title: 'MOI Job — Jama Go',
+        loadComponent: () =>
+          import('./moi-jobs/technician-moi-job-detail.component').then((m) => m.TechnicianMoiJobDetailComponent),
+      },
+      {
+        // MOI jobs issued to this technician — same as Non-MOI, priced from the MOI services list.
+        path: 'moi-jobs',
+        canActivate: [permissionGuard(PERMISSIONS.moiJobWork)],
+        title: 'MOI Jobs — Jama Go',
+        loadComponent: () =>
+          import('./moi-jobs/technician-moi-jobs.component').then((m) => m.TechnicianMoiJobsComponent),
       },
     ],
   },

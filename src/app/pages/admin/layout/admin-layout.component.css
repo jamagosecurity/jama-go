@@ -1288,3 +1288,10 @@
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
 }
+
+/* Room for MOI Jobs and MOI Services: every link still fits a laptop screen. */
+.admin-nav { gap: 0; }
+.admin-nav a { min-height: 34px; padding-top: 2px; padding-bottom: 2px; }
+.admin-nav a .nav-icon, .admin-nav .nav-icon { width: 28px; height: 28px; }
+.admin-nav .nav-label, .admin-nav .nav-sub, .admin-nav .nav-sub--moi, .admin-nav .nav-sub--non { margin: 6px 0 2px; }
+.admin-sidebar .admin-logo { max-width: 180px; }

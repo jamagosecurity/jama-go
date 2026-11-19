@@ -99,10 +99,29 @@
             <small>Brand, type &amp; quantity</small>
           </span>
         </a>
+        @if (canMoiJobs()) {
+        <a routerLink="/admin/moi-jobs" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><path d="m9.5 10 1.8 1.8 3.4-3.6" /></svg></span>
+          <span>
+            <strong>MOI Jobs</strong>
+            <small>Issued to technicians</small>
+          </span>
+          @if (moiJobBadge.count() > 0) {
+            <span class="nav-count" [attr.aria-label]="moiJobBadge.count() + ' finished MOI jobs waiting to be billed'">{{ moiJobBadge.count() }}</span>
+          }
+        </a>
+        <a routerLink="/admin/moi-services" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 11h6M9 15h4" /></svg></span>
+          <span>
+            <strong>MOI Services</strong>
+            <small>MOI price list</small>
+          </span>
+        </a>
+        }
 
         <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
 
-        <a routerLink="/admin/non-moi-jobs" routerLinkActive #jobsLink="routerLinkActive" [class.active]="jobsLink.isActive && !collectionsLink.isActive">
+        <a routerLink="/admin/non-moi-jobs" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
@@ -131,7 +150,7 @@
             <small>Services &amp; prices</small>
           </span>
         </a>
-        <a routerLink="/admin/non-moi-jobs/collections" routerLinkActive="active" #collectionsLink="routerLinkActive">
+        <a routerLink="/admin/collections" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2" /><circle cx="12" cy="12" r="2.6" /><path d="M6 9.5v5M18 9.5v5" /></svg>
           </span>

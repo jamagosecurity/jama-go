@@ -52,6 +52,19 @@
           </span>
         </a>
       }
+
+      @if (canDoMoiJobs()) {
+        <p class="nav-sub nav-sub--moi"><i aria-hidden="true"></i>MOI</p>
+        <a routerLink="/technician/moi-jobs" [class.active]="tab() === 'moi'">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><path d="m9.5 10 1.8 1.8 3.4-3.6" /></svg>
+          </span>
+          <span>
+            <strong>MOI Jobs</strong>
+            <small>Issued to you</small>
+          </span>
+        </a>
+      }
     </nav>
 
     <div class="staff-sidebar-foot">
@@ -99,6 +112,12 @@
       <a routerLink="/technician/non-moi-jobs" [class.active]="tab() === 'jobs'">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><circle cx="12" cy="10" r="2.6" /></svg>
         <span>Jobs</span>
+      </a>
+    }
+    @if (canDoMoiJobs()) {
+      <a routerLink="/technician/moi-jobs" [class.active]="tab() === 'moi'">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><path d="m9.5 10 1.8 1.8 3.4-3.6" /></svg>
+        <span>MOI jobs</span>
       </a>
     }
     <a routerLink="/technician/profile" [class.active]="isProfile()" aria-label="My profile and sign out">

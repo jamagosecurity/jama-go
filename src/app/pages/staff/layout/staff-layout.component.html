@@ -28,7 +28,7 @@
          public-site link were removed at the owner's request; their routes still
          exist and are reachable by URL. -->
     <nav class="staff-nav" aria-label="Staff">
-      @if (canUploadDia() || canManageCameras()) {
+      @if (canUploadDia() || canManageCameras() || canMoiJobs()) {
         <p class="nav-sub nav-sub--moi"><i aria-hidden="true"></i>MOI</p>
       }
       @if (canUploadDia()) {
@@ -60,11 +60,30 @@
           </span>
         </a>
       }
+      @if (canMoiJobs()) {
+      <a routerLink="/staff/moi-jobs" routerLinkActive="active">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><path d="m9.5 10 1.8 1.8 3.4-3.6" /></svg></span>
+        <span>
+          <strong>MOI Jobs</strong>
+          <small>Issued to technicians</small>
+        </span>
+        @if (moiJobBadge.count() > 0) {
+          <span class="nav-count" [attr.aria-label]="moiJobBadge.count() + ' finished MOI jobs waiting to be billed'">{{ moiJobBadge.count() }}</span>
+        }
+      </a>
+      <a routerLink="/staff/moi-services" routerLinkActive="active">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="M9 11h6M9 15h4" /></svg></span>
+        <span>
+          <strong>MOI Services</strong>
+          <small>MOI price list</small>
+        </span>
+      </a>
+      }
 
       <p class="nav-sub nav-sub--non"><i aria-hidden="true"></i>Non-MOI</p>
 
       @if (canIssueJobs()) {
-        <a routerLink="/staff/non-moi-jobs" routerLinkActive #jobsLink="routerLinkActive" [class.active]="jobsLink.isActive && !onCollections()">
+        <a routerLink="/staff/non-moi-jobs" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
@@ -96,8 +115,8 @@
           </span>
         </a>
       }
-      @if (canIssueJobs()) {
-        <a routerLink="/staff/non-moi-jobs/collections" routerLinkActive="active">
+      @if (canIssueJobs() || canMoiJobs()) {
+        <a routerLink="/staff/collections" routerLinkActive="active">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2" /><circle cx="12" cy="12" r="2.6" /><path d="M6 9.5v5M18 9.5v5" /></svg>
           </span>

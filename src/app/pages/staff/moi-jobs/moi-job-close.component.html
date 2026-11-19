@@ -1,0 +1,308 @@
+<section class="admin-page jc">
+  @if (loading()) {
+    <div class="admin-panel"><p>Loading…</p></div>
+  } @else if (!job()) {
+    <div class="admin-panel">
+      <p class="admin-error">{{ error() }}</p>
+      <a class="row-btn" [routerLink]="base">Back to jobs</a>
+    </div>
+  } @else if (job(); as j) {
+    <header class="page-banner">
+      <span class="page-banner-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3z" /><path d="m9 13 2 2 4-4" /></svg>
+      </span>
+      <div class="page-banner-text">
+        <p class="page-banner-eyebrow">{{ j.jobNumber }} · MOI</p>
+        <h1>{{ j.status === 'Closed' ? 'Approved by the client' : j.status === 'Sent' ? 'Bill with the client' : j.status === 'ChangesRequested' ? 'The client asked for changes' : 'Review & send the bill' }}</h1>
+        <p class="page-banner-sub">{{ j.customerName }} · done by {{ j.assignedToName }}@if (j.billRevision > 1) { · revision {{ j.billRevision }} }</p>
+      </div>
+      <div class="page-banner-actions">
+        <a class="banner-ghost" [routerLink]="base">
+          <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>Back to jobs
+        </a>
+      </div>
+    </header>
+
+    <!-- The journey of this job, at a glance. -->
+    <ol class="jc-steps" aria-label="Progress">
+      @for (s of steps(); track s.label; let i = $index) {
+        <li [attr.data-state]="s.state">
+          <span class="jc-step-dot" aria-hidden="true">
+            @if (s.state === 'done') { <svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7" /></svg> }
+            @else if (s.state === 'attention') { ! }
+            @else { {{ i + 1 }} }
+          </span>
+          <span class="jc-step-text"><strong>{{ s.label }}</strong><small>{{ s.sub }}</small></span>
+        </li>
+      }
+    </ol>
+
+    @if (error()) { <p class="admin-error">{{ error() }}</p> }
+
+    @if (j.status === 'Assigned') {
+      <div class="admin-panel"><p>The technician has not completed this job yet, so there is nothing to send.</p></div>
+    } @else {
+      <!-- ===== Summary card ===== -->
+      <section class="jc-hero">
+        <div class="jc-hero-main">
+          <p class="jc-hero-eyebrow">{{ j.jobNumber }}{{ j.billRevision > 1 ? ' · Revision ' + j.billRevision : '' }}</p>
+          <h2 class="jc-hero-name">{{ j.customerName }}</h2>
+          <dl class="jc-hero-meta">
+            <div><dt>Phone</dt><dd>{{ j.customerNumber }}</dd></div>
+            <div><dt>Location</dt><dd>{{ j.location }}</dd></div>
+            <div><dt>Technician</dt><dd>{{ j.assignedToName }}</dd></div>
+            @if (person(j.assignedByName)) { <div><dt>Issued by</dt><dd>{{ person(j.assignedByName) }}</dd></div> }
+            <div><dt>Work finished</dt><dd>{{ j.completedAt | date: 'd MMM y, HH:mm' }}</dd></div>
+          </dl>
+        </div>
+        <div class="jc-hero-amount">
+          <span>Amount payable</span>
+          <strong>QAR {{ headlineAmount() | number: '1.2-2' }}</strong>
+          <small>
+            Total {{ j.workTotal | number: '1.2-2' }}
+            @if ((canClose() ? discount() : j.discount) > 0) { · discount {{ (canClose() ? discount() : j.discount) | number: '1.2-2' }} }
+          </small>
+        </div>
+      </section>
+
+      <!-- ===== Work done ===== -->
+      <section class="jc-card">
+        <h2 class="jc-h">Work done</h2>
+        <p class="jc-note">Prices come from the MOI inventory and cannot be changed here. The only adjustment is a discount.</p>
+        <div class="jc-tablewrap">
+          <table class="jc-table">
+            <thead><tr><th>Issue</th><th class="jc-num">Qty</th><th class="jc-num">Price</th><th class="jc-num">Total</th></tr></thead>
+            <tbody>
+              @for (l of j.lines; track $index) {
+                <tr>
+                  <td><strong>{{ l.issueType }}</strong><small>{{ categoryLabel(l.category) }}</small></td>
+                  <td class="jc-num">{{ l.quantity }}</td>
+                  <td class="jc-num">{{ l.unitFee | number: '1.2-2' }}</td>
+                  <td class="jc-num">{{ l.lineTotal | number: '1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (j.completionNotes) { <p class="jc-notes"><span class="jc-label">Technician's notes</span>{{ j.completionNotes }}</p> }
+      </section>
+
+      @if (j.status === 'ChangesRequested' && j.clientMessage) {
+        <section class="jc-card jc-changes">
+          <h2 class="jc-h">{{ j.clientDecision === 'Rejected' ? 'The client rejected the bill' : 'The client left a comment' }}</h2>
+          <blockquote>{{ j.clientMessage }}</blockquote>
+          <p class="jc-note">— {{ person(j.clientResponderName) }}, {{ j.clientRespondedAt | date: 'd MMM y, HH:mm' }}.
+            Adjust the discount below if you wish, then send a new revision.</p>
+        </section>
+      }
+
+      @if (j.status === 'Closed') {
+        <section class="jc-card jc-closed">
+          <h2 class="jc-h">Approved — the deal is final</h2>
+          <ul class="jc-sent">
+            <li>✓ Approved by <strong>{{ person(j.closedByName) }}</strong> on {{ j.closedAt | date: 'd MMM y, HH:mm' }}</li>
+            @if (j.emailSentAt) { <li>Emailed to <strong>{{ j.customerEmail }}</strong> · {{ j.emailSentAt | date: 'd MMM y, HH:mm' }}</li> }
+            @if (j.whatsAppSentAt) { <li>WhatsApp sent to <strong>{{ j.customerNumber }}</strong> · {{ j.whatsAppSentAt | date: 'd MMM y, HH:mm' }}</li> }
+          </ul>
+          <button type="button" class="jc-btn jc-btn--ghost" (click)="downloadBill()">Download the bill (PDF)</button>
+        </section>
+      } @else if (j.status === 'Sent') {
+        <section class="jc-card jc-closed">
+          <h2 class="jc-h">Waiting for the client</h2>
+          <p class="jc-note">The bill{{ j.billRevision > 1 ? ' (revision ' + j.billRevision + ')' : '' }} was sent for <strong>{{ j.amountPayable | number: '1.2-2' }} QAR</strong>.
+            You will see the red number beside MOI Jobs as soon as they answer.</p>
+          <ul class="jc-sent">
+            @if (j.emailSentAt) { <li>✓ Emailed to <strong>{{ j.customerEmail }}</strong> · {{ j.emailSentAt | date: 'd MMM y, HH:mm' }}</li> }
+            @if (j.whatsAppSentAt) { <li>✓ WhatsApp sent to <strong>{{ j.customerNumber }}</strong> · {{ j.whatsAppSentAt | date: 'd MMM y, HH:mm' }}</li> }
+          </ul>
+          <button type="button" class="jc-btn jc-btn--ghost" (click)="downloadBill()">Download the bill (PDF)</button>
+        </section>
+      } @else if (!canClose()) {
+        <section class="jc-card">
+          <p class="jc-note">The technician has not finished this job yet. Once they do, you can add a discount and send the bill here.</p>
+        </section>
+      } @else {
+        <section class="jc-card jc-send">
+          <h2 class="jc-h">{{ j.status === 'ChangesRequested' ? 'Send a new revision' : 'Discount & send' }}</h2>
+
+          <div class="jc-row">
+            <label class="jc-field">
+              <span class="jc-label">Discount (QAR) <small>optional</small></span>
+              <input type="text" inputmode="decimal" placeholder="0.00" [ngModel]="discountText()"
+                (ngModelChange)="discountText.set($event); confirming.set(false)" [class.is-invalid]="!!discountError()" />
+              @if (discountError()) { <small class="jc-error">{{ discountError() }}</small> }
+            </label>
+            <dl class="jc-sum">
+              <div><dt>Total</dt><dd>{{ j.workTotal | number: '1.2-2' }}</dd></div>
+              @if (discount() > 0) { <div><dt>Discount</dt><dd>− {{ discount() | number: '1.2-2' }}</dd></div> }
+              <div class="jc-sum-pay"><dt>Amount payable</dt><dd>{{ payable() | number: '1.2-2' }} QAR</dd></div>
+            </dl>
+          </div>
+
+          <h3 class="jc-h3">Where should the bill go?</h3>
+          <p class="jc-note">The client receives the invoice by email, with the PDF attached and your signature. One <strong>Review &amp; respond</strong> button opens their page, where they <strong>Approve</strong>, <strong>Reject</strong> or <strong>Comment</strong> in one tap.</p>
+          <div class="jc-channels">
+            <div class="jc-channel is-on">
+              <label class="jc-field">
+                <span class="jc-label">Client's email <em>required</em></span>
+                <input type="email" placeholder="name@example.com" [ngModel]="email()"
+                  (ngModelChange)="email.set($event); confirming.set(false)" [class.is-invalid]="!!emailError()" />
+                @if (emailError()) { <small class="jc-error">{{ emailError() }}</small> }
+              </label>
+              <label class="jc-field">
+                <span class="jc-label">Send from</span>
+                <select [ngModel]="mailboxKey()" (ngModelChange)="mailboxKey.set($event)">
+                  @for (m of mailboxes(); track m.key) { <option [value]="m.key">{{ m.address }}</option> }
+                </select>
+                @if (mailboxError()) { <small class="jc-error">{{ mailboxError() }}</small> }
+              </label>
+            </div>
+          </div>
+
+          <div class="jc-actions">
+            @if (!confirming()) {
+              <button type="button" class="jc-btn jc-btn--main" [disabled]="!canSubmit()" (click)="confirming.set(true)">
+                {{ j.status === 'ChangesRequested' ? 'Send revision ' + (j.billRevision + 1) + ' to the client' : 'Send bill to the client' }}
+              </button>
+            } @else {
+              <div class="jc-confirm">
+                <p>
+                  Send the bill for <strong>{{ payable() | number: '1.2-2' }} QAR</strong>
+                  by email to <strong>{{ email().trim() }}</strong>
+                  for the client to approve? The job will wait for their answer.
+                </p>
+                <div class="jc-confirm-btns">
+                  <button type="button" class="jc-btn jc-btn--main" [disabled]="saving()" (click)="submit()">
+                    {{ saving() ? 'Sending…' : 'Yes, send it' }}
+                  </button>
+                  <button type="button" class="jc-btn jc-btn--ghost" [disabled]="saving()" (click)="confirming.set(false)">Back</button>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      @if (showPayments()) {
+        <section class="jc-card jc-pay" aria-labelledby="jc-pay-h">
+          <div class="jc-pay-head">
+            <h2 class="jc-h" id="jc-pay-h">Payments</h2>
+            <span class="jc-pay-state" [attr.data-state]="payState()">{{ payState() }}</span>
+          </div>
+          <dl class="jc-pay-sum">
+            <div><dt>Bill</dt><dd>{{ billed() | number: '1.2-2' }} QAR</dd></div>
+            <div><dt>Received</dt><dd class="is-paid">{{ paid() | number: '1.2-2' }} QAR</dd></div>
+            <div><dt>Balance</dt><dd [class.is-due]="balance() > 0">{{ balance() | number: '1.2-2' }} QAR</dd></div>
+          </dl>
+
+          @if (j.payments.length) {
+            <ul class="jc-pay-list">
+              @for (p of j.payments; track p.id) {
+                <li>
+                  <span class="jc-pay-method" [attr.data-method]="p.method">{{ p.method === 'Cash' ? 'Cash' : 'Online' }}</span>
+                  <div class="jc-pay-main">
+                    <strong>{{ p.amount | number: '1.2-2' }} QAR</strong>
+                    <small>
+                      {{ p.receivedOn | date: 'EEE d MMM y' }}
+                      @if (p.method === 'Cash') { · {{ p.collectedByName ? 'collected by ' + p.collectedByName : 'received at the office' }} }
+                      · recorded by {{ person(p.recordedByName) }}
+                    </small>
+                    @if (p.note) { <em>{{ p.note }}</em> }
+                  </div>
+                  <div class="jc-pay-acts">
+                    @if (p.hasReceipt) {
+                      <button type="button" class="jc-btn jc-btn--ghost jc-btn--sm" (click)="openReceipt(p)">View receipt</button>
+                    }
+                    @if (isSuper) {
+                      <button type="button" class="jc-pay-del" [disabled]="payDeleting() === p.id" (click)="deletePayment(p)"
+                        title="Remove payment (super admin)" aria-label="Remove payment">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 13h12l1-13"/><path d="M9 7V4h6v3"/></svg>
+                      </button>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="jc-note">No payment recorded yet.</p>
+          }
+
+          @if (canPay() && !payOpen()) {
+            <button type="button" class="jc-btn jc-btn--main" (click)="openPay()">+ Add payment</button>
+          }
+
+          @if (payOpen()) {
+            <div class="jc-pay-form">
+              <div class="jc-pay-methods" role="radiogroup" aria-label="How was it paid?">
+                <button type="button" role="radio" [attr.aria-checked]="payMethod() === 'Cash'" [class.is-on]="payMethod() === 'Cash'"
+                  (click)="payMethod.set('Cash'); payError.set('')">💵 Cash</button>
+                <button type="button" role="radio" [attr.aria-checked]="payMethod() === 'Online'" [class.is-on]="payMethod() === 'Online'"
+                  (click)="payMethod.set('Online'); payError.set('')">🏦 Online (bank transfer)</button>
+              </div>
+              <div class="jc-row">
+                <label class="jc-field">
+                  <span class="jc-label">Amount (QAR)</span>
+                  <input type="text" inputmode="decimal" [ngModel]="payAmount()" (ngModelChange)="payAmount.set($event); payError.set('')" />
+                </label>
+                <div class="jc-field">
+                  <span class="jc-label">Date received</span>
+                  <div class="jc-pay-days">
+                    <button type="button" [class.is-on]="payDate() === today" (click)="payDate.set(today)">Today</button>
+                    <button type="button" [class.is-on]="payDate() === yesterday" (click)="payDate.set(yesterday)">Yesterday</button>
+                    <input type="date" [max]="today" [ngModel]="payDate()" (ngModelChange)="payDate.set($event); payError.set('')" aria-label="Other date" />
+                  </div>
+                </div>
+              </div>
+              <div class="jc-row">
+                @if (payMethod() === 'Cash') {
+                  <label class="jc-field">
+                    <span class="jc-label">Collected by</span>
+                    <select [ngModel]="payCollector()" (ngModelChange)="payCollector.set($event)">
+                      @for (t of technicians(); track t.adminUserId) { <option [value]="t.adminUserId">{{ t.fullName }}</option> }
+                      <option value="">Office (paid at the office)</option>
+                    </select>
+                  </label>
+                }
+                <div class="jc-field">
+                  <span class="jc-label">Receipt {{ payMethod() === 'Online' ? '(required)' : '(optional)' }} <small>photo or PDF, up to 10 MB</small></span>
+                  <span class="jc-file">
+                    <input type="file" id="jc-receipt" accept="image/*,.heic,application/pdf" (change)="onReceipt($event)" />
+                    <label for="jc-receipt" class="jc-file-btn">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+                      {{ payReceipt() ? 'Change file' : 'Upload receipt' }}
+                    </label>
+                    <span class="jc-file-name">{{ payReceipt()?.name || 'No file yet' }}</span>
+                  </span>
+                </div>
+              </div>
+              <label class="jc-field">
+                <span class="jc-label">Note <small>(optional)</small></span>
+                <input type="text" maxlength="500" placeholder="e.g. bank reference, part payment…" [ngModel]="payNote()" (ngModelChange)="payNote.set($event)" />
+              </label>
+              @if (payError()) { <p class="jc-error" role="alert">{{ payError() }}</p> }
+              <div class="jc-pay-actions">
+                <button type="button" class="jc-btn jc-btn--main" [disabled]="paySaving()" (click)="savePayment()">{{ paySaving() ? 'Saving…' : 'Save payment' }}</button>
+                <button type="button" class="jc-btn jc-btn--ghost" [disabled]="paySaving()" (click)="payOpen.set(false)">Cancel</button>
+              </div>
+            </div>
+          }
+        </section>
+      }
+
+      <section class="jc-card">
+        <h2 class="jc-h">History</h2>
+        <ol class="jc-history">
+          @for (e of timeline(); track $index) {
+            <li [attr.data-action]="e.kind">
+              <span class="jc-dot" aria-hidden="true"></span>
+              <div>
+                <strong>{{ e.title }} <time>{{ e.at | date: 'EEE d MMM y, h:mm a' : '+0300' }}</time></strong>
+                <small>{{ e.detail }}</small>
+              </div>
+            </li>
+          }
+        </ol>
+      </section>
+    }
+  }
+</section>
