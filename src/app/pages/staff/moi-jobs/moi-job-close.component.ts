@@ -108,13 +108,15 @@ export class MoiJobCloseComponent implements OnInit {
   protected readonly emailError = computed(() => {
     if (!this.sendEmail()) return '';
     const e = this.email().trim();
-    if (!e) return 'Add the client’s email address — the bill is sent by email.';
+    if (!e) return 'Add the client’s email address, or untick Email and send on WhatsApp.';
     return ADDRESS.test(e) ? '' : 'Enter a valid email address, like name@example.com.';
   });
-  protected readonly mailboxError = computed(() =>
-    this.sendEmail() && !this.mailboxKey() ? 'Choose which company mailbox the email is sent from.' : '');
+  /** Always needed: the bill email goes from it, and the team is told from it when the client answers. */
+  protected readonly mailboxError = computed(() => (!this.mailboxKey() ? 'Choose which company mailbox to use.' : ''));
+  protected readonly channelError = computed(() =>
+    !this.sendEmail() && !this.sendWhatsApp() ? 'Choose how to send the bill: email, WhatsApp or both.' : '');
   protected readonly canSubmit = computed(() =>
-    this.canClose() && !this.saving() && !this.discountError() && !this.emailError() && !this.mailboxError());
+    this.canClose() && !this.saving() && !this.discountError() && !this.emailError() && !this.mailboxError() && !this.channelError());
 
   /** The journey of a job, for the progress bar at the top of the page. */
   protected readonly steps = computed(() => {
@@ -268,9 +270,10 @@ export class MoiJobCloseComponent implements OnInit {
     this.email.set(job.customerEmail ?? '');
     if (job.discount > 0) this.discountText.set(String(job.discount));
     if (!this.mailboxKey()) this.mailboxKey.set(this.mailboxes()[0]?.key ?? '');
-    // The bill always goes by email; WhatsApp is not used for bills.
-    this.sendEmail.set(true);
-    this.sendWhatsApp.set(false);
+    // The person sending picks email, WhatsApp or both. WhatsApp starts ticked when the server has it; email starts
+    // ticked when the client gave an address (or when WhatsApp is not available, so the bill can still go somewhere).
+    this.sendWhatsApp.set(this.whatsAppAvailable());
+    this.sendEmail.set(!!job.customerEmail?.trim() || !this.whatsAppAvailable());
   }
 
   /** "Sara <sara@example.com>" is how audit names are stored; on screen only the name reads well. */
@@ -289,7 +292,7 @@ export class MoiJobCloseComponent implements OnInit {
         email: this.email().trim() || null,
         sendEmail: this.sendEmail(),
         sendWhatsApp: this.sendWhatsApp(),
-        mailboxKey: this.sendEmail() ? this.mailboxKey() : null,
+        mailboxKey: this.mailboxKey(),
       })
       .pipe(finalize(() => this.saving.set(false)))
       .subscribe({
