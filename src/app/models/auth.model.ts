@@ -50,6 +50,8 @@ export const PERMISSIONS = {
   moiJobManage: 'moijob.manage',
   /** Technicians: shows the MOI Jobs section in their portal. */
   moiJobWork: 'moijob.work',
+  /** The accountant: receives the cash people collected and checks the online transfers. */
+  accountsManage: 'accounts.manage',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

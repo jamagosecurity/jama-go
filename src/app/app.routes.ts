@@ -279,6 +279,14 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/staff/non-moi-jobs/non-moi-collections.component').then((m) => m.NonMoiCollectionsComponent),
           },
+          {
+            // The accountant's cash handover (an administrator can open it too).
+            path: 'cash-handover',
+            canActivate: [permissionGuard(PERMISSIONS.accountsManage)],
+            title: 'Cash handover — Jama Go',
+            loadComponent: () =>
+              import('./pages/staff/accounts/cash-handover.component').then((m) => m.CashHandoverComponent),
+          },
         ],
       },
     ],

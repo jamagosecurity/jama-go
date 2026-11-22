@@ -1,0 +1,232 @@
+<section class="admin-page">
+  <header class="page-banner">
+    <div class="page-banner-text">
+      <h1>Cash handover</h1>
+      <p class="page-banner-sub">Count the cash each person hands over at the end of the day</p>
+    </div>
+    <div class="page-banner-actions">
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="load()" [disabled]="loading()">Refresh</button>
+    </div>
+  </header>
+
+  <!-- Cash waiting to be handed over: Non-MOI, MOI and both together. The first two also pick which list is shown below. -->
+  <div class="ah-tiles" role="group" aria-label="Cash waiting">
+    <button type="button" class="ah-tile ah-tile--non" [class.is-on]="kind() === 'nonmoi'" (click)="pickKind('nonmoi')" [attr.aria-pressed]="kind() === 'nonmoi'">
+      <span>Non-MOI cash</span>
+      <strong>{{ waitingNon() | number: '1.2-2' }} <i>QAR</i></strong>
+      <small>{{ peopleNon() }} {{ peopleNon() === 1 ? 'person' : 'people' }} waiting</small>
+    </button>
+    <button type="button" class="ah-tile ah-tile--moi" [class.is-on]="kind() === 'moi'" (click)="pickKind('moi')" [attr.aria-pressed]="kind() === 'moi'">
+      <span>MOI cash</span>
+      <strong>{{ waitingMoi() | number: '1.2-2' }} <i>QAR</i></strong>
+      <small>{{ peopleMoi() }} {{ peopleMoi() === 1 ? 'person' : 'people' }} waiting</small>
+    </button>
+    <div class="ah-tile ah-tile--all">
+      <span>Total cash waiting</span>
+      <strong>{{ waitingAll() | number: '1.2-2' }} <i>QAR</i></strong>
+      <small>MOI + Non-MOI</small>
+    </div>
+  </div>
+
+  @if (error()) { <p class="admin-error" role="alert">{{ error() }}</p> }
+  @if (flash()) { <p class="ah-flash" role="status">✓ {{ flash() }}</p> }
+
+  @if (loading()) {
+    <div class="admin-panel"><p class="ah-empty">Loading…</p></div>
+  } @else {
+    <!-- ===== Waiting for handover ===== -->
+    <div class="admin-panel">
+      <div class="ah-title">
+        <h2>Waiting for handover</h2>
+        <span class="ah-pill">{{ pending()?.total ?? 0 | number: '1.2-2' }} QAR · {{ groups().length }} {{ groups().length === 1 ? 'person' : 'people' }}</span>
+      </div>
+
+      @if (!groups().length) {
+        <p class="ah-empty">All {{ kind() === 'moi' ? 'MOI' : 'Non-MOI' }} cash has been received. Nothing is waiting.</p>
+      } @else {
+        <div class="ah-list">
+          @for (g of groups(); track keyOf(g)) {
+            <article class="ah-card" [class.is-open]="openKey() === keyOf(g)">
+              <button type="button" class="ah-head" (click)="open(g)" [attr.aria-expanded]="openKey() === keyOf(g)">
+                <span class="ah-ava" aria-hidden="true">{{ initials(g.collectorName) }}</span>
+                <span class="ah-who">
+                  <strong>{{ person(g.collectorName) }}</strong>
+                  <small>
+                    {{ g.payments.length }} {{ g.payments.length === 1 ? 'payment' : 'payments' }} ·
+                    {{ g.oldestDay === g.newestDay ? (g.oldestDay | date: 'd MMM') : (g.oldestDay | date: 'd MMM') + ' – ' + (g.newestDay | date: 'd MMM') }}
+                  </small>
+                </span>
+                <span class="ah-amt">{{ g.total | number: '1.2-2' }} <i>QAR</i></span>
+                <span class="ah-go">{{ openKey() === keyOf(g) ? 'Close' : 'Receive cash' }}</span>
+              </button>
+
+              @if (openKey() === keyOf(g)) {
+                <div class="ah-body">
+                  <div class="admin-table-wrap">
+                    <table class="admin-table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Date</th>
+                          <th scope="col">Job</th>
+                          <th scope="col">Customer</th>
+                          <th scope="col">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (p of g.payments; track p.paymentId) {
+                          <tr>
+                            <td data-label="Date">{{ p.receivedOn | date: 'd MMM' }}@if (p.receivedOn < today) { <span class="ah-late">earlier day</span> }</td>
+                            <td data-label="Job"><strong>{{ p.jobNumber }}</strong></td>
+                            <td data-label="Customer">{{ p.customerName }}@if (p.note) { <small class="ah-note">{{ p.note }}</small> }</td>
+                            <td data-label="Amount" class="ah-num">{{ p.amount | number: '1.2-2' }} QAR</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="ah-count">
+                    <label class="ah-field">
+                      <span class="ah-label">Amount you counted (QAR)</span>
+                      <input type="text" inputmode="decimal" autocomplete="off" [ngModel]="counted()"
+                        (ngModelChange)="counted.set($event)" [class.is-invalid]="!!countedError()" />
+                    </label>
+                    <div class="ah-diff" [attr.data-state]="difference() === null ? 'none' : difference() === 0 ? 'exact' : difference()! < 0 ? 'missing' : 'extra'" aria-live="polite">
+                      @if (difference() === null) { — }
+                      @else if (difference() === 0) { ✓ Matches the system }
+                      @else if (difference()! < 0) { QAR {{ -difference()! | number: '1.2-2' }} missing }
+                      @else { QAR {{ difference()! | number: '1.2-2' }} extra }
+                    </div>
+                  </div>
+                  @if (countedError()) { <small class="ah-error">{{ countedError() }}</small> }
+
+                  <label class="ah-field">
+                    <span class="ah-label">Note @if (difference() !== null && difference() !== 0) { <em>required</em> } @else { <small>optional</small> }</span>
+                    <input type="text" maxlength="500" autocomplete="off" placeholder="For example: fuel paid from the cash" [ngModel]="note()"
+                      (ngModelChange)="note.set($event)" [class.is-invalid]="!!noteError()" />
+                  </label>
+                  @if (noteError()) { <small class="ah-error">{{ noteError() }}</small> }
+                  @if (formError()) { <p class="admin-error" role="alert">{{ formError() }}</p> }
+
+                  <div class="ah-actions">
+                    <button type="button" class="btn-admin btn-admin-primary" [disabled]="!canConfirm()" (click)="confirm(g)">
+                      {{ saving() ? 'Saving…' : 'Confirm cash received' }}
+                    </button>
+                    <button type="button" class="btn-admin btn-admin-ghost" [disabled]="saving()" (click)="openKey.set(null)">Cancel</button>
+                  </div>
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- ===== What was received, and the online transfers ===== -->
+    <div class="ah-period">
+      <h2>Received &amp; online transfers</h2>
+      <div class="ah-presets" role="group" aria-label="Period">
+        <button type="button" [class.is-on]="period() === 'today'" (click)="pickPeriod('today')">Today</button>
+        <button type="button" [class.is-on]="period() === 'yesterday'" (click)="pickPeriod('yesterday')">Yesterday</button>
+        <button type="button" [class.is-on]="period() === 'week'" (click)="pickPeriod('week')">Last 7 days</button>
+      </div>
+    </div>
+
+    <div class="ah-kpis">
+      <div class="ah-kpi ah-kpi--main"><span>Cash received</span><strong>{{ receivedTotal() | number: '1.2-2' }} QAR</strong>
+        <small>{{ history().length }} {{ history().length === 1 ? 'handover' : 'handovers' }}</small></div>
+      <div class="ah-kpi"><span>Difference</span>
+        <strong [attr.data-state]="differenceTotal() === 0 ? 'exact' : differenceTotal() < 0 ? 'missing' : 'extra'">
+          {{ differenceTotal() === 0 ? 'None' : (differenceTotal() < 0 ? '− ' : '+ ') + ((differenceTotal() < 0 ? -differenceTotal() : differenceTotal()) | number: '1.2-2') + ' QAR' }}</strong>
+        <small>{{ differenceTotal() < 0 ? 'Missing' : differenceTotal() > 0 ? 'Extra' : 'Every handover matched' }}</small></div>
+      <div class="ah-kpi ah-kpi--online"><span>Online transfers</span><strong>{{ online()?.total ?? 0 | number: '1.2-2' }} QAR</strong>
+        <small>{{ online()?.rows?.length ?? 0 }} to check with the bank</small></div>
+    </div>
+
+    <div class="admin-panel">
+      <div class="ah-title"><h2>Cash received</h2></div>
+      @if (!history().length) {
+        <p class="ah-empty">No handovers in this period.</p>
+      } @else {
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Handed over by</th>
+                <th scope="col">Expected</th>
+                <th scope="col">Received</th>
+                <th scope="col">Difference</th>
+                <th scope="col">Received by</th>
+                <th scope="col">Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (h of history(); track h.id) {
+                <tr>
+                  <td data-label="Time">{{ h.receivedAt | date: 'd MMM, h:mm a' : '+0300' }}</td>
+                  <td data-label="Handed over by">
+                    <strong>{{ person(h.collectorName) }}</strong>
+                    <small class="ah-note">@for (p of h.payments; track p.paymentId; let last = $last) { <span class="ah-job">{{ p.jobNumber }}{{ last ? '' : ',' }}</span> }</small>
+                  </td>
+                  <td data-label="Expected" class="ah-num">{{ h.expected | number: '1.2-2' }}</td>
+                  <td data-label="Received" class="ah-num">{{ h.received | number: '1.2-2' }}</td>
+                  <td data-label="Difference">
+                    @if (h.difference === 0) { <span class="ah-chip" data-state="exact">Exact</span> }
+                    @else if (h.difference < 0) { <span class="ah-chip" data-state="missing">{{ -h.difference | number: '1.2-2' }} missing</span> }
+                    @else { <span class="ah-chip" data-state="extra">{{ h.difference | number: '1.2-2' }} extra</span> }
+                  </td>
+                  <td data-label="Received by">{{ person(h.receivedByName) }}</td>
+                  <td data-label="Note">{{ h.note || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <div class="admin-panel">
+      <div class="ah-title">
+        <h2>Online transfers</h2>
+        <span class="ah-pill ah-pill--blue">Check these against the bank</span>
+      </div>
+      @if (!online()?.rows?.length) {
+        <p class="ah-empty">No online transfers in this period.</p>
+      } @else {
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Job</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Recorded by</th>
+                <th scope="col">Receipt</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of online()?.rows ?? []; track r.paymentId) {
+                <tr>
+                  <td data-label="Date">{{ r.receivedOn | date: 'd MMM y' }}</td>
+                  <td data-label="Job"><strong>{{ r.jobNumber }}</strong></td>
+                  <td data-label="Customer">{{ r.customerName }}@if (r.note) { <small class="ah-note">{{ r.note }}</small> }</td>
+                  <td data-label="Amount" class="ah-num">{{ r.amount | number: '1.2-2' }} QAR</td>
+                  <td data-label="Recorded by">{{ person(r.recordedByName) }}</td>
+                  <td data-label="Receipt">
+                    @if (r.hasReceipt) {
+                      <button type="button" class="row-btn act" title="View receipt" (click)="openReceipt(r)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="act-label">View receipt</span>
+                      </button>
+                    } @else { — }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</section>

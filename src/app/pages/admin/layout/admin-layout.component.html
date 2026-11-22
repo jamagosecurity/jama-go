@@ -160,6 +160,19 @@
           </span>
         </a>
 
+        @if (canAccounts()) {
+        <p class="nav-label">Accounts</p>
+        <a routerLink="/admin/cash-handover" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v18M16.5 7.5c-.7-1.2-2.3-2-4.5-2-2.7 0-4.2 1.2-4.2 2.9 0 4.2 8.9 1.9 8.9 6.3 0 1.8-1.8 3-4.4 3-2.4 0-4.1-1-4.8-2.4" /></svg>
+          </span>
+          <span>
+            <strong>Cash handover</strong>
+            <small>Receive the day's cash</small>
+          </span>
+        </a>
+        }
+
         <p class="nav-label">Quotations &amp; documents</p>
         <!-- Quotation and what has been decided on one, as a parent and its
              children. They were three competing pills before, which made

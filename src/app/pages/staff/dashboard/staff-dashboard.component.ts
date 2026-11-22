@@ -60,6 +60,8 @@ export class StaffDashboardComponent {
   readonly areas = computed(() => {
     const a: string[] = [];
     if (this.canJobs) a.push('Non-MOI jobs');
+    if (this.auth.can(PERMISSIONS.moiJobManage)) a.push('MOI jobs');
+    if (this.auth.can(PERMISSIONS.accountsManage)) a.push('Cash handover');
     if (this.canBoq) a.push('Quotations');
     if (this.auth.can(PERMISSIONS.drawingManage) || this.auth.can(PERMISSIONS.drawingApprove)) a.push('Drawings');
     if (this.canDia) a.push('DIA inspections');

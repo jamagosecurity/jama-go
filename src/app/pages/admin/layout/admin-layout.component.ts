@@ -35,6 +35,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
   /** Finished MOI jobs waiting to be billed — the red number beside MOI Jobs. */
   readonly moiJobBadge = inject(MoiJobBadgeService);
   readonly canMoiJobs = computed(() => this.auth.can(PERMISSIONS.moiJobManage));
+  readonly canAccounts = computed(() => this.auth.can(PERMISSIONS.accountsManage));
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -144,6 +145,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       { label: 'Issue a Non-MOI job', group: 'Non-MOI', url: '/admin/non-moi-jobs/new' },
       { label: 'Collections (cash & online)', group: 'Non-MOI', url: '/admin/collections' },
       { label: 'Non-MOI Inventory', group: 'Non-MOI', url: '/admin/non-moi' },
+      { label: 'Cash handover', group: 'Accounts', url: '/admin/cash-handover' },
       { label: 'Quotation', group: 'Quotations & documents', url: '/admin/boq' },
       { label: 'Quotations approved', group: 'Quotations & documents', url: '/admin/boq/decisions', query: { status: 'Approved' } },
       { label: 'Quotations rejected', group: 'Quotations & documents', url: '/admin/boq/decisions', query: { status: 'Rejected' } },

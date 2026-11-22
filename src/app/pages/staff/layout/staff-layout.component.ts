@@ -89,6 +89,7 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
       { label: 'Non-MOI Inventory', group: 'Non-MOI', url: '/staff/non-moi' },
       { label: 'Collections (cash & online)', group: 'Non-MOI', url: '/staff/collections' },
     );
+    if (this.canAccounts()) list.push({ label: 'Cash handover', group: 'Accounts', url: '/staff/cash-handover' });
     if (this.canSeeBoq()) list.push({ label: 'Quotation', group: 'Quotations & documents', url: '/staff/boq' });
     if (this.canSeeDrawings()) list.push({ label: 'Drawings', group: 'Quotations & documents', url: '/staff/drawings' });
     if (this.canManageVip()) list.push({ label: 'VIP Clients', group: 'Quotations & documents', url: '/staff/vip' });
@@ -219,6 +220,7 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
   /** The Non-MOI Jobs link: its own grant now, which maintenance.manage implies. */
   readonly canIssueJobs = computed(() => this.auth.can(PERMISSIONS.nonMoiJobManage));
   readonly canMoiJobs = computed(() => this.auth.can(PERMISSIONS.moiJobManage));
+  readonly canAccounts = computed(() => this.auth.can(PERMISSIONS.accountsManage));
 
   /** The Company mail link — read-only for staff. */
   readonly canReadMail = computed(() => this.auth.can(PERMISSIONS.mailRead));

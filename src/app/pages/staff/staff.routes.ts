@@ -144,6 +144,13 @@ export const STAFF_ROUTES: Routes = [
           import('./non-moi-jobs/non-moi-collections.component').then((m) => m.NonMoiCollectionsComponent),
       },
       {
+        // The accountant: cash handed over at the end of the day, and the online transfers.
+        path: 'cash-handover',
+        canActivate: [permissionGuard(PERMISSIONS.accountsManage)],
+        title: 'Cash handover — Jama Go',
+        loadComponent: () => import('./accounts/cash-handover.component').then((m) => m.CashHandoverComponent),
+      },
+      {
         // The company mailboxes, read-only for staff an admin granted mail.read.
         path: 'mail',
         canActivate: [permissionGuard(PERMISSIONS.mailRead)],
