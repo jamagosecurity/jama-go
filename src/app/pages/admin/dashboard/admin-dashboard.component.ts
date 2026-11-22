@@ -3,13 +3,14 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval } from 'rxjs';
-import { Dashboard, DashboardJob, DashboardTechnician } from '../../../models/dashboard.model';
+import { Dashboard, DashboardJob, DashboardKind, DashboardTechnician } from '../../../models/dashboard.model';
 import { DashboardService } from '../../../services/dashboard.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
 
 /**
- * The super admin's one-page view: this month's revenue, open invoices, unread mail and everything waiting for a
- * decision on top; today's jobs and each technician's status below. Refreshes itself every minute.
+ * The super admin's one-page view: this month's revenue (MOI and Non-MOI), open invoices, what clients still owe, the cash
+ * the team holds, unread mail and everything waiting for a decision on top; today's jobs, each technician, the cash
+ * handover and the approvals below. Refreshes itself every minute.
  */
 @Component({
   selector: 'app-admin-dashboard',
@@ -35,6 +36,8 @@ export class AdminDashboardComponent implements OnInit {
   });
   readonly doneToday = computed(() => this.data()?.todayJobs.filter((j) => j.status !== 'Assigned').length ?? 0);
   readonly topMailbox = computed(() => this.data()?.mailboxes[0] ?? null);
+  readonly openMoi = computed(() => this.data()?.openInvoices.filter((i) => i.kind === 'MOI').length ?? 0);
+  readonly openNon = computed(() => this.data()?.openInvoices.filter((i) => i.kind === 'NonMOI').length ?? 0);
 
   ngOnInit(): void {
     this.load();
@@ -72,8 +75,20 @@ export class AdminDashboardComponent implements OnInit {
     return name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('');
   }
 
-  /** Job page: completed jobs open on the close/bill screen, the rest on the editor. */
-  jobLink(j: { id: string; status: string }): string[] {
-    return j.status === 'Assigned' ? ['/admin/non-moi-jobs', j.id, 'edit'] : ['/admin/non-moi-jobs', j.id, 'close'];
+  kindLabel(kind: DashboardKind | null): string {
+    return kind === 'MOI' ? 'MOI' : 'Non-MOI';
+  }
+
+  /** Job page: completed jobs open on the close/bill screen, the rest on the editor — in the right section for the kind. */
+  jobLink(j: { id: string; kind: DashboardKind; status: string }): string[] {
+    return [this.base(j.kind), j.id, j.status === 'Assigned' ? 'edit' : 'close'];
+  }
+
+  invoiceLink(i: { id: string; kind: DashboardKind }): string[] {
+    return [this.base(i.kind), i.id, 'close'];
+  }
+
+  private base(kind: DashboardKind): string {
+    return kind === 'MOI' ? '/admin/moi-jobs' : '/admin/non-moi-jobs';
   }
 }

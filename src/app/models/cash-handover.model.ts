@@ -14,7 +14,7 @@ export interface HandoverPayment {
   note: string | null;
 }
 
-/** One person's cash that has not been handed over yet. A null collectorId is cash received at the office. */
+/** One person's cash that has not been handed over yet. For cash received at the office this is the admin who recorded it. */
 export interface PendingHandover {
   collectorId: string | null;
   collectorName: string;

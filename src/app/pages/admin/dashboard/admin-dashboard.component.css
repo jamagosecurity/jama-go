@@ -18,7 +18,7 @@
 @keyframes db-spin { to { transform: rotate(360deg); } }
 
 /* Big numbers */
-.db-kpis { display: grid; grid-template-columns: 1.35fr 1fr 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.db-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
 .db-kpi { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 18px 20px; border: 1px solid var(--hair); border-radius: 16px; background: #fff; color: var(--ink); text-decoration: none; box-shadow: 0 24px 50px -44px rgba(11, 23, 48, 0.6); transition: border-color 0.15s, transform 0.15s; }
 .db-kpi:hover { border-color: #c9ccd6; transform: translateY(-1px); }
 .db-kpi-k { color: var(--muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
@@ -76,6 +76,16 @@ a.db-job:hover { background: var(--warm); }
 .db-appr b { flex: none; min-width: 28px; padding: 2px 8px; border-radius: 999px; background: #eef0f4; color: var(--muted); font-size: 0.78rem; text-align: center; }
 .db-appr b.on { background: var(--red); color: #fff; }
 .db-appr b.on.blue { background: #2d96d5; }
+.db-appr small { margin-left: 6px; color: var(--muted); font-size: 0.74rem; }
+.db-money b { min-width: 0; padding: 3px 10px; font-size: 0.84rem; font-variant-numeric: tabular-nums; }
+.db-money b.on { background: #e5f5ef; color: #0f6b5f; }
+.db-money b.ok { background: #e5f5ef; color: #0f6b5f; }
+.db-money b.bad { background: var(--red); color: #fff; }
+.db-money b.warn { background: #fff3e0; color: #a35a06; }
+
+/* MOI or Non-MOI, beside a job number */
+.db-kind { margin-right: 6px; padding: 1px 7px; border-radius: 999px; background: #eef0f4; color: var(--navy); font-size: 0.64rem; font-style: normal; font-weight: 800; letter-spacing: 0.04em; vertical-align: 1px; }
+.db-kind[data-kind="MOI"] { background: #eeeafd; color: #5b45c9; }
 
 @media (max-width: 1180px) {
   .db-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }

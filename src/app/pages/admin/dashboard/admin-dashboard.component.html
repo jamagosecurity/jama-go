@@ -34,6 +34,7 @@
           }
           Cash {{ d.cashThisMonth | number: '1.0-0' }} · Online {{ d.onlineThisMonth | number: '1.0-0' }}
         </span>
+        <span class="db-kpi-x">Non-MOI {{ d.revenueNonMoiThisMonth | number: '1.0-0' }} · MOI {{ d.revenueMoiThisMonth | number: '1.0-0' }}</span>
         @if (d.quotationsApprovedCount > 0) {
           <span class="db-kpi-x">Quotations approved: QAR {{ d.quotationsApprovedThisMonth | number: '1.0-0' }} ({{ d.quotationsApprovedCount }})</span>
         }
@@ -41,7 +42,17 @@
       <a class="db-kpi" routerLink="/admin/non-moi-jobs">
         <span class="db-kpi-k">Open invoices</span>
         <strong>{{ d.openInvoices.length }}</strong>
-        <span class="db-kpi-s">QAR {{ d.openInvoicesTotal | number: '1.0-0' }} waiting on clients</span>
+        <span class="db-kpi-s">QAR {{ d.openInvoicesTotal | number: '1.0-0' }} waiting on clients · Non-MOI {{ openNon() }} · MOI {{ openMoi() }}</span>
+      </a>
+      <a class="db-kpi" routerLink="/admin/collections">
+        <span class="db-kpi-k">Still owed by clients</span>
+        <strong>QAR {{ d.unpaidTotal | number: '1.0-0' }}</strong>
+        <span class="db-kpi-s">{{ d.unpaidJobs }} approved {{ d.unpaidJobs === 1 ? 'bill' : 'bills' }} not fully paid</span>
+      </a>
+      <a class="db-kpi" [class.is-hot]="d.cash.waitingTotal > 0" routerLink="/admin/cash-handover">
+        <span class="db-kpi-k">Cash with the team</span>
+        <strong>QAR {{ d.cash.waitingTotal | number: '1.0-0' }}</strong>
+        <span class="db-kpi-s">Non-MOI {{ d.cash.waitingNonMoi | number: '1.0-0' }} · MOI {{ d.cash.waitingMoi | number: '1.0-0' }} · not yet handed to the accountant</span>
       </a>
       <a class="db-kpi" routerLink="/admin/mail">
         <span class="db-kpi-k">Unread mail</span>
@@ -77,7 +88,7 @@
                   <span class="db-time">{{ j.scheduledAt ? (j.scheduledAt | date: 'h:mm a' : '+0300') : '—' }}</span>
                   <span class="db-main">
                     <strong>{{ j.customerName }}</strong>
-                    <small>{{ j.jobNumber }} · {{ j.location }}</small>
+                    <small><i class="db-kind" [attr.data-kind]="j.kind">{{ kindLabel(j.kind) }}</i>{{ j.jobNumber }} · {{ j.location }}</small>
                   </span>
                   <span class="db-side">
                     <span class="db-chip" [attr.data-tone]="jobTone(j.status)">{{ jobStatus(j) }}</span>
@@ -133,10 +144,10 @@
           <ul class="db-list">
             @for (i of d.openInvoices; track i.id) {
               <li>
-                <a class="db-job" [routerLink]="['/admin/non-moi-jobs', i.id, 'close']">
+                <a class="db-job" [routerLink]="invoiceLink(i)">
                   <span class="db-main">
                     <strong>{{ i.customerName }}</strong>
-                    <small>{{ i.jobNumber }}@if (i.sentAt) { · sent {{ i.sentAt | date: 'd MMM' : '+0300' }} }</small>
+                    <small><i class="db-kind" [attr.data-kind]="i.kind">{{ kindLabel(i.kind) }}</i>{{ i.jobNumber }}@if (i.sentAt) { · sent {{ i.sentAt | date: 'd MMM' : '+0300' }} }</small>
                     @if (i.status === 'ChangesRequested' && i.clientMessage) { <em>“{{ i.clientMessage }}”</em> }
                   </span>
                   <span class="db-side">
@@ -160,10 +171,30 @@
           <li><a routerLink="/admin/boq"><span>Quotations to approve</span><b [class.on]="d.approvals.quotations > 0">{{ d.approvals.quotations }}</b></a></li>
           <li><a routerLink="/admin/drawings"><span>Drawings to approve</span><b [class.on]="d.approvals.drawings > 0">{{ d.approvals.drawings }}</b></a></li>
           <li><a routerLink="/admin/client-registrations"><span>Client registrations</span><b [class.on]="d.approvals.clientRegistrations > 0">{{ d.approvals.clientRegistrations }}</b></a></li>
-          <li><a routerLink="/admin/non-moi-jobs"><span>Finished jobs to bill</span><b [class.on]="d.approvals.jobsToClose > 0">{{ d.approvals.jobsToClose }}</b></a></li>
+          <li><a routerLink="/admin/non-moi-jobs"><span>Non-MOI jobs to bill</span><b [class.on]="d.approvals.jobsToClose > 0">{{ d.approvals.jobsToClose }}</b></a></li>
+          <li><a routerLink="/admin/moi-jobs"><span>MOI jobs to bill</span><b [class.on]="d.approvals.moiJobsToClose > 0">{{ d.approvals.moiJobsToClose }}</b></a></li>
         </ul>
+      </section>
 
-        <header class="db-card-h db-card-h--sub">
+      <!-- Cash handover -->
+      <section class="db-card">
+        <header class="db-card-h">
+          <h2>Cash handover</h2>
+          <span class="db-pill">QAR {{ d.cash.waitingTotal | number: '1.0-0' }} waiting</span>
+        </header>
+        <ul class="db-list db-appr db-money">
+          <li><a routerLink="/admin/cash-handover"><span>Non-MOI cash waiting <small>{{ d.cash.peopleNonMoi }} {{ d.cash.peopleNonMoi === 1 ? 'person' : 'people' }}</small></span><b [class.on]="d.cash.waitingNonMoi > 0">{{ d.cash.waitingNonMoi | number: '1.2-2' }}</b></a></li>
+          <li><a routerLink="/admin/cash-handover"><span>MOI cash waiting <small>{{ d.cash.peopleMoi }} {{ d.cash.peopleMoi === 1 ? 'person' : 'people' }}</small></span><b [class.on]="d.cash.waitingMoi > 0">{{ d.cash.waitingMoi | number: '1.2-2' }}</b></a></li>
+          <li><a routerLink="/admin/cash-handover"><span><strong>Total waiting</strong></span><b [class.on]="d.cash.waitingTotal > 0">{{ d.cash.waitingTotal | number: '1.2-2' }}</b></a></li>
+          <li><a routerLink="/admin/cash-handover"><span>Received by the accountant today <small>{{ d.cash.handoversToday }} {{ d.cash.handoversToday === 1 ? 'handover' : 'handovers' }}</small></span><b class="ok">{{ d.cash.receivedToday | number: '1.2-2' }}</b></a></li>
+          <li><a routerLink="/admin/cash-handover"><span>Missing / extra this month</span><b [class.bad]="d.cash.differenceThisMonth < 0" [class.warn]="d.cash.differenceThisMonth > 0">{{ d.cash.differenceThisMonth === 0 ? 'None' : (d.cash.differenceThisMonth > 0 ? '+' : '−') + ((d.cash.differenceThisMonth < 0 ? -d.cash.differenceThisMonth : d.cash.differenceThisMonth) | number: '1.2-2') }}</b></a></li>
+        </ul>
+      </section>
+
+      <!-- Unread mail -->
+      <section class="db-card">
+
+        <header class="db-card-h">
           <h2>Unread mail</h2>
           <span class="db-pill">{{ d.unreadMail }}</span>
         </header>
