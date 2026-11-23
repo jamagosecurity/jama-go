@@ -54,3 +54,8 @@
   .sd-kpi--main, .sd-kpis:not(.sd-kpis--small) .sd-kpi:last-child { grid-column: 1 / -1; }
   .sd-kpi strong { font-size: 1.4rem; }
 }
+
+/* Which kind of job work a block is about */
+.sd-kind { display: flex; align-items: center; gap: 8px; margin: 22px 0 10px; color: #14305f; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; }
+.sd-kind i { width: 10px; height: 10px; border-radius: 50%; background: #d21319; }
+.sd-kind[data-kind="MOI"] i { background: #5b45c9; }

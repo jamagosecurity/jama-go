@@ -23,95 +23,11 @@
   </div>
 
   @if (canJobs) {
-    <!-- Non-MOI: what needs me today -->
-    <div class="sd-kpis">
-      <a class="sd-kpi sd-kpi--main" routerLink="/staff/collections">
-        <span>Collected today</span>
-        <strong>QAR {{ (today()?.total ?? 0) | number: '1.0-0' }}</strong>
-        <small>Cash {{ (today()?.cash ?? 0) | number: '1.0-0' }} · Online {{ (today()?.online ?? 0) | number: '1.0-0' }}</small>
-      </a>
-      <a class="sd-kpi" [class.is-hot]="toBill().length > 0" routerLink="/staff/non-moi-jobs">
-        <span>To bill</span>
-        <strong>{{ toBill().length }}</strong>
-        <small>{{ toBill().length ? 'Finished jobs waiting for you' : 'Nothing waiting' }}</small>
-      </a>
-      <a class="sd-kpi" routerLink="/staff/non-moi-jobs">
-        <span>With clients</span>
-        <strong>{{ withClient().length }}</strong>
-        <small>Invoices sent, waiting for an answer</small>
-      </a>
-      <a class="sd-kpi" routerLink="/staff/non-moi-jobs">
-        <span>Unpaid</span>
-        <strong class="is-red">QAR {{ unpaidTotal() | number: '1.0-0' }}</strong>
-        <small>{{ unpaid().length }} {{ unpaid().length === 1 ? 'invoice' : 'invoices' }} with a balance</small>
-      </a>
-    </div>
+    <app-staff-jobs-summary kind="Non-MOI" base="/staff/non-moi-jobs" [jobs]="jobs()" [today]="today()" />
+  }
 
-    <div class="sd-grid">
-      <section class="sd-card">
-        <header><h2>Waiting for you</h2><span class="sd-pill">{{ toBill().length }}</span></header>
-        @if (jobs() === null) { <p class="sd-muted">Loading…</p> }
-        @else if (!toBill().length) { <p class="sd-muted">All caught up — no finished job is waiting to be billed.</p> }
-        @else {
-          <ul class="sd-list">
-            @for (j of toBill().slice(0, 6); track j.id) {
-              <li><a [routerLink]="['/staff/non-moi-jobs', j.id, 'close']">
-                <span class="sd-main"><strong>{{ j.customerName }}</strong><small>{{ j.jobNumber }} · {{ j.location }} · {{ j.assignedToName }}</small></span>
-                <span class="sd-chip" [attr.data-tone]="j.status === 'ChangesRequested' ? 'red' : 'amber'">{{ jobStatus(j.status) }}</span>
-              </a></li>
-            }
-          </ul>
-        }
-      </section>
-
-      <section class="sd-card">
-        <header><h2>Today's visits</h2><span class="sd-pill">{{ todayJobs().length }}</span></header>
-        @if (jobs() === null) { <p class="sd-muted">Loading…</p> }
-        @else if (!todayJobs().length) { <p class="sd-muted">No technician visit is scheduled for today.</p> }
-        @else {
-          <ul class="sd-list">
-            @for (j of todayJobs(); track j.id) {
-              <li><a [routerLink]="j.status === 'Assigned' ? ['/staff/non-moi-jobs', j.id, 'edit'] : ['/staff/non-moi-jobs', j.id, 'close']">
-                <span class="sd-time">{{ j.scheduledAt | date: 'h:mm a' : '+0300' }}</span>
-                <span class="sd-main"><strong>{{ j.customerName }}</strong><small>{{ j.location }} · {{ j.assignedToName }}</small></span>
-                <span class="sd-chip" [attr.data-tone]="j.status === 'Assigned' ? 'blue' : 'green'">{{ jobStatus(j.status) }}</span>
-              </a></li>
-            }
-          </ul>
-        }
-      </section>
-
-      <section class="sd-card">
-        <header><h2>Unpaid invoices</h2><a routerLink="/staff/non-moi-jobs">All jobs</a></header>
-        @if (!unpaid().length) { <p class="sd-muted">{{ jobs() === null ? 'Loading…' : 'Every invoice is paid.' }}</p> }
-        @else {
-          <ul class="sd-list">
-            @for (u of unpaid().slice(0, 6); track u.job.id) {
-              <li><a [routerLink]="['/staff/non-moi-jobs', u.job.id, 'close']">
-                <span class="sd-main"><strong>{{ u.job.customerName }}</strong><small>{{ u.job.jobNumber }} · paid {{ (u.job.amountPaid ?? 0) | number: '1.0-0' }} of {{ u.job.amountPayable | number: '1.0-0' }}</small></span>
-                <b class="sd-amt">QAR {{ u.balance | number: '1.2-2' }}</b>
-              </a></li>
-            }
-          </ul>
-        }
-      </section>
-
-      <section class="sd-card">
-        <header><h2>Collected today</h2><a routerLink="/staff/collections">Collections</a></header>
-        @if (!(today()?.rows?.length)) { <p class="sd-muted">No money recorded yet today.</p> }
-        @else {
-          <ul class="sd-list">
-            @for (r of today()!.rows.slice(0, 6); track r.paymentId) {
-              <li><a [routerLink]="['/staff/non-moi-jobs', r.jobId, 'close']">
-                <span class="sd-chip" [attr.data-tone]="r.method === 'Cash' ? 'green' : 'blue'">{{ r.method }}</span>
-                <span class="sd-main"><strong>{{ r.customerName }}</strong><small>{{ r.jobNumber }}@if (r.collectedByName) { · by {{ r.collectedByName }} }</small></span>
-                <b class="sd-amt">QAR {{ r.amount | number: '1.2-2' }}</b>
-              </a></li>
-            }
-          </ul>
-        }
-      </section>
-    </div>
+  @if (canMoi) {
+    <app-staff-jobs-summary kind="MOI" base="/staff/moi-jobs" [jobs]="moiJobs()" [today]="moiToday()" />
   }
 
   @if (canBoq || canDia || canMail) {

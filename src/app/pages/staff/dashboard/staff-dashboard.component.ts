@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AvatarComponent } from '../../../components/avatar/avatar.component';
 import { PERMISSIONS } from '../../../models/auth.model';
@@ -13,18 +13,21 @@ import { MailService } from '../../../services/mail.service';
 import { NonMoiJobService } from '../../../services/non-moi-job.service';
 import { StaffService } from '../../../services/staff.service';
 import { AdminStaffMember } from '../../../models/staff.model';
+import { MoiJobService } from '../../../services/moi-job.service';
+import { StaffJobsSummaryComponent } from './staff-jobs-summary.component';
 
 const dohaDay = (iso: string | Date) => new Date(new Date(iso).getTime() + 3 * 3600_000).toISOString().slice(0, 10);
 
 /**
- * The staff member's own dashboard, built from what their account may do: Non-MOI work (jobs to bill, invoices
- * with clients, money collected today), their quotations, DIA status and unread company mail. Sections they have
+ * The staff member's own dashboard, built from what their account may do: Non-MOI and MOI work (the same block for
+ * each — jobs to bill, invoices with clients, unpaid, money collected today, today's visits), their quotations, DIA
+ * status and unread company mail. Sections they have
  * no access to are not shown, and nothing is fetched for them.
  */
 @Component({
   selector: 'app-staff-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe, DecimalPipe, AvatarComponent],
+  imports: [RouterLink, DatePipe, AvatarComponent, StaffJobsSummaryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './staff-dashboard.component.html',
   styleUrls: ['../staff.styles.css', './staff-dashboard.component.css'],
@@ -33,11 +36,13 @@ export class StaffDashboardComponent {
   readonly auth = inject(AuthService);
   private readonly staffApi = inject(StaffService);
   private readonly jobsApi = inject(NonMoiJobService);
+  private readonly moiApi = inject(MoiJobService);
   private readonly boqApi = inject(BoqService);
   private readonly diaApi = inject(DiaService);
   private readonly mailApi = inject(MailService);
 
   readonly canJobs = this.auth.can(PERMISSIONS.nonMoiJobManage);
+  readonly canMoi = this.auth.can(PERMISSIONS.moiJobManage);
   readonly canBoq = this.auth.can(PERMISSIONS.boqManage) || this.auth.can(PERMISSIONS.boqApprove);
   readonly canDia = this.auth.can(PERMISSIONS.diaView) || this.auth.can(PERMISSIONS.diaUpload);
   readonly canMail = this.auth.can(PERMISSIONS.mailRead);
@@ -45,6 +50,8 @@ export class StaffDashboardComponent {
   readonly profile = signal<AdminStaffMember | null>(null);
   readonly jobs = signal<NonMoiJob[] | null>(null);
   readonly today = signal<Collections | null>(null);
+  readonly moiJobs = signal<NonMoiJob[] | null>(null);
+  readonly moiToday = signal<Collections | null>(null);
   readonly quotes = signal<BoqListItem[] | null>(null);
   readonly dia = signal<DiaDashboard | null>(null);
   readonly unread = signal<number | null>(null);
@@ -71,21 +78,6 @@ export class StaffDashboardComponent {
     return a;
   });
 
-  // ----- Non-MOI figures -----
-  readonly toBill = computed(() => (this.jobs() ?? []).filter((j) => j.status === 'Completed' || j.status === 'ChangesRequested'));
-  readonly withClient = computed(() => (this.jobs() ?? []).filter((j) => j.status === 'Sent'));
-  readonly unpaid = computed(() => (this.jobs() ?? [])
-    .filter((j) => j.status === 'Sent' || j.status === 'Closed' || j.status === 'ChangesRequested')
-    .map((j) => ({ job: j, balance: Math.max(0, Math.round((j.amountPayable - (j.amountPaid ?? 0)) * 100) / 100) }))
-    .filter((x) => x.balance > 0)
-    .sort((a, b) => b.balance - a.balance));
-  readonly unpaidTotal = computed(() => this.unpaid().reduce((n, x) => n + x.balance, 0));
-  readonly todayJobs = computed(() => {
-    const day = dohaDay(new Date());
-    return (this.jobs() ?? []).filter((j) => j.scheduledAt && dohaDay(j.scheduledAt) === day)
-      .sort((a, b) => (a.scheduledAt ?? '').localeCompare(b.scheduledAt ?? ''));
-  });
-
   // ----- Quotations -----
   readonly quoteCounts = computed(() => {
     const q = this.quotes() ?? [];
@@ -104,6 +96,11 @@ export class StaffDashboardComponent {
       const d = dohaDay(new Date());
       this.jobsApi.collections(d, d).subscribe({ next: (c) => this.today.set(c), error: () => {} });
     }
+    if (this.canMoi) {
+      this.moiApi.list().subscribe({ next: (j) => this.moiJobs.set(j), error: () => this.moiJobs.set([]) });
+      const d = dohaDay(new Date());
+      this.moiApi.collections(d, d).subscribe({ next: (c) => this.moiToday.set(c), error: () => {} });
+    }
     if (this.canBoq) {
       this.boqApi.list({ pageNumber: 1, pageSize: 100, mineOnly: true }).subscribe({ next: (p) => this.quotes.set(p.items), error: () => this.quotes.set([]) });
     }
@@ -113,8 +110,4 @@ export class StaffDashboardComponent {
     }
   }
 
-  jobStatus(s: string): string {
-    return s === 'Assigned' ? 'With technician' : s === 'Completed' ? 'Done · to bill' : s === 'Sent' ? 'With client'
-      : s === 'ChangesRequested' ? 'Client asked change' : s === 'Closed' ? 'Approved' : s;
-  }
 }
