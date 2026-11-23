@@ -146,6 +146,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       { label: 'Collections (cash & online)', group: 'Non-MOI', url: '/admin/collections' },
       { label: 'Non-MOI Inventory', group: 'Non-MOI', url: '/admin/non-moi' },
       { label: 'Cash handover', group: 'Accounts', url: '/admin/cash-handover' },
+      { label: 'Uber bills (approve & pay back)', group: 'Accounts', url: '/admin/uber-claims' },
       { label: 'Quotation', group: 'Quotations & documents', url: '/admin/boq' },
       { label: 'Quotations approved', group: 'Quotations & documents', url: '/admin/boq/decisions', query: { status: 'Approved' } },
       { label: 'Quotations rejected', group: 'Quotations & documents', url: '/admin/boq/decisions', query: { status: 'Rejected' } },

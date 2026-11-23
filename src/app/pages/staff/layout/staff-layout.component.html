@@ -24,10 +24,19 @@
       </div>
     </div>
 
-    <!-- Only the work lives here now. Dashboard, profile, password and the
-         public-site link were removed at the owner's request; their routes still
-         exist and are reachable by URL. -->
+    <!-- The dashboard, then the work. Profile, password and the public-site link
+         stay out of the menu at the owner's request; their routes still exist. -->
     <nav class="staff-nav" aria-label="Staff">
+      <a routerLink="/staff" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-dashboard">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></svg>
+        </span>
+        <span>
+          <strong>Dashboard</strong>
+          <small>Your day at a glance</small>
+        </span>
+      </a>
+
       @if (canUploadDia() || canManageCameras() || canMoiJobs()) {
         <p class="nav-sub nav-sub--moi"><i aria-hidden="true"></i>MOI</p>
       }
@@ -129,6 +138,15 @@
         </a>
       }
 
+      <p class="nav-label">Expenses</p>
+      <a routerLink="/staff/uber-bills" routerLinkActive="active">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 17h14l-1.5-6.5A2 2 0 0 0 15.6 9H8.4a2 2 0 0 0-1.9 1.5Z" /><path d="M7 9 8.5 5h7L17 9" /><circle cx="8" cy="17.5" r="1.6" /><circle cx="16" cy="17.5" r="1.6" /></svg></span>
+        <span>
+          <strong>My Uber bills</strong>
+          <small>Claim back your rides</small>
+        </span>
+      </a>
+
       @if (canAccounts()) {
         <p class="nav-label">Accounts</p>
         <a routerLink="/staff/cash-handover" routerLinkActive="active">
@@ -138,6 +156,13 @@
           <span>
             <strong>Cash handover</strong>
             <small>Receive the day's cash</small>
+          </span>
+        </a>
+        <a routerLink="/staff/uber-claims" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 17h14l-1.5-6.5A2 2 0 0 0 15.6 9H8.4a2 2 0 0 0-1.9 1.5Z" /><path d="M7 9 8.5 5h7L17 9" /><circle cx="8" cy="17.5" r="1.6" /><circle cx="16" cy="17.5" r="1.6" /></svg></span>
+          <span>
+            <strong>Uber bills</strong>
+            <small>Approve &amp; pay back</small>
           </span>
         </a>
       }

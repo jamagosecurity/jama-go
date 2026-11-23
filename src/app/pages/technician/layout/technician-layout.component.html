@@ -65,6 +65,15 @@
           </span>
         </a>
       }
+
+      <p class="nav-label">Expenses</p>
+      <a routerLink="/technician/uber-bills" [class.active]="tab() === 'uber'">
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 17h14l-1.5-6.5A2 2 0 0 0 15.6 9H8.4a2 2 0 0 0-1.9 1.5Z" /><path d="M7 9 8.5 5h7L17 9" /><circle cx="8" cy="17.5" r="1.6" /><circle cx="16" cy="17.5" r="1.6" /></svg></span>
+        <span>
+          <strong>My Uber bills</strong>
+          <small>Claim back your rides</small>
+        </span>
+      </a>
     </nav>
 
     <div class="staff-sidebar-foot">
@@ -120,6 +129,10 @@
         <span>MOI jobs</span>
       </a>
     }
+    <a routerLink="/technician/uber-bills" [class.active]="tab() === 'uber'">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 17h14l-1.5-6.5A2 2 0 0 0 15.6 9H8.4a2 2 0 0 0-1.9 1.5Z" /><path d="M7 9 8.5 5h7L17 9" /><circle cx="8" cy="17.5" r="1.6" /><circle cx="16" cy="17.5" r="1.6" /></svg>
+      <span>Uber</span>
+    </a>
     <a routerLink="/technician/profile" [class.active]="isProfile()" aria-label="My profile and sign out">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
       <span>Account</span>

@@ -179,7 +179,7 @@
       <!-- Cash handover -->
       <section class="db-card">
         <header class="db-card-h">
-          <h2>Cash handover</h2>
+          <h2>Cash &amp; Uber bills</h2>
           <span class="db-pill">QAR {{ d.cash.waitingTotal | number: '1.0-0' }} waiting</span>
         </header>
         <ul class="db-list db-appr db-money">
@@ -188,6 +188,17 @@
           <li><a routerLink="/admin/cash-handover"><span><strong>Total waiting</strong></span><b [class.on]="d.cash.waitingTotal > 0">{{ d.cash.waitingTotal | number: '1.2-2' }}</b></a></li>
           <li><a routerLink="/admin/cash-handover"><span>Received by the accountant today <small>{{ d.cash.handoversToday }} {{ d.cash.handoversToday === 1 ? 'handover' : 'handovers' }}</small></span><b class="ok">{{ d.cash.receivedToday | number: '1.2-2' }}</b></a></li>
           <li><a routerLink="/admin/cash-handover"><span>Missing / extra this month</span><b [class.bad]="d.cash.differenceThisMonth < 0" [class.warn]="d.cash.differenceThisMonth > 0">{{ d.cash.differenceThisMonth === 0 ? 'None' : (d.cash.differenceThisMonth > 0 ? '+' : '−') + ((d.cash.differenceThisMonth < 0 ? -d.cash.differenceThisMonth : d.cash.differenceThisMonth) | number: '1.2-2') }}</b></a></li>
+        </ul>
+
+        <header class="db-card-h db-card-h--sub">
+          <h2>Uber bills</h2>
+          <span class="db-pill">QAR {{ d.travel.owedTotal | number: '1.0-0' }} owed</span>
+        </header>
+        <ul class="db-list db-appr db-money">
+          <li><a routerLink="/admin/uber-claims"><span>Waiting for approval <small>{{ d.travel.toApproveCount }} {{ d.travel.toApproveCount === 1 ? 'bill' : 'bills' }}</small></span><b [class.warn]="d.travel.toApproveCount > 0">{{ d.travel.toApproveTotal | number: '1.2-2' }}</b></a></li>
+          <li><a routerLink="/admin/uber-claims"><span>Owed to staff <small>{{ d.travel.owedCount }} approved</small></span><b [class.bad]="d.travel.owedTotal > 0">{{ d.travel.owedTotal | number: '1.2-2' }}</b></a></li>
+          <li><a routerLink="/admin/uber-claims"><span>Longest wait</span><b [class.bad]="d.travel.oldestOpenDays >= 7">{{ d.travel.toApproveCount + d.travel.owedCount ? d.travel.oldestOpenDays + (d.travel.oldestOpenDays === 1 ? ' day' : ' days') : '—' }}</b></a></li>
+          <li><a routerLink="/admin/uber-claims"><span>Paid back this month</span><b class="ok">{{ d.travel.paidThisMonth | number: '1.2-2' }}</b></a></li>
         </ul>
       </section>
 

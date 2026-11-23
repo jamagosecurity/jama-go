@@ -144,6 +144,19 @@ export const STAFF_ROUTES: Routes = [
           import('./non-moi-jobs/non-moi-collections.component').then((m) => m.NonMoiCollectionsComponent),
       },
       {
+        // Every staff member claims back the Uber rides they paid themselves.
+        path: 'uber-bills',
+        title: 'My Uber bills — Jama Go',
+        loadComponent: () => import('./uber-bills/my-uber-bills.component').then((m) => m.MyUberBillsComponent),
+      },
+      {
+        // The accountant approves Uber bills and pays them back.
+        path: 'uber-claims',
+        canActivate: [permissionGuard(PERMISSIONS.accountsManage)],
+        title: 'Uber bills — Jama Go',
+        loadComponent: () => import('./accounts/uber-claims.component').then((m) => m.UberClaimsComponent),
+      },
+      {
         // The accountant: cash handed over at the end of the day, and the online transfers.
         path: 'cash-handover',
         canActivate: [permissionGuard(PERMISSIONS.accountsManage)],

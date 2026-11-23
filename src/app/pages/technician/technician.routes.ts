@@ -102,6 +102,13 @@ export const TECHNICIAN_ROUTES: Routes = [
         loadComponent: () =>
           import('./moi-jobs/technician-moi-jobs.component').then((m) => m.TechnicianMoiJobsComponent),
       },
+      {
+        // Technicians claim back the Uber rides they paid themselves, like every staff member.
+        path: 'uber-bills',
+        title: 'My Uber bills — Jama Go',
+        loadComponent: () =>
+          import('../staff/uber-bills/my-uber-bills.component').then((m) => m.MyUberBillsComponent),
+      },
     ],
   },
 ];

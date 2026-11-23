@@ -280,6 +280,14 @@ export const routes: Routes = [
               import('./pages/staff/non-moi-jobs/non-moi-collections.component').then((m) => m.NonMoiCollectionsComponent),
           },
           {
+            // Uber bills: approve and pay back (an administrator can open it too).
+            path: 'uber-claims',
+            canActivate: [permissionGuard(PERMISSIONS.accountsManage)],
+            title: 'Uber bills — Jama Go',
+            loadComponent: () =>
+              import('./pages/staff/accounts/uber-claims.component').then((m) => m.UberClaimsComponent),
+          },
+          {
             // The accountant's cash handover (an administrator can open it too).
             path: 'cash-handover',
             canActivate: [permissionGuard(PERMISSIONS.accountsManage)],

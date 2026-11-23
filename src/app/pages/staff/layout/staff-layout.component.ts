@@ -74,7 +74,9 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
 
   // ===== Search screens (Ctrl K): only the screens this person can open =====
   readonly screens = computed(() => {
-    const list: { label: string; group: string; url: string; query?: Record<string, string> }[] = [];
+    const list: { label: string; group: string; url: string; query?: Record<string, string> }[] = [
+      { label: 'My dashboard', group: 'Home', url: '/staff' },
+    ];
     if (this.canUploadDia()) list.push({ label: 'DIA Inspection', group: 'MOI', url: '/staff/dia' });
     if (this.canManageCameras()) list.push({ label: 'Moi Inventory', group: 'MOI', url: '/staff/cameras' });
     if (this.canMoiJobs()) list.push(
@@ -89,7 +91,11 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
       { label: 'Non-MOI Inventory', group: 'Non-MOI', url: '/staff/non-moi' },
       { label: 'Collections (cash & online)', group: 'Non-MOI', url: '/staff/collections' },
     );
-    if (this.canAccounts()) list.push({ label: 'Cash handover', group: 'Accounts', url: '/staff/cash-handover' });
+    list.push({ label: 'My Uber bills', group: 'Expenses', url: '/staff/uber-bills' });
+    if (this.canAccounts()) list.push(
+      { label: 'Cash handover', group: 'Accounts', url: '/staff/cash-handover' },
+      { label: 'Uber bills (approve & pay back)', group: 'Accounts', url: '/staff/uber-claims' },
+    );
     if (this.canSeeBoq()) list.push({ label: 'Quotation', group: 'Quotations & documents', url: '/staff/boq' });
     if (this.canSeeDrawings()) list.push({ label: 'Drawings', group: 'Quotations & documents', url: '/staff/drawings' });
     if (this.canManageVip()) list.push({ label: 'VIP Clients', group: 'Quotations & documents', url: '/staff/vip' });

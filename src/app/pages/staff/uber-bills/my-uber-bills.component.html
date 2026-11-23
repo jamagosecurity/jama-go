@@ -1,0 +1,190 @@
+<section class="admin-page">
+  <header class="page-banner">
+    <div class="page-banner-text">
+      <h1>My Uber bills</h1>
+      <p class="page-banner-sub">Claim back the Uber rides you paid yourself</p>
+    </div>
+    <div class="page-banner-actions">
+      @if (!formOpen()) {
+        <button type="button" class="btn-admin btn-admin-primary" (click)="startNew()">+ New Uber bill</button>
+      }
+    </div>
+  </header>
+
+  @if (error()) { <p class="admin-error" role="alert">{{ error() }}</p> }
+  @if (flash()) { <p class="ub-flash" role="status">✓ {{ flash() }}</p> }
+
+  @if (data(); as d) {
+    <div class="ub-tiles">
+      <div class="ub-tile ub-tile--owed">
+        <span>Owed to you</span>
+        <strong>{{ d.balance.owed | number: '1.2-2' }} <i>QAR</i></strong>
+        <small>{{ d.balance.owedCount }} approved {{ d.balance.owedCount === 1 ? 'bill' : 'bills' }} to be paid back</small>
+      </div>
+      <div class="ub-tile">
+        <span>Waiting for approval</span>
+        <strong>{{ d.balance.waitingApproval | number: '1.2-2' }} <i>QAR</i></strong>
+        <small>{{ d.balance.waitingCount }} {{ d.balance.waitingCount === 1 ? 'bill' : 'bills' }}@if (d.balance.oldestOpenDays > 0) { · oldest {{ d.balance.oldestOpenDays }} {{ d.balance.oldestOpenDays === 1 ? 'day' : 'days' }} }</small>
+      </div>
+      <div class="ub-tile">
+        <span>Paid back this month</span>
+        <strong>{{ d.balance.paidThisMonth | number: '1.2-2' }} <i>QAR</i></strong>
+        <small>@if (d.balance.lastPaidAt) { Last on {{ d.balance.lastPaidAt | date: 'd MMM, h:mm a' : '+0300' }} · all time {{ d.balance.paidTotal | number: '1.2-2' }} } @else { Nothing yet }</small>
+      </div>
+    </div>
+  }
+
+  @if (formOpen()) {
+    <div class="admin-panel ub-form">
+      <h2 class="ub-h">New Uber bill</h2>
+
+      <!-- 1. The receipt -->
+      <div class="ub-step">
+        <span class="ub-label">1 · Uber receipt (PDF)</span>
+        <label class="ub-drop" [class.is-done]="read()?.complete">
+          <input type="file" accept="application/pdf,.pdf" (change)="pickReceipt($event)" />
+          <span>{{ receipt()?.name || 'Choose the PDF from Uber' }}</span>
+          <b>{{ receipt() ? 'Change' : 'Choose file' }}</b>
+        </label>
+        <small class="ub-hint">In the Uber app or on riders.uber.com, open the trip and tap <b>Download receipt</b>.</small>
+        @if (reading()) { <p class="ub-reading">Reading the receipt…</p> }
+        @if (readError()) { <p class="ub-error" role="alert">{{ readError() }}</p> }
+        @if (read(); as r) {
+          @if (r.complete) {
+            <div class="ub-read">
+              <div class="ub-read-head"><b>✓ Read from the receipt</b><span>These come from Uber and cannot be changed.</span></div>
+              <dl>
+                <div><dt>Date</dt><dd>{{ r.tripOn | date: 'EEE d MMM y' }}</dd></div>
+                <div><dt>Time</dt><dd>{{ r.tripTime ? (time(r.tripTime) | date: 'h:mm a') : '—' }}</dd></div>
+                <div><dt>Amount</dt><dd class="ub-amt">{{ r.amount | number: '1.2-2' }} QAR</dd></div>
+                <div class="ub-wide"><dt>From</dt><dd>{{ r.pickup || '—' }}</dd></div>
+                <div class="ub-wide"><dt>To</dt><dd>{{ r.dropoff || '—' }}</dd></div>
+              </dl>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- 2. The route -->
+      <div class="ub-step ub-row">
+        <label class="ub-field">
+          <span class="ub-label">2 · Route</span>
+          <select [ngModel]="tripType()" (ngModelChange)="tripType.set($event)" [class.is-invalid]="tried() && problems()['route']">
+            <option value="" disabled>Choose the route</option>
+            @for (t of tripTypes; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+          </select>
+          @if (tried() && problems()['route']) { <small class="ub-error">{{ problems()['route'] }}</small> }
+        </label>
+        @if (isSite()) {
+          <label class="ub-field">
+            <span class="ub-label">Site name</span>
+            <input type="text" maxlength="200" placeholder="For example: Lusail Marina tower" [ngModel]="siteName()" (ngModelChange)="siteName.set($event)"
+              [class.is-invalid]="tried() && problems()['site']" />
+            @if (tried() && problems()['site']) { <small class="ub-error">{{ problems()['site'] }}</small> }
+          </label>
+        }
+      </div>
+
+      <!-- 3. Who came -->
+      <div class="ub-step">
+        <span class="ub-label">3 · Who came with you <small>optional</small></span>
+        @if (chosen().length) {
+          <div class="ub-chips">
+            @for (p of chosen(); track p.id) {
+              <button type="button" class="ub-chip" (click)="toggleCompanion(p.id)" [attr.aria-label]="'Remove ' + p.name">{{ p.name }} <b aria-hidden="true">×</b></button>
+            }
+          </div>
+        }
+        <input type="search" class="ub-search" placeholder="Search a name" [ngModel]="peopleSearch()" (ngModelChange)="peopleSearch.set($event)" />
+        <div class="ub-people">
+          @for (p of shownPeople(); track p.id) {
+            <label class="ub-person" [class.is-on]="companions().includes(p.id)">
+              <input type="checkbox" [checked]="companions().includes(p.id)" (change)="toggleCompanion(p.id)" />
+              <span>{{ p.name }}</span>
+            </label>
+          } @empty { <p class="ub-hint">Nobody matches that name.</p> }
+        </div>
+      </div>
+
+      <!-- 4. Lunch, site trips only -->
+      @if (isSite()) {
+        <div class="ub-step ub-lunch">
+          <label class="ub-check">
+            <input type="checkbox" [checked]="hadLunch()" (change)="setLunch(!hadLunch())" />
+            <span><strong>We had lunch at the site</strong><small>Up to {{ rate() | number: '1.0-2' }} QAR for each person who ate, with the lunch bill.</small></span>
+          </label>
+          @if (hadLunch()) {
+            <span class="ub-label">Who ate</span>
+            <div class="ub-people ub-people--inline">
+              @for (e of eaters(); track e.id) {
+                <label class="ub-person" [class.is-on]="ateLunch().includes(e.id)">
+                  <input type="checkbox" [checked]="ateLunch().includes(e.id)" (change)="toggleAte(e.id)" />
+                  <span>{{ e.name }}</span>
+                </label>
+              }
+            </div>
+            @if (tried() && problems()['ate']) { <small class="ub-error">{{ problems()['ate'] }}</small> }
+            <div class="ub-row">
+              <label class="ub-field">
+                <span class="ub-label">Lunch bill amount (QAR)</span>
+                <input type="text" inputmode="decimal" placeholder="0.00" [ngModel]="lunchBillText()" (ngModelChange)="lunchBillText.set($event)"
+                  [class.is-invalid]="tried() && problems()['bill']" />
+                @if (tried() && problems()['bill']) { <small class="ub-error">{{ problems()['bill'] }}</small> }
+              </label>
+              <div class="ub-field">
+                <span class="ub-label">Lunch bill (photo or PDF)</span>
+                <label class="ub-drop ub-drop--small" [class.is-done]="!!lunchBill()">
+                  <input type="file" accept="application/pdf,.pdf,image/*" (change)="pickLunchBill($event)" />
+                  <span>{{ lunchBill()?.name || 'Choose file' }}</span>
+                </label>
+                @if (tried() && problems()['billFile']) { <small class="ub-error">{{ problems()['billFile'] }}</small> }
+              </div>
+            </div>
+            @if (lunchBillAmount() !== null && ateLunch().length) {
+              <p class="ub-calc">{{ ateLunch().length }} {{ ateLunch().length === 1 ? 'person' : 'people' }} × {{ rate() | number: '1.0-2' }} = up to {{ lunchCap() | number: '1.2-2' }} QAR · bill {{ lunchBillAmount() | number: '1.2-2' }} → <b>{{ lunchPay() | number: '1.2-2' }} QAR</b></p>
+            }
+          }
+        </div>
+      }
+
+      <label class="ub-field">
+        <span class="ub-label">Note <small>optional</small></span>
+        <input type="text" maxlength="500" [ngModel]="note()" (ngModelChange)="note.set($event)" />
+      </label>
+
+      <div class="ub-sum">
+        <div><span>Ride</span><b>{{ (read()?.amount ?? 0) | number: '1.2-2' }}</b></div>
+        @if (lunchPay() > 0) { <div><span>Lunch</span><b>{{ lunchPay() | number: '1.2-2' }}</b></div> }
+        <div class="ub-sum-total"><span>You get back</span><b>{{ total() | number: '1.2-2' }} QAR</b></div>
+      </div>
+
+      @if (tried() && problems()['receipt']) { <p class="ub-error">{{ problems()['receipt'] }}</p> }
+      @if (formError()) { <p class="admin-error" role="alert">{{ formError() }}</p> }
+      <div class="ub-actions">
+        <button type="button" class="btn-admin btn-admin-primary" [disabled]="saving() || reading()" (click)="submit()">
+          {{ saving() ? 'Sending…' : 'Send for approval' }}
+        </button>
+        <button type="button" class="btn-admin btn-admin-ghost" [disabled]="saving()" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <div class="admin-panel">
+    <h2 class="ub-h">My bills</h2>
+    @if (loading()) {
+      <p class="ub-empty">Loading…</p>
+    } @else if (!data()?.claims?.length) {
+      <p class="ub-empty">No Uber bills yet. Tap <b>New Uber bill</b> after a ride you paid yourself.</p>
+    } @else {
+      <div class="ub-list">
+        @for (c of data()!.claims; track c.id) {
+          <app-travel-claim-card [claim]="c">
+            @if (c.status === 'Submitted') {
+              <button type="button" class="ub-link-danger" (click)="withdraw(c)">Take back</button>
+            }
+          </app-travel-claim-card>
+        }
+      </div>
+    }
+  </div>
+</section>

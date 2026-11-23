@@ -1,0 +1,77 @@
+@let c = claim();
+<article class="tc" [attr.data-status]="c.status">
+  <button type="button" class="tc-head" (click)="open.set(!open())" [attr.aria-expanded]="open()">
+    <span class="tc-main">
+      <span class="tc-top">
+        <strong class="tc-no">{{ c.claimNumber }}</strong>
+        <span class="tc-chip" [attr.data-tone]="status().tone">{{ status().label }}</span>
+      </span>
+      @if (showClaimant()) { <span class="tc-who">{{ person(c.claimantName) }}</span> }
+      <span class="tc-sub">
+        {{ c.tripOn | date: 'EEE d MMM' }}@if (c.tripTime) { · {{ time(c.tripTime) | date: 'h:mm a' }} } · {{ route() }}
+      </span>
+    </span>
+    <span class="tc-side">
+      <strong class="tc-amt">{{ c.payable | number: '1.2-2' }} <i>QAR</i></strong>
+      @if (c.approvedAmount !== null && c.approvedAmount < c.total) { <small class="tc-was">claimed {{ c.total | number: '1.2-2' }}</small> }
+      @if (c.status === 'Paid') {
+        <small class="tc-ok">Paid {{ c.paidAt | date: 'd MMM, h:mm a' : '+0300' }}</small>
+      } @else if (c.status === 'Submitted' || c.status === 'Approved') {
+        <small [class.tc-late]="c.daysWaiting >= 7">Waiting {{ c.daysWaiting }} {{ c.daysWaiting === 1 ? 'day' : 'days' }}</small>
+      }
+    </span>
+  </button>
+
+  @if (open()) {
+    <div class="tc-body">
+      <dl class="tc-facts">
+        @if (ride(); as r) {
+          <div><dt>Ride (from Uber's receipt)</dt><dd>{{ r.amount | number: '1.2-2' }} QAR</dd></div>
+        }
+        @if (lunch(); as l) {
+          <div><dt>Lunch · {{ l.persons }} × up to {{ l.ratePerPerson | number: '1.0-2' }}</dt>
+            <dd>{{ l.amount | number: '1.2-2' }} QAR <small>bill {{ l.billAmount | number: '1.2-2' }}</small></dd></div>
+        }
+        <div class="tc-total"><dt>Claimed</dt><dd>{{ c.total | number: '1.2-2' }} QAR</dd></div>
+        @if (c.approvedAmount !== null) {
+          <div class="tc-approved" [class.is-lower]="c.approvedAmount < c.total"><dt>Approved</dt><dd>{{ c.approvedAmount | number: '1.2-2' }} QAR</dd></div>
+        }
+      </dl>
+
+      @if (c.pickup || c.dropoff) {
+        <p class="tc-route"><span>{{ c.pickup || '—' }}</span><b aria-hidden="true">→</b><span>{{ c.dropoff || '—' }}</span></p>
+      }
+      @if (c.people.length) {
+        <p class="tc-line"><b>Came along:</b> @for (p of c.people; track p.personId; let last = $last) {{{ p.name }}@if (!last) {, }}</p>
+      }
+      @if (ate().length) {
+        <p class="tc-line"><b>Lunch for:</b> @for (n of ate(); track $index; let last = $last) {{{ n }}@if (!last) {, }}</p>
+      }
+      @if (c.note) { <p class="tc-line"><b>Note:</b> {{ c.note }}</p> }
+      @if (c.adjustmentReason) { <p class="tc-adjust"><b>Approved {{ c.approvedAmount | number: '1.2-2' }} instead of {{ c.total | number: '1.2-2' }}:</b> {{ c.adjustmentReason }}</p> }
+      @if (c.status === 'Rejected' && c.rejectReason) { <p class="tc-reject"><b>Rejected:</b> {{ c.rejectReason }}</p> }
+
+      <ol class="tc-steps">
+        <li><span>Submitted</span><time>{{ c.submittedAt | date: 'd MMM y, h:mm a' : '+0300' }}</time></li>
+        @if (c.approvedAt) { <li><span>Approved by {{ person(c.approvedByName) }}</span><time>{{ c.approvedAt | date: 'd MMM y, h:mm a' : '+0300' }}</time></li> }
+        @if (c.rejectedAt) { <li class="is-bad"><span>Rejected by {{ person(c.rejectedByName) }}</span><time>{{ c.rejectedAt | date: 'd MMM y, h:mm a' : '+0300' }}</time></li> }
+        @if (c.withdrawnAt) { <li class="is-grey"><span>Withdrawn</span><time>{{ c.withdrawnAt | date: 'd MMM y, h:mm a' : '+0300' }}</time></li> }
+        @if (c.paidAt) {
+          <li class="is-ok"><span>Paid back by {{ person(c.paidByName) }} · {{ method() }} · {{ c.reimbursementNumber }}</span><time>{{ c.paidAt | date: 'd MMM y, h:mm a' : '+0300' }}</time></li>
+        }
+      </ol>
+      <p class="tc-days">
+        @if (c.status === 'Paid') { Paid back {{ c.daysWaiting === 0 ? 'the same day' : 'after ' + c.daysWaiting + (c.daysWaiting === 1 ? ' day' : ' days') }}. }
+        @else if (c.status === 'Submitted' || c.status === 'Approved') { Waiting {{ c.daysWaiting }} {{ c.daysWaiting === 1 ? 'day' : 'days' }} so far. }
+      </p>
+
+      <div class="tc-actions">
+        @for (l of c.lines; track l.id) {
+          <button type="button" class="tc-file" (click)="openFile(l)">{{ l.kind === 'Ride' ? 'Uber receipt' : 'Lunch bill' }}</button>
+        }
+        <ng-content />
+      </div>
+      @if (fileError()) { <p class="tc-error" role="alert">{{ fileError() }}</p> }
+    </div>
+  }
+</article>

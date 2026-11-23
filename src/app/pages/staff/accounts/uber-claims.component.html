@@ -1,0 +1,291 @@
+<section class="admin-page">
+  <header class="page-banner">
+    <div class="page-banner-text">
+      <h1>Uber bills</h1>
+      <p class="page-banner-sub">Approve staff Uber rides and pay them back</p>
+    </div>
+    <div class="page-banner-actions">
+      <button type="button" class="btn-admin btn-admin-ghost" (click)="load()">Refresh</button>
+    </div>
+  </header>
+
+  @if (error()) { <p class="admin-error" role="alert">{{ error() }}</p> }
+  @if (flash()) { <p class="uc-flash" role="status">✓ {{ flash() }}</p> }
+
+  @if (board(); as b) {
+    <div class="uc-tiles">
+      <button type="button" class="uc-tile" [class.is-on]="!person() && tab() === 'approve'" (click)="showPerson(null); tab.set('approve')">
+        <span>To approve</span>
+        <strong>{{ b.toApproveTotal | number: '1.2-2' }} <i>QAR</i></strong>
+        <small>{{ b.toApproveCount }} {{ b.toApproveCount === 1 ? 'bill' : 'bills' }} waiting for you</small>
+      </button>
+      <button type="button" class="uc-tile" [class.uc-tile--owed]="b.owedTotal > 0" [class.is-on]="!person() && tab() === 'pay'" (click)="showPerson(null); tab.set('pay')">
+        <span>Owed to staff</span>
+        <strong>{{ b.owedTotal | number: '1.2-2' }} <i>QAR</i></strong>
+        <small>{{ b.owedCount }} approved, not paid back yet</small>
+      </button>
+      <div class="uc-tile">
+        <span>Paid back this month</span>
+        <strong>{{ b.paidThisMonth | number: '1.2-2' }} <i>QAR</i></strong>
+        <small>{{ b.reimbursements.length }} {{ b.reimbursements.length === 1 ? 'payout' : 'payouts' }} in the last 30 days</small>
+      </div>
+      <div class="uc-tile">
+        <span>Site lunch</span>
+        <strong>{{ b.lunchRate | number: '1.2-2' }} <i>QAR</i></strong>
+        <small>max per person · <button type="button" class="uc-inline" (click)="openRate()">{{ rateOpen() ? 'Close' : 'Change' }}</button></small>
+      </div>
+    </div>
+
+    @if (rateOpen()) {
+      <div class="admin-panel uc-rate">
+        <h2 class="uc-h">Change the site lunch rate</h2>
+        <p class="uc-note">Trips from the start day use the new rate. Bills already sent keep the rate they were made with.</p>
+        <div class="uc-row">
+          <label class="uc-field"><span class="uc-label">Most per person (QAR)</span>
+            <input type="text" inputmode="decimal" [ngModel]="rateText()" (ngModelChange)="rateText.set($event)" /></label>
+          <label class="uc-field"><span class="uc-label">From</span>
+            <input type="date" [ngModel]="rateFrom()" (ngModelChange)="rateFrom.set($event)" /></label>
+          <button type="button" class="btn-admin btn-admin-primary" (click)="saveRate()">Save rate</button>
+        </div>
+        @if (rateError()) { <p class="uc-error">{{ rateError() }}</p> }
+        @if (rates()?.history?.length) {
+          <ul class="uc-rates">
+            @for (r of rates()!.history; track r.setAt) {
+              <li><b>{{ r.amountPerPerson | number: '1.2-2' }} QAR</b> from {{ r.effectiveFrom | date: 'd MMM y' }} <small>set by {{ name(r.setByName) }} on {{ r.setAt | date: 'd MMM y, h:mm a' : '+0300' }}</small></li>
+            }
+          </ul>
+        } @else { <p class="uc-note">No change yet — the starting rate is 12 QAR.</p> }
+      </div>
+    }
+
+    <!-- Each person's money -->
+    <div class="admin-panel">
+      <h2 class="uc-h">By person</h2>
+      @if (!b.people.length) {
+        <p class="uc-empty">No Uber bills yet.</p>
+      } @else {
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Person</th>
+                <th scope="col">Waiting approval</th>
+                <th scope="col">Owed</th>
+                <th scope="col">Longest wait</th>
+                <th scope="col">Paid this month</th>
+                <th scope="col">Last paid back</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of b.people; track p.personId) {
+                <tr [class.is-picked]="person()?.personId === p.personId">
+                  <td data-label="Person"><strong>{{ p.name }}</strong></td>
+                  <td data-label="Waiting approval" class="uc-num">{{ p.waitingApproval | number: '1.2-2' }}@if (p.waitingCount) { <small>({{ p.waitingCount }})</small> }</td>
+                  <td data-label="Owed" class="uc-num" [class.is-owed]="p.owed > 0">{{ p.owed | number: '1.2-2' }}@if (p.owedCount) { <small>({{ p.owedCount }})</small> }</td>
+                  <td data-label="Longest wait"><span [class.uc-late]="p.oldestOpenDays >= 7">{{ p.waitingCount + p.owedCount ? p.oldestOpenDays + (p.oldestOpenDays === 1 ? ' day' : ' days') : '—' }}</span></td>
+                  <td data-label="Paid this month" class="uc-num">{{ p.paidThisMonth | number: '1.2-2' }}</td>
+                  <td data-label="Last paid back">{{ p.lastPaidAt ? (p.lastPaidAt | date: 'd MMM, h:mm a' : '+0300') : '—' }}</td>
+                  <td data-label="Actions" class="uc-acts">
+                    @if (p.owed > 0 && p.personId !== myId) {
+                      <button type="button" class="uc-btn uc-btn--pay" (click)="startPay(p)">Pay back {{ p.owed | number: '1.2-2' }}</button>
+                    }
+                    <button type="button" class="uc-btn" (click)="showPerson(person()?.personId === p.personId ? null : p)">{{ person()?.personId === p.personId ? 'All people' : 'History' }}</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Paying one person back -->
+    @if (paying(); as p) {
+      <div class="admin-panel uc-pay">
+        <h2 class="uc-h">Pay back {{ p.name }}</h2>
+        <div class="uc-pay-list">
+          @for (c of payClaims(); track c.id) {
+            <label class="uc-pay-item" [class.is-on]="payIds().includes(c.id)">
+              <input type="checkbox" [checked]="payIds().includes(c.id)" (change)="togglePay(c.id)" />
+              <span><b>{{ c.claimNumber }}</b> · {{ c.tripOn | date: 'd MMM' }} · waiting {{ c.daysWaiting }} {{ c.daysWaiting === 1 ? 'day' : 'days' }}</span>
+              <strong>{{ c.payable | number: '1.2-2' }} QAR</strong>
+            </label>
+          }
+        </div>
+        <div class="uc-row">
+          <label class="uc-field"><span class="uc-label">How</span>
+            <select [ngModel]="payMethod()" (ngModelChange)="payMethod.set($event)">
+              <option value="" disabled>Cash or bank transfer</option>
+              <option value="Cash">Cash</option>
+              <option value="BankTransfer">Bank transfer</option>
+            </select></label>
+          <label class="uc-field uc-grow"><span class="uc-label">Reference <small>optional — bank reference or a note</small></span>
+            <input type="text" maxlength="300" [ngModel]="payReference()" (ngModelChange)="payReference.set($event)" /></label>
+        </div>
+        @if (payError()) { <p class="uc-error" role="alert">{{ payError() }}</p> }
+        <div class="uc-pay-foot">
+          <span>Paying now <b>{{ payTotal() | number: '1.2-2' }} QAR</b> for {{ payIds().length }} {{ payIds().length === 1 ? 'bill' : 'bills' }}. The date and time are recorded.</span>
+          <div>
+            <button type="button" class="btn-admin btn-admin-primary" [disabled]="busy() === 'pay'" (click)="pay()">{{ busy() === 'pay' ? 'Saving…' : 'Confirm paid back' }}</button>
+            <button type="button" class="btn-admin btn-admin-ghost" (click)="paying.set(null)">Cancel</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- The bills -->
+    <div class="admin-panel">
+      @if (person(); as p) {
+        <div class="uc-head">
+          <h2 class="uc-h">{{ p.name }} — every Uber bill</h2>
+          <button type="button" class="uc-btn" (click)="showPerson(null)">← All people</button>
+        </div>
+        @if (personSummary(); as ps) {
+          <div class="uc-ps">
+            <div><span>Paid back to {{ p.name }}</span><b>{{ ps.paidTotal | number: '1.2-2' }} QAR</b><small>{{ ps.payouts }} {{ ps.payouts === 1 ? 'payout' : 'payouts' }}</small></div>
+            <div><span>Owed now</span><b [class.is-owed]="ps.owed > 0">{{ ps.owed | number: '1.2-2' }} QAR</b><small>since the last payout</small></div>
+            <div><span>Trips</span><b>{{ ps.trips }}</b><small>not counting rejected</small></div>
+            <div class="uc-ps-wide"><span>Rode with</span>
+              <p>@for (x of ps.companions; track x.name; let last = $last) {<em>{{ x.name }} · {{ x.trips }}</em>} @empty { Nobody — always alone. }</p>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="uc-tabs" role="tablist">
+          <button type="button" role="tab" [class.is-on]="tab() === 'approve'" (click)="tab.set('approve')">To approve <b>{{ toApprove().length }}</b></button>
+          <button type="button" role="tab" [class.is-on]="tab() === 'pay'" (click)="tab.set('pay')">To pay back <b>{{ toPay().length }}</b></button>
+          <button type="button" role="tab" [class.is-on]="tab() === 'history'" (click)="tab.set('history')">Done · last 30 days <b>{{ closed().length }}</b></button>
+        </div>
+      }
+
+      @if (loading()) {
+        <p class="uc-empty">Loading…</p>
+      } @else if (!person() && tab() === 'approve') {
+        @for (g of approveGroups(); track g.personId) {
+          @let sum = summary(g);
+          <section class="ua">
+            <header class="ua-head">
+              <h3>{{ g.name }}</h3>
+              <span>{{ g.claims.length }} {{ g.claims.length === 1 ? 'bill' : 'bills' }} waiting</span>
+              @if (g.personId !== myId) {
+                <button type="button" class="uc-inline" (click)="tickAll(g, sum.count < g.claims.length)">{{ sum.count < g.claims.length ? 'Tick all' : 'Untick all' }}</button>
+              }
+            </header>
+            @if (g.personId === myId) { <p class="uc-own">Your own bills — another accountant or an administrator approves them.</p> }
+            <div class="ua-rows">
+              <div class="ua-cols" aria-hidden="true"><span></span><span>Bill</span><span>Claimed</span><span>Approve (QAR)</span></div>
+              @for (c of g.claims; track c.id) {
+                @let rw = row(c.id);
+                <div class="ua-row" [class.is-off]="!rw.checked">
+                  <label class="ua-tick"><input type="checkbox" [checked]="rw.checked" [disabled]="g.personId === myId"
+                    (change)="setRow(c.id, { checked: !rw.checked })" [attr.aria-label]="'Approve ' + c.claimNumber" /></label>
+                  <button type="button" class="ua-info" (click)="expanded.set(expanded() === c.id ? null : c.id)" [attr.aria-expanded]="expanded() === c.id">
+                    <b>{{ c.claimNumber }}</b>
+                    <span>{{ c.tripOn | date: 'EEE d MMM' }}@if (c.tripTime) { · {{ time(c.tripTime) | date: 'h:mm a' }} } · {{ route(c) }}@if (c.people.length) { · +{{ c.people.length }} }</span>
+                  </button>
+                  <span class="ua-claimed">{{ c.total | number: '1.2-2' }}</span>
+                  <input class="ua-amount" type="text" inputmode="decimal" [ngModel]="rw.amount" (ngModelChange)="setRow(c.id, { amount: $event })"
+                    [disabled]="!rw.checked" [class.is-lower]="isLowered(c)" [class.is-invalid]="!!rowError(c) && !isLowered(c)" [attr.aria-label]="'Approved amount for ' + c.claimNumber" />
+                  @if (rw.checked && isLowered(c)) {
+                    <input class="ua-reason" type="text" maxlength="300" placeholder="Why lower? The person will see it." [ngModel]="rw.reason"
+                      (ngModelChange)="setRow(c.id, { reason: $event })" [class.is-invalid]="!!rowError(c)" />
+                  }
+                  @if (rowError(c)) { <small class="ua-err">{{ rowError(c) }}</small> }
+                </div>
+                @if (expanded() === c.id) {
+                  <div class="ua-detail">
+                    <app-travel-claim-card [claim]="c">
+                      @if (g.personId !== myId) {
+                        @if (rejecting() === c.id) {
+                          <span class="uc-reject">
+                            <input type="text" maxlength="500" placeholder="Why? The person will see it." [ngModel]="reason()" (ngModelChange)="reason.set($event)" />
+                            <button type="button" class="uc-btn uc-btn--bad" [disabled]="!reason().trim() || busy() === c.id" (click)="reject(c)">Reject</button>
+                            <button type="button" class="uc-btn" (click)="rejecting.set(null)">Cancel</button>
+                          </span>
+                        } @else {
+                          <button type="button" class="uc-btn uc-btn--bad" (click)="startReject(c)">Reject this bill…</button>
+                        }
+                      }
+                    </app-travel-claim-card>
+                  </div>
+                }
+              }
+            </div>
+            @if (g.personId !== myId) {
+              <footer class="ua-foot">
+                <span>
+                  {{ sum.count }} {{ sum.count === 1 ? 'bill' : 'bills' }} · claimed {{ sum.claimed | number: '1.2-2' }}
+                  → approving <b>{{ sum.approved | number: '1.2-2' }} QAR</b>@if (sum.lowered) { · {{ sum.lowered }} lowered }
+                </span>
+                <button type="button" class="btn-admin btn-admin-primary" [disabled]="!sum.count || sum.hasError || busy() === g.personId" (click)="approveGroup(g)">
+                  {{ busy() === g.personId ? 'Approving…' : 'Approve ' + sum.count + (sum.count === 1 ? ' bill' : ' bills') }}
+                </button>
+              </footer>
+            }
+          </section>
+        } @empty {
+          <p class="uc-empty">Nothing waiting for approval.</p>
+        }
+      } @else if (!shown().length) {
+        <p class="uc-empty">
+          @if (person()) { No bills from this person. }
+          @else if (tab() === 'approve') { Nothing waiting for approval. }
+          @else if (tab() === 'pay') { Nobody is owed money. }
+          @else { Nothing paid back or rejected in the last 30 days. }
+        </p>
+      } @else {
+        <div class="uc-list">
+          @for (c of shown(); track c.id) {
+            <app-travel-claim-card [claim]="c" [showClaimant]="true">
+              @if (isMine(c) && (c.status === 'Submitted' || c.status === 'Approved')) {
+                <span class="uc-own">Your own bill — another accountant or an administrator decides on it.</span>
+              } @else {
+                @if (c.status === 'Submitted' || c.status === 'Approved') {
+                  @if (rejecting() === c.id) {
+                    <span class="uc-reject">
+                      <input type="text" maxlength="500" placeholder="Why? The person will see it." [ngModel]="reason()" (ngModelChange)="reason.set($event)" />
+                      <button type="button" class="uc-btn uc-btn--bad" [disabled]="!reason().trim() || busy() === c.id" (click)="reject(c)">Reject</button>
+                      <button type="button" class="uc-btn" (click)="rejecting.set(null)">Cancel</button>
+                    </span>
+                  } @else {
+                    <button type="button" class="uc-btn uc-btn--bad" (click)="startReject(c)">Reject…</button>
+                  }
+                }
+              }
+            </app-travel-claim-card>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Payouts -->
+    @if (b.reimbursements.length) {
+      <div class="admin-panel">
+        <h2 class="uc-h">Payouts {{ person() ? 'to ' + person()!.name : '· last 30 days' }}</h2>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th scope="col">Payout</th><th scope="col">Paid to</th><th scope="col">Amount</th><th scope="col">How</th><th scope="col">When</th><th scope="col">Paid by</th><th scope="col">Bills</th></tr>
+            </thead>
+            <tbody>
+              @for (r of b.reimbursements; track r.id) {
+                <tr>
+                  <td data-label="Payout"><strong>{{ r.number }}</strong>@if (r.reference) { <small class="uc-sub">{{ r.reference }}</small> }</td>
+                  <td data-label="Paid to">{{ r.payeeName }}</td>
+                  <td data-label="Amount" class="uc-num">{{ r.amount | number: '1.2-2' }} QAR</td>
+                  <td data-label="How">{{ methodLabel[r.method] }}</td>
+                  <td data-label="When">{{ r.paidAt | date: 'd MMM y, h:mm a' : '+0300' }}</td>
+                  <td data-label="Paid by">{{ name(r.paidByName) }}</td>
+                  <td data-label="Bills">{{ r.claimNumbers.join(', ') }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  } @else if (loading()) {
+    <div class="admin-panel"><p class="uc-empty">Loading…</p></div>
+  }
+</section>

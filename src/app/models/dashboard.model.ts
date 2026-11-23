@@ -19,12 +19,17 @@ export interface DashboardCash {
   waitingNonMoi: number; peopleNonMoi: number; waitingMoi: number; peopleMoi: number; waitingTotal: number;
   receivedToday: number; handoversToday: number; differenceThisMonth: number;
 }
+/** Uber bills: waiting for approval, owed to staff, the longest open wait, and paid back this month. */
+export interface DashboardTravel {
+  toApproveCount: number; toApproveTotal: number; owedCount: number; owedTotal: number; oldestOpenDays: number; paidThisMonth: number;
+}
 export interface Dashboard {
   now: string;
   revenueThisMonth: number; revenueLastMonth: number; paymentsThisMonth: number; cashThisMonth: number; onlineThisMonth: number;
   quotationsApprovedThisMonth: number; quotationsApprovedCount: number;
   revenueNonMoiThisMonth: number; revenueMoiThisMonth: number; unpaidTotal: number; unpaidJobs: number;
   cash: DashboardCash;
+  travel: DashboardTravel;
   openInvoicesTotal: number; openInvoices: DashboardInvoice[];
   todayJobs: DashboardJob[]; overdueJobs: number;
   technicians: DashboardTechnician[];
