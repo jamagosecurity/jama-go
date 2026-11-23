@@ -72,6 +72,12 @@ export class TechnicianMoiJobDetailComponent implements OnInit {
 
   protected readonly statusLabel = jobStatusLabel;
 
+  /** "Sara <sara@jamago.qa>" is how names are stored; on screen only the name reads well. */
+  protected person(name: string | null | undefined): string {
+    return (name ?? '').replace(/\s*<[^>]*>\s*$/, '').trim();
+  }
+
+
   protected isPicked(i: MaintenanceIssueOption): boolean { return this.picked().has(i.id); }
 
   protected toggle(i: MaintenanceIssueOption): void {

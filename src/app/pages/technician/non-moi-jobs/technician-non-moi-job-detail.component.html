@@ -12,7 +12,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>Jobs
       </a>
       <strong class="tjd-jobno">{{ j.jobNumber }}</strong>
-      <span class="tjd-date">@if (j.scheduledAt) {Visit · {{ j.scheduledAt | date: 'EEE d MMM, h:mm a' : '+0300' }}} @else {{{ j.createdAt | date: 'd MMM y' }}}</span>
+      <span class="tjd-date">@if (j.scheduledAt) {Visit · {{ j.scheduledAt | date: 'EEE d MMM, h:mm a' : '+0300' }}} @else {Issued · {{ j.createdAt | date: 'EEE d MMM, h:mm a' : '+0300' }}}</span>
       <span class="tjd-state" [class.is-done]="j.status === 'Closed'" [attr.data-status]="j.status">{{ statusLabel(j.status) }}</span>
     </div>
 
@@ -36,6 +36,18 @@
       </div>
     </section>
 
+    <section class="admin-panel tjd-times" aria-label="Times">
+      <h2 class="tjd-h">Times</h2>
+      <ol class="tjd-steps">
+        <li><span>Issued by {{ person(j.assignedByName) }}</span><time>{{ j.createdAt | date: 'EEE d MMM y, h:mm a' : '+0300' }}</time></li>
+        @if (j.scheduledAt) { <li><span>Visit planned</span><time>{{ j.scheduledAt | date: 'EEE d MMM y, h:mm a' : '+0300' }}</time></li> }
+        @if (j.completedAt) { <li class="is-done"><span>You completed it</span><time>{{ j.completedAt | date: 'EEE d MMM y, h:mm a' : '+0300' }}</time></li> }
+        @if (j.emailSentAt || j.whatsAppSentAt) { <li><span>Bill sent to the client</span><time>{{ (j.emailSentAt ?? j.whatsAppSentAt) | date: 'EEE d MMM y, h:mm a' : '+0300' }}</time></li> }
+        @if (j.clientRespondedAt && j.status !== 'Closed') { <li><span>Client answered</span><time>{{ j.clientRespondedAt | date: 'EEE d MMM y, h:mm a' : '+0300' }}</time></li> }
+        @if (j.closedAt) { <li class="is-done"><span>Client approved</span><time>{{ j.closedAt | date: 'EEE d MMM y, h:mm a' : '+0300' }}</time></li> }
+      </ol>
+    </section>
+
     @if (j.status === 'Closed') {
       <div class="tjd-client tjd-client--ok"><strong>The client approved this bill</strong><span>Amount payable: {{ j.amountPayable | number: '1.2-2' }} QAR. Well done.</span></div>
     } @else if (j.status === 'ChangesRequested') {
@@ -50,7 +62,7 @@
 
     @if (j.status !== 'Assigned') {
       <div class="admin-panel">
-        <h2 class="tjd-h">Work done · {{ j.completedAt | date: 'd MMM y, HH:mm' }}</h2>
+        <h2 class="tjd-h">Work done · {{ j.completedAt | date: 'EEE d MMM y, h:mm a' : '+0300' }}</h2>
         <table class="tjd-table">
           <thead><tr><th>Issue</th><th class="tjd-num">Price</th><th class="tjd-num">Total</th></tr></thead>
           <tbody>

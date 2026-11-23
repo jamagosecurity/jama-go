@@ -37,7 +37,11 @@
 .tj-mini, .tj-mini-status, .tj-chev { display: none; }
 
 /* ===== Phone: still a table — Job | Customer | open arrow. Everything else rides inside those. ===== */
+/* The issued time sits in the Job column on a wide screen; on a phone that column is hidden, so it shows under the customer. */
+.tj-issued { display: none; }
+
 @media (max-width: 720px) {
+  .tj-table td small.tj-issued { display: block; color: #6b7280; font-size: 0.74rem; white-space: nowrap; }
   :host .page-banner { display: none; }
   .tj-table-wrap { overflow: hidden; }
   /* One line per job: name on the left, then Call, Location and the open arrow. */

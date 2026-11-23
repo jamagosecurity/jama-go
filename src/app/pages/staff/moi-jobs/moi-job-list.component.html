@@ -71,6 +71,7 @@
               <th scope="col">Customer</th>
               <th scope="col">Number</th>
               <th scope="col">Location</th>
+              <th scope="col">Created</th>
               <th scope="col">Technician</th>
               <th scope="col">Status</th>
               <th scope="col" class="nj-amount">Amount</th>
@@ -86,6 +87,10 @@
                   {{ job.location }}
                   @if (isPinned(job)) { <span class="nj-pinned" title="Has a map pin — Navigate works">●</span> }
                 </td>
+                <td data-label="Created" class="col-created">
+                  {{ job.createdAt | date: 'd MMM, h:mm a' : '+0300' }}
+                  @if (person(job.assignedByName)) { <small class="nj-when">by {{ person(job.assignedByName) }}</small> }
+                </td>
                 <td data-label="Technician" class="col-tech">
                   {{ job.assignedToName }}
                   @if (job.scheduledAt) { <small class="nj-visit">{{ job.scheduledAt | date: 'd MMM, h:mm a' : '+0300' }}</small> }
@@ -95,6 +100,7 @@
                     [attr.title]="job.status === 'ChangesRequested' && job.clientMessage ? job.clientMessage : statusLabel(job.status)">
                     {{ statusLabel(job.status) }}
                   </span>
+                  @if (statusAt(job); as at) { <small class="nj-when">{{ at | date: 'd MMM, h:mm a' : '+0300' }}</small> }
                 </td>
                 <td data-label="Amount" class="nj-amount">
                   {{ job.status === 'Assigned' ? '—' : (job.amountPayable | number: '1.2-2') + ' QAR' }}

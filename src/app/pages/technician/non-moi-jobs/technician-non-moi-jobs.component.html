@@ -50,7 +50,7 @@
               <tr>
                 <td data-label="Job">
                   <strong class="tj-no">{{ job.jobNumber }}</strong>
-                  <small>{{ job.createdAt | date: 'd MMM y' }}</small>
+                  <small>Issued {{ job.createdAt | date: 'd MMM, h:mm a' : '+0300' }}</small>
                 </td>
                 <td data-label="Visit" class="tj-when">
                   @if (job.scheduledAt) {
@@ -64,6 +64,7 @@
                   <span class="tj-who">
                     <strong>{{ job.customerName }}</strong>
                     <small class="tj-visit">{{ job.scheduledAt ? 'Visit · ' + (job.scheduledAt | date: 'EEE d MMM, h:mm a' : '+0300') : 'Not scheduled' }}</small>
+                    <small class="tj-issued">Issued {{ job.createdAt | date: 'd MMM, h:mm a' : '+0300' }}</small>
                   </span>
                   <span class="tj-status tj-mini-status" [class.is-done]="job.status === 'Closed'" [attr.data-status]="job.status">
                     {{ statusLabel(job.status) }}

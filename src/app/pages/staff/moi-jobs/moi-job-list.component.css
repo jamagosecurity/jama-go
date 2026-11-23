@@ -349,3 +349,7 @@
 .nj-paid { display: block; width: fit-content; margin: 3px auto 0; padding: 1px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 800; background: #fdecec; color: #a40f14; }
 .nj-paid[data-state="part"] { background: #fff1e2; color: #b35c06; }
 .nj-paid[data-state="paid"] { background: #e4f4ee; color: #0f7a5f; }
+
+/* When: created (and by whom) and the time of the current status */
+.nj-table .col-created { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.nj-table .nj-when { display: block; margin-top: 2px; color: #6b7280; font-weight: 600; font-size: 0.76rem; white-space: nowrap; }

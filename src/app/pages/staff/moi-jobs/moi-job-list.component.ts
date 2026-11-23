@@ -64,6 +64,23 @@ export class MoiJobListComponent implements OnInit {
 
   protected readonly statusLabel = jobStatusLabel;
 
+  /** When the job reached the step it is on now: finished by the technician, bill sent, client answered, approved. */
+  protected statusAt(job: NonMoiJob): string | null {
+    switch (job.status) {
+      case 'Completed': return job.completedAt;
+      case 'Sent': return job.emailSentAt ?? job.whatsAppSentAt;
+      case 'ChangesRequested': return job.clientRespondedAt;
+      case 'Closed': return job.closedAt;
+      default: return null;
+    }
+  }
+
+  /** "Sara <sara@jamago.qa>" is how names are stored; on screen only the name reads well. */
+  protected person(name: string | null | undefined): string {
+    return (name ?? '').replace(/\s*<[^>]*>\s*$/, '').trim();
+  }
+
+
   protected setStage(stage: Stage): void {
     this.stage.set(stage);
     this.page.set(1);
