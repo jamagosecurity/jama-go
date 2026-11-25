@@ -63,6 +63,7 @@ export class StaffEditorComponent {
     { prefix: 'nonmoijob.', label: 'Non-MOI jobs' },
     { prefix: 'moijob.', label: 'MOI jobs' },
     { prefix: 'accounts.', label: 'Accounts' },
+    { prefix: 'proforma.', label: 'Administrator' },
     { prefix: 'mail.', label: 'Company mail' },
   ];
 
@@ -96,6 +97,8 @@ export class StaffEditorComponent {
     'nonmoijob.work': ['M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z', 'm9 10 2 2 4-4'],
     'mail.read': ['M3 6h18v12H3z', 'm3 7 9 6 9-6'],
     'accounts.manage': ['M2.5 6h19v12h-19z', 'M12 9.4a2.6 2.6 0 1 0 0 5.2 2.6 2.6 0 0 0 0-5.2Z', 'M6 9.5v5M18 9.5v5'],
+    // A sheet with a priced total: the proforma invoice.
+    'proforma.manage': ['M6 2.5h9l4 4v15H6z', 'M15 2.5v4h4', 'M9 11h7M9 14.5h7M12 18h4'],
     // A pin with a tick: an MOI job at a customer's site.
     'moijob.manage': ['M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z', 'm9.5 10 1.8 1.8 3.4-3.6'],
     'moijob.work': ['M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z', 'M9 13h6'],

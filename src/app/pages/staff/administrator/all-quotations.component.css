@@ -1,0 +1,52 @@
+/* The administrator's list of every quotation, with the proforma invoice of each. */
+:host { display: block; }
+
+.pf-tools { display: grid; gap: 12px; margin: 0 0 14px; }
+.pf-search { width: 100%; min-height: 44px; padding: 0 14px; border: 1.5px solid #cfd6e4; border-radius: 12px; background: #fff; font: inherit; color: #0b1730; }
+.pf-search:focus { outline: none; border-color: #14305f; box-shadow: 0 0 0 3px rgba(20, 48, 95, 0.12); }
+.pf-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pf-chip { min-height: 36px; padding: 0 14px; border: 1.5px solid #cfd6e4; border-radius: 999px; background: #fff; color: #14305f; font: inherit; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+.pf-chip:hover { border-color: #14305f; }
+.pf-chip.is-on { border-color: #14305f; background: #14305f; color: #fff; }
+
+.pf-count { margin: 0 0 8px; color: #6b7280; font-size: 0.82rem; font-weight: 700; }
+.pf-empty { margin: 0; padding: 26px; color: #6b7280; text-align: center; }
+
+.pf-list { display: grid; gap: 8px; }
+.pf-row { display: grid; grid-template-columns: 150px minmax(0, 1.6fr) minmax(0, 0.9fr) 128px 120px 130px 104px; align-items: center; gap: 12px; padding: 12px 14px; }
+.pf-row--head { padding-top: 0; padding-bottom: 0; color: #6b7280; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.pf-item { border: 1.5px solid #e6e3dc; border-radius: 14px; background: #fff; color: inherit; text-decoration: none; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.pf-item:hover { border-color: #14305f; box-shadow: 0 6px 18px rgba(20, 48, 95, 0.08); }
+.pf-item:focus-visible { outline: 3px solid rgba(20, 48, 95, 0.35); outline-offset: 2px; }
+.pf-row > span { min-width: 0; }
+.pf-no, .pf-what, .pf-pi { display: grid; gap: 2px; }
+.pf-no b { color: #14305f; white-space: nowrap; }
+.pf-what b { overflow: hidden; color: #0b1730; text-overflow: ellipsis; white-space: nowrap; }
+.pf-row small { overflow: hidden; color: #6b7280; font-size: 0.78rem; text-overflow: ellipsis; white-space: nowrap; }
+.pf-by { color: #4a5567; font-size: 0.88rem; }
+.pf-num { text-align: right; }
+.pf-total { color: #0b1730; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pf-total i { color: #6b7280; font-size: 0.72rem; font-style: normal; font-weight: 500; }
+.pf-pi b { color: #0f6b5f; font-size: 0.88rem; }
+.pf-act { text-align: right; }
+.pf-btn { min-width: 96px; }
+
+.pf-status { display: inline-block; padding: 3px 10px; border-radius: 999px; background: #eef0f4; color: #4b5260; font-size: 0.72rem; font-style: normal; font-weight: 800; white-space: nowrap; }
+.pf-status[data-status="Approved"] { background: #e5f5ef; color: #0f6b5f; }
+.pf-status[data-status="Submitted"] { background: #fff3e0; color: #a35a06; }
+.pf-status[data-status="Rejected"] { background: #fdecec; color: #a40f14; }
+
+.pf-pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 16px 0 0; color: #4a5567; font-size: 0.86rem; font-weight: 700; }
+
+@media (max-width: 1100px) {
+  .pf-row--head { display: none; }
+  .pf-row { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; }
+  .pf-no { grid-column: 1; }
+  .pf-total { grid-column: 2; grid-row: 1; }
+  .pf-what { grid-column: 1 / -1; }
+  .pf-by { grid-column: 1; }
+  .pf-row > span:nth-child(4) { grid-column: 2; grid-row: 3; text-align: right; }
+  .pf-pi { grid-column: 1; }
+  .pf-act { grid-column: 2; grid-row: 4; }
+}
+

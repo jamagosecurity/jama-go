@@ -36,6 +36,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
   readonly moiJobBadge = inject(MoiJobBadgeService);
   readonly canMoiJobs = computed(() => this.auth.can(PERMISSIONS.moiJobManage));
   readonly canAccounts = computed(() => this.auth.can(PERMISSIONS.accountsManage));
+  readonly canAdministrator = computed(() => this.auth.can(PERMISSIONS.proformaManage));
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -147,6 +148,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       { label: 'Non-MOI Inventory', group: 'Non-MOI', url: '/admin/non-moi' },
       { label: 'Cash handover', group: 'Accounts', url: '/admin/cash-handover' },
       { label: 'Uber bills (approve & pay back)', group: 'Accounts', url: '/admin/uber-claims' },
+      { label: 'Proforma Invoice (all quotations)', group: 'Administrator', url: '/admin/all-quotations' },
       { label: 'Quotation', group: 'Quotations & documents', url: '/admin/boq' },
       { label: 'Quotations approved', group: 'Quotations & documents', url: '/admin/boq/decisions', query: { status: 'Approved' } },
       { label: 'Quotations rejected', group: 'Quotations & documents', url: '/admin/boq/decisions', query: { status: 'Rejected' } },

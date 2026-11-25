@@ -1,0 +1,129 @@
+/* A quotation opened as its proforma invoice — laid out like the printed one. Colours are the PDF's. */
+:host {
+  display: block;
+  --pi-brand: #2594d2;
+  --pi-strong: #1a7bb5;
+  --pi-ink: #0f2846;
+  --pi-muted: #5f7487;
+  --pi-border: #9fb6ca;
+  --pi-head: #d9e9f6;
+  --pi-section: #eaf3fa;
+}
+
+.ps-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 0 14px; }
+.ps-spacer { flex: 1; }
+.ps-back { text-decoration: none; }
+.ps-unsaved { color: #a35a06; font-size: 0.82rem; font-weight: 700; }
+.ps-dl { display: inline-flex; align-items: center; gap: 6px; padding: 4px 4px 4px 14px; border-radius: 999px; background: #14305f; }
+.ps-dl-label { color: #fff; font-size: 0.84rem; font-weight: 800; margin-right: 2px; }
+.ps-dl-btn { min-height: 34px; min-width: 64px; padding: 0 14px; border: 0; border-radius: 999px; background: #fff; color: #14305f; font: inherit; font-size: 0.84rem; font-weight: 800; cursor: pointer; }
+.ps-dl-btn:hover:not(:disabled) { background: #e8f1fb; }
+.ps-dl-btn:disabled { opacity: 0.6; cursor: default; }
+.ps-dl-btn[data-format="pdf"] { color: #b3141b; }
+.ps-dl-btn[data-format="excel"] { color: #0f7a3f; }
+.ps-dl-btn[data-format="word"] { color: #1d5fa8; }
+.ps-flash { margin: 0 0 14px; padding: 12px 16px; border: 1px solid #b9e0d2; border-radius: 12px; background: #e4f4ee; color: #0b5d47; font-weight: 700; }
+.ps-draft { margin: 0 0 14px; padding: 12px 16px; border-radius: 12px; background: #fff3e0; color: #7a4205; font-size: 0.9rem; }
+.ps-empty { padding: 40px; color: #6b7280; text-align: center; }
+
+/* The paper */
+.ps-paper { margin: 0; padding: 18px 22px 14px; border: 1px solid #e3e6ec; border-radius: 6px; background: #fff; box-shadow: 0 12px 40px rgba(15, 40, 70, 0.1); color: var(--pi-ink); font-size: 0.82rem; }
+.ps-paper.is-draft { background: #fff repeating-linear-gradient(-30deg, transparent 0 140px, rgba(209, 39, 61, 0.035) 140px 190px); }
+
+.ps-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 8px; }
+.ps-logo { width: 130px; height: auto; }
+.ps-title { margin: 0; padding: 4px 16px; border: 1.5px solid var(--pi-strong); color: var(--pi-strong); font-family: Georgia, "Times New Roman", serif; font-size: 1.35rem; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; }
+
+.ps-top { display: grid; grid-template-columns: minmax(0, 1fr) 290px; align-items: start; gap: 10px; margin: 0 0 8px; }
+.ps-box { border: 1px solid var(--pi-border); border-collapse: collapse; }
+.ps-box-head { padding: 2px 10px; background: var(--pi-head); font-weight: 800; }
+.ps-box-head small { margin-left: 8px; color: #a35a06; font-size: 0.72rem; font-weight: 700; }
+.ps-line { display: flex; align-items: center; gap: 6px; min-height: 23px; padding: 0 10px; border-top: 1px solid var(--pi-border); }
+.ps-label { flex: none; color: var(--pi-muted); font-weight: 700; white-space: nowrap; }
+.ps-value { overflow-wrap: anywhere; }
+.ps-line.is-changed { background: #fff8ec; }
+
+.ps-input { min-width: 0; flex: 1; min-height: 20px; padding: 0 6px; border: 0; border-bottom: 1.5px dashed #b9c7d6; border-radius: 0; background: transparent; color: var(--pi-ink); font: inherit; font-weight: 800; }
+.ps-input:hover { border-bottom-color: var(--pi-strong); background: #f6faff; }
+.ps-input:focus { outline: none; border-bottom: 1.5px solid var(--pi-strong); background: #eef6fd; }
+.ps-input::placeholder { color: #9aa8b6; font-weight: 500; }
+.ps-undo { flex: none; padding: 2px 8px; border: 1px solid #f0c98a; border-radius: 999px; background: #fff3e0; color: #a35a06; font: inherit; font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.ps-undo:hover { border-color: #a35a06; }
+
+.ps-refs { width: 100%; align-self: start; }
+.ps-refs th, .ps-refs td, .ps-totals th, .ps-totals td, .ps-pay th, .ps-pay td { padding: 2px 10px; border: 1px solid var(--pi-border); }
+.ps-refs th { width: 92px; background: var(--pi-head); text-align: left; font-weight: 700; }
+.ps-refs td { text-align: right; font-weight: 800; }
+.ps-muted { color: var(--pi-muted); font-weight: 600 !important; font-style: italic; }
+
+/* Items */
+.ps-scroll { overflow-x: auto; }
+.ps-items { width: 100%; min-width: 720px; border-collapse: collapse; font-size: 0.76rem; }
+.ps-items th, .ps-items td { padding: 5px 6px; border: 1px solid var(--pi-border); vertical-align: middle; }
+.ps-items thead th { background: var(--pi-head); font-size: 0.68rem; font-weight: 800; text-align: center; white-space: nowrap; }
+.ps-section td { padding: 4px; background: var(--pi-section); text-align: center; }
+.ps-paper .ps-items tr.ps-section td { color: #000 !important; font-weight: 800 !important; letter-spacing: 0.02em; }
+.c-no, .c-unit, .c-qty, .c-brand, .c-model { text-align: center; }
+.c-no { width: 42px; }
+.c-brand { width: 84px; }
+.c-model { width: 140px; }
+.c-unit { width: 50px; }
+.c-qty { width: 44px; }
+.c-money { width: 92px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ps-items thead th.c-money { text-align: center; }
+.ps-none { padding: 18px; color: var(--pi-muted); text-align: center; }
+
+/* Notes and totals */
+.ps-foot { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; margin: 6px 0 0; }
+.ps-notes p { margin: 0 0 8px; }
+.ps-po { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.ps-input--po { flex: 1 1 170px; }
+.ps-input--date { flex: 0 0 150px; }
+.ps-hint { display: block; margin: 4px 0 8px; color: var(--pi-muted); font-size: 0.74rem; }
+.ps-words { margin-top: 6px !important; }
+.ps-totals { width: 100%; align-self: start; }
+.ps-totals th { text-align: right; font-weight: 700; }
+.ps-totals td { width: 120px; text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ps-net th, .ps-net td { background: var(--pi-head); font-size: 0.95rem; }
+
+.ps-terms-row { margin-top: 10px; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); }
+.ps-terms h2, .ps-pay h2 { margin: 0 0 6px; color: var(--pi-strong); font-size: 0.92rem; font-weight: 800; }
+.ps-terms ol { margin: 0; padding-left: 18px; }
+.ps-terms li { margin: 0 0 2px; }
+.ps-pay table { width: 100%; }
+.ps-pay th { width: 118px; background: var(--pi-head); text-align: left; font-weight: 700; }
+.ps-pay td { font-weight: 800; }
+
+.ps-company { display: grid; justify-items: center; gap: 0; margin: 16px 0 0; padding-top: 8px; border-top: 2px solid var(--pi-brand); color: var(--pi-muted); font-size: 0.76rem; text-align: center; }
+.ps-company b { color: var(--pi-strong); font-size: 0.9rem; letter-spacing: 0.03em; }
+
+/* The site styles every admin table alike — cells centred, the last column kept on one line, shaded rounded
+   headings. This paper follows the printed proforma instead. */
+.ps-paper table { table-layout: auto !important; }
+.ps-paper table th, .ps-paper table td { text-align: left !important; vertical-align: middle !important; white-space: normal !important; }
+.ps-paper table th:last-child, .ps-paper table td:last-child { width: auto !important; }
+.ps-paper table th, .ps-paper table td { padding: 2px 6px !important; line-height: 1.2 !important; }
+.ps-paper .ps-items tr.ps-section td { padding: 1px 6px !important; }
+.ps-paper table thead th { background: var(--pi-head) !important; color: var(--pi-ink) !important; border-radius: 0 !important; letter-spacing: 0 !important; font-size: 0.68rem !important; text-align: center !important; white-space: nowrap !important; }
+.ps-paper .ps-items td.c-no, .ps-paper .ps-items td.c-brand, .ps-paper .ps-items td.c-model,
+.ps-paper .ps-items td.c-unit, .ps-paper .ps-items td.c-qty, .ps-paper .ps-items tr.ps-section td { text-align: center !important; }
+.ps-paper .ps-items td.c-money { width: 92px !important; text-align: right !important; white-space: nowrap !important; }
+.ps-paper .ps-refs td, .ps-paper .ps-totals th, .ps-paper .ps-totals td { text-align: right !important; }
+.ps-paper .ps-totals td { width: 120px !important; }
+.ps-paper tbody th { font-size: 0.78rem !important; font-weight: 700 !important; color: var(--pi-ink) !important; }
+.ps-paper .ps-refs th, .ps-paper .ps-refs td { white-space: nowrap !important; }
+.ps-pay table { table-layout: fixed !important; }
+.ps-pay td { overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+  .ps-paper { padding: 18px 14px 16px; }
+  .ps-head { flex-direction: column; align-items: flex-start; }
+  .ps-logo { width: 140px; }
+  .ps-title { font-size: 1.1rem; }
+  .ps-top, .ps-foot, .ps-terms-row { grid-template-columns: 1fr; }
+  .ps-line { flex-wrap: wrap; padding: 6px 10px; }
+  .ps-input { flex-basis: 100%; }
+  .ps-bar .btn-admin-ghost:not(.ps-back) { flex: 1 1 auto; }
+  .ps-dl { flex: 1 1 100%; justify-content: space-between; }
+  .ps-dl-btn { flex: 1 1 0; min-width: 0; }
+}

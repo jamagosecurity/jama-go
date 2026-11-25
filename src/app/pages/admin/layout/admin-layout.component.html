@@ -180,6 +180,17 @@
         </a>
         }
 
+        @if (canAdministrator()) {
+        <p class="nav-label">Administrator</p>
+        <a routerLink="/admin/all-quotations" routerLinkActive="active">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 2.5h9l4 4v15H6z" /><path d="M15 2.5v4h4" /><path d="M9 11h7M9 14.5h7M12 18h4" /></svg></span>
+          <span>
+            <strong>Proforma Invoice</strong>
+            <small>All quotations</small>
+          </span>
+        </a>
+        }
+
         <p class="nav-label">Quotations &amp; documents</p>
         <!-- Quotation and what has been decided on one, as a parent and its
              children. They were three competing pills before, which made

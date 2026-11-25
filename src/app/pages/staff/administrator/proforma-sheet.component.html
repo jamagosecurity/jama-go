@@ -1,0 +1,158 @@
+<section class="admin-page">
+  <div class="ps-bar">
+    <a routerLink=".." class="btn-admin btn-admin-ghost ps-back">‹ All quotations</a>
+    <span class="ps-spacer"></span>
+    @if (sheet(); as s) {
+      @if (unsaved()) { <span class="ps-unsaved">Changes are saved when you download</span> }
+      <button type="button" class="btn-admin btn-admin-ghost" [disabled]="busy()" (click)="preview()">Preview</button>
+      <div class="ps-dl" role="group" [attr.aria-label]="canEdit() ? 'Download' : 'Download draft'">
+        <span class="ps-dl-label">{{ canEdit() ? 'Download' : 'Download draft' }}</span>
+        @for (f of formats; track f.key) {
+          <button type="button" class="ps-dl-btn" [attr.data-format]="f.key" [disabled]="busy()" (click)="download(f.key)">
+            {{ downloading() === f.key ? 'Preparing…' : f.label }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  @if (error()) { <p class="admin-error" role="alert">{{ error() }}</p> }
+  @if (flash()) { <p class="ps-flash" role="status">✓ {{ flash() }}</p> }
+
+  @if (loading() && !sheet()) {
+    <p class="ps-empty">Opening…</p>
+  } @else if (sheet(); as s) {
+    @let d = s.document;
+    @if (!canEdit()) {
+      <p class="ps-draft">This quotation is <b>{{ s.status === 'Submitted' ? 'waiting for approval' : s.status.toLowerCase() }}</b>, not approved — the proforma downloads as a <b>DRAFT</b> with no PI number, exactly as the quotation is.</p>
+    }
+
+    <article class="ps-paper" [class.is-draft]="d.draft">
+      <!-- Logo and title -->
+      <header class="ps-head">
+        <img src="/jamago-logo-document.png" alt="Jama Go Security Equipment" class="ps-logo" />
+        <h1 class="ps-title">PROFORMA INVOICE</h1>
+      </header>
+
+      <!-- Customer details | references -->
+      <div class="ps-top">
+        <div class="ps-box ps-customer">
+          <div class="ps-box-head">Customer Details: @if (canEdit()) { <small>type to change — this proforma only</small> }</div>
+          @for (f of fields; track f.key) {
+            @let key = f.key;
+            <div class="ps-line" [class.is-changed]="changed(key)">
+              <span class="ps-label">{{ f.label }} :</span>
+              @if (canEdit()) {
+                <input type="text" class="ps-input" [attr.maxlength]="f.max" [attr.aria-label]="f.label"
+                  [placeholder]="original(key) || f.label" [ngModel]="customer()[key]" (ngModelChange)="setCustomer(key, $event)" />
+                @if (changed(key)) {
+                  <button type="button" class="ps-undo" (click)="undo(key)" [title]="'Back to the quotation: ' + (original(key) || 'empty')">↺ quotation</button>
+                }
+              } @else {
+                <b class="ps-value">{{ customer()[key] || '—' }}</b>
+              }
+            </div>
+          }
+        </div>
+
+        <table class="ps-box ps-refs">
+          <tbody>
+            <tr><th>Date#</th><td>{{ d.date | date: 'dd-MM-yyyy' }}</td></tr>
+            <tr><th>PI No</th><td [class.ps-muted]="!d.number">{{ d.number ?? (d.draft ? 'DRAFT' : 'Given on download') }}</td></tr>
+            <tr><th>Quote No#</th><td>{{ d.quoteNumber }}</td></tr>
+            <tr><th>Quote Date#</th><td>{{ d.quoteDate | date: 'dd-MM-yyyy' }}</td></tr>
+            <tr><th>Ref#</th><td>{{ d.ref || '—' }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Items -->
+      <div class="ps-scroll">
+        <table class="ps-items">
+          <thead>
+            <tr>
+              <th class="c-no">SNO</th><th>DESCRIPTION</th><th class="c-brand">BRAND</th><th class="c-model">MODEL / PART NO.</th>
+              <th class="c-unit">UNITS</th><th class="c-qty">QTY</th><th class="c-money">UNIT PRICE</th><th class="c-money">TOTAL AMOUNT</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (section of d.sections; track $index) {
+              @if (section.title) { <tr class="ps-section"><td colspan="8">{{ section.title.toUpperCase() }}</td></tr> }
+              @for (line of section.lines; track line.number) {
+                <tr>
+                  <td class="c-no">{{ line.number }}</td>
+                  <td>{{ line.description }}</td>
+                  <td class="c-brand">{{ line.brand }}</td>
+                  <td class="c-model">{{ line.model }}</td>
+                  <td class="c-unit">{{ line.unit }}</td>
+                  <td class="c-qty">{{ line.quantity | number: '1.0-2' }}</td>
+                  <td class="c-money">{{ line.unitPrice | number: '1.2-2' }}</td>
+                  <td class="c-money">{{ line.total | number: '1.2-2' }}</td>
+                </tr>
+              }
+            } @empty {
+              <tr><td colspan="8" class="ps-none">This quotation has no items.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Notes, words | totals -->
+      <div class="ps-foot">
+        <div class="ps-notes">
+          @if (canEdit()) {
+            <div class="ps-po">
+              <b>Notes: P.O. No.</b>
+              <input type="text" class="ps-input ps-input--po" maxlength="60" placeholder="client P.O. number (optional)" aria-label="Client P.O. number"
+                [ngModel]="poNumber()" (ngModelChange)="poNumber.set($event)" />
+              <b>dated</b>
+              <input type="date" class="ps-input ps-input--date" aria-label="P.O. date" [ngModel]="poDate()" (ngModelChange)="poDate.set($event)" />
+            </div>
+            <small class="ps-hint">Leave the P.O. empty if the client has not sent one — then this line is not printed.</small>
+          } @else if (d.poNumber) {
+            <p><b>Notes: P.O. No. {{ d.poNumber }}@if (d.poDate) { dated {{ d.poDate | date: 'dd-MM-yyyy' }} }</b></p>
+          }
+          <p class="ps-words"><b>Amount In Words:</b>&nbsp;<i>{{ s.amountInWords }}</i></p>
+        </div>
+        <table class="ps-box ps-totals">
+          <tbody>
+            <tr><th>Subtotal</th><td>{{ d.subtotal | number: '1.2-2' }}</td></tr>
+            <tr><th>Discount</th><td>{{ d.discount | number: '1.2-2' }}</td></tr>
+            <tr class="ps-net"><th>Net Total (QAR)</th><td>{{ d.netTotal | number: '1.2-2' }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Terms | payment -->
+      <div class="ps-foot ps-terms-row">
+        <div class="ps-terms">
+          <h2>Terms &amp; Conditions:</h2>
+          <ol>@for (t of s.terms; track $index) { <li>{{ t }}</li> }</ol>
+        </div>
+        <div class="ps-pay">
+          <h2>Payment details as follows:</h2>
+          <table class="ps-box">
+            <tbody>
+              <tr><th>Account Holder</th><td>{{ s.payment.accountHolder }}</td></tr>
+              <tr><th>Account Number</th><td>{{ s.payment.accountNumber }}</td></tr>
+              <tr><th>Bank</th><td>{{ s.payment.bank }}</td></tr>
+              <tr><th>Branch</th><td>{{ s.payment.branch }}</td></tr>
+              <tr><th>SWIFT Code</th><td>{{ s.payment.swiftCode }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <footer class="ps-company">
+        <b>{{ s.company.name }}</b>
+        <span>{{ s.company.address }}</span>
+        <span>Mobile {{ s.company.mobiles }}</span>
+      </footer>
+    </article>
+  }
+</section>
+
+@if (previewPdf(); as pdf) {
+  <app-pdf-preview [blob]="pdf" [title]="(sheet()?.document?.number ?? 'Proforma invoice') + ' · ' + (sheet()?.document?.quoteNumber ?? '') + ' — preview'"
+    (closed)="previewPdf.set(null)" (download)="download('pdf')" />
+}

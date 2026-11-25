@@ -157,6 +157,20 @@ export const STAFF_ROUTES: Routes = [
         loadComponent: () => import('./accounts/uber-claims.component').then((m) => m.UberClaimsComponent),
       },
       {
+        // The office administrator: every quotation in any status, and its proforma invoice.
+        path: 'all-quotations',
+        canActivate: [permissionGuard(PERMISSIONS.proformaManage)],
+        title: 'Proforma Invoice — Jama Go',
+        loadComponent: () => import('./administrator/all-quotations.component').then((m) => m.AllQuotationsComponent),
+      },
+      {
+        // One quotation opened as its proforma invoice.
+        path: 'all-quotations/:id',
+        canActivate: [permissionGuard(PERMISSIONS.proformaManage)],
+        title: 'Proforma Invoice — Jama Go',
+        loadComponent: () => import('./administrator/proforma-sheet.component').then((m) => m.ProformaSheetComponent),
+      },
+      {
         // The accountant: cash handed over at the end of the day, and the online transfers.
         path: 'cash-handover',
         canActivate: [permissionGuard(PERMISSIONS.accountsManage)],

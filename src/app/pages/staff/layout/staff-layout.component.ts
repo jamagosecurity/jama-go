@@ -96,6 +96,7 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
       { label: 'Cash handover', group: 'Accounts', url: '/staff/cash-handover' },
       { label: 'Uber bills (approve & pay back)', group: 'Accounts', url: '/staff/uber-claims' },
     );
+    if (this.canAdministrator()) list.push({ label: 'Proforma Invoice (all quotations)', group: 'Administrator', url: '/staff/all-quotations' });
     if (this.canSeeBoq()) list.push({ label: 'Quotation', group: 'Quotations & documents', url: '/staff/boq' });
     if (this.canSeeDrawings()) list.push({ label: 'Drawings', group: 'Quotations & documents', url: '/staff/drawings' });
     if (this.canManageVip()) list.push({ label: 'VIP Clients', group: 'Quotations & documents', url: '/staff/vip' });
@@ -227,6 +228,7 @@ export class StaffLayoutComponent implements OnInit, AfterViewInit {
   readonly canIssueJobs = computed(() => this.auth.can(PERMISSIONS.nonMoiJobManage));
   readonly canMoiJobs = computed(() => this.auth.can(PERMISSIONS.moiJobManage));
   readonly canAccounts = computed(() => this.auth.can(PERMISSIONS.accountsManage));
+  readonly canAdministrator = computed(() => this.auth.can(PERMISSIONS.proformaManage));
 
   /** The Company mail link — read-only for staff. */
   readonly canReadMail = computed(() => this.auth.can(PERMISSIONS.mailRead));

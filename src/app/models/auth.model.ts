@@ -52,6 +52,8 @@ export const PERMISSIONS = {
   moiJobWork: 'moijob.work',
   /** The accountant: receives the cash people collected and checks the online transfers. */
   accountsManage: 'accounts.manage',
+  /** The office administrator: every quotation in any status, and its proforma invoice. */
+  proformaManage: 'proforma.manage',
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

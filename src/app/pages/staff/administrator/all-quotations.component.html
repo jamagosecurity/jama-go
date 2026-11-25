@@ -1,0 +1,62 @@
+<section class="admin-page">
+  <header class="page-banner">
+    <div class="page-banner-text">
+      <h1>Proforma Invoice</h1>
+      <p class="page-banner-sub">All quotations from every staff member — click one to open it as a proforma invoice</p>
+    </div>
+  </header>
+
+  @if (error()) { <p class="admin-error" role="alert">{{ error() }}</p> }
+
+  <div class="admin-panel">
+    <div class="pf-tools">
+      <input type="search" class="pf-search" placeholder="Search quote no., PI no., P.O., client, project, staff…"
+        [ngModel]="search()" (ngModelChange)="setSearch($event)" aria-label="Search quotations" />
+      <div class="pf-chips" role="group" aria-label="Status">
+        @for (s of statuses; track s.value) {
+          <button type="button" class="pf-chip" [class.is-on]="status() === s.value" (click)="setStatus(s.value)">{{ s.label }}</button>
+        }
+      </div>
+    </div>
+
+    @let p = page();
+    @if (loading() && !p) {
+      <p class="pf-empty">Loading…</p>
+    } @else if (!p?.items?.length) {
+      <p class="pf-empty">No quotations match.</p>
+    } @else {
+      <div class="pf-count">{{ p!.totalCount }} {{ p!.totalCount === 1 ? 'quotation' : 'quotations' }}@if (loading()) { · loading… }</div>
+      <div class="pf-list">
+        <div class="pf-row pf-row--head" aria-hidden="true">
+          <span>Quote no.</span><span>Project &amp; client</span><span>Made by</span><span>Status</span><span class="pf-num">Net total</span><span>Proforma</span><span></span>
+        </div>
+        @for (q of p!.items; track q.id) {
+          <a class="pf-item pf-row" [routerLink]="[q.id]" [attr.aria-label]="'Open ' + quoteNo(q) + ' as proforma invoice'">
+            <span class="pf-no"><b>{{ quoteNo(q) }}</b><small>{{ q.issueDate | date: 'd MMM y' }}</small></span>
+            <span class="pf-what"><b>{{ q.projectName }}</b><small>{{ q.proforma?.customerName || q.clientName || '—' }}@if (q.siteLocation) { · {{ q.siteLocation }} }</small></span>
+            <span class="pf-by">{{ person(q.preparedByName) }}</span>
+            <span><i class="pf-status" [attr.data-status]="q.status">{{ statusLabel(q.status) }}</i></span>
+            <span class="pf-num pf-total">{{ q.grandTotal | number: '1.2-2' }} <i>QAR</i></span>
+            <span class="pf-pi">
+              @if (q.proforma; as pi) {
+                <b>{{ pi.number }}</b>
+                <small>@if (pi.poNumber) { P.O. {{ pi.poNumber }} } @else { No P.O. }</small>
+              } @else {
+                <small>Not made yet</small>
+              }
+            </span>
+            <span class="pf-act"><span class="btn-admin btn-admin-primary pf-btn">Open</span></span>
+          </a>
+        }
+      </div>
+
+      @if (p!.totalPages > 1) {
+        <nav class="pf-pager" aria-label="Pages">
+          <button type="button" class="btn-admin btn-admin-ghost" [disabled]="p!.pageNumber <= 1 || loading()" (click)="goTo(p!.pageNumber - 1)">‹ Previous</button>
+          <span>Page {{ p!.pageNumber }} of {{ p!.totalPages }}</span>
+          <button type="button" class="btn-admin btn-admin-ghost" [disabled]="p!.pageNumber >= p!.totalPages || loading()" (click)="goTo(p!.pageNumber + 1)">Next ›</button>
+        </nav>
+      }
+    }
+  </div>
+</section>
