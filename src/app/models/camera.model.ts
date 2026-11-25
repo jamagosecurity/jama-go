@@ -42,7 +42,7 @@ export type ProductCategory =
   | 'AccessControl'
   | 'Service';
 
-export type UnitOfMeasurement = 'Piece' | 'Box' | 'Set' | 'Metre' | 'Roll' | 'Lot';
+export type UnitOfMeasurement = 'Piece' | 'Box' | 'Set' | 'Metre' | 'Roll' | 'Lot' | 'Point';
 
 export type ItemType = 'Product' | 'Service';
 
@@ -98,6 +98,7 @@ export const UNITS_OF_MEASUREMENT: readonly Option<UnitOfMeasurement>[] = [
   { value: 'Metre', label: 'Mtr' },
   { value: 'Roll', label: 'Roll' },
   { value: 'Lot', label: 'Lot' },
+  { value: 'Point', label: 'Per point' },
 ];
 
 /**
