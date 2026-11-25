@@ -1,0 +1,27 @@
+:host { display: inline-flex; }
+.row-btn.is-open { box-shadow: 0 0 0 3px rgba(20, 48, 95, 0.15); }
+
+/* The panel renders in the CDK overlay container, outside this component. */
+::ng-deep .dl-menu-backdrop { background: transparent; }
+::ng-deep .dl-menu-panel {
+  display: grid; gap: 2px; min-width: 220px; padding: 6px;
+  border: 1px solid #e3e6ec; border-radius: 12px; background: #fff;
+  box-shadow: 0 14px 34px rgba(15, 40, 70, 0.16);
+  font-family: inherit;
+}
+::ng-deep .dl-menu-title { padding: 4px 8px 6px; color: #6b7280; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+::ng-deep .dl-menu-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border: 0; border-radius: 9px;
+  background: transparent; color: #0b1730; font: inherit; text-align: left; cursor: pointer;
+}
+::ng-deep .dl-menu-item:hover, ::ng-deep .dl-menu-item:focus-visible { background: #f1f5fb; outline: none; }
+::ng-deep .dl-menu-tag {
+  display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 8px;
+  color: #fff; font-size: 0.62rem; font-weight: 900; letter-spacing: 0.04em;
+}
+::ng-deep .dl-menu-item[data-format="pdf"] .dl-menu-tag { background: #c62828; }
+::ng-deep .dl-menu-item[data-format="excel"] .dl-menu-tag { background: #1d7a46; }
+::ng-deep .dl-menu-item[data-format="word"] .dl-menu-tag { background: #1f5fae; }
+::ng-deep .dl-menu-text { display: grid; gap: 1px; }
+::ng-deep .dl-menu-text strong { font-size: 0.88rem; }
+::ng-deep .dl-menu-text small { color: #6b7280; font-size: 0.74rem; }

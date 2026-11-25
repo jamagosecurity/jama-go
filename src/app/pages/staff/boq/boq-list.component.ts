@@ -1,5 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { EXPORT_FORMATS, ExportFormat, exportExtension } from '../../../models/export-format.model';
+import { DownloadMenuComponent } from '../../../components/download-menu/download-menu.component';
+import { ExportFormat, exportExtension } from '../../../models/export-format.model';
 import {
   ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal,
 } from '@angular/core';
@@ -23,7 +24,7 @@ const PAGE_SIZE = 20;
 @Component({
   selector: 'app-boq-list',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, PdfPreviewComponent, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, DownloadMenuComponent, PdfPreviewComponent, ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './boq-list.component.html',
   styleUrl: './boq.css',
@@ -42,9 +43,12 @@ export class BoqListComponent implements OnInit {
   protected readonly loading = signal(true);
   protected readonly listError = signal('');
   protected readonly busyId = signal<string | null>(null);
-  /** The row whose download button is showing its PDF / Excel / Word choice. */
-  protected readonly downloadChoiceId = signal<string | null>(null);
-  protected readonly exportFormats = EXPORT_FORMATS;
+  /** What each download holds, shown in the download menu. */
+  protected readonly downloadHints = {
+    pdf: 'The quotation, ready to send',
+    excel: 'Priced items only',
+    word: 'The whole quotation, to edit',
+  };
   protected readonly pendingDeleteId = signal<string | null>(null);
 
   protected readonly page = signal(1);
@@ -176,13 +180,8 @@ export class BoqListComponent implements OnInit {
     if (this.previewing) this.download(this.previewing);
   }
 
-  protected toggleDownloadChoice(boq: BoqListItem): void {
-    this.downloadChoiceId.update((id) => (id === boq.id ? null : boq.id));
-  }
-
   /** PDF, Excel or Word. Word is the whole quotation like the PDF; Excel is the priced items only. */
   protected download(boq: BoqListItem, format: ExportFormat = 'pdf'): void {
-    this.downloadChoiceId.set(null);
     this.busyId.set(boq.id);
     this.listError.set('');
     this.service

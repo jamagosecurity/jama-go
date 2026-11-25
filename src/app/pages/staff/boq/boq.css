@@ -2,6 +2,8 @@
    panel and button classes are global; this adds only what BOQ needs. */
 
 .boq-page { max-width: 1500px; }
+/* The quotation lists use the whole width: on a wide (or zoomed-out) screen the cap left a strip of empty page. */
+.boq-page.boq-page--wide { max-width: none; }
 
 /* Where you are (left) against what you can do here (right) — the header
    used to run "back / status / eight buttons" as one flat row, which is
@@ -2104,10 +2106,3 @@
   .boq-list-table.boq-list-table.boq-list-table tbody tr { margin-bottom: 0; }
 }
 
-/* The download button's PDF / Excel / Word choice, shown inline in the row. */
-.dl-choice { display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; }
-.dl-choice .row-btn.dl-choice-btn { min-width: 0; padding: 0 10px; font-size: 0.78rem; font-weight: 800; }
-.dl-choice .row-btn.dl-choice-btn[data-format="pdf"] { color: #b3141b; }
-.dl-choice .row-btn.dl-choice-btn[data-format="excel"] { color: #0f7a3f; }
-.dl-choice .row-btn.dl-choice-btn[data-format="word"] { color: #1d5fa8; }
-.dl-choice .row-btn.dl-choice-close { min-width: 0; padding: 0 9px; font-size: 1rem; line-height: 1; }

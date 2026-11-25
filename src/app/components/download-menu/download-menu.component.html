@@ -1,0 +1,33 @@
+<button type="button" class="row-btn row-btn--icon act" cdkOverlayOrigin #origin="cdkOverlayOrigin"
+  [disabled]="disabled()" [class.is-open]="open()" title="Download: PDF, Excel or Word" aria-label="Download"
+  aria-haspopup="menu" [attr.aria-expanded]="open()" (click)="toggle()">
+  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+  </svg>
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="open()"
+  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="dl-menu-backdrop"
+  (backdropClick)="open.set(false)"
+  (detach)="open.set(false)"
+  (overlayKeydown)="$event.key === 'Escape' && open.set(false)"
+>
+  <div class="dl-menu-panel" role="menu" aria-label="Download as">
+    <div class="dl-menu-title">Download as</div>
+    @for (item of items; track item.key) {
+      <button type="button" class="dl-menu-item" role="menuitem" [attr.data-format]="item.key" (click)="pick(item.key)">
+        <span class="dl-menu-tag">{{ item.tag }}</span>
+        <span class="dl-menu-text">
+          <strong>{{ item.label }}</strong>
+          @if (hints()[item.key]; as hint) { <small>{{ hint }}</small> }
+        </span>
+      </button>
+    }
+  </div>
+</ng-template>
