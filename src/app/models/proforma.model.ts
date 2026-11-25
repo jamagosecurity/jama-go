@@ -1,7 +1,9 @@
 import { BoqStatus } from './boq.model';
 
+import { ExportFormat } from './export-format.model';
+
 /** The file formats a proforma downloads in. */
-export type ProformaFileFormat = 'pdf' | 'excel' | 'word';
+export type ProformaFileFormat = ExportFormat;
 
 /** The kept part of a quotation's proforma invoice. */
 export interface Proforma {

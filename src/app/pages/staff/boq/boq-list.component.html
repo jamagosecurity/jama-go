@@ -108,13 +108,23 @@
                         </svg>
                       </button>
 
-                      <button type="button" class="row-btn row-btn--icon act" [disabled]="busyId() === boq.id"
-                        title="Download PDF" (click)="download(boq)">
-                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
-                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
-                        </svg>
-                      </button>
+                      @if (downloadChoiceId() === boq.id) {
+                        <span class="dl-choice" role="group" aria-label="Download as">
+                          @for (f of exportFormats; track f.key) {
+                            <button type="button" class="row-btn dl-choice-btn" [attr.data-format]="f.key" [disabled]="busyId() === boq.id"
+                              [title]="'Download ' + f.label" (click)="download(boq, f.key)">{{ f.label }}</button>
+                          }
+                          <button type="button" class="row-btn dl-choice-close" title="Close" aria-label="Close" (click)="toggleDownloadChoice(boq)">×</button>
+                        </span>
+                      } @else {
+                        <button type="button" class="row-btn row-btn--icon act" [disabled]="busyId() === boq.id"
+                          title="Download: PDF, Excel or Word" aria-label="Download" (click)="toggleDownloadChoice(boq)">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+                          </svg>
+                        </button>
+                      }
 
 
                       <button type="button" class="row-btn row-btn--icon row-btn--delete act act--delete"

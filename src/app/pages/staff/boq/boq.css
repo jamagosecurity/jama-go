@@ -2103,3 +2103,11 @@
   .boq-list-table.boq-list-table.boq-list-table tbody { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
   .boq-list-table.boq-list-table.boq-list-table tbody tr { margin-bottom: 0; }
 }
+
+/* The download button's PDF / Excel / Word choice, shown inline in the row. */
+.dl-choice { display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; }
+.dl-choice .row-btn.dl-choice-btn { min-width: 0; padding: 0 10px; font-size: 0.78rem; font-weight: 800; }
+.dl-choice .row-btn.dl-choice-btn[data-format="pdf"] { color: #b3141b; }
+.dl-choice .row-btn.dl-choice-btn[data-format="excel"] { color: #0f7a3f; }
+.dl-choice .row-btn.dl-choice-btn[data-format="word"] { color: #1d5fa8; }
+.dl-choice .row-btn.dl-choice-close { min-width: 0; padding: 0 9px; font-size: 1rem; line-height: 1; }

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize, switchMap } from 'rxjs';
 import { PdfPreviewComponent } from '../../../components/pdf-preview/pdf-preview.component';
+import { EXPORT_FORMATS } from '../../../models/export-format.model';
 import { ProformaCustomer, ProformaFileFormat, ProformaSheet } from '../../../models/proforma.model';
 import { ProformaService } from '../../../services/proforma.service';
 import { getApiErrorMessage } from '../../../utils/api-error.util';
@@ -49,11 +50,7 @@ export class ProformaSheetComponent implements OnInit {
   /** The format being downloaded right now, if any. */
   protected readonly downloading = signal<ProformaFileFormat | null>(null);
 
-  protected readonly formats: ReadonlyArray<{ key: ProformaFileFormat; label: string; ext: string }> = [
-    { key: 'pdf', label: 'PDF', ext: 'pdf' },
-    { key: 'excel', label: 'Excel', ext: 'xlsx' },
-    { key: 'word', label: 'Word', ext: 'docx' },
-  ];
+  protected readonly formats = EXPORT_FORMATS;
 
   // What is typed on the invoice.
   protected readonly customer = signal<ProformaCustomer>({ name: '', project: '', contactNumber: '', location: '' });

@@ -1,4 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ExportFormat, exportExtension } from '../../../models/export-format.model';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, OnInit, ViewChild,
@@ -228,7 +229,8 @@ export class BoqEditorComponent implements OnInit {
   protected readonly boq = signal<Boq | null>(null);
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
-  protected readonly downloading = signal(false);
+  /** The format being downloaded right now, if any. */
+  protected readonly downloading = signal<ExportFormat | null>(null);
   /** On by default — some clients already have the standard commercial
    *  terms agreed elsewhere and just want the cover and the priced items. */
   protected readonly includeTermsPage = signal(true);
@@ -1846,7 +1848,9 @@ export class BoqEditorComponent implements OnInit {
     this.previewBlob.set(null);
   }
 
-  protected download(): void {
+  /** PDF, Excel or Word. Word is the whole quotation and follows the terms-page choices like the PDF; Excel is the
+   *  priced items only, so the language choice does not apply to it. */
+  protected download(format: ExportFormat = 'pdf'): void {
     const boq = this.boq();
     if (!boq) return;
 
@@ -1854,17 +1858,18 @@ export class BoqEditorComponent implements OnInit {
     // English needs no suffix — it is what "Download PDF" has always
     // produced. The other two are a deliberate choice at the point of
     // download, so the file itself says which one this is.
-    const suffix = language === 'Arabic' ? ' (Arabic)' : language === 'Both' ? ' (Bilingual)' : '';
+    const suffix = format === 'excel' || !this.includeTermsPage() ? ''
+      : language === 'Arabic' ? ' (Arabic)' : language === 'Both' ? ' (Bilingual)' : '';
 
     this.downloadMenuOpen.set(false);
-    this.downloading.set(true);
+    this.downloading.set(format);
     this.service
-      .downloadPdf(boq.id, this.includeTermsPage(), language)
-      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.downloading.set(false)))
+      .downloadFile(boq.id, format, this.includeTermsPage(), language)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.downloading.set(null)))
       .subscribe({
-        next: (blob) => downloadBlob(blob, `${boq.boqNumber}${suffix}.pdf`),
+        next: (blob) => downloadBlob(blob, `${boq.boqNumber}${suffix}.${exportExtension(format)}`),
         error: (err: unknown) =>
-          this.formError.set(getApiErrorMessage(err, 'Unable to download the PDF.')),
+          this.formError.set(getApiErrorMessage(err, `Unable to download the ${format === 'pdf' ? 'PDF' : format === 'excel' ? 'Excel file' : 'Word file'}.`)),
       });
   }
 

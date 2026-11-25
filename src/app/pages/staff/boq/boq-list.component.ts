@@ -1,4 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
+import { EXPORT_FORMATS, ExportFormat, exportExtension } from '../../../models/export-format.model';
 import {
   ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal,
 } from '@angular/core';
@@ -41,6 +42,9 @@ export class BoqListComponent implements OnInit {
   protected readonly loading = signal(true);
   protected readonly listError = signal('');
   protected readonly busyId = signal<string | null>(null);
+  /** The row whose download button is showing its PDF / Excel / Word choice. */
+  protected readonly downloadChoiceId = signal<string | null>(null);
+  protected readonly exportFormats = EXPORT_FORMATS;
   protected readonly pendingDeleteId = signal<string | null>(null);
 
   protected readonly page = signal(1);
@@ -172,16 +176,22 @@ export class BoqListComponent implements OnInit {
     if (this.previewing) this.download(this.previewing);
   }
 
-  protected download(boq: BoqListItem): void {
+  protected toggleDownloadChoice(boq: BoqListItem): void {
+    this.downloadChoiceId.update((id) => (id === boq.id ? null : boq.id));
+  }
+
+  /** PDF, Excel or Word. Word is the whole quotation like the PDF; Excel is the priced items only. */
+  protected download(boq: BoqListItem, format: ExportFormat = 'pdf'): void {
+    this.downloadChoiceId.set(null);
     this.busyId.set(boq.id);
     this.listError.set('');
     this.service
-      .downloadPdf(boq.id)
+      .downloadFile(boq.id, format)
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busyId.set(null)))
       .subscribe({
-        next: (blob) => downloadBlob(blob, `${boq.boqNumber}.pdf`),
+        next: (blob) => downloadBlob(blob, `${boq.boqNumber}.${exportExtension(format)}`),
         error: (err: unknown) =>
-          this.listError.set(getApiErrorMessage(err, 'Unable to download the PDF.')),
+          this.listError.set(getApiErrorMessage(err, 'Unable to download the quotation.')),
       });
   }
 

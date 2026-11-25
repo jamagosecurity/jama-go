@@ -1,4 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { ExportFormat } from '../models/export-format.model';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -126,6 +127,20 @@ export class BoqService {
     return this.http.get(`${this.baseUrl}/${id}/pdf`, {
       responseType: 'blob',
       params: { includeTermsPage, termsLanguage },
+    });
+  }
+
+  /** The quotation as PDF, Excel or Word. Word is the whole quotation like the PDF (and follows the terms-page
+   *  choices); Excel is the priced items only. */
+  downloadFile(
+    id: string,
+    format: ExportFormat,
+    includeTermsPage = true,
+    termsLanguage: BoqTermsLanguage = 'English',
+  ): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${id}/file`, {
+      responseType: 'blob',
+      params: { format, includeTermsPage, termsLanguage },
     });
   }
 

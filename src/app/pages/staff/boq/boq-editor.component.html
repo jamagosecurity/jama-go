@@ -62,8 +62,14 @@
                 }
                 <button type="button" class="boq-menu-item" [disabled]="previewing()"
                   (click)="preview()">{{ previewing() ? 'Preparing…' : 'Preview' }}</button>
-                <button type="button" class="boq-menu-item" [disabled]="downloading()"
-                  (click)="download()">{{ downloading() ? 'Preparing…' : 'Download PDF' }}</button>
+                <button type="button" class="boq-menu-item" [disabled]="!!downloading()"
+                  (click)="download('pdf')">{{ downloading() === 'pdf' ? 'Preparing…' : 'Download PDF' }}</button>
+                <button type="button" class="boq-menu-item" [disabled]="!!downloading()"
+                  title="The priced items, ready to work with in Excel"
+                  (click)="download('excel')">{{ downloading() === 'excel' ? 'Preparing…' : 'Download Excel' }}</button>
+                <button type="button" class="boq-menu-item" [disabled]="!!downloading()"
+                  title="The whole quotation, like the PDF, ready to edit in Word"
+                  (click)="download('word')">{{ downloading() === 'word' ? 'Preparing…' : 'Download Word' }}</button>
                 <label class="boq-menu-check" title="Uncheck to leave out the commercial terms letter (page 2) — for a client who already has terms agreed elsewhere.">
                   <input type="checkbox" [checked]="includeTermsPage()"
                     (change)="includeTermsPage.set($any($event.target).checked)" />
