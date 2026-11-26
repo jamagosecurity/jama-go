@@ -99,8 +99,10 @@
               <figure class="nm-shot">
                 <img [src]="image.url" [alt]="image.fileName" loading="lazy" />
                 <figcaption>{{ image.fileName }}</figcaption>
-                <button type="button" class="nm-shot-remove" (click)="removeImage(image)"
-                  [attr.aria-label]="'Remove ' + image.fileName">×</button>
+                @if (canDelete()) {
+                  <button type="button" class="nm-shot-remove" (click)="removeImage(image)"
+                    [attr.aria-label]="'Remove ' + image.fileName">×</button>
+                }
               </figure>
             }
 

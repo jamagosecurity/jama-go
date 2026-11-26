@@ -51,6 +51,15 @@
             <small>Issued to you</small>
           </span>
         </a>
+        <a routerLink="/technician/non-moi" [class.active]="tab() === 'inventory'">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4Z" /><path d="M3 12l9 4 9-4" /><path d="M3 17l9 4 9-4" /></svg>
+          </span>
+          <span>
+            <strong>Non-MOI Inventory</strong>
+            <small>Add items &amp; prices</small>
+          </span>
+        </a>
       }
 
       @if (canDoMoiJobs()) {

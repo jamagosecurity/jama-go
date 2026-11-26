@@ -371,3 +371,6 @@
   /* An empty grey square per row only wastes the card's width. */
   .nm-thumb--empty { display: none; }
 }
+
+/* Who added the service, and who last changed its price — the office or a technician. */
+.nm-itemtext small.nm-who { color: #8a6d1f; font-size: 0.72rem; font-weight: 600; }

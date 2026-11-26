@@ -79,6 +79,7 @@
         @if (j.completionNotes) { <p class="tjd-notes">{{ j.completionNotes }}</p> }
       </div>
     } @else {
+      @if (catalogueFlash()) { <p class="tjd-flash" role="status">✓ {{ catalogueFlash() }}</p> }
       @for (g of groups(); track g.category) {
         <div class="admin-panel tjd-group">
           <h2 class="tjd-h">{{ categoryLabel(g.category) }}</h2>
@@ -88,8 +89,38 @@
                 <input type="checkbox" [checked]="isPicked(i)" (change)="toggle(i)" />
                 <span>{{ i.issueType }}</span>
               </label>
-              <span class="tjd-price">{{ i.defaultFee | number: '1.2-2' }} QAR</span>
+              @if (editingId() === i.id) {
+                <span class="tjd-edit">
+                  <input type="text" inputmode="decimal" class="tjd-edit-in" [value]="editPrice()" (input)="editPrice.set($any($event.target).value)"
+                    (keydown.enter)="savePrice(i)" (keydown.escape)="editingId.set(null)" aria-label="New price (QAR)" />
+                  <button type="button" class="tjd-mini tjd-mini--ok" [disabled]="catalogueBusy()" (click)="savePrice(i)">{{ catalogueBusy() ? '…' : 'Save' }}</button>
+                  <button type="button" class="tjd-mini" [disabled]="catalogueBusy()" (click)="editingId.set(null)">Cancel</button>
+                </span>
+              } @else {
+                <span class="tjd-price">{{ i.defaultFee | number: '1.2-2' }} QAR</span>
+                <button type="button" class="tjd-pen" (click)="startEditPrice(i)" [attr.aria-label]="'Change the price of ' + i.issueType" title="Change price">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+                </button>
+              }
             </div>
+            @if (editingId() === i.id) {
+              <p class="tjd-hint">The new price is saved in the Non-MOI inventory and used on every job from now on.</p>
+            }
+          }
+          @if (addingIn() === g.category) {
+            <div class="tjd-add">
+              <input type="text" class="tjd-add-name" maxlength="200" placeholder="Item name" [value]="newName()" (input)="newName.set($any($event.target).value)" aria-label="Item name" />
+              <input type="text" inputmode="decimal" class="tjd-edit-in" placeholder="Price" [value]="newPrice()" (input)="newPrice.set($any($event.target).value)"
+                (keydown.enter)="saveNew(g.category)" aria-label="Price (QAR)" />
+              <button type="button" class="tjd-mini tjd-mini--ok" [disabled]="catalogueBusy()" (click)="saveNew(g.category)">{{ catalogueBusy() ? '…' : 'Add' }}</button>
+              <button type="button" class="tjd-mini" [disabled]="catalogueBusy()" (click)="addingIn.set(null)">Cancel</button>
+            </div>
+            <p class="tjd-hint">Goes into the Non-MOI inventory straight away, for everyone, and is ticked on this job.</p>
+          } @else {
+            <button type="button" class="tjd-addbtn" (click)="startAdd(g.category)">+ Add item to {{ categoryLabel(g.category) }}</button>
+          }
+          @if (catalogueError() && (addingIn() === g.category || g.items.some(x => x.id === editingId()))) {
+            <p class="tjd-cat-error" role="alert">{{ catalogueError() }}</p>
           }
         </div>
       }

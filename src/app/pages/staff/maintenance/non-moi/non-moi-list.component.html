@@ -80,8 +80,10 @@
           <strong>{{ name }}</strong>
           <small>{{ customCategoryCount() }} {{ customCategoryCount() === 1 ? 'service' : 'services' }} · category you added</small>
         </span>
-        <button type="button" class="btn-admin btn-admin-ghost" (click)="startRenameCategory()">Rename</button>
-        <button type="button" class="btn-admin btn-admin-ghost" (click)="confirmingCategoryDelete.set(true)">Delete category</button>
+        @if (canDelete()) {
+          <button type="button" class="btn-admin btn-admin-ghost" (click)="startRenameCategory()">Rename</button>
+          <button type="button" class="btn-admin btn-admin-ghost" (click)="confirmingCategoryDelete.set(true)">Delete category</button>
+        }
       }
     </div>
   }
@@ -127,6 +129,13 @@
                     @if (item.descriptionAr) {
                       <small class="nm-ar" dir="rtl" lang="ar" [title]="item.descriptionAr">{{ item.descriptionAr }}</small>
                     }
+                    @if (item.addedByName || item.priceChangedByName) {
+                      <small class="nm-who">
+                        @if (item.addedByName) { Added by {{ person(item.addedByName) }} }
+                        @if (item.addedByName && item.priceChangedByName) { · }
+                        @if (item.priceChangedByName) { Price changed by {{ person(item.priceChangedByName) }}@if (item.priceChangedAt) {, {{ item.priceChangedAt | date: 'd MMM y, h:mm a' : '+0300' }}} }
+                      </small>
+                    }
                   </span>
                   </span>
                 </td>
@@ -152,14 +161,16 @@
                       </svg>
                       <span class="act-label">Edit</span>
                     </a>
-                    <button type="button" class="row-btn row-btn--delete act act--delete" (click)="askDelete(item)"
-                      [attr.aria-label]="'Delete ' + item.issueType" title="Delete">
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M4 7h16" /><path d="M10 11v6M14 11v6" />
-                        <path d="M5 7l1 13h12l1-13" /><path d="M9 7V4h6v3" />
-                      </svg>
-                      <span class="act-label">Delete</span>
-                    </button>
+                    @if (canDelete()) {
+                      <button type="button" class="row-btn row-btn--delete act act--delete" (click)="askDelete(item)"
+                        [attr.aria-label]="'Delete ' + item.issueType" title="Delete">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M4 7h16" /><path d="M10 11v6M14 11v6" />
+                          <path d="M5 7l1 13h12l1-13" /><path d="M9 7V4h6v3" />
+                        </svg>
+                        <span class="act-label">Delete</span>
+                      </button>
+                    }
                   }
                 </td>
               </tr>

@@ -10,6 +10,8 @@ import {
   MaintenanceIssueOption,
   maintenanceCategoryOptions,
 } from '../../../../models/maintenance.model';
+import { PERMISSIONS } from '../../../../models/auth.model';
+import { AuthService } from '../../../../services/auth.service';
 import { MaintenanceService } from '../../../../services/maintenance.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
 import { NON_MOI_BASE_PATH } from './non-moi-base-path';
@@ -39,6 +41,9 @@ export class NonMoiEditorComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
   protected readonly base = inject(NON_MOI_BASE_PATH);
+  private readonly auth = inject(AuthService);
+  /** Removing a picture stays with the Non-MOI office; technicians add services, pictures and prices. */
+  protected readonly canDelete = computed(() => this.auth.can(PERMISSIONS.nonMoiJobManage));
 
   /** Categories on the price list now, so a custom one added earlier can be
    *  picked again; the built-ins are always there. */

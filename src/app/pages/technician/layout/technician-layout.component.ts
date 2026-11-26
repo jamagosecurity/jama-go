@@ -66,8 +66,9 @@ export class TechnicianLayoutComponent {
     this.menuOpen.set(false);
   }
 
-  private tabFor(url: string): 'dia' | 'jobs' | 'moi' | 'uber' {
+  private tabFor(url: string): 'dia' | 'jobs' | 'moi' | 'uber' | 'inventory' {
     if (url.startsWith(JOBS_PREFIX)) return 'jobs';
+    if (url.startsWith('/technician/non-moi')) return 'inventory';
     if (url.startsWith('/technician/moi-jobs')) return 'moi';
     if (url.startsWith('/technician/uber-bills')) return 'uber';
     return 'dia';

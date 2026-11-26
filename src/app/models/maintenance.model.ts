@@ -121,6 +121,10 @@ export interface MaintenanceIssueOption {
   descriptionAr: string | null;
   defaultFee: number;
   images: MaintenanceImage[];
+  /** Who added it, and who last changed its price and when — office staff or a technician. */
+  addedByName?: string | null;
+  priceChangedByName?: string | null;
+  priceChangedAt?: string | null;
 }
 
 /** What admin sends to add or edit a service on the Non-MOI price list. */

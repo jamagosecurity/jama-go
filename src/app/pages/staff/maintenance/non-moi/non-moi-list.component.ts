@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,6 +19,8 @@ import {
   maintenanceCategoryLabel,
   maintenanceCategoryOptions,
 } from '../../../../models/maintenance.model';
+import { PERMISSIONS } from '../../../../models/auth.model';
+import { AuthService } from '../../../../services/auth.service';
 import { MaintenanceService } from '../../../../services/maintenance.service';
 import { getApiErrorMessage } from '../../../../utils/api-error.util';
 import { NON_MOI_BASE_PATH } from './non-moi-base-path';
@@ -36,7 +38,7 @@ const PAGE_SIZE = 20;
 @Component({
   selector: 'app-non-moi-list',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, AppSelectComponent],
+  imports: [RouterLink, DatePipe, DecimalPipe, AppSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './non-moi-list.component.html',
   styleUrl: './non-moi-list.component.css',
@@ -45,6 +47,14 @@ export class NonMoiListComponent implements OnInit {
   private readonly service = inject(MaintenanceService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly base = inject(NON_MOI_BASE_PATH);
+  private readonly auth = inject(AuthService);
+  /** Deleting services and renaming or deleting categories stays with the Non-MOI office; technicians add and edit. */
+  protected readonly canDelete = computed(() => this.auth.can(PERMISSIONS.nonMoiJobManage));
+
+  /** "Name <email>" → "Name". */
+  protected person(name: string | null | undefined): string {
+    return (name ?? '').replace(/\s*<[^>]*>\s*$/, '').trim();
+  }
 
   /** Every section, including any admin has added — read off the list itself. */
   protected readonly categoryOptions = computed(() =>

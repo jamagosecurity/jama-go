@@ -52,6 +52,82 @@ export class TechnicianNonMoiJobDetailComponent implements OnInit {
     this.catalogue().reduce((sum, i) => sum + (this.picked().get(i.id) ?? 0) * i.defaultFee, 0));
   protected readonly count = computed(() => this.picked().size);
 
+  // ----- keeping the Non-MOI inventory up to date from the job -----
+  // A price changed here is the inventory price, for every job from now on; an item added here is in the inventory
+  // at once and ticked on this job. Both are recorded with who did it.
+  protected readonly editingId = signal<string | null>(null);
+  protected readonly editPrice = signal('');
+  protected readonly addingIn = signal<string | null>(null);
+  protected readonly newName = signal('');
+  protected readonly newPrice = signal('');
+  protected readonly catalogueBusy = signal(false);
+  protected readonly catalogueError = signal('');
+  protected readonly catalogueFlash = signal('');
+
+  protected startEditPrice(i: MaintenanceIssueOption): void {
+    this.addingIn.set(null);
+    this.catalogueError.set('');
+    this.editingId.set(i.id);
+    this.editPrice.set(String(i.defaultFee));
+  }
+
+  protected savePrice(i: MaintenanceIssueOption): void {
+    const price = this.parsePrice(this.editPrice());
+    if (price === null) return;
+    if (price === i.defaultFee) { this.editingId.set(null); return; }
+    this.catalogueBusy.set(true);
+    this.maintenance
+      .updateCatalogueItem(i.id, { category: i.category, name: i.issueType, descriptionEn: i.descriptionEn, descriptionAr: i.descriptionAr, price })
+      .pipe(finalize(() => this.catalogueBusy.set(false)))
+      .subscribe({
+        next: (saved) => {
+          this.catalogue.update((list) => list.map((x) => (x.id === saved.id ? saved : x)));
+          this.editingId.set(null);
+          this.catalogueFlash.set(`${saved.issueType}: price changed to ${saved.defaultFee.toFixed(2)} QAR for everyone.`);
+        },
+        error: (err: unknown) => this.catalogueError.set(getApiErrorMessage(err, 'Could not change the price.')),
+      });
+  }
+
+  protected startAdd(category: string): void {
+    this.editingId.set(null);
+    this.catalogueError.set('');
+    this.addingIn.set(category);
+    this.newName.set('');
+    this.newPrice.set('');
+  }
+
+  protected saveNew(category: string): void {
+    const name = this.newName().trim();
+    if (!name) { this.catalogueError.set('Type the item name.'); return; }
+    const price = this.parsePrice(this.newPrice());
+    if (price === null) return;
+    this.catalogueBusy.set(true);
+    this.maintenance
+      .addCatalogueItem({ category, name, descriptionEn: null, descriptionAr: null, price })
+      .pipe(finalize(() => this.catalogueBusy.set(false)))
+      .subscribe({
+        next: (added) => {
+          this.catalogue.update((list) => [...list, added]);
+          this.addingIn.set(null);
+          if (!this.isPicked(added)) this.toggle(added);
+          this.catalogueFlash.set(`${added.issueType} added to the inventory and ticked on this job.`);
+        },
+        error: (err: unknown) => this.catalogueError.set(getApiErrorMessage(err, 'Could not add the item.')),
+      });
+  }
+
+  /** A price as typed: a number with at most two decimals; null (with a message) otherwise. */
+  private parsePrice(text: string): number | null {
+    const value = text.replace(/,/g, '').trim();
+    if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+      this.catalogueError.set('Enter the price as a number, like 45 or 120.50.');
+      return null;
+    }
+    this.catalogueError.set('');
+    return Number(value);
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     forkJoin({ mine: this.jobs.mine(), catalogue: this.maintenance.issueCatalogue() })

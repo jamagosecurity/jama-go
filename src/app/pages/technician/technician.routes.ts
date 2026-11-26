@@ -1,4 +1,5 @@
 import { inject } from '@angular/core';
+import { createNonMoiRoutes } from '../staff/maintenance/non-moi/non-moi.routes';
 import { CanActivateFn, Router, Routes } from '@angular/router';
 import { permissionGuard } from '../../guards/admin.guard';
 import { PERMISSIONS } from '../../models/auth.model';
@@ -77,6 +78,13 @@ export const TECHNICIAN_ROUTES: Routes = [
         title: 'Non-MOI Job — Jama Go',
         loadComponent: () =>
           import('./non-moi-jobs/technician-non-moi-job-detail.component').then((m) => m.TechnicianNonMoiJobDetailComponent),
+      },
+      {
+        // The Non-MOI inventory: technicians add services and change prices, like the office (deleting stays
+        // with the office). Every change is recorded with who made it.
+        path: 'non-moi',
+        canActivate: [permissionGuard(PERMISSIONS.nonMoiJobWork)],
+        children: createNonMoiRoutes('/technician/non-moi'),
       },
       {
         // Jobs admin issued to this technician — the Non-MOI counterpart of
