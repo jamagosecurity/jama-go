@@ -39,12 +39,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Services',
     menu: 'grid',
     children: [
-      { href: '/#manned-guarding', label: 'Manned Guarding' },
-      { href: '/#mobile-patrols', label: 'Mobile Patrols' },
-      { href: '/#event-security', label: 'Event Security' },
-      { href: '/#cctv-monitoring', label: 'CCTV Monitoring' },
-      { href: '/#residential-security', label: 'Residential Security' },
-      { href: '/#alarm-response', label: 'Alarm Response' },
+      { href: '/#surveillance-cctv', label: 'CCTV Surveillance' },
+      { href: '/#access-control', label: 'Access Control' },
+      { href: '/#intruder-alarms', label: 'Intruder Alarms' },
+      { href: '/#gate-barriers', label: 'Gate Barriers' },
+      { href: '/#moi-approval', label: 'MOI-SSD Approval' },
+      { href: '/#amc-services', label: 'AMC & Maintenance' },
     ],
   },
   {

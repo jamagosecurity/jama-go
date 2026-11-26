@@ -403,6 +403,15 @@ a { color: inherit; text-decoration: none; }
   transition: .3s;
 }
 
+/* ----- Header clear at the top of the light home page: no bar, the normal dark text and full-colour logo. ----- */
+.site-header--clear {
+  background: transparent;
+  border-bottom-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 /* ----- Header floating over the home hero -----
    Applied only on the home route and only while the page is at the top, so
    every other page keeps the solid white bar it has always had. */
@@ -829,13 +838,19 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Footer */
-.site-footer { border-top: 1px solid var(--line); background: var(--bg-2); padding: 48px 0 28px; }
-.footer-inner { display: flex; justify-content: space-between; gap: 30px; flex-wrap: wrap; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
-.footer-brand p { color: var(--muted); font-size: 14px; margin-top: 8px; }
-.footer-links { display: flex; gap: 26px; flex-wrap: wrap; }
-.footer-links a { color: var(--muted); font-size: 15px; transition: color .2s; }
-.footer-links a:hover { color: var(--text); }
+.site-footer { border-top: 1px solid var(--line); background: #f5f8fc; padding: 64px 0 28px; }
+.footer-top { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 36px; padding-bottom: 40px; border-bottom: 1px solid var(--line); }
+.footer-brand { display: grid; gap: 16px; align-content: start; }
+.footer-logo { width: 180px; height: auto; }
+.footer-brand p { color: var(--muted); font-size: 14.5px; line-height: 1.65; max-width: 360px; margin: 0; }
+.footer-moi { width: 200px; height: auto; border-radius: 10px; box-shadow: 0 8px 20px -12px rgba(11, 23, 48, 0.3); }
+.footer-col { display: grid; gap: 11px; align-content: start; }
+.footer-col h3 { margin: 0 0 6px; color: var(--text); font-size: 13px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.footer-col a, .footer-col p { color: var(--muted); font-size: 14.5px; line-height: 1.55; margin: 0; text-decoration: none; transition: color .2s; }
+.footer-col a:hover { color: var(--text); }
 .footer-bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 22px; color: var(--muted); font-size: 13px; }
+@media (max-width: 960px) { .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); } .footer-brand { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .footer-top { grid-template-columns: 1fr; } }
 
 /* ===== Reveal animation ===== */
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }

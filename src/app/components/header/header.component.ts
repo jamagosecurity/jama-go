@@ -39,9 +39,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   scrolled = false;
 
   /**
-   * The home hero is a dark full-bleed stage that the header floats over. Once
-   * the page scrolls past it — or the mobile menu opens over it — the bar has
-   * to become solid again or the links lose their background.
+   * At the top of the home page the bar is clear, sitting on the light hero. Once the page scrolls — or the
+   * mobile menu opens — it becomes solid again so the links keep their background.
    */
   get overHero(): boolean {
     return this.activePath === '/' && !this.scrolled && !this.mobileOpen;
