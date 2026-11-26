@@ -261,7 +261,39 @@ h2 { font-size: clamp(1.9rem, 3.3vw, 2.75rem); font-weight: 700; line-height: 1.
 /* ----- Coverage ----- */
 .hp-areas { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .hp-areas li { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--tint); color: var(--ink-2); font-size: 0.9rem; font-weight: 600; }
-.hp-cover-map { width: min(100%, 420px); max-height: none; }
+.hp-cover-map { position: relative; isolation: isolate; width: min(100%, 420px); aspect-ratio: 400 / 720; margin: 0 auto; }
+/* A soft aura behind the map, like the hero's, and a shadow beneath it so the map floats. */
+/* Every glow fades to nothing well inside the box, so no edge ever shows. */
+.hp-cover-map::before {
+  content: ''; position: absolute; z-index: -1; inset: -10% -30% -8%; pointer-events: none;
+  background:
+    radial-gradient(36% 30% at 71% 54%, rgba(210, 19, 25, 0.13), transparent 70%),
+    radial-gradient(44% 34% at 40% 30%, rgba(37, 148, 210, 0.22), transparent 70%),
+    radial-gradient(48% 30% at 52% 74%, rgba(42, 91, 171, 0.16), transparent 70%);
+}
+#coverage { overflow-x: hidden; overflow-x: clip; }
+.hp-cover-map::after {
+  content: ''; position: absolute; z-index: -1; left: 16%; right: 10%; bottom: 3%; height: 7%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(11, 23, 48, 0.2), transparent);
+}
+.hp-cover-map svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.hp-cover-map pattern circle { fill: rgba(42, 91, 171, 0.4); }
+.hp-coast { fill: none; stroke: rgba(42, 91, 171, 0.55); stroke-width: 1.4; stroke-linejoin: round; }
+.hp-route { fill: none; stroke: rgba(210, 19, 25, 0.6); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 5 7; animation: hp-flow 2.8s linear infinite; }
+.hp-marker { fill: #fff; stroke: var(--blue); stroke-width: 2.4; }
+.hp-marker.is-hub { fill: var(--red); stroke: #fff; stroke-width: 3; }
+/* Doha, the base: a radar ping that keeps going out. */
+.hp-pulse {
+  fill: none; stroke: var(--red); stroke-width: 1.6; vector-effect: non-scaling-stroke;
+  transform-box: fill-box; transform-origin: center; animation: hp-pulse 2.8s ease-out infinite;
+}
+.hp-pulse--late { animation-delay: -1.4s; }
+.hp-maplabel {
+  position: absolute; transform: translate(12px, -50%); padding: 4px 10px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92); border: 1px solid var(--line); box-shadow: 0 6px 16px -8px rgba(11, 23, 48, 0.3);
+  backdrop-filter: blur(6px); color: var(--ink-2); font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+}
+.hp-maplabel.is-hub { background: var(--ink); color: #fff; border-color: var(--ink); }
 
 /* ----- Support ----- */
 .hp-support { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
@@ -310,6 +342,7 @@ h2 { font-size: clamp(1.9rem, 3.3vw, 2.75rem); font-weight: 700; line-height: 1.
 @media (prefers-reduced-motion: reduce) {
   .hp-marquee-track, .hp-route, .hp-pulse, .hp-blob, .hp-lens-aura, .hp-lens-sweep, .hp-iris, .hp-pupil, .hp-led,
   .hp-glass, .hp-shine, .hp-live { animation: none; }
+  .hp-pulse { display: none; }
   .hp-card, .hp-btn { transition: none; }
 }
 
@@ -340,6 +373,6 @@ h2 { font-size: clamp(1.9rem, 3.3vw, 2.75rem); font-weight: 700; line-height: 1.
   .hp-glass--c { bottom: 0; right: 4%; }
   .hp-btn { width: 100%; justify-content: center; }
   .hp-moi-lines div { grid-template-columns: 84px minmax(0, 1fr) auto; }
-  .hp-map, .hp-cover-map { width: 72%; margin: 0 auto 0 5%; }
+  .hp-cover-map { width: 72%; margin: 0 auto 0 5%; }
   .hp-card { padding: 24px 22px; }
 }

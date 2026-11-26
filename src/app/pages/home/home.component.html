@@ -267,13 +267,23 @@
           <defs>
             <pattern id="hpDots2" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.35" /></pattern>
             <clipPath id="hpLand2"><path [attr.d]="qatarPath" /></clipPath>
+            <linearGradient id="hpLandFill2" x1="0" y1="0" x2="0.35" y2="1">
+              <stop offset="0" stop-color="#ffffff" />
+              <stop offset="1" stop-color="#dce8f7" />
+            </linearGradient>
           </defs>
           <g clip-path="url(#hpLand2)">
-            <rect class="hp-land" [attr.width]="mapW" [attr.height]="mapH" />
+            <rect class="hp-land" [attr.width]="mapW" [attr.height]="mapH" fill="url(#hpLandFill2)" />
             <rect class="hp-land-dots" [attr.width]="mapW" [attr.height]="mapH" fill="url(#hpDots2)" />
           </g>
           <path class="hp-coast" [attr.d]="qatarPath" />
           @for (r of routes; track r) { <path class="hp-route" [attr.d]="r" /> }
+          @for (m of markers; track m.name) {
+            @if (m.hub) {
+              <circle class="hp-pulse" [attr.cx]="m.x" [attr.cy]="m.y" r="7" />
+              <circle class="hp-pulse hp-pulse--late" [attr.cx]="m.x" [attr.cy]="m.y" r="7" />
+            }
+          }
           @for (m of markers; track m.name) {
             <circle class="hp-marker" [class.is-hub]="m.hub" [attr.cx]="m.x" [attr.cy]="m.y" [attr.r]="m.hub ? 7 : 4.5" />
           }
