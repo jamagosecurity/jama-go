@@ -1663,3 +1663,166 @@
 .contact-faq.open { border-color: rgba(200,183,138,0.5); }
 .contact-faq.open .contact-faq-num { color: #111d2e; background: #c8b78a; }
 .contact-faq-q { font-weight: 600; }
+
+/* Channel cards: real WhatsApp green and mail red; the grey-beige tint is removed from every card. */
+.contact-channel--green .contact-channel-icon { background: #25d366; color: #fff; box-shadow: 0 12px 24px -12px rgba(37, 211, 102, 0.75); }
+.contact-channel--green .contact-channel-badge { color: #128c4a; background: rgba(37, 211, 102, 0.14); }
+.contact-channel--gold .contact-channel-icon { background: #ea4335; color: #fff; box-shadow: 0 12px 24px -12px rgba(234, 67, 53, 0.7); }
+.contact-channel--gold .contact-channel-badge { color: #c5221f; background: rgba(234, 67, 53, 0.12); }
+.contact-channel--blue .contact-channel-icon { background: #1a73e8; color: #fff; box-shadow: 0 12px 24px -12px rgba(26, 115, 232, 0.7); }
+.contact-channel--blue .contact-channel-badge { color: #1257b3; background: rgba(26, 115, 232, 0.12); }
+.contact-channel--violet .contact-channel-icon { background: #0f9d58; color: #fff; box-shadow: 0 12px 24px -12px rgba(15, 157, 88, 0.7); }
+.contact-channel--violet .contact-channel-badge { color: #0b7a44; background: rgba(15, 157, 88, 0.12); }
+/* Stats and trust badges: solid original colours, no grey-beige tint. */
+.contact-stat--blue .contact-stat-icon { background: #1a73e8; color: #fff; box-shadow: 0 12px 24px -12px rgba(26, 115, 232, 0.7); }
+.contact-stat--gold .contact-stat-icon { background: #f5a623; color: #1f2937; box-shadow: 0 12px 24px -12px rgba(245, 166, 35, 0.7); }
+.contact-stat--teal .contact-stat-icon { background: #0d9488; color: #fff; box-shadow: 0 12px 24px -12px rgba(13, 148, 136, 0.7); }
+.contact-stat--coral .contact-stat-icon { background: #ea4335; color: #fff; box-shadow: 0 12px 24px -12px rgba(234, 67, 53, 0.7); }
+.contact-trust-badge--blue .contact-trust-badge-icon { background: #1a73e8; color: #fff; }
+.contact-trust-badge--green .contact-trust-badge-icon { background: #8a1538; color: #fff; }
+.contact-trust-badge--gold .contact-trust-badge-icon { background: #f5a623; color: #1f2937; }
+.contact-trust-badge--violet .contact-trust-badge-icon { background: #0f9d58; color: #fff; }
+/* Trial: cool, clean page background instead of the warm beige. */
+.contact-page { background: linear-gradient(180deg, #eef4fb 0%, #ffffff 55%, #f4f8fc 100%); }
+/* Gradient boxes: each stat and trust box has its own soft colour gradient. */
+.contact-stat.contact-stat--blue { background: linear-gradient(160deg, #d9e8fd 0%, #ffffff 90%); }
+.contact-stat.contact-stat--gold { background: linear-gradient(160deg, #fdebc8 0%, #ffffff 90%); }
+.contact-stat.contact-stat--teal { background: linear-gradient(160deg, #d2f1ec 0%, #ffffff 90%); }
+.contact-stat.contact-stat--coral { background: linear-gradient(160deg, #fcdcd7 0%, #ffffff 90%); }
+.contact-trust-badge.contact-trust-badge--blue { background: linear-gradient(160deg, #d9e8fd 0%, #ffffff 90%); }
+.contact-trust-badge.contact-trust-badge--green { background: linear-gradient(160deg, #f5dbe2 0%, #ffffff 90%); }
+.contact-trust-badge.contact-trust-badge--gold { background: linear-gradient(160deg, #fdebc8 0%, #ffffff 90%); }
+.contact-trust-badge.contact-trust-badge--violet { background: linear-gradient(160deg, #d3f2de 0%, #ffffff 90%); }
+/* Gradient contact cards: each channel card has a soft gradient in its own colour. */
+.contact-channel.contact-channel--blue { background: linear-gradient(160deg, #d9e8fd 0%, #ffffff 90%); }
+.contact-channel.contact-channel--green { background: linear-gradient(160deg, #d3f2de 0%, #ffffff 90%); }
+.contact-channel.contact-channel--gold { background: linear-gradient(160deg, #fcdcd7 0%, #ffffff 90%); }
+.contact-channel.contact-channel--violet { background: linear-gradient(160deg, #d2f1ec 0%, #ffffff 90%); }
+
+/* Hero: richer brand gradient, navy to Jama Go blue. */
+.contact-hero-bg { background: linear-gradient(115deg, rgba(7, 20, 42, 0.97) 0%, rgba(14, 52, 104, 0.92) 55%, rgba(26, 115, 232, 0.6) 100%); }
+
+/* Enquiry form: blue gradient card, brand-blue icon and button, blue focus ring. */
+.contact-form-card { background: linear-gradient(160deg, #e6f0fc 0%, #ffffff 58%) !important; border-color: rgba(26, 115, 232, 0.16) !important; }
+.contact-form-icon { color: #ffffff !important; background: linear-gradient(135deg, #1a73e8, #0b4fb3) !important; box-shadow: 0 12px 24px -12px rgba(26, 115, 232, 0.7); }
+.contact-submit { color: #ffffff !important; border: 0 !important; background: linear-gradient(135deg, #1a73e8, #0b4fb3) !important; box-shadow: 0 16px 30px -14px rgba(26, 115, 232, 0.75); }
+.contact-submit:hover { filter: brightness(1.06); }
+.contact-form-card .field input:focus,
+.contact-form-card .field select:focus,
+.contact-form-card .field textarea:focus { border-color: #1a73e8 !important; box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.14) !important; }
+
+/* No photos: the broken hero photo and the showroom photos are replaced with designed graphics. */
+.contact-hero-photo { display: none; }
+.contact-visit-photo img { display: none; }
+.contact-visit-photo { background: linear-gradient(140deg, #1a73e8 0%, #0b3c7a 100%); }
+.contact-visit-photo:nth-of-type(2) { background: linear-gradient(140deg, #0f9d58 0%, #0b5d3a 100%); }
+.contact-visit-photo:nth-of-type(3) { background: linear-gradient(140deg, #14213d 0%, #3b5b92 100%); }
+.contact-visit-photo figcaption { color: #ffffff; }
+/* Hero primary button in brand blue. */
+.contact-hero-btn--primary { color: #ffffff !important; background: linear-gradient(135deg, #1a73e8, #0b4fb3) !important; box-shadow: 0 16px 30px -14px rgba(26, 115, 232, 0.8) !important; }
+/* Remaining beige sections (form and FAQ) become cool white. */
+.contact-section--alt, .contact-faq-section { background: transparent !important; }
+
+/* Showroom tiles: real images, cropped to fill; the second tile zooms in on the camera. */
+.contact-visit-photo { position: relative; overflow: hidden; }
+.contact-visit-photo img { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.contact-visit-photo:nth-of-type(2) img { transform: scale(2.1); transform-origin: 88% 45%; }
+.contact-visit-photo figcaption { z-index: 1; }
+
+/* Get Directions: white button with navy text, so it reads clearly on the navy hero. */
+.contact-hero-btn--ghost { color: #0b1930 !important; background: #ffffff !important; border-color: #ffffff !important; box-shadow: 0 14px 28px -16px rgba(0, 0, 0, 0.5) !important; }
+.contact-hero-btn--ghost:hover { background: #eaf2fd !important; }
+
+/* Showroom info icons: same colours as the contact cards (address green, phone blue, email red). */
+.contact-visit-icon.contact-visit-icon--violet { color: #ffffff; background: linear-gradient(135deg, #0f9d58, #0b7a44); box-shadow: 0 12px 24px -12px rgba(15, 157, 88, 0.75); }
+.contact-visit-icon.contact-visit-icon--blue { color: #ffffff; background: linear-gradient(135deg, #1a73e8, #0b4fb3); box-shadow: 0 12px 24px -12px rgba(26, 115, 232, 0.75); }
+.contact-visit-icon.contact-visit-icon--gold { color: #ffffff; background: linear-gradient(135deg, #ea4335, #c5221f); box-shadow: 0 12px 24px -12px rgba(234, 67, 53, 0.7); }
+
+/* "Why Choose Us?" card: Jama Go blue gradient, white text, WhatsApp-green button. */
+.contact-why-card { background: linear-gradient(160deg, #1a73e8 0%, #0b3c7a 100%) !important; border-color: rgba(255, 255, 255, 0.2) !important; box-shadow: 0 30px 60px -30px rgba(26, 115, 232, 0.7) !important; }
+.contact-why-card .contact-why-icon { color: #ffffff !important; background: rgba(255, 255, 255, 0.18) !important; border-color: rgba(255, 255, 255, 0.3) !important; }
+.contact-why-card h3, .contact-why-card h2 { color: #ffffff !important; }
+.contact-why-card li { color: #ffffff !important; }
+.contact-why-card li::before, .contact-why-card .contact-why-check { color: #ffffff !important; }
+.contact-why-cta { color: #ffffff !important; background: linear-gradient(135deg, #e8242b, #a40f14) !important; border-color: transparent !important; box-shadow: 0 14px 28px -14px rgba(210, 19, 25, 0.8) !important; }
+.contact-why-cta:hover { filter: brightness(1.08); }
+.contact-why-card li > span[aria-hidden="true"] { color: #ffffff !important; }
+
+/* Office Hours card: brand colours. Blue gradient card, navy schedule block, red Friday holiday. */
+.contact-hours-card { background: linear-gradient(160deg, #e6f0fc 0%, #ffffff 60%) !important; border-color: rgba(26, 115, 232, 0.16) !important; }
+.contact-hours-icon { color: #ffffff !important; background: linear-gradient(135deg, #1a73e8, #0b4fb3) !important; box-shadow: 0 12px 24px -12px rgba(26, 115, 232, 0.7); }
+.contact-hours-hero { background: linear-gradient(135deg, #1a73e8 0%, #0b3c7a 100%) !important; border-color: transparent !important; color: #ffffff !important; }
+.contact-hours-hero strong, .contact-hours-hero-main strong { color: #ffffff !important; }
+.contact-hours-hero-label, .contact-hours-hero-note { color: rgba(255, 255, 255, 0.85) !important; }
+.contact-hours-status { color: #ffffff !important; background: rgba(255, 255, 255, 0.16) !important; border-color: rgba(255, 255, 255, 0.35) !important; }
+.contact-hours-status-dot { background: #25d366 !important; }
+.contact-hours-day { background: #ffffff !important; border-color: rgba(26, 115, 232, 0.18) !important; }
+.contact-hours-day-short { color: #1257b3 !important; }
+.contact-hours-friday { background: #fdecea !important; border-color: rgba(210, 19, 25, 0.25) !important; }
+.contact-hours-friday-icon { color: #d21319 !important; }
+/* Each day box has its own gradient; Friday (holiday) stays red. */
+.contact-hours-day:nth-child(1) { background: linear-gradient(160deg, #d9e8fd 0%, #ffffff 90%) !important; }
+.contact-hours-day:nth-child(2) { background: linear-gradient(160deg, #d2f1ec 0%, #ffffff 90%) !important; }
+.contact-hours-day:nth-child(3) { background: linear-gradient(160deg, #d3f2de 0%, #ffffff 90%) !important; }
+.contact-hours-day:nth-child(4) { background: linear-gradient(160deg, #e2dcfb 0%, #ffffff 90%) !important; }
+.contact-hours-day:nth-child(5) { background: linear-gradient(160deg, #dbeefe 0%, #ffffff 90%) !important; }
+.contact-hours-day:nth-child(6) { background: linear-gradient(160deg, #fdebc8 0%, #ffffff 90%) !important; }
+.contact-hours-day:nth-child(7) { background: linear-gradient(160deg, #fdecea 0%, #ffffff 90%) !important; }
+
+/* Final polish: no gold left. Section labels and heading lines in brand blue, FAQ number in blue,
+   hero WhatsApp button in WhatsApp green. */
+.contact-section .contact-kicker { color: #1a73e8 !important; }
+.contact-section-head h2::after { width: 52px !important; height: 3px !important; border-radius: 999px; background: linear-gradient(90deg, #1a73e8, #d21319) !important; }
+.contact-faq.open .contact-faq-num { color: #ffffff !important; background: linear-gradient(135deg, #1a73e8, #0b4fb3) !important; }
+.contact-hero-btn--whatsapp { color: #ffffff !important; background: linear-gradient(135deg, #25d366, #128c7e) !important; border-color: transparent !important; box-shadow: 0 16px 30px -14px rgba(37, 211, 102, 0.7) !important; }
+
+/* Last gold traces, found by a colour scan: glows, hero badge, borders. All brand blue now. */
+.contact-page-glow--2 { background: rgba(26, 115, 232, 0.07) !important; }
+.contact-hero-glow--2 { background: rgba(26, 115, 232, 0.35) !important; }
+.contact-hours-glow, .contact-why-glow { background: rgba(26, 115, 232, 0.16) !important; }
+.contact-why-card .contact-why-glow { background: rgba(255, 255, 255, 0.12) !important; }
+.contact-hero-overlay { background-image: radial-gradient(circle at 20% 20%, rgba(26, 115, 232, 0.28), transparent 55%), radial-gradient(circle at 85% 80%, rgba(210, 19, 25, 0.16), transparent 50%) !important; }
+.contact-kicker--hero { color: #ffffff !important; background: rgba(255, 255, 255, 0.1) !important; border-color: rgba(255, 255, 255, 0.28) !important; }
+.contact-kicker--hero .contact-kicker-dot { color: #25d366 !important; }
+.contact-hero-btn--primary { border-color: transparent !important; }
+.contact-stats { border-color: rgba(26, 115, 232, 0.16) !important; }
+.contact-faq.open { border-color: rgba(26, 115, 232, 0.4) !important; }
+
+/* Office hours tiles: the time is the same every day and shown large above, so each open day gets a
+   green "open" dot instead of a cramped four-line time. Friday keeps "Holiday". */
+.contact-hours-day--open .contact-hours-day-hours { display: none; }
+.contact-hours-day--open::after { content: ""; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: #25d366; box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.18); }
+/* FAQ cards: visible white cards with a light blue edge. */
+.contact-faq { background: #ffffff !important; border: 1px solid rgba(26, 115, 232, 0.14) !important; box-shadow: 0 10px 28px -18px rgba(11, 25, 48, 0.35) !important; }
+.contact-why-cta { position: relative; z-index: 2; }
+
+/* ===== One colour family (the page had too many colours). Every card is the same soft blue-white
+   gradient and every icon Jama Go blue. Colour stays only where it means something: WhatsApp green on
+   WhatsApp, red for the Friday holiday, small green "open" dots, and the red Chat on WhatsApp button. ===== */
+.contact-stats .contact-stat[class*="contact-stat--"],
+.contact-trust .contact-trust-badge[class*="contact-trust-badge--"],
+.contact-channels .contact-channel[class*="contact-channel--"] {
+  background: linear-gradient(160deg, #e6f0fc 0%, #ffffff 90%);
+}
+.contact-stats .contact-stat[class*="contact-stat--"] .contact-stat-icon,
+.contact-trust .contact-trust-badge[class*="contact-trust-badge--"] .contact-trust-badge-icon,
+.contact-channels .contact-channel[class*="contact-channel--"] .contact-channel-icon,
+.contact-visit-icon[class*="contact-visit-icon--"] {
+  color: #ffffff;
+  background: linear-gradient(135deg, #1a73e8, #0b4fb3);
+  box-shadow: 0 12px 24px -12px rgba(26, 115, 232, 0.7);
+}
+.contact-channels .contact-channel[class*="contact-channel--"] .contact-channel-badge {
+  color: #1257b3;
+  background: rgba(26, 115, 232, 0.12);
+}
+/* WhatsApp keeps its own green so people recognise it at a glance. */
+.contact-channels .contact-channel.contact-channel--green .contact-channel-icon {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  box-shadow: 0 12px 24px -12px rgba(37, 211, 102, 0.7);
+}
+/* Office hours: every open day the same soft blue; Friday stays red. */
+.contact-hours-week .contact-hours-day.contact-hours-day--open { background: linear-gradient(160deg, #e6f0fc 0%, #ffffff 90%) !important; }
+.contact-hours-day--open .contact-hours-day-short { color: #1257b3 !important; background: rgba(26, 115, 232, 0.12) !important; }
+/* Phone and email chips: the same blue pill as the menu when the cursor is on them. */
+.contact-chip:hover { color: #ffffff; background: linear-gradient(135deg, #1a73e8, #0b4fb3); border-color: transparent; }

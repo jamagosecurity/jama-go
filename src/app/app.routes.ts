@@ -37,7 +37,7 @@ export const routes: Routes = [
   ...MARKETING_ROUTES,
   {
     path: 'contact',
-    title: 'Contact Us — Jama Go Security',
+    title: 'Contact Jama Go Security — CCTV in Qatar',
     loadComponent: () =>
       import('./components/contact/contact.component').then((m) => m.ContactComponent),
   },

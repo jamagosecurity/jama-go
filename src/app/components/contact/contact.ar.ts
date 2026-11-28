@@ -1,7 +1,7 @@
 export const CONTACT_TEXT_AR: Record<string, string> = {
   "We're Here For You": 'نحن هنا لمساعدتك',
   'Contact Jama Go Security Equipment': 'تواصل مع جاما جو لمعدات الأمن',
-  'Questions about CCTV, access control, alarms, or a tailored security plan? Our engineers are ready to protect your site with professional installation and 24/7 support.': 'لديك سؤال عن الكاميرات أو التحكم في الدخول أو الإنذارات أو خطة أمنية مخصصة؟ مهندسونا مستعدون لحماية موقعك بتركيب احترافي ودعم على مدار الساعة.',
+  'Questions about CCTV, access control, alarms, or a tailored security plan in Qatar? Our engineers are ready to protect your site with professional installation and 24/7 support.': 'لديك سؤال عن الكاميرات أو التحكم في الدخول أو الإنذارات أو خطة أمنية مخصصة في قطر؟ مهندسونا مستعدون لحماية موقعك بتركيب احترافي ودعم على مدار الساعة.',
   'Call Now': 'اتصل الآن',
   'WhatsApp': 'واتساب',
   'Get Directions': 'احصل على الاتجاهات',

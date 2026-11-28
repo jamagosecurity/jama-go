@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, Meta, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RevealDirective } from '../../directives/reveal.directive';
 import { CountUpDirective } from '../../directives/count-up.directive';
@@ -62,6 +62,13 @@ export class ContactComponent {
   readonly translations = CONTACT_TEXT_AR;
   private readonly sanitizer = inject(DomSanitizer);
   private readonly contactService = inject(ContactService);
+  private readonly meta = inject(Meta);
+
+  constructor() {
+    this.meta.updateTag({ name: 'description', content: 'Contact Jama Go Security Equipment in Doha, Qatar: CCTV, access control, alarms and gate barriers installed by our engineers, with 24/7 support and a free site survey.' });
+    this.meta.updateTag({ property: 'og:title', content: 'Contact Jama Go Security — Qatar' });
+    this.meta.updateTag({ property: 'og:description', content: 'Contact Jama Go Security Equipment in Doha, Qatar: CCTV, access control, alarms and gate barriers installed by our engineers, with 24/7 support and a free site survey.' });
+  }
 
   readonly companyEn = 'Jama Go Security Equipment';
 
@@ -94,18 +101,18 @@ export class ContactComponent {
 
   readonly showcaseImages: ShowcaseImage[] = [
     {
-      src: 'https://images.unsplash.com/photo-1557597774-9d273605dfa8?auto=format&fit=crop&w=800&q=80',
-      alt: 'Security monitoring and CCTV control room',
+      src: '/sifeddine-hero.jpg',
+      alt: 'Dahua CCTV camera mounted on a wall with the Doha skyline behind',
       caption: 'CCTV & Monitoring',
     },
     {
-      src: 'https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=800&q=80',
-      alt: 'Professional security camera installation',
+      src: '/sifeddine-hero.jpg',
+      alt: 'Close-up of a CCTV camera installed on a wall',
       caption: 'Expert Installation',
     },
     {
-      src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
-      alt: 'Commercial building security solutions in Qatar',
+      src: '/sifeddine-reel-poster.jpg',
+      alt: 'Illustration of warehouses and factories with security coverage',
       caption: 'Commercial Projects',
     },
   ];

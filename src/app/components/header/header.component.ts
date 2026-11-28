@@ -160,7 +160,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   childIsActive(item: NavDropdownItem): boolean {
     const siblings = this.flattenChildren(item.children);
-    return siblings.some((c) => this.isMegaLinkActive(c, siblings));
+    // A page that has its own top-level link (e.g. Contact) lights up that link only, not a
+    // dropdown that also happens to point at it (Solutions → Free Consultation → /contact).
+    return siblings.some((c) => !this.hasTopLevelLink(c.href) && this.isMegaLinkActive(c, siblings));
+  }
+
+  private hasTopLevelLink(href: string): boolean {
+    return this.navItems.some((n) => !this.isDropdown(n) && 'href' in n && n.href === href);
   }
 
   isMegaLinkActive(child: NavLink, siblings: NavLink[]): boolean {
