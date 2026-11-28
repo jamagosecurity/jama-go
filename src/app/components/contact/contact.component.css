@@ -1796,33 +1796,5 @@
 .contact-faq { background: #ffffff !important; border: 1px solid rgba(26, 115, 232, 0.14) !important; box-shadow: 0 10px 28px -18px rgba(11, 25, 48, 0.35) !important; }
 .contact-why-cta { position: relative; z-index: 2; }
 
-/* ===== One colour family (the page had too many colours). Every card is the same soft blue-white
-   gradient and every icon Jama Go blue. Colour stays only where it means something: WhatsApp green on
-   WhatsApp, red for the Friday holiday, small green "open" dots, and the red Chat on WhatsApp button. ===== */
-.contact-stats .contact-stat[class*="contact-stat--"],
-.contact-trust .contact-trust-badge[class*="contact-trust-badge--"],
-.contact-channels .contact-channel[class*="contact-channel--"] {
-  background: linear-gradient(160deg, #e6f0fc 0%, #ffffff 90%);
-}
-.contact-stats .contact-stat[class*="contact-stat--"] .contact-stat-icon,
-.contact-trust .contact-trust-badge[class*="contact-trust-badge--"] .contact-trust-badge-icon,
-.contact-channels .contact-channel[class*="contact-channel--"] .contact-channel-icon,
-.contact-visit-icon[class*="contact-visit-icon--"] {
-  color: #ffffff;
-  background: linear-gradient(135deg, #1a73e8, #0b4fb3);
-  box-shadow: 0 12px 24px -12px rgba(26, 115, 232, 0.7);
-}
-.contact-channels .contact-channel[class*="contact-channel--"] .contact-channel-badge {
-  color: #1257b3;
-  background: rgba(26, 115, 232, 0.12);
-}
-/* WhatsApp keeps its own green so people recognise it at a glance. */
-.contact-channels .contact-channel.contact-channel--green .contact-channel-icon {
-  background: linear-gradient(135deg, #25d366, #128c7e);
-  box-shadow: 0 12px 24px -12px rgba(37, 211, 102, 0.7);
-}
-/* Office hours: every open day the same soft blue; Friday stays red. */
-.contact-hours-week .contact-hours-day.contact-hours-day--open { background: linear-gradient(160deg, #e6f0fc 0%, #ffffff 90%) !important; }
-.contact-hours-day--open .contact-hours-day-short { color: #1257b3 !important; background: rgba(26, 115, 232, 0.12) !important; }
 /* Phone and email chips: the same blue pill as the menu when the cursor is on them. */
 .contact-chip:hover { color: #ffffff; background: linear-gradient(135deg, #1a73e8, #0b4fb3); border-color: transparent; }
