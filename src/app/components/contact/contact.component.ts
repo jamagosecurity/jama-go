@@ -3,7 +3,9 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RevealDirective } from '../../directives/reveal.directive';
 import { CountUpDirective } from '../../directives/count-up.directive';
+import { I18nDirective } from '../../directives/i18n.directive';
 import { ContactService } from '../../services/contact.service';
+import { CONTACT_TEXT_AR } from './contact.ar';
 
 interface HeroStat {
   id: string;
@@ -51,12 +53,13 @@ interface FaqItem {
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [FormsModule, RevealDirective, CountUpDirective],
+  imports: [FormsModule, RevealDirective, CountUpDirective, I18nDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.css',
 })
 export class ContactComponent {
+  readonly translations = CONTACT_TEXT_AR;
   private readonly sanitizer = inject(DomSanitizer);
   private readonly contactService = inject(ContactService);
 

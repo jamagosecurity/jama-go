@@ -2,11 +2,12 @@
   class="site-header"
   [class.open]="mobileOpen"
   [class.site-header--clear]="overHero"
+  [class.site-header--over-hero]="overHero"
   id="top"
 >
   <div class="container header-inner">
     <a href="/" class="brand" aria-label="Jama Go Security home" (click)="closeMobile()">
-      <app-logo variant="header" />
+      <app-logo variant="header" [tone]="overHero || mobileOpen ? 'light' : 'color'" />
     </a>
 
     <nav class="main-nav" aria-label="Main navigation">
@@ -28,7 +29,7 @@
               (mousedown)="onDropdownMouseDown($event)"
               (click)="!isDesktopNav && toggleMobileDropdown(item.label)"
             >
-              {{ item.label }}
+              {{ label(item.label) }}
               <span class="nav-caret" aria-hidden="true"></span>
             </button>
 
@@ -44,7 +45,7 @@
                           [class.active]="isMegaLinkActive(child, column)"
                           (click)="closeMobile()"
                         >
-                          {{ child.label }}
+                          {{ label(child.label) }}
                         </a>
                       }
                     </div>
@@ -59,7 +60,7 @@
                       [class.active]="isMegaLinkActive(child, asLinks(item.children))"
                       (click)="closeMobile()"
                     >
-                      {{ child.label }}
+                      {{ label(child.label) }}
                     </a>
                   }
                 </div>
@@ -72,7 +73,7 @@
                       [class.active]="isMegaLinkActive(child, asLinks(item.children))"
                       (click)="closeMobile()"
                     >
-                      {{ child.label }}
+                      {{ label(child.label) }}
                     </a>
                   }
                 </div>
@@ -86,19 +87,28 @@
             [class.active]="isActive(item.href)"
             (click)="closeMobile()"
           >
-            {{ item.label }}
+            {{ label(item.label) }}
           </a>
         }
       }
+      <a href="/contact" class="nav-mobile-cta" (click)="closeMobile()">{{ language.text('Book a free site survey', 'احجز معاينة مجانية لموقعك') }}</a>
     </nav>
 
-    <a href="/contact" class="btn btn-primary btn-sm nav-cta" (click)="closeMobile()">
-      Get a Quote
-    </a>
+    <div class="nav-actions">
+      <button
+        type="button"
+        class="nav-language"
+        (click)="language.toggle()"
+        [attr.aria-label]="language.text('Switch to Arabic', 'التبديل إلى الإنجليزية')"
+      >{{ language.text('العربية', 'English') }}</button>
+      <a href="/contact" class="btn btn-primary btn-sm nav-cta" (click)="closeMobile()">
+        {{ language.text('Get a Quote', 'اطلب عرض سعر') }}
+      </a>
+    </div>
 
     <button
       class="nav-toggle"
-      aria-label="Toggle menu"
+      [attr.aria-label]="language.text('Toggle menu', 'فتح أو إغلاق القائمة')"
       [attr.aria-expanded]="mobileOpen"
       (click)="toggleMobileMenu()"
     >

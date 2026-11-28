@@ -709,3 +709,31 @@
 /* The remove button is the shared round rose icon now. */
 .quote-page .quote-line-remove.row-btn { width: 32px; height: 32px; padding: 0; }
 .quote-page .quote-line-remove.row-btn svg { width: 15px; height: 15px; }
+
+.quote-page { max-width: 1440px; padding: clamp(24px,3vw,44px) clamp(16px,3vw,36px) clamp(64px,7vw,96px); color: #0b1930; background: #f7f5ef; }
+.quote-page .admin-page-header { position: relative; align-items: center; margin-bottom: 22px; padding: clamp(26px,4vw,44px); overflow: hidden; border: 1px solid rgba(200,183,138,.24); border-radius: 26px; background: radial-gradient(500px 280px at 100% 0%,rgba(64,111,156,.28),transparent 65%),#071426; box-shadow: 0 28px 60px -42px rgba(7,20,38,.7); }
+.quote-page .admin-page-header::after { content: ""; position: absolute; width: 240px; height: 240px; top: -140px; right: -60px; border: 1px solid rgba(200,183,138,.12); border-radius: 50%; box-shadow: 0 0 0 45px rgba(200,183,138,.025); pointer-events: none; }
+.quote-page .admin-page-header > div { position: relative; z-index: 1; }
+.quote-page .admin-page-header h1 { color: #fff; background: none; -webkit-text-fill-color: #fff; font-size: clamp(1.9rem,3.4vw,3rem); font-weight: 600; letter-spacing: -.045em; }
+.quote-page .admin-page-header p { color: #a8b5c6; }
+.quote-page .admin-kicker { color: #c8b78a; }
+.quote-page .admin-kicker::before { background: #c8b78a; box-shadow: 0 0 0 4px rgba(200,183,138,.1); }
+.quote-page .quote-back { color: #c8b78a; }
+.quote-page .btn-admin-primary { border: 1px solid #b5a272; color: #111d2e; background: linear-gradient(135deg,#e6dcc1,#c4b080); box-shadow: 0 14px 28px -18px rgba(200,183,138,.65); text-shadow: none; }
+.quote-page .quote-head-actions .btn-admin-ghost { color: #e5e9ef; border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.05); }
+.quote-page .quote-head-actions .quote-status { border: 1px solid rgba(200,183,138,.25); color: #e9dfc5; background: rgba(200,183,138,.08); }
+.quote-page .camera-stats > div { border-color: rgba(255,255,255,.12); background: rgba(255,255,255,.05); }
+.quote-page .camera-stats dt,.quote-page .camera-cur { color: #93a3b7; }
+.quote-page .camera-stats dd { color: #e9dfc5; font-weight: 550; }
+.quote-page .camera-filters { border-color: rgba(11,25,48,.09); border-radius: 18px; background: rgba(255,255,255,.65); box-shadow: 0 18px 40px -36px rgba(11,25,48,.35); animation: quote-panel-in .6s .08s cubic-bezier(.22,1,.36,1) both; }
+.quote-page .admin-panel { border-color: rgba(11,25,48,.09); border-radius: 22px; background: rgba(255,255,255,.72); box-shadow: 0 24px 55px -42px rgba(11,25,48,.4); animation: quote-panel-in .65s .14s cubic-bezier(.22,1,.36,1) both; }
+.quote-page .admin-panel::before { height: 1px; background: linear-gradient(90deg,transparent,#c8b78a,transparent); }
+.quote-page .admin-panel-title h2 { font-weight: 600; }
+.quote-page .camera-table tbody tr { transition: background .2s ease; }
+.quote-page .camera-table tbody tr:hover { background: rgba(200,183,138,.07); }
+.quote-page .camera-field input:focus,.quote-page .camera-field select:focus,.quote-page .camera-field textarea:focus { border-color: rgba(139,119,74,.65); box-shadow: 0 0 0 4px rgba(200,183,138,.16); }
+.quote-page .quote-totals .is-grand { background: linear-gradient(110deg,#071426,#163b60); }
+.quote-page .quote-picker-results button:hover { border-color: rgba(200,183,138,.55); background: rgba(200,183,138,.07); }
+@keyframes quote-panel-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (max-width: 760px) { .quote-page .admin-page-header { align-items: flex-start; } }
+@media (prefers-reduced-motion: reduce) { .quote-page .camera-filters,.quote-page .admin-panel { animation: none; } }

@@ -21,6 +21,7 @@ import { NON_MOI_JOBS_BASE_PATH } from './pages/staff/non-moi-jobs/non-moi-jobs-
 import { createMoiJobRoutes } from './pages/staff/moi-jobs/moi-jobs.routes';
 import { createMoiServiceRoutes } from './pages/staff/moi-services/moi-services.routes';
 import { PERMISSIONS } from './models/auth.model';
+import { MARKETING_ROUTES } from './pages/marketing/marketing.routes';
 
 /**
  * Only the home page is imported eagerly. Everything else is lazy.
@@ -33,6 +34,7 @@ import { PERMISSIONS } from './models/auth.model';
  */
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Jama Go Security — Protecting What Matters Most' },
+  ...MARKETING_ROUTES,
   {
     path: 'contact',
     title: 'Contact Us — Jama Go Security',

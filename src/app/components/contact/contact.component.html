@@ -1,4 +1,4 @@
-<section class="contact-page" id="contact">
+<section class="contact-page" id="contact" [appI18n]="translations">
   <div class="contact-page-bg" aria-hidden="true">
     <div class="contact-page-glow contact-page-glow--1"></div>
     <div class="contact-page-glow contact-page-glow--2"></div>
@@ -143,9 +143,10 @@
       </div>
 
       <div class="contact-channels">
-        @for (channel of channels; track channel.id) {
+        @for (channel of channels; track channel.id; let i = $index) {
           <a
             appReveal
+            [revealDelay]="i * 80"
             class="contact-channel"
             [class]="'contact-channel--' + channel.tone"
             [href]="channel.href"

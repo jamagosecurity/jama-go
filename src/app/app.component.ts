@@ -6,6 +6,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { AnalyticsService } from './services/analytics.service';
 import { isPortalRoute } from './utils/portal-routes';
+import { LanguageService } from './services/language.service';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ import { isPortalRoute } from './utils/portal-routes';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
+  readonly language = inject(LanguageService);
   private readonly router = inject(Router);
 
   constructor() {

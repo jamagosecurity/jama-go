@@ -1,27 +1,27 @@
 <footer class="site-footer">
   <div class="container footer-top">
     <div class="footer-brand">
-      <img class="footer-logo" src="/JamaGoLogo-trim.png" alt="Jama Go Security Equipment" width="180" height="54" loading="lazy" />
-      <p>A trusted partner to customers and suppliers — security systems surveyed, installed and maintained across Qatar.</p>
+      <img class="footer-logo" src="/JamaGoLogo-gold.png" alt="Jama Go Security Equipment" width="202" height="60" loading="lazy" />
+      <p>{{ language.text('A trusted partner to customers and suppliers — security systems surveyed, installed and maintained across Qatar.', 'شريك موثوق للعملاء والموردين — نعاين ونركب ونصون أنظمة الأمن في جميع أنحاء قطر.') }}</p>
       <img class="footer-moi" src="/moi-ssd-badge.jpg" alt="MOI-SSD approved CCTV contractor — Ministry of Interior, Qatar" width="220" height="81" loading="lazy" />
     </div>
-    <nav class="footer-col" aria-label="Services">
-      <h3>Services</h3>
-      @for (link of serviceLinks; track link.href) { <a [href]="link.href">{{ link.label }}</a> }
+    <nav class="footer-col" [attr.aria-label]="language.text('Services', 'خدماتنا')">
+      <h3>{{ language.text('Services', 'خدماتنا') }}</h3>
+      @for (link of serviceLinks; track link.href) { <a [href]="link.href">{{ label(link.label) }}</a> }
     </nav>
-    <nav class="footer-col" aria-label="Company">
-      <h3>Company</h3>
-      @for (link of companyLinks; track link.href) { <a [href]="link.href">{{ link.label }}</a> }
+    <nav class="footer-col" [attr.aria-label]="language.text('Company', 'الشركة')">
+      <h3>{{ language.text('Company', 'الشركة') }}</h3>
+      @for (link of companyLinks; track link.href) { <a [href]="link.href">{{ label(link.label) }}</a> }
     </nav>
     <div class="footer-col footer-contact">
-      <h3>Contact</h3>
-      <p>Unit 41, Zone 56, Street 340, Building No. 349, Al Ain Complex, Salwa Road, Doha – Qatar</p>
+      <h3>{{ language.text('Contact', 'تواصل معنا') }}</h3>
+      <p>{{ language.text('Unit 41, Zone 56, Street 340, Building No. 349, Al Ain Complex, Salwa Road, Doha – Qatar', 'الوحدة 41، المنطقة 56، الشارع 340، مبنى رقم 349، مجمع العين، طريق سلوى، الدوحة – قطر') }}</p>
       @for (p of phones; track p) { <a [href]="'tel:' + p.replaceAll(' ', '')">{{ p }}</a> }
       <a href="mailto:info@jamago.qa">info&#64;jamago.qa</a>
     </div>
   </div>
   <div class="container footer-bottom">
-    <span>© {{ year }} Jama Go Security Equipment. All rights reserved.</span>
-    <span>Doha, Qatar</span>
+    <span>© {{ year }} {{ language.text('Jama Go Security Equipment. All rights reserved.', 'جاما جو لمعدات الأمن. جميع الحقوق محفوظة.') }}</span>
+    <span class="footer-signature">{{ language.text('Engineered in Doha, Qatar', 'هندسة أمنية من الدوحة، قطر') }}</span>
   </div>
 </footer>

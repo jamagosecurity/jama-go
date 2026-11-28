@@ -12,6 +12,9 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { RevealDirective } from '../../directives/reveal.directive';
+import { I18nDirective } from '../../directives/i18n.directive';
+import { SIFEDDINE_TEXT_AR } from './sifeddine-landing.ar';
 
 interface ExperienceItem {
   role: string;
@@ -44,12 +47,13 @@ const HERO_VIDEO_MIN_WIDTH = 900;
 @Component({
   selector: 'app-sifeddine-landing',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, RevealDirective, I18nDirective],
   templateUrl: './sifeddine-landing.component.html',
   styleUrl: './sifeddine-landing.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SifeddineLandingComponent implements OnInit {
+  protected readonly translations = SIFEDDINE_TEXT_AR;
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   protected readonly years = signal(0);

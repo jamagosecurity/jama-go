@@ -39,7 +39,8 @@
             "styles": [
               "src/fonts.css",
               "src/material-theme.scss",
-              "src/styles.css"
+              "src/styles.css",
+              "src/public-premium.css"
             ],
             "scripts": [],
             "outputMode": "static",

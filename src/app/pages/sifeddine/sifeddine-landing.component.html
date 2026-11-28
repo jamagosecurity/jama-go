@@ -1,4 +1,4 @@
-<main class="sf-page">
+<main class="sf-page" [appI18n]="translations">
   <!-- ============ HERO ============ -->
   <section class="sf-hero">
     <!-- Full-bleed stage. The still is the only thing that loads on narrow
@@ -195,15 +195,15 @@
   <!-- ============ FOCUS AREAS ============ -->
   <section class="sf-section sf-section--tint" id="focus">
     <div class="sf-container">
-      <div class="sf-section-head">
+      <div class="sf-section-head" appReveal>
         <span class="sf-tag sf-tag--orange">What I do</span>
         <h2 class="sf-h2">Focus areas that move the needle</h2>
         <p class="sf-section-sub">From first hello to signed contract — and everything that keeps clients coming back.</p>
       </div>
 
       <div class="sf-focus-grid">
-        @for (item of focus; track item.title) {
-          <article class="sf-focus-card" [style.--accent]="item.accent">
+        @for (item of focus; track item.title; let i = $index) {
+          <article class="sf-focus-card" [style.--accent]="item.accent" appReveal [revealDelay]="(i % 3) * 80">
             <span class="sf-focus-icon">
               @switch (item.icon) {
                 @case ('shield') {
@@ -240,7 +240,7 @@
        cover. preload="none" means nothing downloads until it is played. -->
   <section class="sf-reel" id="reel">
     <div class="sf-container">
-      <div class="sf-section-head">
+      <div class="sf-section-head" appReveal>
         <span class="sf-tag sf-tag--blue">Watch</span>
         <h2 class="sf-h2 sf-h2--light">What we protect</h2>
         <p class="sf-section-sub sf-section-sub--light">
@@ -265,15 +265,15 @@
   <!-- ============ EXPERIENCE TIMELINE ============ -->
   <section class="sf-section" id="experience">
     <div class="sf-container">
-      <div class="sf-section-head">
+      <div class="sf-section-head" appReveal>
         <span class="sf-tag sf-tag--purple">Journey</span>
         <h2 class="sf-h2">Experience that compounds</h2>
         <p class="sf-section-sub">Three senior roles, two countries, one consistent thread: growth built on trust.</p>
       </div>
 
       <div class="sf-timeline">
-        @for (job of experience; track job.role) {
-          <div class="sf-tl-item" [style.--accent]="job.accent">
+        @for (job of experience; track job.role; let i = $index) {
+          <div class="sf-tl-item" [style.--accent]="job.accent" appReveal [revealDelay]="i * 90">
             <span class="sf-tl-dot"></span>
             <div class="sf-tl-card">
               <div class="sf-tl-top">
@@ -295,7 +295,7 @@
   <!-- ============ SKILLS CLOUD ============ -->
   <section class="sf-section sf-section--tint" id="skills">
     <div class="sf-container">
-      <div class="sf-section-head">
+      <div class="sf-section-head" appReveal>
         <span class="sf-tag sf-tag--teal">Toolkit</span>
         <h2 class="sf-h2">Skills sharpened in the field</h2>
       </div>

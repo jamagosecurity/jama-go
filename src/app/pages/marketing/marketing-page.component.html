@@ -1,0 +1,157 @@
+<main class="mp" [attr.data-theme]="content().theme" [attr.data-layout]="content().layout">
+  <section class="mp-hero" aria-labelledby="mp-title">
+    <div class="mp-hero-gridlines" aria-hidden="true"></div>
+    <div class="mp-orb mp-orb--one" aria-hidden="true"></div>
+    <div class="mp-orb mp-orb--two" aria-hidden="true"></div>
+
+    <div class="mp-wrap">
+      <nav class="mp-breadcrumb" [attr.aria-label]="language.text('Breadcrumb', 'مسار التصفح')">
+        <a routerLink="/">{{ language.text('Home', 'الرئيسية') }}</a><span aria-hidden="true">/</span><span>{{ content().eyebrow }}</span>
+      </nav>
+
+      <div class="mp-hero-layout">
+        <div class="mp-hero-copy">
+          <p class="mp-kicker">{{ content().eyebrow }}</p>
+          <h1 id="mp-title">{{ content().title }} <span>{{ content().accent }}</span></h1>
+          <p class="mp-lead">{{ content().description }}</p>
+          <div class="mp-actions">
+            <a routerLink="/contact" class="mp-button mp-button--gold">
+              {{ language.text('Book a free site survey', 'احجز معاينة مجانية لموقعك') }}
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+            </a>
+            <a href="tel:+97430644006" class="mp-button mp-button--ghost">{{ language.text('Call', 'اتصل') }} <bdi>+974 3064 4006</bdi></a>
+          </div>
+        </div>
+
+        <div class="mp-visual" [attr.aria-label]="language.text('Service highlights', 'أبرز مزايا الخدمة')">
+          <div class="mp-visual-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="mp-visual-core">
+            <img src="/JamaGoLogo-gold.png" alt="" width="180" height="54" />
+            <span>{{ language.text('Security, thoughtfully engineered', 'حلول أمنية بهندسة مدروسة') }}</span>
+          </div>
+          <div class="mp-highlights">
+            @for (highlight of content().highlights; track highlight; let i = $index) {
+              <div class="mp-highlight" [style.--i]="i">
+                <small>0{{ i + 1 }}</small><span>{{ highlight }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mp-promises" [attr.aria-label]="language.text('What to expect', 'ما الذي تتوقعه')">
+    <div class="mp-wrap mp-promises-grid">
+      @for (promise of promises(); track promise.label; let i = $index) {
+        <div appReveal [revealDelay]="i * 80">
+          <strong>{{ promise.value }}</strong><span>{{ promise.label }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="mp-section" id="overview" aria-labelledby="mp-overview-title">
+    <div class="mp-wrap">
+      <header class="mp-section-head" appReveal>
+        <div>
+          <p class="mp-kicker mp-kicker--light">{{ language.text('What we deliver', 'ما الذي نقدمه') }}</p>
+          <h2 id="mp-overview-title">{{ content().overviewTitle }}</h2>
+        </div>
+        <p>{{ content().overviewText }}</p>
+      </header>
+
+      <div class="mp-features">
+        @for (feature of content().features; track feature.title; let i = $index) {
+          <article class="mp-feature" appReveal [revealDelay]="(i % 3) * 90">
+            <span class="mp-feature-number">0{{ i + 1 }}</span>
+            <div class="mp-feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 20 6v6c0 5-3.4 8.4-8 9.9C7.4 20.4 4 17 4 12V6Z" /><path d="m8.5 12 2.5 2.5 4.5-5" /></svg>
+            </div>
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.text }}</p>
+            @if (feature.href) {
+              <a [routerLink]="feature.href" class="mp-text-link">{{ language.text('Read the complete guide', 'اقرأ الدليل الكامل') }} <span aria-hidden="true">→</span></a>
+            }
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="mp-process" id="delivery" aria-labelledby="mp-process-title">
+    <div class="mp-wrap">
+      <header class="mp-process-head" appReveal>
+        <p class="mp-kicker">{{ language.text('Our approach', 'منهجنا') }}</p>
+        <h2 id="mp-process-title">{{ language.text('A clear process.', 'عملية واضحة.') }}<br />{{ language.text('No guesswork.', 'بلا تخمين.') }}</h2>
+        <p>{{ language.text('You know what happens next, who is responsible, and what you receive at every stage.', 'تعرف الخطوة التالية والمسؤول عنها وما ستستلمه في كل مرحلة.') }}</p>
+      </header>
+      <ol class="mp-steps">
+        @for (step of content().steps; track step.title; let i = $index) {
+          <li appReveal [revealDelay]="i * 100">
+            <span>{{ (i + 1).toString().padStart(2, '0') }}</span>
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.text }}</p>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="mp-section mp-details" id="details" aria-labelledby="mp-details-title">
+    <div class="mp-wrap mp-details-grid">
+      <div class="mp-details-copy" appReveal>
+        <p class="mp-kicker mp-kicker--light">{{ language.text('Built around your site', 'مصمم حول موقعك') }}</p>
+        <h2 id="mp-details-title">{{ language.text('Considered in every detail.', 'كل التفاصيل مدروسة.') }}</h2>
+        <p>{{ content().detailText }}</p>
+        <ul>
+          @for (item of content().checklist; track item) {
+            <li><span aria-hidden="true">✓</span>{{ item }}</li>
+          }
+        </ul>
+      </div>
+      <nav class="mp-related" [attr.aria-label]="language.text('Related pages', 'صفحات ذات صلة')" appReveal [revealDelay]="120">
+        <p>{{ language.text('Continue exploring', 'تابع الاستكشاف') }}</p>
+        @for (link of content().related; track link.href) {
+          <a [routerLink]="link.href">
+            <span><strong>{{ link.label }}</strong><small>{{ link.text }}</small></span>
+            <i aria-hidden="true">↗</i>
+          </a>
+        }
+      </nav>
+    </div>
+  </section>
+
+  <section class="mp-section mp-faq" aria-labelledby="mp-faq-title">
+    <div class="mp-wrap mp-faq-grid">
+      <header appReveal>
+        <p class="mp-kicker mp-kicker--light">{{ language.text('Good to know', 'معلومات مفيدة') }}</p>
+        <h2 id="mp-faq-title">{{ language.text('Questions,', 'إجابات واضحة') }}<br />{{ language.text('answered clearly.', 'عن أسئلتك.') }}</h2>
+        <p>{{ language.text('Need more detail? Our team can walk you through the options for your specific site.', 'تحتاج إلى مزيد من التفاصيل؟ يشرح فريقنا الخيارات المناسبة لموقعك خطوة بخطوة.') }}</p>
+        <a routerLink="/contact" class="mp-text-link">{{ language.text('Ask our team', 'اسأل فريقنا') }} <span aria-hidden="true">→</span></a>
+      </header>
+      <div class="mp-faq-list">
+        @for (faq of content().faqs; track faq.question; let i = $index) {
+          <details [attr.name]="content().key + '-faq'" appReveal [revealDelay]="i * 90" [open]="i === 0">
+            <summary><span>0{{ i + 1 }}</span><strong>{{ faq.question }}</strong><i aria-hidden="true"></i></summary>
+            <div><p>{{ faq.answer }}</p></div>
+          </details>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="mp-cta">
+    <div class="mp-wrap mp-cta-panel" appReveal>
+      <div>
+        <p class="mp-kicker">{{ language.text('Your site, secured properly', 'موقعك يستحق أمناً متقناً') }}</p>
+        <h2>{{ language.text('Let’s start with a conversation.', 'لنبدأ بمحادثة.') }}</h2>
+        <p>{{ language.text('Tell us what you want to protect. We’ll visit, listen, and recommend a clear way forward.', 'أخبرنا بما تريد حمايته، وسنزور موقعك ونستمع إليك ونقترح عليك طريقاً واضحاً للمضي قدماً.') }}</p>
+      </div>
+      <div class="mp-cta-actions">
+        <a routerLink="/contact" class="mp-button mp-button--gold">{{ language.text('Request your free survey', 'اطلب معاينتك المجانية') }}</a>
+        <a href="https://wa.me/97430644006" target="_blank" rel="noopener noreferrer" class="mp-button mp-button--ghost">{{ language.text('Chat on WhatsApp', 'تحدث عبر واتساب') }}</a>
+      </div>
+    </div>
+  </section>
+</main>

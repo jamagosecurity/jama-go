@@ -11,7 +11,7 @@ const nodeExe =
 const npmCli =
   process.platform === 'win32'
     ? join(nodeDir, 'node_modules', 'npm', 'bin', 'npm-cli.js')
-    : join(nodeDir, 'bin', 'npm');
+    : join(nodeDir, 'lib', 'node_modules', 'npm', 'bin', 'npm-cli.js');
 
 if (!existsSync(nodeExe)) {
   console.error('Local Node runtime is missing. Run: npm run setup:node');

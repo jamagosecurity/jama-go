@@ -1,8 +1,21 @@
-<div class="cat-page">
-  <header class="cat-head">
-    <span class="cat-kicker">Catalogue</span>
-    <h1>Cameras in stock</h1>
-    <p>Browse by type. Prices are in Qatari Riyal.</p>
+<div class="cat-page" [appI18n]="translations">
+  <header class="cat-head" appReveal>
+    <div class="cat-head-copy">
+      <span class="cat-kicker">The equipment collection</span>
+      <h1>See clearly.<br /><span>Choose confidently.</span></h1>
+      <p>Explore our available camera collection by form factor, with live stock and transparent pricing in Qatari Riyal.</p>
+    </div>
+    <div class="cat-head-meta" aria-label="Catalogue summary">
+      <span>Available models</span>
+      @if (error()) {
+        <strong>—</strong>
+        <small>Live stock temporarily unavailable</small>
+      } @else {
+        <strong>{{ totalItems() | number }}</strong>
+        <small>Updated from current stock</small>
+      }
+    </div>
+    <div class="cat-head-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
   </header>
 
   @if (loadingCounts()) {
@@ -13,7 +26,7 @@
   } @else if (sections().length) {
     <div class="cat-sections">
       @for (section of sections(); track section.type) {
-        <section class="cat-section" [class.is-open]="isOpen(section.type)">
+        <section class="cat-section" [class.is-open]="isOpen(section.type)" appReveal>
           <h2>
             <button type="button" class="cat-section-head"
               [attr.aria-expanded]="isOpen(section.type)"
@@ -144,4 +157,13 @@
       <p>Stock items added in the admin panel will appear here.</p>
     </div>
   }
+
+  <aside class="cat-consult" appReveal>
+    <div>
+      <span class="cat-kicker">Not sure which camera fits?</span>
+      <h2>Let’s design the right view.</h2>
+      <p>Tell us about your site. We’ll recommend the coverage, recording and equipment around how you actually use it.</p>
+    </div>
+    <a href="/contact">Book a free site survey <span aria-hidden="true">↗</span></a>
+  </aside>
 </div>

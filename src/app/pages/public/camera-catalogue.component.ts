@@ -19,6 +19,9 @@ import {
 } from '../../models/camera.model';
 import { CameraService } from '../../services/camera.service';
 import { getApiErrorMessage } from '../../utils/api-error.util';
+import { RevealDirective } from '../../directives/reveal.directive';
+import { I18nDirective } from '../../directives/i18n.directive';
+import { CAMERA_CATALOGUE_TEXT_AR } from './camera-catalogue.ar';
 
 /**
  * The public camera catalogue.
@@ -35,12 +38,13 @@ import { getApiErrorMessage } from '../../utils/api-error.util';
 @Component({
   selector: 'app-camera-catalogue',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, RevealDirective, I18nDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './camera-catalogue.component.html',
   styleUrl: './camera-catalogue.component.css',
 })
 export class CameraCatalogueComponent implements OnInit {
+  protected readonly translations = CAMERA_CATALOGUE_TEXT_AR;
   private readonly service = inject(CameraService);
   private readonly destroyRef = inject(DestroyRef);
 

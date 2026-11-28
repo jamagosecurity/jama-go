@@ -169,3 +169,17 @@ form { display: grid; gap: 16px; }
 
 /* The shading begins where the map's open space ends (set by the map), so the whole of Qatar stays clear. */
 @media (min-width: 1081px) { .lg-shade { background: linear-gradient(90deg, rgba(5, 14, 38, 0) 0%, rgba(5, 14, 38, 0.06) calc(var(--map-open, 40%) - 90px), rgba(5, 14, 38, 0.84) calc(var(--map-open, 40%) + 10px), rgba(5, 14, 38, 0.92) 100%); } }
+
+.lg-card { border: 1px solid rgba(200,183,138,.42); animation: lg-card-enter .8s .12s cubic-bezier(.22,1,.36,1) both; }
+.lg-live { animation: lg-live-enter .9s cubic-bezier(.22,1,.36,1) both; }
+.lg-livemap { animation: lg-map-enter 1.4s ease both; }
+.lg-card-logo img { width: 174px; height: auto; }
+.lg-card h1 { font-family: "Sora","Inter",sans-serif; font-size: 2rem; font-weight: 600; letter-spacing: -.045em; }
+.lg-submit { border: 1px solid #b5a272; color: #111d2e; background: linear-gradient(135deg,#e6dcc1,#c4b080); box-shadow: 0 20px 34px -20px rgba(200,183,138,.65); }
+.lg-submit:hover { box-shadow: 0 24px 40px -20px rgba(200,183,138,.75); }
+.lg-chip i { animation: lg-live 2.2s ease-out infinite; }
+@keyframes lg-card-enter { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes lg-live-enter { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes lg-map-enter { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 1080px) { .lg-card { animation-name: lg-live-enter; } }
+@media (prefers-reduced-motion: reduce) { .lg-live,.lg-livemap,.lg-chip i { animation: none; } }

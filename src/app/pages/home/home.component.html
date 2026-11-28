@@ -1,13 +1,16 @@
-<div class="hp">
-  <!-- ===== Hero: the lens with its aura ===== -->
+<div class="hp" [appI18n]="translations">
+  <!-- ===== Hero: the animated Qatar security network ===== -->
   <section class="hp-hero" #hero aria-labelledby="hp-title">
-    <div class="hp-aura" aria-hidden="true">
-      <span class="hp-blob hp-blob--1"></span>
-      <span class="hp-blob hp-blob--2"></span>
-      <span class="hp-blob hp-blob--3"></span>
-      <span class="hp-blob hp-blob--4"></span>
-      <span class="hp-spot"></span>
-      <span class="hp-grain"></span>
+    <div class="hp-cinema" aria-hidden="true">
+      <span class="hp-cinema-glow"></span>
+      <span class="hp-cinema-spot"></span>
+      <span class="hp-cinema-grain"></span>
+      <div class="hp-stars">
+        @for (star of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; track star) {
+          <i [style.--i]="star"></i>
+        }
+      </div>
+      <div class="hp-horizon"><i></i><i></i><i></i></div>
     </div>
 
     <div class="hp-wrap hp-hero-grid">
@@ -50,45 +53,83 @@
         </div>
       </div>
 
-      <div class="hp-lens-stage" aria-hidden="true">
-        <div class="hp-lens-aura"></div>
-        <div class="hp-lens-sweep"></div>
-        <div class="hp-lens">
-          <div class="hp-lens-ring"></div>
-          <div class="hp-lens-grip"></div>
-          <div class="hp-lens-glass">
-            <svg class="hp-iris" viewBox="-50 -50 100 100">
-              <defs>
-                <linearGradient id="hpBlade" x1="0" y1="-48" x2="20" y2="-8" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stop-color="#1d2b4a" /><stop offset="0.6" stop-color="#0c1730" /><stop offset="1" stop-color="#22355c" />
-                </linearGradient>
-              </defs>
-              @for (angle of irisBlades; track angle) {
-                <path class="hp-blade" [attr.transform]="'rotate(' + angle + ')'" d="M0 -48 A48 48 0 0 1 41.6 -24 L11.3 -6.5 L0 -13 Z" />
-              }
-            </svg>
-            <span class="hp-pupil"></span>
-            <span class="hp-glint hp-glint--1"></span>
-            <span class="hp-glint hp-glint--2"></span>
-            <span class="hp-glint hp-glint--3"></span>
-          </div>
-          <span class="hp-led"></span>
-        </div>
+      <div class="hp-command" aria-hidden="true">
+        <div class="hp-scene">
+          <div class="hp-scene-grid"></div>
+          <svg class="hp-links" viewBox="0 0 620 620" fill="none">
+            <path d="M98 150 270 270M524 142 360 270M128 500 280 360M510 492 356 360" />
+            <circle cx="98" cy="150" r="4" /><circle cx="524" cy="142" r="4" />
+            <circle cx="128" cy="500" r="4" /><circle cx="510" cy="492" r="4" />
+          </svg>
 
-        <div class="hp-glass hp-glass--a">
-          <span class="hp-glass-ic"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg></span>
-          <span><strong>24/7</strong><small>Support line</small></span>
-        </div>
-        <div class="hp-glass hp-glass--b">
-          <span class="hp-glass-ic hp-glass-ic--warm"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" /><circle cx="12" cy="10" r="2.6" /></svg></span>
-          <span><strong>Free</strong><small>Site survey</small></span>
-        </div>
-        <div class="hp-glass hp-glass--c">
-          <span class="hp-glass-ic hp-glass-ic--ok"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg></span>
-          <span><strong>Survey → AMC</strong><small>One team throughout</small></span>
+          <div class="hp-monitor">
+            <div class="hp-monitor-shine"></div>
+            <header class="hp-monitor-head">
+              <span class="hp-monitor-brand"><i></i><span>JAMA GO<small>Security network</small></span></span>
+              <span class="hp-monitor-live"><i></i>LIVE</span>
+            </header>
+
+            <div class="hp-monitor-body">
+              <div class="hp-radar">
+                <span class="hp-radar-ring hp-radar-ring--1"></span>
+                <span class="hp-radar-ring hp-radar-ring--2"></span>
+                <span class="hp-radar-ring hp-radar-ring--3"></span>
+                <span class="hp-radar-cross"></span>
+                <span class="hp-radar-sweep"></span>
+                <svg class="hp-radar-map" [attr.viewBox]="'0 0 ' + mapW + ' ' + mapH">
+                  <defs>
+                    <linearGradient id="hpRadarLand" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="#d9c99e" stop-opacity=".34" />
+                      <stop offset="1" stop-color="#4f91b8" stop-opacity=".12" />
+                    </linearGradient>
+                  </defs>
+                  <path class="hp-radar-land" [attr.d]="qatarPath" />
+                  @for (route of routes; track route) { <path class="hp-net-route" [attr.d]="route" /> }
+                  @for (marker of markers; track marker.name) {
+                    <circle class="hp-net-marker" [class.is-hub]="marker.hub" [attr.cx]="marker.x" [attr.cy]="marker.y" [attr.r]="marker.hub ? 8 : 5" />
+                  }
+                </svg>
+                <span class="hp-radar-hub"><i></i><b>DOHA</b></span>
+              </div>
+
+              <div class="hp-monitor-data">
+                <span class="hp-data-label">Coverage</span>
+                <strong>QATAR</strong>
+                <small>One connected team</small>
+                <div class="hp-signal-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="hp-data-line"><span>Survey</span><i></i><span>Install</span><i></i><span>Maintain</span></div>
+              </div>
+            </div>
+
+            <footer class="hp-monitor-foot">
+              <span><i></i>Security, connected.</span>
+              @if (dohaTime(); as time) { <time>{{ time }} AST</time> }
+            </footer>
+          </div>
+
+          <div class="hp-float-card hp-float-card--security">
+            <span class="hp-float-icon"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v6c0 5-3.4 8.4-8 9.9C7.4 20.4 4 17 4 12V6Z" /><path d="m8.5 12 2.5 2.5 4.5-5" /></svg></span>
+            <span><strong>Unified security</strong><small>CCTV · Access · Alarms</small></span>
+            <i class="hp-card-pulse"></i>
+          </div>
+
+          <div class="hp-float-card hp-float-card--moi">
+            <img src="/moi-ssd-badge.jpg" alt="" width="58" height="30" />
+            <span><strong>MOI-SSD</strong><small>Approved contractor</small></span>
+          </div>
+
+          <div class="hp-float-card hp-float-card--support">
+            <span class="hp-float-icon hp-float-icon--gold"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg></span>
+            <span><strong>24/7</strong><small>Support line</small></span>
+          </div>
+
+          <span class="hp-scene-caption">SECURITY WITHOUT COMPROMISE</span>
         </div>
       </div>
     </div>
+    <a class="hp-scroll-cue" href="#services" aria-label="Scroll to explore our services">
+      <span>Discover</span><i aria-hidden="true"></i>
+    </a>
   </section>
 
   <!-- ===== Brands ===== -->
@@ -110,14 +151,14 @@
   <!-- ===== Services ===== -->
   <section class="hp-section" id="services" aria-labelledby="hp-services-title">
     <div class="hp-wrap">
-      <header class="hp-head" data-reveal>
+      <header class="hp-head" appReveal>
         <p class="hp-kicker">What we do</p>
         <h2 id="hp-services-title">Complete security systems,<br />one dependable team.</h2>
         <p>From a single camera to a full building — designed, installed and looked after by the same people.</p>
       </header>
       <div class="hp-services">
-        @for (s of services; track s.id) {
-          <article class="hp-card" [id]="s.id" data-reveal>
+        @for (s of services; track s.id; let i = $index) {
+          <article class="hp-card" [id]="s.id" appReveal [revealDelay]="(i % 3) * 90">
             @for (alias of s.aliases ?? []; track alias) { <span class="hp-anchor" [id]="alias"></span> }
             <span class="hp-card-ic" aria-hidden="true">
               <svg viewBox="0 0 24 24">@for (d of s.icon; track d) { <path [attr.d]="d" /> }</svg>
@@ -130,7 +171,7 @@
           </article>
         }
       </div>
-      <div class="hp-also" data-reveal>
+      <div class="hp-also" appReveal>
         <span class="hp-also-label">Also</span>
         @for (a of alsoOffered; track a.id) { <span class="hp-chip" [id]="a.id">{{ a.label }}</span> }
       </div>
@@ -140,7 +181,7 @@
   <!-- ===== MOI-SSD approval ===== -->
   <section class="hp-section hp-section--tint" id="moi-approval" aria-labelledby="hp-moi-title">
     <div class="hp-wrap hp-split">
-      <div data-reveal>
+      <div appReveal>
         <p class="hp-kicker">MOI-SSD approval</p>
         <h2 id="hp-moi-title">Approval-ready CCTV,<br />from the first drawing.</h2>
         <p class="hp-text">
@@ -154,7 +195,7 @@
           }
         </ol>
       </div>
-      <div class="hp-moi-visual" data-reveal>
+      <div class="hp-moi-visual" appReveal>
         <div class="hp-moi-card">
           <img src="/moi-ssd-badge.jpg" alt="MOI-SSD approved CCTV contractor — approved by the Ministry of Interior, Qatar" width="300" height="110" loading="lazy" />
           <div class="hp-moi-lines" aria-hidden="true">
@@ -171,18 +212,18 @@
   <!-- ===== Projects ===== -->
   <section class="hp-section" id="projects" aria-labelledby="hp-projects-title">
     <div class="hp-wrap">
-      <header class="hp-head" data-reveal>
+      <header class="hp-head" appReveal>
         <p class="hp-kicker">Projects</p>
         <h2 id="hp-projects-title">Two kinds of project.<br />One standard of work.</h2>
       </header>
       <div class="hp-projects">
-        <article class="hp-project hp-project--moi" id="moi-projects" data-reveal>
+        <article class="hp-project hp-project--moi" id="moi-projects" appReveal>
           <span class="hp-tag">MOI projects</span>
           <h3>Sites that need Ministry of Interior approval</h3>
           <p>We design, install and document the system to the MOI-SSD standard, and see it through inspection to approval.</p>
           <a href="/#moi-approval">How MOI approval works <span aria-hidden="true">→</span></a>
         </article>
-        <article class="hp-project" id="non-moi-projects" data-reveal>
+        <article class="hp-project" id="non-moi-projects" appReveal>
           <span class="hp-tag hp-tag--alt">Non-MOI projects</span>
           <h3>Villas, offices, shops and compounds</h3>
           <p>The same quality of design and installation, without the paperwork — with maintenance afterwards if you want it.</p>
@@ -192,16 +233,42 @@
     </div>
   </section>
 
+  <!-- ===== Environments ===== -->
+  <section class="hp-section hp-sector-section" id="sectors" aria-labelledby="hp-sectors-title">
+    <div class="hp-wrap">
+      <header class="hp-head hp-head--split" appReveal>
+        <div>
+          <p class="hp-kicker">Designed around your world</p>
+          <h2 id="hp-sectors-title">One standard.<br />Every environment.</h2>
+        </div>
+        <p>Security should feel considered, not added on. Every system is shaped around the people, movement and character of the site.</p>
+      </header>
+      <div class="hp-sector-grid">
+        @for (sector of sectors; track sector.title; let i = $index) {
+          <article class="hp-sector" appReveal [revealDelay]="i * 80">
+            <div class="hp-sector-top">
+              <span class="hp-sector-icon" aria-hidden="true"><svg viewBox="0 0 24 24">@for (d of sector.icon; track d) { <path [attr.d]="d" /> }</svg></span>
+              <span class="hp-sector-label">{{ sector.label }}</span>
+            </div>
+            <h3>{{ sector.title }}</h3>
+            <p>{{ sector.text }}</p>
+            <span class="hp-sector-number" aria-hidden="true">0{{ i + 1 }}</span>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
   <!-- ===== How we work ===== -->
   <section class="hp-section hp-section--tint" id="how" aria-labelledby="hp-how-title">
     <div class="hp-wrap">
-      <header class="hp-head" data-reveal>
+      <header class="hp-head" appReveal>
         <p class="hp-kicker">How we work</p>
         <h2 id="hp-how-title">From survey to support,<br />in five clear steps.</h2>
       </header>
       <ol class="hp-steps">
         @for (step of steps; track step.title; let i = $index) {
-          <li data-reveal>
+          <li appReveal>
             <span class="hp-step-no">{{ (i + 1).toString().padStart(2, '0') }}</span>
             <h3>{{ step.title }}</h3>
             <p>{{ step.text }}</p>
@@ -215,7 +282,7 @@
   <section class="hp-section" id="why" aria-labelledby="hp-why-title">
     <span class="hp-anchor" id="team"></span>
     <div class="hp-wrap hp-split hp-split--why">
-      <div data-reveal>
+      <div appReveal>
         <p class="hp-kicker">Why Jama Go</p>
         <h2 id="hp-why-title">One team.<br />From survey to support.</h2>
         <p class="hp-text">
@@ -227,7 +294,7 @@
       </div>
       <div class="hp-reasons">
         @for (r of reasons; track r.title) {
-          <div class="hp-reason" data-reveal>
+          <div class="hp-reason" appReveal>
             <span class="hp-reason-tick" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12.5 4 4 8-9" /></svg></span>
             <div><h3>{{ r.title }}</h3><p>{{ r.text }}</p></div>
           </div>
@@ -240,7 +307,7 @@
   <section class="hp-facts" id="stats" aria-label="Jama Go at a glance">
     <div class="hp-wrap hp-facts-grid">
       @for (f of facts; track f.label) {
-        <div class="hp-fact" data-reveal>
+        <div class="hp-fact" appReveal>
           <strong>{{ f.value }}</strong>
           <span>{{ f.label }}</span>
         </div>
@@ -251,7 +318,7 @@
   <!-- ===== Coverage ===== -->
   <section class="hp-section" id="coverage" aria-labelledby="hp-cover-title">
     <div class="hp-wrap hp-split">
-      <div data-reveal>
+      <div appReveal>
         <p class="hp-kicker">Across Qatar</p>
         <h2 id="hp-cover-title">Installed and serviced<br />nationwide.</h2>
         <p class="hp-text">
@@ -262,7 +329,7 @@
           @for (m of markers; track m.name) { <li>{{ m.name }}</li> }
         </ul>
       </div>
-      <div class="hp-cover-map" data-reveal aria-hidden="true">
+      <div class="hp-cover-map" appReveal aria-hidden="true">
         <svg [attr.viewBox]="'0 0 ' + mapW + ' ' + mapH" preserveAspectRatio="xMidYMid meet">
           <defs>
             <pattern id="hpDots2" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.35" /></pattern>
@@ -300,17 +367,50 @@
   <!-- ===== Support ===== -->
   <section class="hp-section hp-section--tint" id="support" aria-labelledby="hp-support-title">
     <div class="hp-wrap">
-      <header class="hp-head" data-reveal>
+      <header class="hp-head" appReveal>
         <p class="hp-kicker">Support</p>
         <h2 id="hp-support-title">Help when you need it,<br />day or night.</h2>
       </header>
       <div class="hp-support">
-        @for (s of support; track s.title) {
-          <article class="hp-card hp-card--soft" data-reveal>
+        @for (s of support; track s.title; let i = $index) {
+          <article class="hp-card hp-card--soft" appReveal [revealDelay]="i * 90">
             <span class="hp-card-ic" aria-hidden="true"><svg viewBox="0 0 24 24">@for (d of s.icon; track d) { <path [attr.d]="d" /> }</svg></span>
             <h3>{{ s.title }}</h3>
             <p>{{ s.text }}</p>
           </article>
+        }
+      </div>
+      <a class="hp-support-link" href="tel:+97430644006" appReveal>
+        <span><small>Urgent support, day or night</small><strong>+974 3064 4006</strong></span>
+        <i aria-hidden="true">↗</i>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== Journal ===== -->
+  <section class="hp-section hp-journal" id="blog" aria-labelledby="hp-journal-title">
+    <div class="hp-wrap">
+      <header class="hp-head hp-head--split" appReveal>
+        <div>
+          <p class="hp-kicker">The Jama Go journal</p>
+          <h2 id="hp-journal-title">Clarity before<br />you commit.</h2>
+        </div>
+        <p>Practical notes from the way we survey, design and care for security systems across Qatar.</p>
+      </header>
+      <div class="hp-insights">
+        @for (insight of insights; track insight.title; let i = $index) {
+          <details class="hp-insight" appReveal [revealDelay]="i * 90" [attr.name]="'journal'">
+            <summary>
+              <span class="hp-insight-meta"><small>0{{ i + 1 }}</small>{{ insight.category }}</span>
+              <h3>{{ insight.title }}</h3>
+              <p>{{ insight.summary }}</p>
+              <span class="hp-insight-open"><span>Read note</span><i aria-hidden="true"></i></span>
+            </summary>
+            <div class="hp-insight-body">
+              <p>{{ insight.body }}</p>
+              <a [href]="insight.link">{{ insight.linkLabel }} <span aria-hidden="true">→</span></a>
+            </div>
+          </details>
         }
       </div>
     </div>
@@ -319,7 +419,7 @@
   <!-- ===== Final call to action ===== -->
   <section class="hp-cta" id="free-consultation" aria-labelledby="hp-cta-title">
     <div class="hp-wrap">
-      <div class="hp-cta-panel" data-reveal>
+      <div class="hp-cta-panel" appReveal>
         <div class="hp-cta-copy">
           <p class="hp-kicker hp-kicker--light">Free consultation</p>
           <h2 id="hp-cta-title">Let's secure your site.</h2>

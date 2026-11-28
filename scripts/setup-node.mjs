@@ -11,8 +11,12 @@ const toolsDir = join(root, '.tools');
 const targetDir = join(toolsDir, 'node');
 const versionFile = join(toolsDir, 'node-version.txt');
 const version = 'v26.5.0';
-const archiveName = `node-${version}-win-x64.zip`;
+const platform = process.platform === 'win32' ? 'win' : process.platform;
+const architecture = process.arch === 'arm64' ? 'arm64' : 'x64';
+const extension = process.platform === 'win32' ? 'zip' : process.platform === 'darwin' ? 'tar.gz' : 'tar.xz';
+const archiveName = `node-${version}-${platform}-${architecture}.${extension}`;
 const url = `https://nodejs.org/dist/${version}/${archiveName}`;
+const nodeExecutable = process.platform === 'win32' ? join(targetDir, 'node.exe') : join(targetDir, 'bin', 'node');
 
 async function download(downloadUrl, destination) {
   const response = await fetch(downloadUrl);
@@ -23,10 +27,28 @@ async function download(downloadUrl, destination) {
 }
 
 function installedVersionMatches() {
-  if (!existsSync(join(targetDir, 'node.exe')) || !existsSync(versionFile)) {
+  if (!existsSync(nodeExecutable) || !existsSync(versionFile)) {
     return false;
   }
   return readFileSync(versionFile, 'utf8').trim() === version;
+}
+
+function extractArchive(archivePath, extractRoot) {
+  if (process.platform === 'win32') {
+    execFileSync(
+      'powershell',
+      [
+        '-NoProfile',
+        '-Command',
+        `Expand-Archive -Path '${archivePath.replace(/'/g, "''")}' -DestinationPath '${extractRoot.replace(/'/g, "''")}' -Force`,
+      ],
+      { stdio: 'inherit' },
+    );
+    return;
+  }
+
+  const compressionFlag = extension === 'tar.gz' ? '-xzf' : '-xJf';
+  execFileSync('tar', [compressionFlag, archivePath, '-C', extractRoot], { stdio: 'inherit' });
 }
 
 async function main() {
@@ -39,22 +61,14 @@ async function main() {
   const archivePath = join(toolsDir, archiveName);
   const extractRoot = join(toolsDir, 'extract');
 
-  console.log(`Downloading Node ${version}...`);
+  console.log(`Downloading Node ${version} for ${platform}-${architecture}...`);
   await download(url, archivePath);
 
   rmSync(extractRoot, { recursive: true, force: true });
   mkdirSync(extractRoot, { recursive: true });
 
   console.log('Extracting Node runtime...');
-  execFileSync(
-    'powershell',
-    [
-      '-NoProfile',
-      '-Command',
-      `Expand-Archive -Path '${archivePath.replace(/'/g, "''")}' -DestinationPath '${extractRoot.replace(/'/g, "''")}' -Force`,
-    ],
-    { stdio: 'inherit' },
-  );
+  extractArchive(archivePath, extractRoot);
 
   const extractedName = (await readdir(extractRoot)).find((name) => name.startsWith('node-'));
   if (!extractedName) {

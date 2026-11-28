@@ -28,7 +28,7 @@ import { getApiErrorMessage } from '../../../utils/api-error.util';
   `,
   styles: `
     :host { display: grid; place-items: center; min-height: 100vh; padding: 24px 16px; background: radial-gradient(120% 120% at 0% 0%, rgba(165, 164, 148, 0.18), transparent 50%), linear-gradient(160deg, #eef2fa, #f8f9fc); }
-    .rp { width: 100%; max-width: 480px; overflow: hidden; border: 1px solid rgba(143, 141, 119, 0.35); border-radius: 26px; background: #fff; box-shadow: 0 30px 60px -36px rgba(13, 32, 64, 0.6); color: #14305f; }
+    .rp { width: 100%; max-width: 480px; overflow: hidden; animation: lux-page-enter .65s cubic-bezier(.22,1,.36,1) both; border: 1px solid rgba(143, 141, 119, 0.35); border-radius: 26px; background: #fff; box-shadow: 0 30px 60px -36px rgba(13, 32, 64, 0.6); color: #14305f; }
     .rp-cover { padding: 26px 28px 22px; background: linear-gradient(135deg, #0e244e, #163d7a); box-shadow: inset 0 -3px 0 #b5b4a8; }
     .rp-cover img { height: 34px; filter: brightness(0) invert(1); }
     .rp-cover p { margin: 12px 0 0; color: rgba(236, 235, 228, 0.85); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; }

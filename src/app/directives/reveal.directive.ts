@@ -4,7 +4,9 @@ import {
   AfterViewInit,
   OnDestroy,
   PLATFORM_ID,
+  Input,
   inject,
+  numberAttribute,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -13,6 +15,8 @@ import { isPlatformBrowser } from '@angular/common';
   standalone: true,
 })
 export class RevealDirective implements AfterViewInit, OnDestroy {
+  @Input({ transform: numberAttribute }) revealDelay = 0;
+
   private observer?: IntersectionObserver;
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
@@ -28,6 +32,7 @@ export class RevealDirective implements AfterViewInit, OnDestroy {
 
     const element = this.el.nativeElement;
     element.classList.add('reveal');
+    element.style.setProperty('--reveal-delay', `${this.revealDelay}ms`);
 
     this.observer = new IntersectionObserver(
       (entries) => {

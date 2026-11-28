@@ -12,7 +12,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { LogoComponent } from '../logo/logo.component';
-import { NAV_ITEMS } from '../../data/nav.data';
+import { NAV_ITEMS, NAV_LABELS_AR } from '../../data/nav.data';
+import { LanguageService } from '../../services/language.service';
 import {
   isNavDropdown,
   NavDropdownItem,
@@ -30,6 +31,7 @@ import { DESKTOP_MQ } from '../../utils/mega-menu.utils';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   readonly navItems = NAV_ITEMS;
+  readonly language = inject(LanguageService);
 
   mobileOpen = false;
   activePath = '/';
@@ -139,6 +141,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return children as NavLink[];
   }
 
+  label(english: string): string {
+    return this.language.text(english, NAV_LABELS_AR[english] ?? english);
+  }
+
   flattenChildren(children: NavLink[] | NavLink[][]): NavLink[] {
     if (Array.isArray(children[0])) {
       return (children as NavLink[][]).flat();
@@ -147,10 +153,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   isActive(href: string): boolean {
-    if (href === '/contact') return this.activePath === '/contact';
     if (href === '/') return this.activePath === '/' && !this.activeHash;
     if (href.startsWith('/#')) return this.activePath === '/' && this.activeHash === href.slice(1);
-    return false;
+    return this.activePath === href || this.activePath.startsWith(`${href}/`);
   }
 
   childIsActive(item: NavDropdownItem): boolean {

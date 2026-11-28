@@ -1,6 +1,9 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HERO_ROUTES, MAP_H, MAP_W, MARKER_SEEDS, QATAR_PATH } from '../../components/hero/hero.component';
+import { RevealDirective } from '../../directives/reveal.directive';
+import { I18nDirective } from '../../directives/i18n.directive';
+import { HOME_TEXT_AR } from './home.ar';
 
 interface Service {
   /** The anchor the header's menus link to. */
@@ -27,23 +30,20 @@ interface Fact {
  * approved-contractor badge, the letterhead (Salwa Road showroom, phones, email) and the brands in the quotation
  * catalogue. The facts band holds no invented figures — real numbers go in {@link facts} when the company sends them.
  *
- * Sections carry the ids the header's menus link to (#surveillance-cctv, #moi-approval, #support …), so every menu
- * entry lands on the part of the page it names.
+ * Section ids support direct links within the homepage. Dedicated header destinations live in the marketing routes.
  */
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, RevealDirective, I18nDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
+  protected readonly translations = HOME_TEXT_AR;
   private readonly destroyRef = inject(DestroyRef);
   private readonly hero = viewChild<ElementRef<HTMLElement>>('hero');
-
-  /** The six blades of the lens's iris, one every 60°. */
-  protected readonly irisBlades = [0, 60, 120, 180, 240, 300];
 
   // ----- the map (real coastline and towns, shared with the sign-in page) -----
   protected readonly mapW = MAP_W;
@@ -214,6 +214,60 @@ export class HomeComponent {
     { title: 'Technical assistance', text: 'Apps, remote viewing, passwords and settings — often fixed over the phone.', icon: ['M4 13a8 8 0 0 1 16 0', 'M4 13v4a2 2 0 0 0 2 2h1v-6H4', 'M20 13v4a2 2 0 0 1-2 2h-1v-6h3'] },
   ];
 
+  protected readonly sectors = [
+    {
+      title: 'Homes & residential compounds',
+      text: 'Discreet cameras, video intercoms, smart locks and remote viewing shaped around everyday life.',
+      label: 'Residential',
+      icon: ['M3 21h18', 'M5 21V9l7-5 7 5v12', 'M10 21v-6h4v6'],
+    },
+    {
+      title: 'Offices & commercial towers',
+      text: 'Connected surveillance, access control, attendance and networks managed as one reliable system.',
+      label: 'Commercial',
+      icon: ['M4 21V3h11v18', 'M15 9h5v12', 'M8 7h3M8 11h3M8 15h3', 'M2 21h20'],
+    },
+    {
+      title: 'MOI-regulated sites',
+      text: 'Drawings, storage calculations, installation and inspection support aligned from the beginning.',
+      label: 'Approval-ready',
+      icon: ['M12 2.5 20 5.5v6c0 5-3.4 8.4-8 9.9-4.6-1.5-8-4.9-8-9.9v-6Z', 'm8.5 12 2.5 2.5 4.5-5'],
+    },
+    {
+      title: 'Retail & hospitality',
+      text: 'Clear visibility across entrances, floors, stock areas and car parks without disrupting the guest experience.',
+      label: 'Customer spaces',
+      icon: ['M4 10v11h16V10', 'M3 4h18l-2 6H5Z', 'M9 21v-6h6v6'],
+    },
+  ];
+
+  protected readonly insights = [
+    {
+      category: 'CCTV planning',
+      title: 'What should a useful site survey cover?',
+      summary: 'A good camera plan starts with how your site works—not with a number of cameras.',
+      body: 'We look at entrances, movement, lighting, blind spots, recording requirements and where you want to view footage. The result is a camera layout and an itemised recommendation that you can understand before installation begins.',
+      link: '/journal/site-survey',
+      linkLabel: 'Read the full survey guide',
+    },
+    {
+      category: 'MOI-SSD',
+      title: 'Why plan approval before buying equipment?',
+      summary: 'Storage, coverage and documentation need to work together from day one.',
+      body: 'For sites that require MOI-SSD approval, the approved drawing informs the installation. Planning the camera coverage and recording storage together avoids avoidable changes later and keeps inspection and handover connected to the original design.',
+      link: '/journal/moi-planning',
+      linkLabel: 'Read the full approval guide',
+    },
+    {
+      category: 'Long-term care',
+      title: 'What does an AMC actually protect?',
+      summary: 'The value of a security system depends on it still working when you need it.',
+      body: 'Planned maintenance checks the complete chain: cameras and sensors, recording, storage, power, connectivity and remote access. It also gives your team a familiar support contact for settings, user changes and urgent issues.',
+      link: '/journal/amc-value',
+      linkLabel: 'Read the full maintenance guide',
+    },
+  ];
+
   protected readonly year = new Date().getFullYear();
 
   /** The real Doha time. Null on the server (the page is prerendered), filled in the browser. */
@@ -227,8 +281,8 @@ export class HomeComponent {
       const timer = setInterval(tick, 15_000);
       this.destroyRef.onDestroy(() => clearInterval(timer));
 
-      // The aura's light follows the pointer and the lens leans a little towards it. Mouse and trackpad only, and
-      // never for anyone who prefers reduced motion. One update per frame at most.
+      // The spotlight and 3D scene follow the pointer on mouse and trackpad only, and never for reduced motion.
+      // One update per frame at most.
       const hero = this.hero()?.nativeElement;
       const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (hero && !calm && window.matchMedia('(pointer: fine)').matches) {
